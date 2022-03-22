@@ -1,0 +1,63 @@
+<title>数据库备份</title>
+
+<div class="layui-card layadmin-header">
+    <div class="layui-breadcrumb" lay-filter="breadcrumb">
+        <a>数据库管理</a>
+        <a><cite>数据库备份</cite></a>
+    </div>
+</div>
+
+<div class="layui-fluid">
+  <div class="layui-card">
+    <div class="layui-card-header">数据库备份</div>
+    <div class="layui-card-body">      
+      <script  type="text/html" id="table-data-index-tool">
+        <button class="layui-btn layuiadmin-btn-useradmin" data-type="batchdel">立即备份</button>
+        <button class="layui-btn layui-btn-normal" data-type="add">优化表</button>
+        <button class="layui-btn layui-btn-danger" data-type="add">修复表</button>
+    </script>
+      
+      <table id="LAY-data-index" lay-filter="LAY-data-index"></table>
+   
+      <script type="text/html" id="table-data-index">
+        <a class="layui-btn layui-btn-normal layui-btn-xs" lay-event="edit">优化表</a>
+        <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del">修复表</a>
+      </script>
+    </div>
+  </div>
+</div>
+
+<script>
+layui.use(['admin', 'table','setter','layer'], function(){
+  var $ = layui.$
+  ,admin = layui.admin
+  ,setter = layui.setter
+  ,view = layui.view
+  ,layer = layui.layer
+  ,table = layui.table
+  ,layer = layui.layer
+  ,form = layui.form;
+  
+        
+  table.render({
+        elem: '#LAY-data-index'
+        ,url: '/json/table/user.js'
+        ,cellMinWidth: 80 //全局定义常规单元格的最小宽度，layui 2.2.1 新增
+        ,toolbar: '#table-data-index-tool'
+        ,cols: [[
+        {type:'checkbox'}
+        ,{field:'id', width:80, title: 'ID', sort: true,align:'center'}
+        ,{field:'username', title: '表名',align:'center', sort: true}
+        ,{field:'username',  title: '数据量',templet:function(d){
+            return '['+d.username+']条记录'
+        },align:'center', sort: true}
+        ,{field:'sign', title: '数据大小', width: 100,align:'center', sort: true} 
+        ,{field:'wealth',title: '创建时间',align:'center', sort: true}
+        ,{field:'wealth',title: '备份状态',align:'center'}
+        ,{fixed: 'right', title:'操作', toolbar: '#table-data-index',align:'center',width:200}
+        ]]
+    });
+  
+
+});
+</script>

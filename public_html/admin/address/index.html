@@ -1,0 +1,258 @@
+<title>扩展工具</title>
+
+<div class="layui-card layadmin-header">
+  <div class="layui-breadcrumb" lay-filter="breadcrumb">
+    <a>扩展工具</a>
+    <a><cite>地址区域</cite></a>
+  </div>
+</div>
+<style>
+.lay_address td,.lay_address th{
+    text-align: center;
+}
+</style>
+
+<div class="layui-fluid">
+<div class="layui-row layui-col-space15">
+<div class="layui-col-md12">
+    <div class="layui-card">
+        <div class="layui-card-header">地址区域</div>
+        <div class="layui-card-body">
+            <div class="test-table-reload-btn" style="margin-bottom: 10px;">
+                <button type="button" class="layui-btn layuiadmin-btn-admin address_btn" style="margin-right: 30px;" data-type="add"><i class="layui-icon layui-icon-add-1 layuiadmin-button-btn"></i>添加地区</button>
+                <form class="layui-form " style=" float: right;" lay-filter="list_search">
+                    <div class="layui-form-item" >
+                        <div class="layui-inline">
+                        <div class="layui-input-inline">
+                            <input type="text" name="keywords" placeholder="请输入搜索的省" autocomplete="off" class="layui-input">
+                        </div>
+                        </div>
+                        <div class="layui-inline">
+                            <button class="layui-btn layuiadmin-btn-list" lay-submit lay-filter="address_search" type="button"><i class="layui-icon layui-icon-search layuiadmin-button-btn"></i></button>
+                        </div>
+                    </div>
+                </form>   
+            </div>  
+                        
+            <table class="layui-table lay_address" id="table_static" lay-filter="table_static">
+            <thead>
+            <tr>
+                <th style="text-align: left">地区</th>
+                <th>所在层级</th>
+                <th>上级地区</th>
+                <th>操作</th>
+            </tr> 
+            </thead>
+            <tbody id="view">
+       
+            </tbody>
+            </table>
+            <!-- 第一步：编写模版。 -->
+            <script id="demo" type="text/html">
+            {{#  layui.each(d, function(index, item){ }}
+            <tr>
+                <td style="text-align: left">{{item.name}}</td>
+                <td>{{item.level}}</td>
+                <td>无</td>
+                <td>
+                    <a class="layui-btn layui-btn-xs lay_edit" data-id="{{item.id}}" lay-event="edit">修改</a>
+                    <a class="layui-btn layui-btn-danger layui-btn-xs lay_del" data-id="{{item.id}}" lay-event="del">删除</a>
+                </td>
+            </tr>
+            {{#  layui.each(item.child, function(index, aitem){ }}
+            <tr>
+                <td style="text-align: left;text-indent:2em;">————{{aitem.name}}</td>
+                <td>{{aitem.level}}</td>
+                <td>{{item.name}}</td>
+                <td>
+                    <a class="layui-btn layui-btn-xs lay_edit" data-id="{{aitem.id}}" lay-event="edit">修改</a>
+                    <a class="layui-btn layui-btn-danger layui-btn-xs lay_del" data-id="{{aitem.id}}" lay-event="del">删除</a>
+                </td>
+            </tr>
+            {{#  layui.each(aitem.child, function(index, bitem){ }}
+            <tr>
+                <td style="text-align: left;text-indent:4em;">————————{{bitem.name}}</td>
+                <td>{{bitem.level}}</td>
+                <td>{{aitem.name}}</td>
+                <td>
+                    <a class="layui-btn layui-btn-xs lay_edit" data-id="{{bitem.id}}" lay-event="edit">修改</a>
+                    <a class="layui-btn layui-btn-danger layui-btn-xs lay_del" data-id="{{bitem.id}}" lay-event="del">删除</a>
+                </td>
+            </tr>
+            {{#  }); }}
+            {{#  }); }}
+            {{#  }); }}
+            </script>
+            <!-- 页码 laypage -->
+            <div id="demo20"></div>
+           
+        </div>
+    </div>
+</div>
+</div>
+</div>
+
+
+
+<script>
+layui.use(['admin','table', 'view', 'form', 'laytpl','layer','laypage'], function(){
+    var $ = layui.$
+    ,admin = layui.admin
+    ,laytpl = layui.laytpl
+    ,element = layui.element
+    ,form = layui.form
+    ,view = layui.view
+    ,laypage = layui.laypage
+    ,layer = layui.layer
+    ,table = layui.table
+    ,router = layui.router();
+
+
+//模拟渲染
+var curr;//定义当前页
+json_curr(1);
+function json_curr(curr,keywords=''){
+admin.req({
+    url: layui.setter.baseUrl + 'admin/address/index?keywords=' +keywords
+    ,data: { page: curr || 1 }
+    ,type: 'get'
+    ,success: function (res) {
+    if (res.code == 1) {
+            var data=res.data.lists;
+            //第三步：渲染模版
+            var getTpl = demo.innerHTML
+            ,view = document.getElementById('view');
+            laytpl(getTpl).render(data, function(html){
+                view.innerHTML = html;
+            })
+
+            //调用分页
+            laypage.render({
+                elem: 'demo20'
+                ,count: res.data.count
+                ,limit: 1
+                ,limits:[]
+                ,curr: curr //初始化当前页(非常重要)
+                ,jump: function(obj,first){
+                    // console.log(obj);
+                    // var data=res.data.lists; 
+                    // 不加first的话，会死循环                   
+                    if(!first){
+                        json_curr( obj.curr );
+                    } 
+
+                }
+
+            });
+        
+    } else {
+        layer.msg(res.msg);
+    }
+
+    }
+ });
+
+}
+
+// 搜索按钮
+form.on('submit(address_search)',function(e){
+    json_curr(1,e.field.keywords);
+    //get_data(e.field);
+});
+
+$(document).on('click','.lay_edit',function(){
+    var data_id=$(this).attr('data-id');
+    var d={ data_id:data_id }
+    admin.popup({
+        title: "修改地区",
+        area: admin.screen() < 2 ? ['95%', '80%'] :["500px", "300px"],
+        id: "LAY-popup-add_menu",
+        success: function(layero, index){
+        view(this.id).render('/address/edit_address',d).done(function() {
+            form.render(null, 'edit_address'); // 弹窗的lay-filter值
+            //监听提交
+            form.on('submit(component-form-element)', function (data) {
+                var data=data.field;
+                admin.req({
+                url: layui.setter.baseUrl + 'admin/address/index_edit' //实际使用请改成服务端真实接口
+                ,data: { id:data_id, parent_id: data.parent_id, name: data.name }
+                ,type: 'post'
+                ,success: function (res) {
+                    if (res.status == 1) {
+                        layer.msg(res.msg, { icon: 1, time: 1000 });
+                        json_curr(1);
+                        layer.close(index); //执行关闭 
+                    } else {
+                        layer.msg(res.msg,{ icon: 5, shade: 0.5, time: 1000 });
+                    }
+                }
+                });
+            });
+            
+        });
+        }
+    });
+})
+$(document).on('click','.lay_del',function(){
+    var id=$(this).attr('data-id');
+    layer.confirm('确认删除此地区?', {icon: 3, title:'提示'}, function(index){
+    admin.req({
+        url: layui.setter.baseUrl + 'admin/address/index_del' //实际使用请改成服务端真实接口
+        ,data: { id: id }
+        ,type: 'post'
+        ,success: function (res) {
+            if (res.status == 1) {
+                layer.msg("删除成功",{ icon: 1, time: 1000 });
+                json_curr(1);
+                layer.close(index);
+            } else {
+                layer.msg(res.msg,{ icon: 5, shade: 0.5, time: 1000 });
+            }
+        }
+    });       
+    });
+})
+
+        
+    var $ = layui.$, active = {
+        // 添加
+        add:function(){
+            admin.popup({
+                title: "新增地区",
+                area: admin.screen() < 2 ? ['95%', '80%'] :["500px", "480px"],
+                id: "LAY-popup-add_menu",
+                success: function(layero, index){
+                view(this.id).render('/address/add_address').done(function() {
+                form.render(null, 'add_address'); // 弹窗的lay-filter值
+                //监听提交
+                form.on('submit(component-form-element)', function (data) {
+                    var data=data.field;
+                    admin.req({
+                    url: layui.setter.baseUrl + 'admin/address/index_add' //实际使用请改成服务端真实接口
+                    ,data: { parent_id: data.parent_id, name: data.name }
+                    ,type: 'post'
+                    ,success: function (res) {
+                        if (res.status == 1) {
+                            layer.msg(res.msg, { icon: 1, time: 1000 });
+                            json_curr(1);
+                            layer.close(index); //执行关闭 
+                        } else {
+                            layer.msg(res.msg,{ icon: 5, shade: 0.5, time: 1000 });
+                        }
+                    }
+                    });
+                });
+                    
+                });
+                }
+            });
+        }
+    };
+    $('.address_btn').on('click', function(){
+        var type = $(this).data('type');
+        active[type] ? active[type].call(this) : '';
+    });
+    
+    
+});
+</script>

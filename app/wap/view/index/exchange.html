@@ -1,0 +1,130 @@
+{include file="public/header" /}
+<style>
+#mescroll{
+    position: fixed;
+    top: 0.44rem;
+    bottom: 0.5rem;
+    left: 0;
+    width: 100%;
+    overflow-x: inherit;
+}
+.mescroll-totop{
+    bottom: 58px;
+}
+</style>
+</head>
+<body>
+<header class="mui-bar mui-bar-nav bg_red_head" id="header">
+    <a class="back-page mui-icon mui-icon-left-nav mui-pull-left" href="javascript:;"></a>
+    <a id="menu" class="mui-action-menu mui-icon mui-icon-bars mui-pull-right" href="javascript:void(0);"></a>
+    <h1 class="mui-title">Ring vibration area</h1>
+    </header>
+    <div class="mui-content">
+        <div id="mescroll" class="mescroll">
+        <ul class="goods_line" id="dataList">
+            <!-- <li><a href="javascript:;">
+                <img src="__IMG__/img_5.png" width="100%">
+                <div class="goods_line_txt">
+                    <h3>Themed flowers</h3>
+                    <p><span>4000</span> points</p>
+                    <p class="fr">100,000 people redeemed</p>
+            </div>         
+        </a></li> -->
+    </ul>
+    </div>
+</div>
+
+{include file="public/head_nav"/}
+{include file="public/nav"/}
+{include file="public/footer" /}
+<script type="text/template" id="list">
+<li><a href="/wap/index/goods_info.html?id={{id}}">
+    <img src="{{original_img}}" width="100%">
+    <div class="goods_line_txt">
+        <h3 class="mui-ellipsis-2">{{goods_name}}</h3>
+        <!-- <p><span>{{exchange_integral}}</span> points={{exchange_integral_money}}KRC</p> -->
+                <p><span>{{shop_price}}</span> Hashpower</p>
+                <p class="fr">{{sales_num}} redeemed</p>
+            </div>
+        </a></li>
+        </script>
+        <script>
+        
+        //Create a MeScroll object, the internal pull-down refresh is enabled by default, up.callback is automatically executed, and the list data is refreshed;
+        var mescroll = new MeScroll("mescroll", {
+            up: {
+                callback: getListData, //Pull-up callback, which can be abbreviated here; equivalent to callback: function (page) { getListData(page); }
+                isBounce: false, //The ios bounce and parsing are prohibited here (be sure to read carefully, especially the last point): http://www.mescroll.com/qa.html#q10
+                noMoreSize: 5, //If the list has no data, you can set the total number of lists to be greater than half a page before displaying no more data; avoid too little list data (for example, only one piece of data), it will not look good to display no more data; Default 5
+                empty: {
+                    icon: "/static/wap/images/none2.png", //icon, default null
+            tip: "No data at the moment~~~", //Tips
+
+        },
+        clearEmptyId: "dataList", //equivalent to setting clearId and empty.warpId at the same time; simplified writing; default null; note that this cannot be configured in vue
+        toTop: { //Configure back to top button
+            src: "/static/wap/images/top.png", //default scroll to 1000px display, configurable offset modification
+            offset: 1000
+        },
+        lazyLoad: {
+            use: true // Whether to enable lazy loading, default false
+        },
+        htmlNodata: '',
+        page: {
+            num: 0,
+            size: 8,
+            time: null
+        },
+        offset: 150,
+        loadFull: {
+            use: true,
+            delay: 500
+        }
+    }
+});
+
+function getListData(page) {
+    // load data online
+        getListDataFromNet(page.num, page.size, function(curPageData) {
+            //mescroll will automatically judge the list according to the passed parameters, if there is no data, it will prompt empty; if there is no next page of data in the list, it will prompt no more data;
+            mescroll.endSuccess(curPageData.length);
+            //set list data
+            setListData(curPageData);
+        }, function() {
+            //Callback for networking failure, hide the status of pull-down refresh and pull-up loading;
+            mescroll.endErr();
+        });
+    }
+    
+    function setListData(curPageData) {
+        // console.log(curPageData);
+        var list = '';
+        for (var i in curPageData) {
+            list += template('list', curPageData[i]);
+        }
+        $('#dataList').append(list);
+    }
+    
+    function getListDataFromNet(pageNum, pageSize, successCallback, errorCallback) {
+        setTimeout(function() {
+        $get('/api/goods/exchangeList', {page:pageNum,num:8}, function(data) {
+            if (data.status == 1) {
+                var curPageData = data.data;
+                var listData = [];
+                //All products (simulate pagination data)
+            for (var i in curPageData) {
+                if (i == curPageData.length) break;
+                listData.push(curPageData[i]);
+            }
+            successCallback(listData);
+        } else {
+            mescroll.endErr();
+        }
+
+    });
+    }, 1000);
+}
+
+</script>
+</body>
+</html>

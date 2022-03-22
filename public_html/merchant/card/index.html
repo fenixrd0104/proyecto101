@@ -1,0 +1,241 @@
+
+
+  <title>创业优惠卡</title>
+
+  <div class="layui-card layadmin-header">
+    <div class="layui-breadcrumb" lay-filter="breadcrumb">
+      <a>收银管理</a>
+      <a><cite>创业优惠卡</cite></a>
+    </div>
+  </div>
+  
+  <div class="layui-fluid">
+    <div class="layui-row layui-col-space15">
+      <div class="layui-col-md12">
+        <div class="layui-card">
+          <div class="layui-card-header">创业优惠卡</div>
+          <div class="layui-card-body">
+          
+            <div class="test-table-reload-btn" style="margin-bottom: 10px;">
+             
+              <button type="button" class="layui-btn layuiadmin-btn-admin" style="margin-right: 30px;" data-type="add"><i class="layui-icon layui-icon-file-b layuiadmin-button-btn"></i>生成</button>
+              <div class="layui-inline">
+                <input class="layui-input" name="id" placeholder="输入需查询卡号" id="test-table-demoReload" autocomplete="off" style="width: 250px;">
+              </div>
+              <button type="button" class="layui-btn" data-type="reload"><i class="layui-icon">&#xe615;</i> 搜索</button>
+            </div>
+             
+            <table class="layui-hide" id="card_list" lay-filter="card_list"></table>  
+            <script type="text/html" id="tool_card_list">
+              {{# if(d.status==1){ }}
+              <a class="layui-btn layui-btn-disabled layui-btn-xs" ><i class="layui-icon layui-icon-link"></i>绑定</a>
+              {{# }else{ }}  
+              <a class="layui-btn layui-btn-normal layui-btn-xs" lay-event="edit"><i class="layui-icon layui-icon-link"></i>绑定</a>
+              {{# } }} 
+            </script>   
+       
+            <script type="text/html" id="test-table-state">
+              {{# if(d.status==1){ }}
+                <a href="javascript:;" class='layui-btn   layui-btn-xs' >已使用</a>
+              {{# }else{ }}  
+                <a href="javascript:;" class='layui-btn layui-btn-xs layui-btn-danger' >未使用</a>
+              {{# } }}  
+            </script>         
+            <script type="text/html" id="prize1">
+              {{# if(d.prize1==1){ }}
+                <a href="javascript:;" class='layui-btn layui-btn-disabled layui-btn-xs' >已领取</a>
+              {{# }else{ }}  
+                <a href="javascript:;" class='layui-btn layui-btn-xs layui-btn-warm'  onclick="lingqu(this,{{d.id}},'prize1');" data-type="prize1" data-id="{{d.id}}">点击领取</a>
+              {{# } }}  
+            </script>         
+            <script type="text/html" id="prize2">
+              {{# if(d.prize2==1){ }}
+                <a href="javascript:;" class='layui-btn layui-btn-disabled layui-btn-xs' >已领取</a>
+              {{# }else{ }}  
+                <a href="javascript:;" class='layui-btn layui-btn-xs layui-btn-warm'  onclick="lingqu(this,{{d.id}},'prize2');" data-type="prize1" data-id="{{d.id}}">点击领取</a>
+              {{# } }}  
+            </script>         
+            <script type="text/html" id="prize3">
+              {{# if(d.prize3==1){ }}
+                <a href="javascript:;" class='layui-btn layui-btn-disabled layui-btn-xs' >已领取</a>
+              {{# }else{ }}  
+                <a href="javascript:;" class='layui-btn layui-btn-xs layui-btn-warm' onclick="lingqu(this,{{d.id}},'prize3');" data-type="prize1" data-id="{{d.id}}">点击领取</a>
+              {{# } }}  
+            </script>         
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+<script>
+  layui.use(['admin', 'table', 'view', 'form','layer'], function(){
+    var table = layui.table
+        ,admin = layui.admin
+        ,layer = layui.layer
+        ,form = layui.form
+        ,view = layui.view;
+  
+    //方法级渲染
+    table.render({
+      elem: '#card_list'
+      ,url: layui.setter.baseUrl+'merchant/member/create_card_lists'
+      ,parseData: function(res){ //res 即为原始返回的数据
+            return {
+            "code": res.code, //解析接口状态
+            "msg": res.msg, //解析提示文本
+            "count": res.data.count, //解析数据长度
+            "data": res.data.lists //解析数据列表
+            };
+        }
+      ,cols: [[
+        {field:'id', width:80, title: 'ID', sort: true, align:'center'}
+        ,{field:'card_id', title: '卡号', align:'center',width:200}
+        ,{field:'status', width:80, title: '状态', templet: '#test-table-state', align:'center'}
+        ,{field:'create_time', title: '生成日期', align:'center',templet: "<div>{{layui.util.toDateString(d.create_time*1000, 'yyyy-MM-dd HH:mm:ss')}}</div>"}
+        ,{field:'update_time', title: '绑定时间', align:'center',templet:function(d){
+          if(d.update_time===0){
+            return '未绑定';
+          }else{
+            return layui.util.toDateString(d.update_time*1000, 'yyyy-MM-dd HH:mm:ss')
+          }
+        }
+      }
+        ,{field:'account', title: '绑定账户', align:'center'}
+        ,{field:'prize1', title: '奖品1', align:'center',templet:"#prize1"}
+        ,{field:'prize2', title: '奖品2', align:'center',templet:"#prize2"}
+        ,{field:'prize3', title: '奖品3', align:'center',templet:"#prize3"}
+        ,{fixed: 'right', title: '操作', align:'center',  toolbar: '#tool_card_list',width:160}
+      ]],
+      page:true
+    });
+    
+    // 搜索
+    var $ = layui.$, active = { 
+      add:function(){
+        admin.popup({
+          title: "生成创业优惠卡",
+          area: admin.screen() < 2 ? ['95%', '90%'] :["500px", "300px"],
+          id: "LAY-popup-add_card",
+          success: function(layero, index){
+            view(this.id).render('/card/generate').done(function() {
+              form.render(null, 'generate'); // 弹窗的lay-filter值
+               //监听提交
+               form.on('submit(generate_submit)',function(datas){
+                admin.req({
+                    url: layui.setter.baseUrl+'merchant/member/create_card'
+                    ,data:datas.field,
+                    type:'post',
+                    success: function(res){
+                      if(res.code==1){
+                        layer.msg(res.msg, {icon: 1,shade:0.5,time: 1000},function(){
+                          
+                          layer.close(index);
+                          table.reload('card_list');
+                        });
+                      }else{
+                          layer.msg(res.msg, {icon: 5,anim: 6,shade:0.5,time: 1000});
+                      }
+                    }
+                });
+               });
+              
+            });
+          }
+        });
+      }
+      ,reload: function(){
+        var demoReload = $('#test-table-demoReload');
+        
+        //执行重载
+        table.reload('card_list', {
+          page: {
+            curr: 1 //重新从第 1 页开始
+          }
+          ,where: {
+            keywords: demoReload.val()
+          }
+        });
+      }
+    };
+    
+    $('.test-table-reload-btn .layui-btn').on('click', function(){
+      var type = $(this).data('type');
+      active[type] ? active[type].call(this) : '';
+    });
+
+    //监听工具条
+    table.on('tool(card_list)', function(obj){
+      var data = obj.data;
+      var card_id = obj.data.card_id;
+     if(obj.event === 'edit'){
+        // 编辑
+        admin.popup({
+          title: "绑定创业优惠卡",
+          area: admin.screen() < 2 ? ['95%', '90%'] :["850px", "600px"],
+          id: "LAY-popup-edit_card",
+          success: function(layero, index){
+            view(this.id).render('/card/bind',data).done(function() {
+              form.render(null, 'bind'); // 弹窗的lay-filter值
+              table.on('tool(choose_vip_list)',function(datas){
+                console.log(datas);
+                var uid=datas.data.id;
+                admin.req({
+                    url: layui.setter.baseUrl+'merchant/member/create_card_bangka'
+                    ,data:{uid:uid,card_id:card_id},
+                    type:'post',
+                    success: function(res){
+                      if(res.code==1){
+                        layer.msg(res.msg, {icon: 1,shade:0.5,time: 1000},function(){
+                          
+                          layer.close(index);
+                          table.reload('card_list');
+                        });
+                      }else{
+                          layer.msg(res.msg, {icon: 5,anim: 6,shade:0.5,time: 1000});
+                      }
+                    }
+                });
+              });
+
+            });
+          }
+        });
+      }
+    });
+    // 领取奖励
+    window.lingqu=function(that,id,type){
+      if(type=='prize1'){
+        var text="奖品1";
+      }else if(type=='prize2'){
+        var text="奖品2";
+      }else{
+        var text="奖品3";
+      }
+      layer.confirm('是否立即领取'+text, {
+        btn: ['领取','取消'] ,title:'提示',icon:3
+      }, function(){
+        admin.req({
+            url: layui.setter.baseUrl+'merchant/member/create_card_prize' //实际使用请改成服务端真实接口
+            ,data: {id:id,prize:type},
+            type:'post',
+            success: function(res){
+              if(res.code==1){                
+                  $(that).addClass('layui-btn-disabled').removeClass('layui-btn-warm').html('已领取');                                
+              }else{
+                layer.msg(res.msg, {icon: 5,anim: 6,shade:0.5,time: 1000});
+              }
+            }
+          }); 
+      }, function(){
+        
+      });
+
+
+
+
+    }
+
+  
+  });
+</script>

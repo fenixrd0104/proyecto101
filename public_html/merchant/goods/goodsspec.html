@@ -1,0 +1,209 @@
+<title>商品规格</title>
+
+<div class="layui-card layadmin-header">
+    <div class="layui-breadcrumb" lay-filter="breadcrumb">
+        <a>商品管理</a>
+        <a><cite>商品规格</cite></a>
+    </div>
+</div>
+
+<div class="layui-fluid">
+<div class="layui-card">
+    <div class="layui-card-header">商品规格</div>
+    <div class="layui-card-body">
+        <form class="layui-form">
+        <div class="layui-row" style="margin-bottom:20px;">
+            <div class="layui-col-md9">
+                <a class="layui-btn" onclick="add_goodsspec();"><i class="layui-icon layui-icon-add-1 layuiadmin-button-btn"></i>添加规格</a>
+            </div>
+            <div class="layui-col-md3">
+                <select name="" id="spec_type_id" lay-filter="choose_type_id"> </select>
+            </div>
+        </div>
+        </form>
+
+        <table id="goods_spec" lay-filter="goods_spec"></table>
+        <script type="text/html" id="table_goods_spec">
+            <a class="layui-btn layui-btn-normal layui-btn-xs" lay-event="edit"><i class="layui-icon layui-icon-edit"></i>编辑</a>
+            <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del"><i class="layui-icon layui-icon-delete"></i>删除</a>
+        </script>
+    </div>   
+</div>
+</div>
+<script>
+layui.use(['admin', 'table','layer'], function(){
+    var $ = layui.$
+    ,admin = layui.admin
+    ,view = layui.view
+    ,layer = layui.layer
+    ,table = layui.table
+    ,form = layui.form;
+
+    form.render();
+    var router = layui.router();
+    // console.log(router.search);
+    var type = router.search.type; 
+    if(type){
+        get_data(type);
+    }else{
+        get_data(0);
+    }
+
+    // 更改类型
+    form.on('select(choose_type_id)',function(e){
+        get_data(e.value);
+    });
+    function get_data(type_id){
+      table.render({
+        elem: '#goods_spec'
+        ,url: layui.setter.baseUrl+'merchant/goods/goodsSpec?type_id='+type_id
+        ,parseData: function(res){ //res 即为原始返回的数据
+            var list="<option value='0'>--全部类型--</option>";
+            for( var i in res.data.typeList){
+                list += "<option value='"+res.data.typeList[i].id+"' >"+res.data.typeList[i].name+"</option> ";
+            }    
+            $('#spec_type_id').html(list);
+            
+            $('#spec_type_id').val(type_id);
+            form.render('select'); 
+            return {
+            "code": res.code, //解析接口状态
+            "msg": res.msg, //解析提示文本
+            "count": res.data.count, //解析数据长度
+            "data": res.data.lists //解析数据列表
+            };
+        }
+        ,cellMinWidth: 80 
+        ,cols: [[{field:'id', width:80, title: 'ID',align:'center',sort:true}
+        ,{field:'name', title: '规格名称',align:'center'}
+        ,{field:'type_name', title: '所属类型',align:'center'}
+        ,{field:'values', title: '规格项',align:'center',templet:function(d){
+          var item='';
+          for(var i in d.values){
+            item+='&nbsp;'+d.values[i].item+'&nbsp;|'
+          }
+          item.substring(0,item.length-1);
+          return item.substring(0,item.length-1);
+          // return JSON.stringify(d.values)
+        }}
+        ,{field:'order', title: '排序',align:'center',edit:true}
+        ,{fixed: 'right', title:'操作', toolbar: '#table_goods_spec',align:'center',width:160}
+        ]],
+        page:true
+    });
+    }
+
+    table.on('tool(goods_spec)',function(e){
+    var id=e.data.id;
+    if(e.event==='edit'){
+    var data=e.data;
+    admin.popup({
+        title: "编辑规格",
+        area: admin.screen() < 2 ? ['95%', '90%'] :["600px", "450px"],
+        id: "LAY-popup-edit_goodsspec",
+        success: function(layero, index){
+        view(this.id).render('/goods/edit_spec',data).done(function() {
+        form.render(null, 'add_spec'); // 弹窗的lay-filter值
+        //监听提交
+        form.on('submit(spec_submit)', function(data){
+            data.field.id=id;
+            // console.log(data.field);   
+            admin.req({
+                url: layui.setter.baseUrl+'merchant/goods/editGoodsSpec' //实际使用请改成服务端真实接口
+                ,data: data.field
+                ,type:'post'
+                ,success: function(res){
+                    if(res.code==1){
+                        layer.msg(res.msg , {icon: 1,time: 1000} , function(){
+                        setTimeout(function(){
+                            layer.close(index); //执行关闭 
+                            layui.table.reload('goods_spec'); //重载表格
+                        },1000);
+                        });
+                    }else{
+                        layer.msg(res.msg, {icon: 5,anim: 6,shade:0.5,time: 1000});
+                    }
+                }
+            }); 
+        });
+        });
+        }
+        });
+    }else{
+        layer.confirm('确认删除此规格吗?', {icon: 3, title:'提示'}, function(index){
+        admin.req({
+            url: layui.setter.baseUrl+'merchant/goods/delGoodsSpec' //实际使用请改成服务端真实接口
+            ,data: {id:id}
+            ,type:'get'
+            ,success: function(res){
+                if(res.code==1){                 
+                    e.del();
+                    layer.close(index); 
+                }else{
+                    layer.msg(res.msg, {icon: 5,anim: 6,shade:0.5,time: 1000});
+                }
+            }
+        });  
+        });
+    }
+    });
+
+    // 添加规格
+    window.add_goodsspec=function(){
+    admin.popup({
+        title: "添加规格",
+        area: admin.screen() < 2 ? ['95%', '90%'] :["600px", "500px"],
+        id: "LAY-popup-add_goodsspec",
+        success: function(layero, index){
+        view(this.id).render('/goods/add_spec').done(function() {
+        form.render(null, 'add_spec'); // 弹窗的lay-filter值
+        //监听提交
+        form.on('submit(spec_submit)', function(data){
+            // console.log(data);
+            admin.req({
+                url: layui.setter.baseUrl+'merchant/goods/addGoodsSpec' 
+                ,data: { type_id:data.field.type_id, items:data.field.items, name:data.field.name }
+                ,type:'post'
+                ,success: function(res){
+                if(res.code==1){
+                    layer.msg(res.msg , {icon: 1,time: 1000} , function(){
+                    setTimeout(function(){
+                        layer.close(index); //执行关闭 
+                        layui.table.reload('goods_spec'); //重载表格
+                    },1000);
+                    });
+                }else{
+                    layer.msg(res.msg, {icon: 5,anim: 6,shade:0.5,time: 1000});
+                }
+                }
+            }); 
+        });
+        });
+        }
+    });
+    };
+
+    table.on('edit(goods_spec)',function(e){  
+        var items='';
+        for(var i in e.data.values){
+            items+= e.data.values[i].item+'\r\n'
+        }
+        e.data.items=items;
+        admin.req({
+            url: layui.setter.baseUrl+'merchant/goods/editGoodsSpec' //实际使用请改成服务端真实接口
+            ,data:e.data
+            ,type:'post'
+            ,success: function(res){
+                if(res.code==1){
+                    
+                }else{
+                    layer.msg(res.msg, {icon: 5,anim: 6,shade:0.5,time: 1000});
+                }
+            }
+        }); 
+    });
+
+
+
+});
+</script>

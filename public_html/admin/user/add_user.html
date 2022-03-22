@@ -1,0 +1,151 @@
+
+<div class="layui-form" action="" lay-filter="add_user" style="padding: 20px 30px 0 0;">
+    <div class="layui-form-item">
+        <label class="layui-form-label">管理员名称</label>
+        <div class="layui-input-block">   
+            <script type="text/html" template>                        
+                <input type="text" name="username" lay-verify="required" placeholder="" autocomplete="off" class="layui-input" value="{{d.params.username||''}}" >
+            </script>    
+        </div>
+    </div>                
+    <div class="layui-form-item">
+        <label class="layui-form-label">管理员角色</label>
+        <div class="layui-input-block">   
+            <select name="groupid" id="juese" lay-verify="required" autocomplete="off" >
+            </select>
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">登录密码</label>
+        <div class="layui-input-block"> 
+            <script type="text/html" template>
+                <input type="password" name="password"  placeholder="再次输入修改密码" autocomplete="off" class="layui-input"  >
+            </script>                           
+            
+        </div>
+    </div> 
+    <div class="layui-form-item">
+        <label class="layui-form-label">真实姓名</label>
+        <div class="layui-input-block">     
+            <script type="text/html" template>               
+            <input type="text" name="real_name" lay-verify="required" placeholder="" autocomplete="off" class="layui-input" value="{{d.params.real_name||''}}" >
+            </script>
+        </div>
+    </div> 
+    <div class="layui-form-item">
+        <label class="layui-form-label">状态</label>
+        <div class="layui-input-block">
+           
+            <div id="my_status"></div>
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <div class="layui-input-block">
+            <button type="button" class="layui-btn" lay-submit="" lay-filter="add_user_submit"><i class="layui-icon">&#xe654;</i>保存</button>
+            <button type="button" class="layui-btn layui-btn-danger" data-type="close"><i class="layui-icon">&#x1006;</i>返回</button>
+        </div>
+    </div>
+</div>
+<script type="text/html" template lay-done="layui.data.sendParams(d.params)"></script>    
+<script>
+layui.data.sendParams = function(params){
+var id=params.id;
+    layui.use(['admin','form','upload', 'laydate','layer'], function(){
+        var $ = layui.$
+        ,admin = layui.admin
+        ,element = layui.element
+        ,form = layui.form
+        ,layer = layui.layer
+        ,laydate = layui.laydate
+        ,layer = layui.layer
+        ,upload = layui.upload
+        ,router = layui.router();
+            
+        laydate.render({ // 日期
+            elem: '#test1'
+        });
+        laydate.render({ // 日期
+            elem: '#test2'
+        });
+        element.render();     
+
+        
+    
+        var $ = layui.$, active = {
+        // 返回--按钮
+            close:function(index){ 
+                layer.closeAll('page');
+            }
+        };
+        
+        $('.layui-input-block .layui-btn').on('click', function(){
+            var type = $(this).data('type');
+            active[type] ? active[type].call(this) : '';
+        });
+        if(id){
+            // 编辑
+           var par={id:id}
+           admin.req({
+                url: layui.setter.baseUrl+'admin/user/userEdit' 
+                ,data:par,
+                type:'get',
+                success: function(res){
+                if(res.code==1){
+                    console.log(res.data.role)
+                    var list1="<option value=''>请选择角色</option>";
+                    for(var i in res.data.role){
+                        list1+="<option value='"+i+"' >"+res.data.role[i]+"</option>";
+                    }
+                    $('#juese').html(list1);
+                    if(params.groupid){
+                        $('#juese').val(params.groupid);
+                    }
+                    params.status=res.data.info.status;
+                    
+                    if(params.status==1){
+                        $('#my_status').html('<input type="radio" name="status" value="1" title="开启" checked ><input type="radio" name="status" value="0" title="关闭" >');
+                    }else{
+                        $('#my_status').html('<input type="radio" name="status" value="1" title="开启"  ><input type="radio" name="status" value="0" title="关闭" checked>');
+                    }
+                    form.render();
+                    }else{
+                        layer.msg(res.msg, {icon: 5,anim: 6,shade:0.5,time: 1500});
+                    }
+                }
+            });
+        }else{
+            // 添加
+            par='';
+            admin.req({
+                url: layui.setter.baseUrl+'admin/user/userAdd' //实际使用请改成服务端真实接口
+                ,data:par,
+                type:'get',
+                success: function(res){
+                if(res.code==1){
+                    console.log(res.data.role)
+                    var list1="<option value=''>请选择角色</option>";
+                    for(var i in res.data.role){
+                        list1+="<option value='"+i+"' >"+res.data.role[i]+"</option>";
+                    }
+                    $('#juese').html(list1);
+                    if(params.groupid){
+                        $('#juese').val(params.groupid);
+                    }
+                //     <input type="radio" name="status" value="1" title="开启" checked>
+                // <input type="radio" name="status" value="0" title="关闭">
+
+                $('#my_status').html('<input type="radio" name="status" value="1" title="开启" checked ><input type="radio" name="status" value="0" title="关闭" >');
+
+                    form.render();
+                    }else{
+                        layer.msg(res.msg, {icon: 5,anim: 6,shade:0.5,time: 1500});
+                    }
+                }
+            });
+        }
+             
+         
+        
+    });
+}
+</script>

@@ -1,0 +1,38 @@
+<form class="layui-form" action="" lay-filter="choose_guige" style="padding: 20px 30px 0 0;">
+    <div class="layui-form-item">
+        <label class="layui-form-label" style="width: 65px;">规格</label>
+        <div class="layui-input-block" id="guige_box"></div>
+    </div>    
+    <div class="layui-form-item">
+        <div class="layui-input-block">
+        <button type="button" class="layui-btn" lay-submit lay-filter="submit_choose_guige"><i class="layui-icon">&#xe654;</i>添加</button>
+        </div>
+    </div>
+</form>
+<script type="text/html" template lay-done="layui.data.sendParams(d.params)"></script>   
+<script>
+    layui.data.sendParams = function(params){
+        layui.use(['admin', 'upload','form','table','view','setter'], function(){
+            var $ = layui.$
+            ,setter = layui.setter
+            ,admin = layui.admin
+            ,upload = layui.upload
+            ,element = layui.element
+            ,view = layui.view
+            ,layer = layui.layer
+            ,form = layui.form;
+
+            form.render();
+            // console.log(params);
+            var list='';
+            for(var i in params){
+                list+='<input type="radio" name="spec_id" id="" value="'+params[i].spec_id+'" title="'+params[i].spec_name+'">';
+            }
+            $('#guige_box').html(list);
+            
+            form.render();
+            
+
+        });
+    }
+</script>

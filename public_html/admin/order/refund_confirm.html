@@ -1,0 +1,236 @@
+<style>
+    #refund_img img{
+        /* width:100px; */
+        height:100px;
+        margin-right: 10px;
+        margin-bottom: 10px;
+    }
+</style>
+
+<form class="layui-form" action="" lay-filter="add_audit" style="padding: 20px 30px 0 0;"> 
+    <div class="layui-form-item">
+        <label class="layui-form-label">订单编号</label>
+        <div class="layui-input-block">
+            <input type="text" name="order_sn" value="" autocomplete="off" placeholder="" class="layui-input layui-disabled" disabled>     
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">用户ID</label>
+        <div class="layui-input-block">
+            <input type="text" name="user_id" value="" autocomplete="off" placeholder="" class="layui-input layui-disabled" disabled>     
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">申请日期</label>
+        <div class="layui-input-block">
+            <input type="text" name="refund_time" value="" autocomplete="off" placeholder="" class="layui-input layui-disabled" disabled>     
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">服务类型</label>
+        <div class="layui-input-block">
+            <input type="text" name="refund_type" value="" autocomplete="off" placeholder="" class="layui-input layui-disabled" disabled>     
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">退款金额</label>
+        <div class="layui-input-block">
+            <input type="text" name="refund_money" value=""  autocomplete="off" placeholder="" class="layui-input">  
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">退还余额</label>
+        <div class="layui-input-block">
+            <input type="text" name="refund_deposit" value=""  autocomplete="off" placeholder="" class="layui-input">  
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">退还积分</label>
+        <div class="layui-input-block">
+            <input type="text" name="refund_integral" value=""  autocomplete="off" placeholder="" class="layui-input">  
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">退货快递单号</label>
+        <div class="layui-input-block">
+            <input type="text" name="refund_kddh" value="" autocomplete="off" placeholder="" class="layui-input layui-disabled" disabled>     
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">退货快递类型</label>
+        <div class="layui-input-block">
+            <input type="text" name="refund_kdlx" value="" autocomplete="off" placeholder="" class="layui-input layui-disabled" disabled>     
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">原因</label>
+        <div class="layui-input-block">
+            <input type="text" name="reason" value=""  autocomplete="off" placeholder="" class="layui-input layui-disabled" disabled>  
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">问题描述</label>
+        <div class="layui-input-block">
+            <textarea name="describe" autocomplete="off" placeholder="" class="layui-textarea layui-disabled" disabled></textarea>
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">图片</label>
+        <div class="layui-input-block" id="refund_img">
+            <img src="/static/admin/src/style/res/no_img.jpg" alt="">
+        </div>
+    </div>
+    <div class="layui-form-item" >
+        <label class="layui-form-label">邮寄地址</label>
+        <div class="layui-input-block">
+            <input type="text" name="shop_addr" class="layui-input"  title="邮寄地址" >
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">审核意见</label>
+        <div class="layui-input-block">
+            <input type="radio" name="status" value="-1" title="审核拒绝" >
+            <input type="radio" name="status" value="1" title="审核通过" checked>
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">处理备注</label>
+        <div class="layui-input-block">
+            <textarea name="note" autocomplete="off"  placeholder="请填写处理备注" class="layui-textarea"></textarea>
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <div class="layui-input-block">
+            <input type="hidden" name="type" value="0">
+            <button type="button" class="layui-btn" lay-submit lay-filter="confirm_submit"><i class="layui-icon">&#xe654;</i>保存</button>
+            <button type="button" class="layui-btn layui-btn-danger" data-type="close"><i class="layui-icon">&#x1006;</i>返回</button>
+        </div>
+    </div>
+</form>  
+    
+<script type="text/html" template lay-done="layui.data.sendParams(d.params)"></script> 
+<script> 
+layui.data.sendParams = function(params){
+    console.log(params);
+    layui.use(['admin', 'form', 'view','layer'], function(){
+        var $ = layui.$
+        ,admin = layui.admin
+        ,form = layui.form
+        ,layer = layui.layer
+        ,view = layui.view
+        ,router = layui.router();
+
+        form.render(null, 'add_audit');
+
+        var $ = layui.$, active = {
+            // 返回--按钮
+            close:function(index){ 
+                layer.closeAll('page');
+            }
+        };
+        
+        $('.layui-input-block .layui-btn').on('click', function(){
+        var type = $(this).data('type');
+            active[type] ? active[type].call(this) : '';
+        });
+        // 获取审核数据
+        admin.req({
+            url: layui.setter.baseUrl+'admin/order/shenhe'
+            ,data: {id:params,type:0},
+            type:'get',
+            success: function(res){
+                if(res.code==1){
+                    var data=res.data.info;
+                    var type=res.data.refund_type;
+                    var curr_type='';
+                    for(var i in type){
+                        if(i==data.refund_type){
+                            curr_type=type[i];
+                        }
+                    }
+                    var imgs='';
+                    // 遍历图片并在页面中显示
+                    if(data.imgs!=''){
+                        var data_img=data.imgs;
+                        data_img = JSON.parse(data_img);
+                        data_img = data_img.split('@');
+                        for(var i in data_img){
+                            imgs+='<img src="'+data_img[i]+'">';
+                        }
+                        $('#refund_img').html(imgs);
+                    }
+                    // 时间戳转如期格式
+                    data.refund_time=layui.util.toDateString(data.refund_time*1000, 'yyyy-MM-dd HH:mm:ss');
+                    // 表单赋值
+                    form.val('add_audit',{
+                        'user_id':data.user_id,
+                        'order_sn':data.order_sn,
+                        'refund_time':data.refund_time,
+                        'refund_type':curr_type,
+                        'refund_kddh':data.refund_kddh,
+                        'refund_kdlx':data.refund_kdlx,
+                        'refund_money':data.refund_money,
+                        'refund_deposit':data.refund_deposit,
+                        'refund_integral':data.refund_integral,
+                        'reason':data.reason,
+                        'describe':data.describe
+                    });
+                    form.render();
+                }else{
+                    layer.msg(res.msg, {icon: 5,anim: 6,shade:0.5,time: 1500});
+                }
+            }
+        });
+
+        // //确认退货
+        // admin.req({
+        //     url: layui.setter.baseUrl+'admin/order/confirm'
+        //     ,data: {id:params,type:0},
+        //     type:'get',
+        //     success: function(res){
+        //         if(res.code==1){
+        //             var data=res.data.info;
+        //             var type=res.data.refund_type;
+        //             var curr_type='';
+        //             for(var i in type){
+        //                 if(i==data.refund_type){
+        //                     curr_type=type[i];
+        //                 }
+        //             }
+        //             var imgs='';
+        //             // 遍历图片并在页面中显示
+        //             if(data.imgs!=''){
+        //                 var data_img=data.imgs;
+        //                 data_img = JSON.parse(data_img);
+        //                 data_img = data_img.split('@');
+        //                 for(var i in data_img){
+        //                     imgs+='<img src="'+data_img[i]+'">';
+        //                 }
+        //                 $('#refund_img').html(imgs);
+        //             }
+        //             // 时间戳转如期格式
+        //             data.refund_time=layui.util.toDateString(data.refund_time*1000, 'yyyy-MM-dd HH:mm:ss');
+        //             // 表单赋值
+        //             form.val('add_audit',{
+        //                 'user_id':data.user_id,
+        //                 'order_sn':data.order_sn,
+        //                 'refund_time':data.refund_time,
+        //                 'refund_type':curr_type,
+        //                 'refund_kddh':data.refund_kddh,
+        //                 'refund_kdlx':data.refund_kdlx,
+        //                 'refund_money':data.refund_money,
+        //                 'refund_deposit':data.refund_deposit,
+        //                 'refund_integral':data.refund_integral,
+        //                 'reason':data.reason,
+        //                 'describe':data.describe
+        //             });
+        //             form.render();
+        //         }else{
+        //             layer.msg(res.msg, {icon: 5,anim: 6,shade:0.5,time: 1500});
+        //         }
+        //     }
+        // });
+
+    });
+}
+</script>

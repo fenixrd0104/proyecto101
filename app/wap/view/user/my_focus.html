@@ -1,0 +1,243 @@
+{include file="public/header" /}
+<style>
+.xxx{
+    position: initial;
+    display: block;
+}
+.store-like{
+    margin: 0.1rem 0 0.12rem;
+}
+.deleshow{
+    padding: 0;
+    width: 2.3rem;
+}
+.product-text{
+    font-size: 0.15rem;
+    line-height: 0.22rem;
+    display: block;
+}
+.red-btn{
+    display: block;
+    line-height: 0.45rem;
+}
+#mescroll{
+    position: fixed;
+    top: 90px;
+    bottom: 0px;
+    left: 0;
+    width: 100%;
+    height:auto;
+}
+</style>
+</head>    
+<body class="mypop">
+<header class="mui-bar mui-bar-nav index_header bg_white" id="header">
+    <a class="back-page mui-icon mui-icon-left-nav mui-pull-left" href="javascript:;"></a>
+    <a id="menu" class="mui-action-menu mui-icon mui-icon-bars mui-pull-right" href="javascript:void(0);"></a>
+    <h1 class="mui-title">My Favorites</h1>
+    </header>
+    <div class="mui-content pos-abso scroll-y ">
+        <div class="focus_tab cont">
+            <ul>
+                <li class="on">Favorites (<span id="goods_len">0</span>)</li>
+                <li>Following shops (<span id="shop_len">0</span>)</li>
+        </ul>
+    </div>
+    <div class="focus_hd">
+        <div class="mescroll" id="mescroll">
+            <div class="focus-list foucs_shop" id="dataList">
+                
+            </div>  
+        </div>
+    <!--        <div class="mescroll" id="mescroll" style="display: none;">
+        <div class="focus-list foucs_store" id="foucs_store">
+            <div class="focus-member mui-clearfix">
+                <div class="shopimg fl">
+                    <a href="javascript:;">
+                        <img src="/static/wap/images/touxiang.png">
+                    </a>
+                </div>
+                <div class="deleshow fr">
+                    <div class="deletes">
+                        <a href="javascript:;">
+                            <span class="product-text mui-ellipsis">Beautiful You</span>
+                        </a>
+                    </div>
+                    <div class="store-like">
+                        <i class="xxx"></i>
+                    </div>
+                    <div class="flex">
+                        <p class="fl" style="width:50%;"><span>2</span><span>reviews</span></p>
+                        <a class="fr close-focus" href=""><p class="close-focus-p fr">Unfollow</p></a>
+                    </div>
+                </div>
+            </div>
+        </div>  
+        </div> -->
+        
+    </div>
+    
+</div>
+{include file="public/head_nav"/}
+{include file="public/footer"/}
+<script type="text/html" id="list">
+<div class="focus-member mui-clearfix">
+    <div class="shopimg fl">
+        <a href="/wap/index/goods_info.html?id={{goods_id}}">
+            <img src="{{original_img}}">
+        </a>
+    </div>
+    <div class="deleshow fr">
+        <div class="deletes">
+            <a href="/wap/index/goods_info.html?id={{goods_id}}">
+                <span class="product-text mui-ellipsis-2">{{goods_name}}</span>
+            </a>
+        </div>
+        <p class="sc_hui"><span>{{comment_count}}</span>people collection</p>
+        <div class="sc_between">
+            <p class="sc_pri"><span class="text_red">KRC </span><span class="text_red">{{shop_price}}</span></p>
+            <a class="close-focus" href="javascript:;" onclick="cancel_focus({{id}},this);"><p class="close-focus-p fr">unsubscribe</p></a>
+        </div>
+    </div>
+</div>   
+</script>
+<script type="text/html" id="list_s">
+<div class="focus_shop">
+    <a class="flex_start" href="/wap/store/store_info.html?shop_id={{shop_id}}">
+        <img src="{{image}}" onerror="this.src='__IMG__/touxiang.png'" alt="">
+        <h3 class="mui-ellipsis">{{name}}</h3>
+    </a>
+</div>   
+</script>
+<script type="text/javascript">
+var this_url='/api/goods/collection_list';    
+/* ---Commodity collection list--- */
+//Create a MeScroll object, the internal pull-down refresh is enabled by default, up.callback is automatically executed, and the list data is refreshed;
+var mescroll = new MeScroll("mescroll", {
+    up: {
+        callback: getListData, //Pull-up callback, which can be abbreviated here; equivalent to callback: function (page) { getListData(page); }
+        isBounce: false, //The ios bounce and parsing are prohibited here (be sure to read carefully, especially the last point): http://www.mescroll.com/qa.html#q10
+        noMoreSize: 3, //If there is no more data in the list, you can set the total number of lists to be greater than half a page before displaying no more data; avoid too little data in the list (for example, there is only one data), it will not look good if there is no more data; Default 5
+        empty: {
+            icon: "/static/wap/images/none2.png", //icon, default null
+            tip: "No favorites for now~~", //Tips
+
+        },
+        clearEmptyId: "dataList", //equivalent to setting clearId and empty.warpId at the same time; simplified writing; default null; note that this cannot be configured in vue
+        toTop: { //Configure back to top button
+            src: "/static/wap/images/top.png", //default scroll to 1000px display, configurable offset modification
+            offset: 1000
+        },
+        lazyLoad: {
+            use: true // Whether to enable lazy loading, default false
+        },
+        page: {
+            num: 0,
+            size:8,
+            time: null
+        },
+        htmlNodata:'<p class="upwarp-nodata">-- END --</p>',
+        offset: 150,
+        loadFull: {
+            use: true,
+            delay: 500
+        }
+    }
+});   
+function getListData(page){
+     // load data online
+     getListDataFromNet(page.num, page.size, function(curPageData) {
+        //mescroll will automatically judge the list according to the passed parameters, if there is no data, it will prompt empty; if there is no next page of data in the list, it will prompt no more data;
+        mescroll.endSuccess(curPageData.length);
+        //set list data
+        setListData(curPageData);
+    }, function() {
+        //Callback for networking failure, hide the status of pull-down refresh and pull-up loading;
+        mescroll.endErr();
+    });
+}
+function setListData(curPageData){
+    var list='';
+    for(var i in curPageData){
+        if(curPageData[i].goods_name){           
+            list+=template('list',curPageData[i]);
+        } else{
+            list+=template('list_s',curPageData[i]);
+        }
+    }
+   
+    
+    $('#dataList').append(list);
+}
+function getListDataFromNet(pageNum,pageSize,successCallback,errorCallback) {
+    // Delay one second, simulate networking
+    setTimeout(function () {
+    $get(this_url,{page:pageNum,num:8},function(d){
+        if(d.status==1){   
+            $('#goods_len').html(d.count.collection_num);                     
+            $('#shop_len').html(d.count.follow_num);                     
+            var curPageData=d.data;
+            var listData = [];            
+            for(var i in curPageData){
+                if(i==curPageData.length) break;
+                listData.push(curPageData[i]);
+            }
+            successCallback(listData);
+        } else {
+            mescroll.endErr();
+        }
+    });
+    },1000);
+}			
+
+//Tab
+$('.focus_tab li').on('click', function () {
+    $(this).addClass('on').siblings().removeClass('on');
+    type = $(this).index();
+    $('.focus_hd>div').eq(type).show().siblings().hide();
+    if(type==0){
+        this_url='/api/goods/collection_list';
+    }else{
+        this_url='/api/shop/follow_list';
+    }
+    // reset the list data
+    mescroll.resetUpScroll();
+    // hide back to top button
+    mescroll.hideTopBtn();
+
+});
+//Get the number of favorite items or stores
+function get_goods(typeclass,span){
+    var length=$(typeclass).children('.focus-member').length;
+    var span_len=$(span);
+    span_len.html(length);
+    length==0?($('.null_message').show()):($('.null_message').hide());
+}
+//unsubscribe
+function cancel_focus($id,_this){
+    var focus = layer.confirm('No more secret observation?', {
+        title: false,
+        closeBtn: 0,
+        skin: 'addcat_demo',
+        shadeClose: true, //Turn on the mask to close
+        btn: ['Cancel', 'OK'] //Button
+    }, function () {
+        $('.layui-layer-btn a').attr('href', 'javascript:;');
+        layer.close(focus);
+    }, function () {
+        $get('/api/goods/uncollection',{ids:$id},function(d){
+        if(d.status==1){
+            mui.toast(d.msg);
+            // reset the list data
+            mescroll.resetUpScroll();
+            // hide back to top button
+            mescroll.hideTopBtn();
+        }else{
+            mui.toast(d.msg);               
+        }       
+        });         
+    });        
+}
+</script>
+</body>
+</html>

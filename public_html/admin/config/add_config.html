@@ -1,0 +1,122 @@
+<div class="layui-form" action="" lay-filter="add_config" style="padding: 20px 30px 0 0;">
+    <div class="layui-row">
+        <div class="layui-form-item">
+            <div class="layui-form-label">配置标识</div>
+            <div class="layui-input-block">
+                <script type="text/html" template>      
+                <input type="text" name="name" lay-verify="required" autocomplete="off" placeholder="" class="layui-input" value="{{ d.params.name || '' }}">                
+                </script>
+            </div>
+            <div class="layui-form-mid layui-input-block layui-word-aux" style="min-height:auto;">用于config函数调用，只能使用英文且不能重复</div>
+        </div>
+        <div class="layui-form-item">
+            <div class="layui-form-label">配置标题</div>
+            <div class="layui-input-block">
+                <script type="text/html" template>    
+                <input type="text" name="title" lay-verify="required" autocomplete="off" placeholder="" class="layui-input" value="{{ d.params.title || '' }}">
+                </script>
+            </div>
+            <div class="layui-form-mid layui-input-block layui-word-aux" style="min-height:auto;">用于后台显示的配置标题介绍</div>
+        </div>
+        <div class="layui-form-item">
+            <div class="layui-form-label">配置类型</div>
+            <div class="layui-input-block">
+                <script type="text/html" template>   
+                <select name="type" id="lay_type">
+                    <option value="">==请选择==</option>                    
+                </select>
+                </script>
+            </div>
+            <div class="layui-form-mid layui-input-block layui-word-aux" style="min-height:auto;">（系统会根据不同类型解析配置值）</div>
+        </div>
+        <div class="layui-form-item">
+            <div class="layui-form-label">系统分组</div>
+            <div class="layui-input-block">
+                <script type="text/html" template>   
+                <select name="group" id="lay_group">
+                    <option value="">==请选择==</option>
+                </select>
+                </script>
+            </div>
+            <div class="layui-form-mid layui-input-block layui-word-aux" style="min-height:auto;">配置分组 用于批量设置 不分组则不会显示在系统设置中）</div>
+        </div>
+        <div class="layui-form-item">
+            <div class="layui-form-label">配置值</div>
+            <div class="layui-input-block">
+                <script type="text/html" template>   
+                <input type="text" name="value" lay-verify="required" autocomplete="off" placeholder="请输入配置值" class="layui-input" value="{{ d.params.value || '' }}">
+                </script>
+            </div>
+            <div class="layui-form-mid layui-input-block layui-word-aux" style="min-height:auto;">用于config函数调用显示的值</div>
+        </div>
+        <div class="layui-form-item">
+            <div class="layui-form-label">配置项</div>
+            <div class="layui-input-block">
+                <script type="text/html" template>   
+                <textarea name="extra" placeholder="" class="layui-textarea">{{ d.params.extra || '' }}</textarea>
+                </script>
+            </div>
+            <div class="layui-form-mid layui-input-block layui-word-aux" style="min-height:auto;">如果是枚举型 需要配置该项</div>
+        </div>
+        <div class="layui-form-item">
+            <div class="layui-form-label">配置描述</div>
+            <div class="layui-input-block">
+                <script type="text/html" template>   
+                <textarea name="remark" placeholder="" lay-verify="required" autocomplete="off"  class="layui-textarea">{{ d.params.remark || '' }}</textarea>
+                </script>
+            </div>
+            <div class="layui-form-mid layui-input-block layui-word-aux" style="min-height:auto;"> 配置详细说明</div>
+        </div>
+        <div class="layui-form-item">
+            <div class="layui-form-label">排序</div>
+            <div class="layui-input-block">
+                <script type="text/html" template>   
+                <input type="text" name="sort" lay-verify="required" autocomplete="off" placeholder="" class="layui-input" value="{{ d.params.sort || '255' }}">
+                </script>
+            </div>
+            <div class="layui-form-mid layui-input-block layui-word-aux" style="min-height:auto;">用于显示的顺序</div>
+        </div>
+        <div class="layui-form-item">
+            <div class="layui-form-label">状态</div>
+            <div class="layui-input-block">
+                <script type="text/html" template>   
+                {{# if(d.params.id){ }} 
+                <input type="radio" name="status" value="1" title="是" {{ d.params.status=== 1 ? 'checked': '' }}>
+                <input type="radio" name="status" value="0" title="否" {{ d.params.status=== 0 ? 'checked': '' }}>      
+                {{# }else{ }}
+                <input type="radio" name="status" value="1" title="是" checked>
+                <input type="radio" name="status" value="0" title="否">    
+                {{# } }}  
+                </script>              
+            </div>
+            <!-- <div class="layui-form-mid layui-word-aux">默认开启</div> -->
+        </div>
+        <div class="layui-form-item">
+            <div class="layui-input-block">
+                <button type="button" class="layui-btn" lay-submit="" lay-filter="component-form-element"><i class="layui-icon layui-icon-link"></i>保存</button>
+            </div>
+        </div>
+    </div>
+</div>
+<script type="text/html" template lay-done="layui.data.sendParams(d.params)"></script>  
+<script>
+layui.data.sendParams = function(params){
+    // console.log(params);
+    var id=params.id;
+    layui.use(['admin', 'form','view','setter','layer'], function(){
+        var $ = layui.$
+        ,admin = layui.admin
+        ,setter = layui.setter
+        ,element = layui.element
+        ,view = layui.view
+        ,layer = layui.layer
+        ,form = layui.form;
+
+        form.render();
+        
+        
+
+    });
+}
+
+</script>

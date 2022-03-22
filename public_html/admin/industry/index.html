@@ -1,0 +1,151 @@
+
+<title>店铺列表</title>
+
+<div class="layui-card layadmin-header">
+    <div class="layui-breadcrumb" lay-filter="breadcrumb">
+        <a>分店管理</a>
+        <a><cite>行业管理</cite></a>
+    </div>
+</div>
+
+<script type="text/html" template>
+    <link rel="stylesheet" href="{{ layui.setter.base }}style/goods.css?v={{ layui.admin.v }}-1" media="all">
+</script>
+<style>
+  .layui-table-cell {
+    height: auto;
+}
+</style>
+<div class="layui-fluid">
+        <div class="layui-row">
+                <div class="layui-col-md12">
+                    <div class="layui-card">
+                        <div class="layui-card-header">
+                            行业管理
+                        </div>
+                        <div class="layui-card-body">
+                          <div class="layui-row layui-col-space10">
+                                <div class="layui-col-md12">
+                                    <div class="layui-form  layuiadmin-card-header-auto goods_list_search" lay-filter="app-content-list">
+                                      
+                                          <div class="layui-inline">
+                                            <div class="layui-input-inline">
+                                              <select name="label">
+                                                <option value="">全部</option>
+                                                <option value="0">美食</option>
+                                                <option value="1">新闻</option>
+                                                <option value="2">八卦</option>
+                                                <option value="3">体育</option>
+                                                <option value="4">音乐</option>
+                                              </select>
+                                            </div>
+                                          </div>
+                                          <div class="layui-inline">
+                                            <div class="layui-input-inline">
+                                              <input type="text" name="title" placeholder="请输入" autocomplete="off" class="layui-input">
+                                            </div>
+                                          </div>
+                                          <div class="layui-inline">
+                                            <button class="layui-btn layuiadmin-btn-list" lay-submit lay-filter="LAY-app-contlist-search">
+                                              <i class="layui-icon layui-icon-search layuiadmin-button-btn"></i>
+                                            </button>
+                                          </div>
+                                        </div>
+                                      </div>
+                                </div>
+                          </div>
+                      </div>
+                </div>
+            </div>
+    <div class="layui-row">
+        <div class="layui-col-md12">
+          <div class="layui-card">
+            <div class="layui-card-body">
+            
+             <table class="layui-hide" id="test-table-industry" lay-filter="test-table-industry"></table>
+             <script type="text/html" id="test-table-toolbar-toolbarDemo">
+                <div class="layui-btn-container">
+                    <button type="button" class="layui-btn" id="add_industry">新增行业</button>
+                </div>
+              </script>
+              <script type="text/html" id="test-table-toolbar-industry">
+                <a class="layui-btn layui-btn-xs layui-btn-normal" lay-event="detail">编辑</a>
+                <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del">删除</a>
+              </script>
+            </div>
+          </div>
+        </div>
+      </div>
+
+</div>
+
+
+
+<script>
+    layui.use(['admin','table','form','layer'], function(){
+      var $ = layui.$
+      ,admin = layui.admin
+      ,view = layui.view
+      ,layer = layui.layer
+      ,table = layui.table
+      ,form = layui.form;
+      
+      form.render(null, 'app-content-list');
+      
+    table.render({
+      elem: '#test-table-industry'
+      ,url: '/json/table/user.js'
+      ,toolbar: '#test-table-toolbar-toolbarDemo'
+      ,cellMinWidth: 80 //全局定义常规单元格的最小宽度，layui 2.2.1 新增
+      ,cols: [[
+        {field:'id', width:80, title: 'ID', sort: true}
+        ,{field:'classify', title: '行业名称',align:"center"}
+        ,{field:'city', title: '链接',align:"center"}
+        ,{field:'wealth', title: '时间',align:"center"}
+        ,{field:'sign', title: '备注',align:"center"}
+        ,{fixed: 'right', title:'操作', toolbar: '#test-table-toolbar-industry', width:200}
+      ]],
+      page:true
+    });
+    $('body').on('click','#add_industry',function(){
+      admin.popup({
+            title: "新增行业",
+            area: ["500px", "300px"],
+            id: "LAY-popup-add_industry",
+            success: function(e, i) {
+                view(this.id).render('/industry/add_industry').done(function() {
+                });
+            }
+        });
+    });
+    table.on("tool(test-table-industry)",function(e){
+        console.log(e);
+        var d=e.data;
+        if(e.event === 'detail'){
+            // layer.msg('查看操作');
+            admin.popup({
+                title: "编辑行业",
+                area: ["500px", "400px"],
+                id: "LAY-popup-add_industry",
+                success: function(e) {
+                    view(this.id).render("/industry/add_industry", d).done(function() {
+                        form.render(null, "industry_edit")
+                    })
+                }
+            })
+        }else if(e.event==='del'){
+            layer.confirm("真的删除当前信息吗？",
+            function(i) {
+                layui.table.reload("test-table-industry"),
+                layer.close(i);
+            })
+        }
+    });
+
+   
+    
+    
+  
+    });
+</script>
+  

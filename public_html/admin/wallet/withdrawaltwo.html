@@ -1,0 +1,201 @@
+<title>提现管理</title>
+
+<div class="layui-card layadmin-header">
+    <div class="layui-breadcrumb" lay-filter="breadcrumb">
+        <a>财务管理</a>
+        <a><cite>提现管理</cite></a>
+    </div>
+</div>
+
+<div class="layui-fluid">
+<div class="layui-row layui-col-space15">
+<div class="layui-col-md12">
+<div class="layui-card">
+    <div class="layui-card-header">提现管理</div>
+    <div class="layui-card-body"> 
+        <form class="layui-form" style="margin-bottom: 20px;">
+            <div class="layui-inline">
+                <input type="text" class="layui-input" id="test-laydate-type-datetime-start" name="startime" placeholder="提币时间">
+            </div>
+            <div class="layui-inline">
+                <select name="status" id="tixian_status">
+                     <option value="">操作状态</option>
+                    <option value="1">待审核</option>
+                    <option value="2">到账中</option>
+                    <option value="3">已拒绝</option>
+                    <option value="4">已到账</option>
+                    <option value="5">失败</option>
+                </select>
+            </div>
+            <div class="layui-inline">
+                <input class="layui-input" name="currency" placeholder="搜索币种名称" id="test-table-demoReload">
+            </div>
+            <div class="layui-inline">
+                <input class="layui-input" name="mobile" placeholder="搜索提币手机号" id="test-table-demoReload">
+            </div>
+            <div class="layui-inline">
+                <input class="layui-input" name="txnum" placeholder="搜索提币订单号" id="test-table-demoReload">
+            </div>
+            <div class="layui-inline">
+                <input class="layui-input" name="qianbao_url" placeholder="搜索提现地址" id="test-table-demoReload">
+            </div>
+            <div class="layui-inline">
+                <button class="layui-btn" type="button" lay-submit lay-filter="tixian_search"><i class="layui-icon">&#xe615;</i>搜索</button>
+            </div>
+        </form>
+      
+        <table class="layui-hide" id="tixian" lay-filter="tixian"></table>   
+        <script id="tool_tixian_opr" type='text/html' templet>
+        {{# if(d.status==1){ }}
+            <button class="layui-btn layui-btn-xs" lay-event="audit">审核</button>
+            <button class="layui-btn layui-btn-xs layui-btn-danger" lay-event="refused">拒绝</button>
+        {{# }else{ }}
+            <button class="layui-btn layui-btn-xs layui-btn-disabled" disabled>审核</button>
+            <button class="layui-btn layui-btn-xs layui-btn-disabled" disabled>拒绝</button>
+        {{# } }}  
+        </script> 
+            
+    </div>
+</div>
+</div>
+</div>
+</div>
+      
+<script>
+layui.use(['admin','table', 'view', 'form','layer','laydate'], function(){
+    var $ = layui.$
+        ,admin = layui.admin
+        ,element = layui.element
+        ,form = layui.form
+        ,view = layui.view
+        ,laydate = layui.laydate
+        ,layer = layui.layer
+        ,table = layui.table;
+    //日期时间选择器
+    laydate.render({
+        elem: '#test-laydate-type-datetime-start'
+        ,type: 'datetime'
+    });
+    laydate.render({
+        elem: '#test-laydate-type-datetime-end'
+        ,type: 'datetime'
+    });
+    form.render();
+
+    form.on('submit(tixian_search)',function(datas){
+        get_data(datas.field);
+    });
+
+
+    var keywords="";
+    var act="";
+    var n=1;
+    var is_loading=true;
+    get_data({keywords:''});
+    function get_data(param){
+    table.render({
+        elem: '#tixian'
+        ,url: layui.setter.baseUrl+'admin/Withdrawal/index'
+        ,toolbar: '#tool_tixian'
+        ,parseData: function(res){ //res 即为原始返回的数据
+            if(is_loading==true){
+                // 筛选条件
+                var list="<option value=''>操作状态</option>";
+                for(var i in res.data.status){
+                    list+="<option value='"+i+"'>"+res.data.status[i]+"</option>";
+                }
+                $('#tixian_status').html(list);
+                is_loading=false;
+                form.render();
+            }
+            return {
+            "code": res.code, //解析接口状态
+            "msg": res.msg, //解析提示文本
+            "count": res.data.count, //解析数据长度
+            "data": res.data.list //解析数据列表
+            };
+        }
+        ,cols: [[
+            {field:'id', width:85, title: '序号', sort: true, align:'center'}
+            ,{field:'txnum',title: '提币订单号', align:'center'}
+            ,{field:'currency',title: '币名', align:'center'}
+            ,{field:'account', title: '账号',align:'center'}
+            ,{field:'mobile', title: '手机号',align:'center'}
+            ,{field:'qianbao_url',title: '提币地址', align:'center'}
+            ,{field:'money',title: '提现总数', align:'center',sort:true,templet:function (d) {
+                    return d.money;
+                }}
+            ,{field:'actual',title: '实际到账', align:'center',sort:true,templet:function (d) {
+                    return d.actual;
+                }}
+            ,{field:'handling_fee',title: '手续费', align:'center',sort:true,templet:function (d) {
+                    return d.handling_fee;
+                }}
+            ,{field:'status',title: '操作类型', align:'center',templet:function(d){
+                    if(d.status==1){
+                        return "待审核";
+                    }else if(d.status==3){
+                        return "已拒绝";
+                    }else if(d.status==4){
+                        return "已到账";
+                    }else if(d.status==5){
+                        return "失败";
+                    }
+                }}
+            , {field: 'ti_id', title: '哈希值', align: 'center'}
+            ,{field:'created_at', title: '申请时间', align:'center',templet: "<div>{{layui.util.toDateString(d.created_at*1000, 'yyyy-MM-dd HH:mm:ss')}}</div>",sort:true}
+            ,{field:'mark', title: '备注', align:'center',align:'center'}
+            ,{fixed:'right',width:140, title: '操作', align:'center', toolbar: '#tool_tixian_opr'}
+        ]],
+        page:true,
+        limits:[10,20,50,100,500,1000,5000,10000,100000],
+        where:param
+    });
+    }
+
+    // 审核状态
+    table.on('tool(tixian)', function(obj){
+    var id=obj.data.id;
+    if(obj.event=='audit'){
+        layer.confirm('是否同意提现?', {icon: 3, title:'提示'}, function(index){
+            admin.req({
+                url: layui.setter.baseUrl+'admin/Withdrawal/remit' //实际使用请改成服务端真实接口
+                ,data: {id:id},
+                type:'get',
+                success: function(res){
+                    if(res.code==1){
+                        // console.log(res.msg)
+                        layer.msg(res.msg, {icon: 1,anim: 6,time: 1000},function(){
+                            layui.table.reload('tixian'); //重载表格
+                        });
+                    }else{
+                        layer.msg(res.msg, {icon: 5,anim: 6,shade:0.5,time: 1500});
+                    }
+                }
+            });
+        });
+    } else if(obj.event=='refused'){
+    layer.confirm('是否拒绝提现?', {icon: 3, title:'提示'}, function(index){
+        admin.req({
+        url: layui.setter.baseUrl+'admin/Withdrawal/reject' //实际使用请改成服务端真实接口
+        ,data: {id:id},
+        type:'get',
+        success: function(res){
+            if(res.code==1){
+                // console.log(res.msg)
+                layer.msg(res.msg, {icon: 1,anim: 6,time: 1000},function(){
+                    layui.table.reload('tixian'); //重载表格
+                });  
+            }else{
+                layer.msg(res.msg, {icon: 5,anim: 6,shade:0.5,time: 1500});
+            }
+        }
+        });  
+    });
+    }
+    });
+    
+    
+
+});
+</script>

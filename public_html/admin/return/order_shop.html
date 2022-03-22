@@ -1,0 +1,72 @@
+<title>采购订单</title>
+
+<div class="layui-row">
+    <div class="layui-col-md12">  
+    <form  class="layui-form" lay-filter="app-content-list">
+        <div class="layui-inline" style="width:300px;">
+            <input type="text" name="keywords" placeholder="单号/供应商/收货人/收货电话" autocomplete="off" class="layui-input">
+        </div>
+        <div class="layui-inline">
+            <button class="layui-btn layuiadmin-btn-list" lay-submit lay-filter="fo_search" type="button"><i class="layui-icon layui-icon-search layuiadmin-button-btn"></i></button>
+        </div>
+    </form>
+    </div>
+    <div class="layui-col-md12">
+        <table class="layui-hide" id="test-table-order_shop" lay-filter="test-table-order_shop"></table>          
+        <script type="text/html" id="test-table-toolbar-received_order">
+            <button type="button" class="layui-btn layui-btn-xs layui-btn-normal" lay-event="generate">生成退货单</button>
+        </script>
+    </div>
+</div>
+
+<script>
+layui.use(['admin','table','form','laydate'], function(){
+    var $ = layui.$
+    ,admin = layui.admin
+    ,view = layui.view
+    ,table = layui.table
+    ,setter = layui.setter
+    ,layer = layui.layer
+    ,laydate = layui.laydate
+    ,form = layui.form;
+      
+    form.render(null, 'app-content-list');
+
+    var keywords='';
+    get_data(keywords);
+    function get_data(keywords){
+      table.render({
+        elem: '#test-table-order_shop'
+        ,url: layui.setter.baseUrl+'admin/PurchaseRefunds/purchaseOrder' 
+        ,cellMinWidth: 80 
+        ,parseData:function(res){
+          return {
+            "code": res.code, //解析接口状态
+            "msg": res.msg, //解析提示文本
+            "count": res.data.count, //解析数据长度
+            "data": res.data.lists //解析数据列表
+            };
+        }
+        ,cols: [[
+            // {field:'o_id', title: 'ID', width:70, sort: true,align:"center"},
+            {field:'id', title: '采购收货单', width:120, sort: true, align:"center"}
+            ,{field:'supplier_name', title: '供应商', align:"center"}
+            ,{field:'order_money', title: '单据金额', align:"center"} 
+            ,{field:'create_time', title: '创建时间', align:"center"} 
+            ,{fixed: 'right', title:'操作', width:100, toolbar: '#test-table-toolbar-received_order', align:"center"}
+        ]],
+        page:true,
+        where:{keywords:keywords}
+      });
+    }
+    // 搜索
+    form.on('submit(fo_search)',function(e){
+      get_data(e.field.keywords);
+    });
+
+
+   
+  
+});
+</script>
+  

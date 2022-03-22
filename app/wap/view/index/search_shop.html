@@ -1,0 +1,357 @@
+{include file="public/header"/}
+</head>    
+<body>
+<header class="mui-bar mui-bar-nav index_header search_head" id="header">
+    <a class="back-page mui-icon mui-icon-left-nav mui-pull-left" href="javascript:;"></a>
+    <a id="menu" class="mui-action-menu mui-icon mui-icon-bars mui-pull-right" href="javascript:void(0);"></a>
+    <input class="mui-title" type="text" onfocus="window.location.href='/wap/index/search.html'" placeholder="Search more products">
+    </header>
+    <div class="street_nav search_listup">
+        <ul class="mui-clearfix">
+            <li class="search_li li_synthe" data-list="colligate">
+                <a href="javascript:void(0);">
+                    <span>Comprehensive</span>
+                    <i class="iconfont icon-arrDown"></i>
+                </a>
+            </li>
+            <li class="search_li s_li" data-list="sales_num">
+                <a href="javascript:void(0);">
+                    <span>Sales</span>
+                </a>
+            </li>
+            <li class="search_li s_li li_price" data-list="shop_price">
+                <a href="javascript:void(0);">
+                    <span>Price</span>
+                    <img class="arrow" src="__IMG__/jiantou_1.png" alt="">
+                    <img class="arrow_asc" src="__IMG__/jiantou_2.png" alt="">
+                    <img class="arrow_desc" src="__IMG__/jiantou_3.png" alt="">
+                </a>
+            </li>
+            <li class="li_screen" data-list="screen">
+                <a href="javascript:void(0);">
+                    <span>Filter</span>
+                <i class="iconfont icon-shaixuan"></i>
+            </a>
+        </li>
+        <li>
+            <a href="javascript:void(0);">
+                <i class="iconfont icon-list1 i_list"></i>
+            </a>
+        </li>
+    </ul>
+</div>
+<div class="mui-content search_content">     
+    <div class="search_listlow search_small">
+        <ul id="searchUl">            
+            <!-- <li><a href="javascript:void(0);">
+                <div class="searimg"><img src="__IMG__/touxiang.png" alt=""></div>
+                <div class="seartxt">
+                    <p class="name mui-ellipsis">女装</p>
+                    <p class="red">KRC 20.00元</p>
+                   <span>0 reviews</span>
+                </div>
+            </a></li>
+            <li><a href="javascript:void(0);">
+                <div class="searimg"><img src="__IMG__/touxiang.png" alt=""></div>
+                <div class="seartxt">
+                    <p class="name mui-ellipsis">Women's clothing</p>
+                    <p class="red">KRC $20.00</p>
+                    <span>0 reviews</span>
+                </div>
+            </a></li> -->
+        </ul>
+        <div class="dropDown"></div>
+    </div>
+    <div class="search_none" style="display:none;">
+        <img src="__IMG__/none3.png" alt="">
+        <p>Sorry, there are no relevant results at the moment, try another filter condition</p>
+    </div>
+</div>
+<!-- General -->
+<div class="search_synthebg">
+    <div class="search_synthe">
+        <a class="on" href="javascript:void(0);" data-list="colligate">
+            <span>Comprehensive</span>
+            <i class="iconfont icon-duihao"></i>
+        </a>
+        <a href="javascript:void(0);" data-list="sales_num">
+            <span>Sales</span>
+            <i class="iconfont icon-duihao"></i>
+        </a>
+        <a href="javascript:void(0);" data-list="shop_price">
+            <span>Price</span>
+            <i class="iconfont icon-duihao"></i>
+        </a>
+    </div>
+</div>
+<!-- filter -->
+<div class="search_screen">
+    <div class="screen_body">
+        <div class="screen_header">
+            <p>Filter</p>
+        </div>
+        <div class="screen_content">
+            <ul class="screen_up">
+                <li><i class="iconfont icon-duihao"></i><span>Show all</span></li>
+                <li><i class="iconfont icon-duihao"></i><span>Free shipping only</span></li>
+                <li><i class="iconfont icon-duihao"></i><span>Available only</span></li>
+                <li><i class="iconfont icon-duihao"></i><span>Promotional items</span></li>
+            </ul>
+            <div class="m10"></div>
+            <div class="sc_filter" id="filter">
+                <!-- <div class="screen_list">
+                    <p class="screen_tit">Branding
+                        <i class="iconfont icon-arrow-down"></i>
+                    </p>s
+                    <ul class="screen_listul">
+                        <li><span>Apple</span><i class="iconfont icon-duihao"></i></li>
+                        <li><span>Apple</span><i class="iconfont icon-duihao"></i></li>
+                        <li><span>Apple</span><i class="iconfont icon-duihao"></i></li>
+                    </ul>
+                </div> -->
+            </div>
+            
+        </div>
+        <div class="screen_footer mui-clearfix">
+            <button class="reset">Reset</button>
+            <button class="confirm">OK</button>
+        </div>
+    </div>
+    
+</div>
+<div class="search_screenbg"></div>
+
+{include file="public/head_nav"/}
+{include file="public/footer"/}
+<script type="text/html" id="goods">
+<li><a href="javascript:void(0);">
+    <div class="searimg"><img src="{{original_img}}" alt=""></div>
+    <div class="seartxt">
+        <p class="name">{{goods_name}}</p>
+        <p class="red">KRC {{shop_price}}$</p>
+        <span class="elalu">{{comment_count}} reviews</span>&nbsp;
+        <span class="payment">{{sales_num}} people pay</span>
+    </div>
+</a></li>
+</script>
+<script>
+/* ---default data--- */
+var searchname = "{:input('searchname')}";
+$('.mui-title').val(searchname);
+var type=getQueryString('type');
+
+if(searchname==""){
+    searchname=type;
+}
+
+var par;
+    getData();
+    function getData(){
+        par={
+            type:searchname,
+            order_by:'colligate',
+            order:'desc',
+            page:1,num:8,screen:''
+        }
+        $get('/api/goods/special_goods',par,function(d){
+            // console.log(d);
+            if(d.status == 1){
+                var list = "";
+                var obj=d.data.goods_list;
+                for(var i in obj){
+                    list+=template('goods',obj[i]);
+                }
+                $('.search_listlow ul').html(list);
+                
+                /* filter */
+                var screen_div = "";
+                var obj_1 = d.data.filter;  
+
+                for( i = 0;i < obj_1.length;i++){                       
+                    for( k in obj_1[i][0] ){ 
+                        var screen_ul = ""; 
+                        if(obj_1[i][0][k].length != 0){
+                            for( j in obj_1[i][0][k]){   
+                                screen_ul+= '<li><span data-key="'+obj_1[i][0][k][j].key+'" data-value="'+obj_1[i][0][k][j].value+'">'+obj_1[i][0][k][j].name+'</span><i class="iconfont icon-duihao"></i></li>';
+                            }
+                            screen_div+='<div class="screen_list"><p class="screen_tit">'+k+'<i class="iconfont icon-arrow-down"></i></p><ul class="screen_listul">'+screen_ul+'</ul></div> ';
+                        }                            
+                    }
+                }
+                $('#filter').html(screen_div);
+                //Filtering---The selection of price, brand... 
+                $('.screen_listul>li').on('tap',function(){                       
+                    $(this).toggleClass('active');
+                    $(this).siblings().removeClass('active'); 
+                })  
+                $('.screen_tit').on('tap',function(){            
+                    $(this).siblings('.screen_listul').slideToggle();
+                    if($(this).find('i').hasClass('icon-arrow-down')){
+                        $(this).find('i').addClass('icon-arrow-up').removeClass('icon-arrow-down');
+                    }else{
+                        $(this).find('i').addClass('icon-arrow-down').removeClass('icon-arrow-up');
+                    }
+                }) 
+            } else{
+                $('.search_listlow').hide();
+                $('.search_none').show();
+            }
+        });
+        Load(par);
+    } 
+    //The selected style of 'Comprehensive' 'Sales'...
+    $('.street_nav .search_li').on('tap',function(){
+        $(this).addClass('on');
+        $(this).siblings().removeClass('on');
+        if($('.li_price').hasClass('on')){
+            $('.li_price').addClass('li_price_desc');                       
+        } else{
+            $('.li_price').attr('class','search_li s_li li_price');
+        }          
+    })
+    //comprehensive            
+    $('.search_synthe a').on('tap',function(){
+        $(this).addClass('on');
+        $(this).siblings().removeClass('on');
+        $('.search_synthebg').hide();
+        var txt=$(this).find('span').html();       
+        $('.li_synthe').find('span').html(txt);
+    
+        var list=$(this).attr('data-list');     
+        $('.li_synthe').attr('data-list',list); 
+        par.order_by=list;
+        strData();
+    });    
+    $('.li_synthe').on('tap',function(){
+        $('.search_synthebg').show();
+    })
+    $('.search_synthebg').on('click',function(event){
+		if(event.target==this){
+            $('.search_synthebg').hide();
+        }                  
+	})  
+    /* filter---OK */
+    $('.screen_footer .confirm').on('tap',function(){
+        strData();
+    })
+    // filter reset
+    $('.screen_footer .reset').on('tap',function(){
+        $('.screen_content').find('li').removeClass('active');
+    })
+    /* ------ */
+    $('.search_listup .s_li').on('tap',function(){
+        strData();
+    })
+    function strData(){
+        var list=$('.search_listup .on').attr('data-list');
+        if($('.s_li').hasClass('li_price_asc')){ // descending order
+            order='desc';
+        }else if($('.s_li').hasClass('li_price_desc')){ //Ascending
+            order='asc';                 
+        } else{
+            order='desc'; 
+        }
+        var brand="";
+        var price="";
+        var screen="";
+        $('.screen_list .active').each(function(){
+            brand = $(this).find('span').attr('data-key');
+            price = $(this).find('span').attr('data-value');
+            screen +='@'+brand+'-'+price;
+        })
+        // console.log(list,screen.substring(1)); 
+        var par={
+            type:searchname,
+            order_by:list,
+            order:order,
+            page:1,
+            num:8,
+            screen:screen.substring(1)
+        }
+        $get('/api/goods/special_goods',par,function(d){
+            // console.log(d);                
+            if(d.status == 1){
+                var list = "";
+                var obj=d.data.goods_list;
+                for(var i in obj){
+                    list+=template('goods',obj[i]);
+                }
+                $('.search_listlow ul').html(list);
+            } else{
+                $('.search_listlow').hide();
+                $('.search_none').show();
+            }
+        }); 
+        Load(par);
+    }
+    function Load(par){
+        upLoad(
+            $(document),
+            $('#searchUl').next(".dropDown"),
+            function(suc,err){
+                par.page++;
+                $get('/api/goods/special_goods',par, function (d) {
+                    if(d.status == 1){
+                        var list = "";
+                        var obj=d.data.goods_list;
+                        for(var i in obj){
+                            list+=template('goods',obj[i]);
+                        }
+                        $('.search_listlow ul').append(list);
+                        suc();
+                    } else {
+                        err();
+                    }
+                });
+            }
+        );
+    }
+    //Change the graphic list style
+    $('.i_list').on('tap',function(){
+        if($(this).hasClass('icon-list1')){
+            $(this).addClass('icon-list2').removeClass('icon-list1');
+            $('.search_listlow').addClass('search_big').removeClass('search_small');
+        }else{
+            $(this).addClass('icon-list1').removeClass('icon-list2');
+            $('.search_listlow').addClass('search_small').removeClass('search_big');
+        }
+    })
+    //price
+    $('.li_price').on('tap',function(){
+        if($(this).hasClass('li_price_asc')){ //price in descending order
+            $(this).addClass('li_price_desc').removeClass('li_price_asc');
+        }else{ //price in ascending order
+            $(this).addClass('li_price_asc').removeClass('li_price_desc');
+        }
+    })
+    //filter---
+    $('.li_screen').on('tap',function(){
+        $('.search_screen').css('transform','translateX(0)');
+        $('.search_screenbg').show();
+        $('.search_screenbg').css('opacity','1');
+    })
+    $('.search_screen,.screen_footer .confirm').on('tap',function(event){
+        if(event.target==this){
+            $('.search_screen').css('transform','translateX(100%)');
+            $('.search_screenbg').hide();
+            $('.search_screenbg').css('opacity','0');
+        }
+    })
+    //Filtering---show all, free shipping...selected
+    $('.screen_up>li').on('tap',function(){
+        $(this).addClass('active');
+        $(this).siblings().removeClass('active');
+    })
+    // get the address bar
+    function getQueryString(name) {
+        var reg = new RegExp('(^|&)' + name + '=([^&]*)(&|$)', 'i');
+        
+        var r = window.location.search.substr(1).match(reg);
+        if (r != null) {
+            return unescape(r[2]);
+        }
+        return null;
+    }
+</script>
+</body>
+</html>

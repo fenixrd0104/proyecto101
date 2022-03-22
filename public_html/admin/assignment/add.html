@@ -1,0 +1,198 @@
+<link href="/static/admin/umedit/themes/default/css/umeditor.css" type="text/css" rel="stylesheet">
+<style>
+    .edui-tab-item{
+        line-height: 11px;
+    }
+</style>
+<form class="layui-form" action="" lay-filter="add_article" style="padding: 20px 30px 0 0;">
+    <div class="layui-form-item">
+        <label class="layui-form-label">标题</label>
+        <div class="layui-input-block">   
+            <script type="text/html" template>                        
+            <input type="text" name="title" lay-verify="required" placeholder="请输入标题" autocomplete="off" class="layui-input" value="{{ d.params.title || '' }}" >
+            </script>    
+        </div>
+    </div>
+
+    <div class="layui-form-item">
+        <label class="layui-form-label">描述</label>
+        <div class="layui-input-block">
+            <script type="text/html" template>
+                <input type="text" name="description" lay-verify="required" placeholder="请输入描述" autocomplete="off" class="layui-input" value="{{ d.params.description || '' }}" >
+            </script>
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">详情</label>
+        <div class="layui-input-block"> 
+            <textarea name="content" autocomplete="off" lay-verify="required" placeholder="输入详情" class="layui-textarea">{{ d.params.content || '' }}</textarea>
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">封面</label>
+        <div class="layui-input-block">
+            <div class="layui-input-inline">
+                <input name="cover" id="goods_img" placeholder="图片地址"  class="layui-input">
+            </div>
+            <div class="layui-input-inline layui-btn-container" style="width: auto;">
+                <button type="button" class="layui-btn" id="LAY_avatarUpload">
+                    <i class="layui-icon">&#xe67c;</i>上传图片
+                </button>
+                <a class="layui-btn layui-btn-primary" onclick="see_img();">查看图片</a>
+            </div>
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">奖励</label>
+        <div class="layui-input-block">
+            <script type="text/html" template>
+                <input type="text" name="reward" lay-verify="required" placeholder="请输入奖励" autocomplete="off" class="layui-input" value="{{ d.params.reward || '' }}" >
+            </script>
+        </div>
+    </div>
+
+
+
+
+
+
+    <div class="layui-form-item">
+        <div class="layui-input-block">
+            <button type="button" class="layui-btn" lay-submit="" lay-filter="add_ar">+保存</button>
+        </div>
+    </div>
+    <script type="text/html" template lay-done="layui.data.sendParams(d.params)">
+  
+    </script>
+</form>
+<script src="/static/admin/layui/lay/modules/jquery.3.1.1.js"></script>
+<script src="/static/admin/umedit/umeditor.config.js"></script>
+<script src="/static/admin/umedit/umeditor.min.js"></script>
+<script src="/static/admin/umedit/lang/zh-cn/zh-cn.js"></script>
+    
+<script>
+layui.data.sendParams = function(params){
+    console.log(params);
+    var um = UM.getEditor('editor',{
+        initialFrameWidth:600,
+        initialFrameHeight:350,
+        // imageFieldName:"file" //上传图片的表单的name
+    });
+
+    UM.getEditor('editor').addListener('blur',function(editor){
+        $('#get_content').val(UM.getEditor('editor').getContent());
+    });
+    
+    layui.use(['admin','form','upload','layedit','view','setter','layer'], function(){
+      var $ = layui.$
+      ,admin = layui.admin
+      ,setter = layui.setter
+      ,layedit = layui.layedit
+      ,element = layui.element
+      ,form = layui.form
+      ,view = layui.view
+      ,layer = layui.layer
+      ,upload = layui.upload
+      ,router = layui.router();
+  
+      element.render();      
+      form.render(null, 'add_article');
+
+    if(params.id){
+        
+        // admin/Article/editArticle
+        admin.req({
+            url: layui.setter.baseUrl+'admin/article/editArticle' //实际使用请改成服务端真实接口
+            ,data: {id:params.id},
+            type:'get',
+            success: function(res){
+                if(res.code==1){
+                    um.setContent(res.data.info.content);
+                    form.val('add_article',{
+                        'keyword':res.data.info.keyword,
+                        'remark':res.data.info.remark,
+                        'content':res.data.info.content,
+                        'writer_img':res.data.info.writer_img,
+                        'writer':res.data.info.writer,
+                        'photo':res.data.info.photo
+                    });
+                }else{
+                    layer.msg(res.msg);
+                }       
+            } 
+        }); 
+    }
+
+ 
+      // 查看图片
+      window.see_img=function(){
+        var i = $('#goods_img').val();
+
+        layer.photos({
+            photos: {
+                title: "查看头像",
+                data: [{
+                    src: i
+                }]
+            },
+            shade: 0.5,
+            closeBtn: 1,
+            anim: 5
+        });
+      };
+      window.see_img2=function(){
+        var i = $('#writer_img').val();
+
+        layer.photos({
+            photos: {
+                title: "查看头像",
+                data: [{
+                    src: i
+                }]
+            },
+            shade: 0.5,
+            closeBtn: 1,
+            anim: 5
+        });
+      };
+      //多图片上传
+      upload.render({
+        elem: '#LAY_avatarUpload'
+        ,url: layui.setter.baseUrl+'admin/upload/upload'
+        ,multiple: true
+        ,before: function(obj){
+            //预读本地文件示例，不支持ie8
+            obj.preview(function(index, file, result){
+                $('#upload_goods_images_box').append('<img src="'+ result +'" alt="'+ file.name +'" class="layui-upload-img" style="width:120px;height:120px;margin:0 15px 15px 0px;">')
+            });
+        }
+        ,done: function(res){            
+            //上传完毕
+            $('#goods_img').val(res.data);
+            layer.msg(res.msg);
+        }
+      });
+
+      //多图片上传
+      upload.render({
+        elem: '#LAY_avatarUpload2'
+        ,url: layui.setter.baseUrl+'admin/upload/upload'
+        ,multiple: true
+        ,before: function(obj){
+            //预读本地文件示例，不支持ie8
+            obj.preview(function(index, file, result){
+                $('#upload_goods_images_box').append('<img src="'+ result +'" alt="'+ file.name +'" class="layui-upload-img" style="width:120px;height:120px;margin:0 15px 15px 0px;">')
+            });
+        }
+        ,done: function(res){            
+            //上传完毕
+            $('#writer_img').val(res.data);
+            layer.msg(res.msg);
+        }
+      });
+     
+      
+    });
+
+} 
+</script>

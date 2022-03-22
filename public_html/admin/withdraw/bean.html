@@ -1,0 +1,129 @@
+<title>豆日志</title>
+<div class="layui-card layadmin-header">
+  <div class="layui-breadcrumb" lay-filter="breadcrumb">
+      <a>会员管理</a>
+      <a><cite>豆日志</cite></a>
+  </div>
+</div>
+
+<div class="layui-fluid">
+        <div class="layui-row layui-col-space15">
+          <div class="layui-col-md12">
+            <div class="layui-card">
+              <div class="layui-card-header">豆日志</div>
+              <div class="layui-card-body"> 
+                  <div class="test-table-reload-btn" style="margin-bottom: 10px;">
+                    
+                    <!-- <div class="layui-input-inline">
+                        <button type="button" class="layui-btn layuiadmin-btn-admin" style="margin-right: 30px;" data-type="add"><i class="layui-icon layui-icon-add-1 layuiadmin-button-btn"></i>添加会员组</button>
+                    </div> -->
+                    <div class="layui-input-inline">
+      
+                        <form class="layui-form">
+                          <div class="layui-inline">
+                            <select name="act" id="bean_status">
+                               
+                            </select>
+                         </div>
+                         <div class="layui-inline">
+                             <div class="layui-input-inline">
+                               <input type="text" class="layui-input" id="test-laydate-type-datetime-start" name="start_time" placeholder="开始时间">
+                             </div>
+                           </div>
+                           <div class="layui-inline">
+                             <div class="layui-input-inline">
+                               <input type="text" class="layui-input"  name="end_time" id="test-laydate-type-datetime-end" placeholder="结束时间">
+                             </div>
+                           </div>
+                            <div class="layui-inline">
+                                <input class="layui-input" name="keywords" placeholder="搜索账号/会员ID" id="test-table-demoReload" autocomplete="off">
+                              </div>
+                              <button class="layui-btn" type="button" lay-submit lay-filter="bean_search"><i class="layui-icon">&#xe615;</i>搜索</button>
+                        </form>
+                       
+                    </div>
+                   
+                  </div>   
+                  <div class="test-table-reload-btn" style="margin-bottom: 10px;">
+                    
+                  </div>   
+                  <table class="layui-hide" id="bean" lay-filter="bean"></table>    
+               
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <script>
+      layui.use(['admin','table', 'view', 'form','layer','laydate'], function(){
+        var $ = layui.$
+        ,admin = layui.admin
+        ,element = layui.element
+        ,form = layui.form
+        ,view = layui.view
+        ,laydate = layui.laydate
+        ,layer = layui.layer
+        ,table = layui.table;
+           //日期时间选择器
+          laydate.render({
+              elem: '#test-laydate-type-datetime-start'
+              ,type: 'datetime'
+          });
+          laydate.render({
+              elem: '#test-laydate-type-datetime-end'
+              ,type: 'datetime'
+          });
+          form.render();
+
+        form.on('submit(bean_search)',function(datas){
+            get_data(datas.field);
+        });
+       
+      
+        var keywords="";
+          var act="";
+          var first=true;
+          get_data({keywords:''});
+          function get_data(param){
+            table.render({
+              elem: '#bean'
+              ,url: layui.setter.baseUrl+'admin/member/tianyuan_details'
+              ,parseData: function(res){ //res 即为原始返回的数据
+                  act=res.data.atc_list;
+                  if(first==true){
+                    var list='<option value="">--请选择--</option>';
+                    for(var i in act){
+                      list+='<option value="'+i+'">'+act[i]+'</option>'
+                    }
+                    $('#bean_status').html(list);
+                    form.render();
+
+                  }
+                  first=false;
+                  return {
+                  "code": res.code, //解析接口状态
+                  "msg": res.msg, //解析提示文本
+                  "count": res.data.count, //解析数据长度
+                  "data": res.data.lists //解析数据列表
+                  };
+              }
+              ,cols: [[
+                {field:'id', width:85, title: '序号', sort: true, align:'center'}
+                ,{field:'uid',  title: '会员ID',align:'center'}
+                ,{field:'account',title: '会员账号', align:'center'}
+                ,{field:'num',title: '金额', align:'center'}
+                ,{field:'update_time', title: '发生时间', align:'center'}
+                ,{field:'remark', title: '备注', align:'center'}
+              ]],
+              page:true,
+              where:param
+            });
+          }
+          
+
+         
+
+      
+      });
+      </script>

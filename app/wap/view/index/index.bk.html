@@ -1,0 +1,217 @@
+{include file="public/header"/}
+</head>    
+<body style="background: #f0f0f0;">
+<header class="mui-bar mui-bar-nav index_head" id="index_head">
+    <div class="index_left fl">
+        <img class="small_search" src="__IMG__/search_1.png">
+        <input type="search" name="searchgoods" class="index-search" placeholder="Please enter the product you are searching for" id="search_input">
+    </div>
+    <div class="index_right fr">
+        <img class="index_pic hide" onclick="window.location.href='/wap/user/my.html'" src="__IMG__/search_2.png"/>
+        <a href="/wap/index/login.html" class="hide">Login</a>
+    </div>
+</header>
+<div class="mui-content" style="padding-top: 0 !important;">
+    <!-- banner image -->
+    <div class="swiper-container lunbo">
+        <div class="swiper-wrapper" id="s_wrapper">
+        </div>
+        <div class="swiper-pagination"></div>
+    </div>
+    <!-- nav icon -->
+    <div class="index_nav">
+        <a href="/wap/index/classify.html">
+            <img src="__IMG__/icon_01.png"/>
+            <span>All categories</span>
+        </a>
+        <a href="/wap/index/street.html">
+            <img src="__IMG__/icon_02.png"/>
+            <span>Store Street</span>
+        </a>
+        <a href="/wap/index/exchange.html">
+            <img src="__IMG__/icon_03.png"/>
+            <span>KRC Ecology</span>
+        </a>
+        <a href="/wap/index/news.html">
+            <img src="__IMG__/icon_04.png"/>
+            <span>News</span>
+        </a>
+    </div>
+    <!-- Announcement -->
+    <div class="flex_between bg_white notice">
+        <div class="notice_left">
+            <h3>Mall</h3>
+            <p>Announcements</p>
+        </div>
+        <div id="notice_swiper" class="swiper-container swiper-no-swiping notice_swiper">
+            <div class="swiper-wrapper" id="s_notice">
+               
+            </div>
+        </div>
+    </div>
+    <!-- Product list -->
+    <div class="mb5"></div>
+    <div class="index_title">
+        <h1>Recommendation area</h1>
+        <a class="fr" href="/wap/index/goods_list.html?type=is_recommend">See more></a>
+    </div>
+    <ul class="goods_ul" id="recomm_ul">
+        
+    </ul>
+    <!-- Points redemption list -->
+    <div class="index_title">
+        <h1>Hashrate exchange</h1>
+        <a class="fr" href="/wap/index/goods_list.html?type=is_deduction">See more></a>
+    </div>
+    <ul class="goods_ul" id="inter_ul">
+        
+    </ul>
+    <div class="mb30"></div>
+    <div class="index_stop" onclick="$('html,body').animate({'scrollTop':0},600);"><i class="iconfont icon-top"></i> </div>
+</div>
+{include file="public/nav"/}
+{include file="public/footer"/}
+<script type="text/html" id="lunbo">
+    <div class="swiper-slide">
+        <img src="{{images}}" alt="">
+    </div>
+</script>
+<script type="text/html" id="notice">
+    <div class="swiper-slide">
+        <a class="mui-ellipsis" href="/wap/index/notice_detail.html?id={{id}}">{{title}}</a>
+    </div>
+</script>
+<script type="text/html" id="recomm_list">
+    <li><a href="/wap/index/goods_info.html?id={{id}}">
+        <img src="{{original_img}}" width="100%">
+        <div class="goods_li_txt">
+            <h1 class="mui-ellipsis-2">{{goods_name}}</h1>
+            <p><span>KRC </span>{{shop_price}}</p>
+            <span> {{sales_num}} units sold</span>
+        </div>
+    </a></li>
+</script>
+<script type="text/html" id="inter_list">
+    <li><a href="/wap/index/goods_info.html?id={{id}}">
+        <img src="{{original_img}}" width="100%">
+        <div class="goods_li_txt">
+            <h1 class="mui-ellipsis-2">{{goods_name}}</h1>
+            <!-- <h3>{{exchange_integral}}Points={{exchange_integral_money}}KRC</h3> -->
+            <h3>{{shop_price}}Hashpower</h3>
+            <span>Price US {{shop_price}}</span>
+        </div>
+    </a></li>
+</script>
+<script>
+// carousel
+var mySwiper = new Swiper('.lunbo', {
+    autoplay: true,
+    pagination: {
+        el: '.swiper-pagination',
+    },
+});
+// list of announcements
+var noticeSwiper = new Swiper('#notice_swiper', {
+    direction: 'vertical',
+    slidesPerView: 2, // Display several slides per page
+    autoplay: {
+        delay: 3000,
+        disableOnInteraction: false,
+    }
+   
+});
+// 
+get_info();
+function get_info(){
+    $get('/api/user/getuserinfo',{},function(data){
+        if(data.code==1){
+           $('.index_right img').show();
+        }else{
+            // mui.toast(data.msg);
+           $('.index_right a').show();
+        }   
+    });
+    $get('/api/ad/wap_index',{},function(data){
+        var lunbo = "";
+        for(var i in data[1]){
+            lunbo+=template("lunbo",data[1][i]);
+        }
+        mySwiper.appendSlide(lunbo);
+        var notice = "";
+        for(var a in data[2]){
+            notice+=template("notice",data[2][a]);
+        }
+        noticeSwiper.appendSlide(notice);
+    });
+var par={
+    type: 'is_recommend',
+    order_by: 'colligate',
+    order: 'asc',
+    page: 1,
+    num: 10,
+    screen: ''
+}
+var par_s={
+    type: 'is_deduction',
+    order_by: 'colligate',
+    order: 'asc',
+    page: 1,
+    num: 10,
+    screen: ''
+}
+    $get('/api/goods/special_goods',par,function(data){
+        var recomm_list = "";
+        for(var i in data.data.goods_list){
+            recomm_list+=template("recomm_list",data.data.goods_list[i]);
+        }
+        $('#recomm_ul').html(recomm_list);
+    });
+    $get('/api/goods/special_goods',par_s,function(data){
+        var inter_list = "";
+        for(var i in data.data.goods_list){
+            inter_list+=template("inter_list",data.data.goods_list[i]);
+        }
+        $('#inter_ul').html(inter_list);
+    });
+}
+
+// search
+$('.small_search').on('tap',function () {
+    var sear_inp=$("input[name = searchgoods]").val();
+    if(sear_inp == ""){
+        mui.toast("Please enter the search content");
+    }else{
+        window.location.href='/wap/index/goods_list/searchname/'+ sear_inp;
+    }
+});
+$("#search_input").on('keypress', function(e) {
+        var keycode = e.keyCode;
+        //Get the value of the search box
+        var searchContent = $(this).val();
+        if (keycode == '13') {
+            e.preventDefault();
+            //Request search interface
+            if (searchContent == '') {
+                mui.toast('Please enter the search content');
+            } else {
+                console.log('click to search')
+                window.location.href='/wap/index/goods_list/searchname/'+ searchContent;
+            }
+        }
+    });
+// header background color
+$(window).scroll(function(){              
+    var head_height = $(window).scrollTop();
+    if(head_height > $('.index_head').height()){
+        $('.index_head').addClass('index_head_red');
+    }else{
+        $('.index_head').removeClass('index_head_red');
+    };
+});
+// Back to top
+$(".comebackTop").on('tap',function () {
+    $('body,html').animate({ scrollTop: 0 }, 300);
+});
+</script>
+</body>
+</html>

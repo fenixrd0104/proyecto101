@@ -1,0 +1,115 @@
+{include file="public/header" /}
+<style>
+        .bg_red_s{
+            background:#fe4c40;
+        }
+    </style>
+</head>
+<body style="background: #f0f0f0;">
+<header class="mui-bar mui-bar-nav bg_white" id="header">
+    <a class="back-page mui-icon mui-icon-left-nav mui-pull-left" href="javascript:;"></a>
+    <a id="menu" class="mui-action-menu mui-icon mui-icon-bars mui-pull-right" href="javascript:;"></a>
+    <h1 class="mui-title">Merchant management</h1>
+    </header>
+    <div class="mui-content">
+        <div class="store_top">
+            
+        </div>
+        <div class="mb10"></div>
+        <div class="store_nav bg_white">
+            <h3>My Apps</h3>
+            <ul class="store_nav_ul">
+                <li><a href="javascript:;" onclick='to_edit();'>
+                    <div class="s_div bg_blus_s"><i class="iconfont icon-sjzl"></i></div>
+                    <p>Business Profile</p>
+                </a></li>
+                <li><a href="javascript:;" onclick='to_store();'>
+                    <div class="s_div bg_orange_s"><i class="iconfont icon-dp"></i></div>
+                    <p>Store</p>
+                </a></li>
+                <li><a href="/wap/store/store_goods.html">
+                    <div class="s_div bg_green_s"><i class="iconfont icon-sp"></i></div>
+                    <p>Products</p>
+                </a></li>
+                <li><a href="/wap/store/store_order.html">
+                    <div class="s_div bg_yellow_s"><i class="iconfont icon-dd"></i></div>
+                    <p>Order</p>
+            </a></li>
+            <li><a href="/wap/store/store_baodan.html">
+                <div class="s_div bg_red_s"><i class="iconfont icon-baodan"></i></div>
+                <p>Invoice</p>
+            </a></li>
+            <li><a href="/wap/store/store_sales.html">
+                <div class="s_div bg_orange_s"><i class="iconfont icon-xs"></i></div>
+                <p>Sales Pool</p>
+            </a></li>
+            <li><a href="/wap/store/store_water.html">
+                <div class="s_div bg_pink_s"><i class="iconfont icon-ls"></i></div>
+                <p>Inventory Pool</p>
+            </a></li>
+        </ul>
+    </div>
+    <div class="mb10"></div>
+    <div class="store_nav bg_white">
+        <h3>PC-side merchant background</h3>
+        <div class="p_href_div">
+            <!-- <span>Link:</span> -->
+            <span class="p_href" title=""></span>
+        </div>
+        <div class="mb15"></div>
+        <button title="" type="button" id="btn_code" class="href_btn">Click to copy</button>
+        <div class="mb10"></div>
+    </div>
+    <div class="mb20"></div>
+    <div class="agent_txt">
+        <h3>Warm reminder:</h3>
+        <p>Copy the link above, open it on a computer browser, manage the store, upload products and more! </p>
+    </div>
+</div>
+
+{include file="public/head_nav"/}
+{include file="public/footer"/}
+<script type="text/template" id="content">
+    <div class="store_head">
+        <img src="{{image}}" alt="">
+        <div class="store_head_txt">
+            <h3 id="user_name">{{nickname}}</h3>               
+            <p><i><img src="__IMG__/img_10.png" alt="" id="this_img"></i>{{name}}</p>                
+           <p>Shop ID: {{shop_id}}</p>
+        </div>
+    </div>
+    <p>Opening time: {{create_time}}</p>
+</script>
+<script>
+var shop_id='';
+get_data();
+function get_data(){
+    var u_url=baseurl+'merchant/#/user/login';
+    $('.p_href').html(u_url);
+    $('.p_href').attr('title',u_url);
+    $get('/api/merchant/merchant_management',{},function(res){
+        if(res.status==1){
+            res.data.image=res.data.image||'__IMG__/touxiang.png';
+            $('.store_top').html(template('content',res.data));
+            shop_id=res.data.shop_id;
+        }
+    });
+}
+function to_edit(){
+    if(shop_id!=''){
+        window.location.href='/wap/store/edit_store.html?id='+shop_id;
+    }
+}
+function to_store(){
+    window.location.href='/wap/store/store_info.html?shop_id='+shop_id;
+}
+// copy the address
+$('#btn_code').on('tap',function(){
+    mui.toast("Copied");
+    var val = $('.p_href').attr('title');
+    $(this).attr('data-clipboard-text', val);
+    var clipboard = new ClipboardJS('#btn_code');
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,362 @@
+{include file="public/header" /}
+<style>
+    #mescroll {
+        position: fixed;
+        top: 0.9rem;
+        bottom: 0;
+        left: 0;
+        width: 100%;
+        height: auto;
+    }
+
+    .mui-popup-text {
+        padding: 0 0 0.1rem 0 !important;
+    }
+
+    .focus_tab {
+        background: #242424;
+    }
+
+    #header .mui-pull-right {
+        font-size: 0.14rem;
+        padding: 0;
+        line-height: 44px;
+        color: #c0a065;
+    }
+
+    .cancel_btn {
+        color: #999;
+        width: 100%;
+        border: 1px solid #999;
+        display: inline-block;
+        text-align: center;
+        font-size: 0.12rem;
+        border-radius: 3px;
+        -webkit-border-radius: 3px;
+        -moz-border-radius: 3px;
+        -ms-border-radius: 3px;
+        -o-border-radius: 3px;
+    }
+</style>
+</head>
+
+<body class="order_list bg-re mypop" style="background: #f8f8f8;">
+    <header class="mui-bar mui-bar-nav index_header bg_white" id="header">
+        <a class="mui-icon mui-icon-left-nav mui-pull-left" href="/wap/user/my.html"></a>
+        <a class="mui-pull-right" href="javascript:void(0);"
+            onclick="window.location.href='/wap/user/auction.html'">Apply</a>
+        <h1 class="mui-title">My <span id="order_type"></span>Auction</h1>
+    </header>
+    <div class="mui-content">
+        <div class="focus_tab focus_hd">
+            <ul>
+                <li data-type="1" class="on">Initiated by me</li>
+                <li data-type="2">I was captured</li>
+                <li data-type="3">My Appointments</li>
+            </ul>
+            <p id="attention" style="padding: 0.05rem 0.1rem;background: #161616;display:none;">
+                Please place an order within 1 hour for the products to be auctioned, otherwise the qualification to be auctioned will be automatically cancelled and the relevant deposit will be deducted. </p>
+        </div>
+        <div class="search_listlow search_small">
+            <div class="mescroll" id="mescroll">
+                <ul id="dataList">
+
+                </ul>
+            </div>
+        </div>
+    </div>
+    <div class="mescroll-empty empty-info" style="display:none">
+        <img class="empty-icon" src="/static/wap/images/none2.png">
+        <p class="empty-tip">There is no auction record at the moment~</p>
+    </div>
+    </div>
+
+    {include file="public/head_nav"/}
+    {include file="public/footer"/}
+    <script type="text/template" id="list">
+        {{ if is_overdue ==2 }}
+        <li class="over_time">
+        {{ else }}
+        <li>
+        {{ /if }}
+            {{ if is_private==1}}
+                {{ if _type == 3}}
+                    <a href="javascript:;" onclick="next(1,{{auction_id}})">
+                {{ else }}
+                    <a href="javascript:;" onclick="next(1,{{id}})">
+                {{ /if}}
+            {{ else }}
+                {{ if _type == 3}}
+                    <a href="javascript:;" onclick="next(0,{{auction_id}})">
+                {{ else }}
+                    <a href="javascript:;" onclick="next(0,{{id}})">
+                {{ /if}}
+            {{ /if}}
+            {{ if goods_img}}
+            <div class="searimg"><img src="{{goods_img}}" alt=""></div>
+            {{ else }}
+            <div class="searimg"><img src="__IMG__/class.png" alt=""></div>
+            {{ /if }}
+            <div class="seartxt">
+                <div class="mui-clearfix">
+                {{ if _type ==1 && is_finish == 2}}
+                    {{ if pay_status ==1}}
+                        <p class="fl name mui-ellipsis" style="width:80%;">{{goods_name}}</p>
+                        {{ if is_remit==1}}
+                        <p class="fr name text_green">Payment paid</p>
+                        {{ else if is_remit==0}}
+                        <p class="fr name text_orange_s">Pending payment</p>
+                        {{ /if}}
+                    {{ else }}
+                        <p class="name mui-ellipsis">{{goods_name}}</p>
+                        {{ if status == 7}}
+                        <p class="font-12 text_hui">Re-auctioned</p>
+                        {{ else if status == 1 && !bidders}}
+                        <p class="font-12 text_hui">To be re-auctioned</p>
+                        {{ else }}
+                        <p class="font-12 text_hui">Waiting for the user to make up the balance</p>
+                        {{ /if}}
+                    {{ /if}}
+                {{ else if _type == 3}}
+                    {{ if is_msg == 0}}
+                        <p class="fl name mui-ellipsis" style="width:75%;">{{goods_name}}</p>
+                        <p class="fr name"><span class="cancel_btn" onclick="cancel_remind(event,{{auction_id}});">Cancel appointment</span></p>
+                    {{ else}}
+                    <p class="fl name mui-ellipsis" style="width:80%;">{{goods_name}}</p>
+                    <p class="fr name text_hui">Remind</p>
+                    {{ /if }}
+                {{ else }}
+                <p class="name mui-ellipsis">{{goods_name}}</p>
+                {{ /if}}
+                </div>
+                {{ if is_finish == 2}}
+                <p class="red">Sold price <span class="font-16">{{price}}</span>KRC</p>
+                {{ else if is_finish == 1}}
+                <p class="red">Starting price <span class="font-16">{{price}}</span>KRC</p>
+                {{ else }}
+                <p class="red">Current price <span class="font-16">{{price}}</span>KRC</p>
+                {{ /if}}
+                {{ if is_finish==1}}
+                <span class="font-14 text_green">{{start_time}}start</span>
+                {{ if msg_time && _type == 3}}
+                <span class="font-14 block">Reminder time:{{msg_time}}</span>
+                {{ /if}}
+                {{ else if is_finish==2}}
+                <span class="font-14">{{end_time}}end</span>
+                {{ else if is_finish==3}}
+                <span class="font-14 text_red">In progress</span>
+                {{ else if status==0}}
+                <span class="font-14 text_orange_s">Pending review</span>
+                {{ else if status == 2}}
+                <p class="font-12 text_hui">Approval failed</p>
+                {{ /if}}
+            </div>
+            </a>
+            {{ if status == 1 && pay_status == 1 }}
+            <div class="pay_cancel">
+                <a href="/wap/user/auction_take.html?id={{id}}">Pickup</a>
+                <button class="red_btn bg-gold" onclick="auction_again({{id}});">Secondary auction</button>
+            </div>
+            {{ /if}}
+            {{ if status  == 5 }}
+            <div class="pay_cancel">
+               <a href="javascript:;">Waiting for the second auction</a>
+            </div>
+            {{ /if}}
+            {{ if status == 6 }}
+            <div class="pay_cancel">
+                <a href="javascript:;">Pending Shipment</a>
+            </div>
+            {{ /if}}
+            {{ if status == 1 && pay_status == 0}}
+                {{ if is_overdue ==1 }}
+                    <div class="pay_cancel">
+                        <a href="javascript:;" onclick="renew_auction({{pay_money}},{{id}});">Make up the balance</a>
+                    </div>
+                {{ /if }}
+            
+            {{ /if}}
+            {{ if goods_status == 1 }}
+            <div class="pay_cancel">
+                <a href="/wap/user/order_wuliu.html?id={{id}}">View Shipping</a>
+            </div>
+            {{ /if}}
+        </li>
+</script>
+    <script type="text/javascript">
+        var type_p = getQueryString('type');
+        if (type_p) {
+            $('.focus_tab li[data-type="' + type_p + '"]').addClass('on').siblings().removeClass('on');
+        }
+        switch_height();
+        mui.init();
+        function next(p, id) {
+            if (p == 1) {
+                // pop-up window -- private password
+                mui.confirm('<div class="gender_pop" style="padding:5px 10px;"><p><input class="p_inp password" type="password" placeholder="Please enter a private password"></p ></div>', 'Please enter a private password', ['Cancel', 'OK'], function (e) {
+                    if (e.index === 1) {
+                        password = $('.password').val();
+                        if (password == '') {
+                            mui.toast("Please enter your private password!");
+                            return false;
+                        } else {
+                            $('.mui-popup-button:last-child').html('Submitting...');
+                            $('.mui-popup-button:last-child').addClass('mui-disabled');
+                            $post("/api/auction/into_auction", { id: id, password: password }, function (data) {
+                                $('.mui-popup-button:last-child').html('OK');
+                                $('.mui-popup-button:last-child').removeClass('mui-disabled');
+                                if (data.status == 1) {
+                                    window.location.href = '/wap/user/auction_detail.html?id=' + id;
+                                } else {
+                                    mui.toast(data.msg);
+                                }
+                            });
+                            return false;
+                        }
+                    } else {
+                    }
+                }, 'div');
+            } else {
+                window.location.href = '/wap/user/auction_detail.html?id=' + id;
+            }
+        }
+        var id = getQueryString("id"), o_type = "";
+        var type = type_p ? type_p : 1;//type 1 2 bidders I applied for
+                // make up
+                function renew_auction(n, id) {
+                    // pop-up window--payment password
+                    mui.confirm('<div class="gender_pop" style="padding:5px 10px;"><p style="padding-bottom:0.1rem;">You also need to make up ' + n + 'KRC</p ><p><input class="p_inp password" type="password" placeholder="Please enter payment password" "></p></div>', 'Please enter payment password', ['Cancel', ' OK'], function (e) {
+                        if (e.index === 1) {
+                            var password = $('.password').val();
+                            if (password == '') {
+                                mui.toast("Please enter the payment password!");
+                        return false;
+                    } else {
+                        $post("/api/auction/renew_auction", { id: id, password: password }, function (data) {
+                            if (data.status == 1) {
+                                mui.toast(data.msg);
+                                setTimeout(() => {
+                                    window.location.reload();
+                                }, 1500);
+                            } else {
+                                mui.toast(data.msg);
+                            }
+                        })
+                    }
+                } else {
+                }
+            }, 'div');
+        };
+        // cancel appointment
+        function cancel_remind(e,id) {
+            e.stopPropagation();
+            $get('/api/auction/auction_call', { id: id, time: 0 }, function (data) {
+                if (data.status == 1) {
+                    mui.toast('Reservation cancelled');
+                    // reset the list data
+                    mescroll.resetUpScroll();
+                    // hide back to top button
+                    mescroll.hideTopBtn();
+                } else {
+                    mui.toast(data.msg);
+                }
+            });
+        }
+        //Create a MeScroll object, the internal pull-down refresh is enabled by default, up.callback is automatically executed, and the list data is refreshed;
+        var mescroll = new MeScroll("mescroll", {
+            up: {
+                callback: getListData,
+                isBounce: false,
+                noMoreSize: 5,
+                empty: {
+                    icon: "/static/wap/images/none4.png", //icon, default null
+                    tip: "There is no auction record for now~~", //Tips
+                },
+                clearEmptyId: "dataList",
+                toTop: {
+                    src: "/static/wap/images/top.png", //default scroll to 1000px display, configurable offset modification
+                    offset: 1000
+                },
+                lazyLoad: {
+                    use: true // Whether to enable lazy loading, default false
+                },
+                page: {
+                    num: 0,
+                    size: 10,
+                    time: null
+                },
+                htmlNodata: '<p class="upwarp-nodata">no more</p>',
+                offset: 150,
+                loadFull: {
+                    use: true,
+                    delay: 500
+                }
+            }
+        });
+        function getListData(page) {
+            // load data online
+            var url = '/api/auction/my_auction', obj = { type: type, page: page.num, limit: page.size };
+            if (type == 3) {
+                url = '/api/auction/auction_arrange';
+                obj = { page: page.num, limit: page.size };
+            }
+            // Delay one second, simulate networking
+            setTimeout(function () {
+                $get(url, obj, function (d) {
+                    if (d.status == 1) {
+                        var curPageData = d.data.list;
+                        mescroll.endSuccess(curPageData.length);
+                        //set list data
+                        var list = '';
+                        for (var i in curPageData) {
+                            curPageData[i]._type = type;
+                            curPageData[i].msg_time = new Date(curPageData[i].msg_time * 1000).Format("yyyy-MM-dd hh:mm:ss");
+                            curPageData[i].goods_img = curPageData[i].goods_img.split(',')[0];
+                            list += template('list', curPageData[i]);
+                        };
+                        $('#dataList').append(list);
+                        if (type == 1) {
+                            $('.pay_cancel').hide();
+                            $('.over_time').removeClass('over_time');
+                        };
+                    } else {
+                        mescroll.endErr();
+                    }
+                });
+            }, 1000);
+        };
+        // secondary auction
+        function auction_again(id) {
+            window.location.href = "/wap/user/auction.html?id=" + id;
+        };
+
+        // initialize the menu
+        $(".focus_tab li").click(function () {
+            type = $(this).attr('data-type');
+            $(this).addClass('on').siblings().removeClass('on');
+            // reset the list data
+            mescroll.resetUpScroll();
+            // hide back to top button
+            mescroll.hideTopBtn();
+            if ($(this).index() == 1) {
+                $('#attention').fadeIn();
+            } else {
+                $('#attention').hide();
+            }
+            switch_height();
+        });
+        function switch_height() {
+            var h1 = $('header').height(), h2 = $('.focus_tab').height();
+            $('.mescroll').css('top', (h1 + h2));
+        };
+        function getQueryString(name) {
+            var result = window.location.search.match(new RegExp("[\?\&]" + name + "=([^\&]+)", "i"));
+            if (result == null || result.length < 1) {
+                return "";
+            }
+            return result[1];
+        };
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,416 @@
+<title>添加运费模板</title>
+<style>
+    .t_l{
+        text-align: left;
+    }
+    .t_c{
+        text-align: center;
+    }
+    .t_r{
+        text-align:right;
+    }
+    @media screen and (max-width: 992px){
+        .t_r{
+            text-align:left;
+        }
+    }
+    .layui-form>.layui-row>.layui-form-item>div{
+        line-height: 36px;
+        padding:0px 10px;
+    }
+    .layui-form>.layui-row>.layui-form-item .layui-input-inline{
+        margin-bottom: 20px;
+        margin-left: 0;
+    }
+    .layui-form-switch{
+        margin-top: 0;
+    }
+    .layui-table-cell{
+        height:auto;
+        overflow: auto;
+    }
+    #LAY-popup-add_freight{ padding: 20px 0; }
+</style>
+
+<div class="layui-form" action="" lay-filter="add_goods" style="padding: 20px 0 0 0;">
+    <div class="layui-row">
+        <div class="layui-form-item">
+            <div class="layui-col-md3 t_r ">模板名称</div>
+            <div class="layui-col-md5">
+                <input type="text" name="name" lay-verify="required" autocomplete="off" placeholder="请输入模板名称" value="" class="layui-input">
+            </div>
+            <div class="layui-col-md4 layui-word-aux">输入模板的名称</div>
+        </div>
+        <div class="layui-form-item">
+            <div class="layui-col-md3 t_r ">计价方式</div>
+            <div class="layui-col-md9">
+                <input type="radio" name="charge_type" value="1" title="按件数" checked lay-filter="jijia_type">
+                <input type="radio" name="charge_type" value="2" title="按重量" lay-filter="jijia_type">
+                <input type="radio" name="charge_type" value="3" title="按体积" lay-filter="jijia_type">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <div class="layui-col-md3 t_r ">运费设置</div>
+            <div class="layui-col-md9 layui-word-aux">
+                <div class="layui-row">
+                <div class="layui-col-md12">
+                    <div class="layui-word-aux">除指定地区外，其余地区的运费采用“默认运费”</div>
+                </div>
+                </div>
+            </div>
+            <div class="layui-col-md3 t_r">默认运费</div>
+            <div class="layui-col-md9">
+                超
+                <input type="text" name="begin" class="layui-input" style="width:50px;display: inline-block;margin-bottom: 20px;" lay-verify="required" autocomplete="off" value="">
+                <span class="yufei_type">件</span>
+                <input type="text" name="begin_price" class="layui-input" style="width:50px;display: inline-block;margin-bottom: 20px;" lay-verify="required" autocomplete="off" value="">
+                元，每增加
+                <input type="text" name="inc" class="layui-input" style="width:50px;display: inline-block;margin-bottom: 20px;" lay-verify="required" autocomplete="off" value="">
+                <span class="yufei_type">件</span>增加
+                <input type="text" name="inc_price" class="layui-input" style="width:50px;display: inline-block;margin-bottom: 20px;" lay-verify="required" autocomplete="off" value="">
+                元
+            </div>
+            <div class="layui-col-md12">
+                <script type="text/html" id="table_yunfei_toolbar">
+                <div class="layui-btn-container">
+                    <button type="button" class="layui-btn" lay-event="addyunfei" id="add_yunfei"><i class="layui-icon layui-icon-add-1 layuiadmin-button-btn"></i>增加</button>
+                </div>
+                </script>
+
+                <table id="table_yunfei" lay-filter="table_yunfei"></table>                
+                <script type="text/html" id="table_tool_yunfei">
+                    <!-- <a class="layui-btn layui-btn-normal layui-btn-xs" lay-event="edit">编辑</a> -->
+                    <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del">删除</a>
+                </script>
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <div class="layui-col-md3 t_r ">指定条件包邮（可选）</div>
+            <div class="layui-col-md9 layui-word-aux">
+                <div class="layui-row">
+                    <div class="layui-col-md12">
+                    <div class="layui-word-aux">
+                        <input type="checkbox" name="is_parcel" lay-skin="switch" lay-text="是|否" lay-filter="is_parcel">
+                    </div>
+                    </div>
+                </div>
+            </div>
+            <div class="layui-col-md12 layui-hide" id="table_parcel">
+                <script type="text/html" id="test-table-is_parcel">
+                <div class="layui-btn-container">
+                    <button type="button" class="layui-btn" lay-event="addparcel"  id="add_is_parcel"><i class="layui-icon layui-icon-add-1 layuiadmin-button-btn"></i>增加</button>
+                </div>
+                </script>
+
+                <table id="table_is_parcel" lay-filter="table_is_parcel"></table>
+                <!-- 设置包邮条件 -->
+                <script id="set_parcel" type="text/html">
+                    {{# if(d.type=="weight"){ }}
+                    <div>重量在 {{d.range}} KG内包邮</div>
+                    {{# }else{ }}
+                    <div>金额满 {{d.range}} 元包邮</div>
+                    {{# } }}
+                </script>
+                <script type="text/html" id="table_tool_is_parcel">
+                    <!-- <a class="layui-btn layui-btn-normal layui-btn-xs" lay-event="edit">编辑</a> -->
+                    <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del">删除</a>
+                </script>
+            </div>
+        </div>
+        <hr style="margin: 10px;">
+        <div class="layui-form-item" style="padding-top: 5px;margin-bottom: 0;">
+            <div class="layui-col-md12 t_c">
+                <input type="hidden" name="data" id="data">
+                <button type="button" class="layui-btn" lay-submit="" lay-filter="component-add-freight"><i class="layui-icon layui-icon-link"></i>保存</button>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<script>
+layui.use(['admin','table','form','view','upload','layedit','setter','layer'], function(){
+    var $ = layui.$
+    ,admin = layui.admin
+    ,setter = layui.setter
+    ,form = layui.form
+    ,table = layui.table
+    ,layer = layui.layer
+    ,element = layui.element
+    ,layedit = layui.layedit
+    ,upload = layui.upload
+    ,view = layui.view
+    ,device = layui.device();
+    
+    form.render();
+
+    // 计价方式监听
+    form.on('radio(jijia_type)',function(e){
+        // console.log(e);
+        if(e.value==="1"){
+            $('.yufei_type').html('件');
+        }else if(e.value==="2"){
+            $('.yufei_type').html('KG');
+        }else{
+            $('.yufei_type').html('立方');
+        }
+    });
+    // 包邮方式监听
+    form.on('switch(is_parcel)',function(e){
+        // console.log(e);
+        if(e.elem.checked===true){
+            $('#table_parcel').removeClass('layui-hide').addClass('layui-show');
+        }else{
+            $('#table_parcel').removeClass('layui-show').addClass('layui-hide');
+        }
+    });
+
+    var tableYunfei = [];
+    var tableParcel = [];
+    // 运费模板
+    table.render({
+        elem: '#table_yunfei'
+        ,data: tableYunfei
+        ,toolbar: '#table_yunfei_toolbar'
+        ,text: { none: '暂无信息' }
+        ,cellMinWidth: 80 
+        ,cols: [[
+          {field:'choose_province', title: '运送到',align:'center',templet:function(d){
+            var show='';
+            for(i in d.choose_province){
+                show+=d.choose_province[i].title+",&nbsp;"
+            }
+            return show;
+          }}
+          ,{field:'begin_yf', width:100, title: '首费单位',align:'center'}
+          ,{field:'begin_price_yf', width:80, title: '首费',align:'center'}
+          ,{field:'inc_yf', width:100, title: '续费单位',align:'center'}
+          ,{field:'inc_price_yf', width:80, title: '续费',align:'center'}
+          ,{fixed: '', title:'操作',width:100, toolbar: '#table_tool_yunfei',align:'center'}
+        ]]
+    });
+    // 头工具栏事件--- 增加
+    table.on('toolbar(table_yunfei)', function(obj){
+    if(obj.event === 'addyunfei'){
+        admin.popup({
+            title: "增加运费模板",
+            area: admin.screen() < 2 ? ['95%', '90%'] :["600px", "450px"],
+            id: "LAY-popup-add_yunfei",
+            success: function(layero, index){
+                view(this.id).render('/freight/add_yunfei').done(function() {
+                form.render(null, 'add_yunfei'); // 弹窗的lay-filter值
+                    // 再一次次点击 增加得到默认的值
+                    var yf_table = table.cache["table_yunfei"];                       
+                    var new_area=[];                     
+                    var new_province=[];                     
+                    var new_district=[];                     
+                    if(yf_table!=""){
+                        for( var i in yf_table){
+                            new_area.push(yf_table[i].choose_area);
+                            new_province.push(yf_table[i].choose_province);
+                            new_district.push(yf_table[i].choose_district);
+                        }                        
+                    } else {
+                        new_area=[];                     
+                        new_province=[];                     
+                        new_district=[];                     
+                    }                    
+                    $('#new_area').val(JSON.stringify(new_area));
+                    $('#new_province').val(JSON.stringify(new_province));
+                    $('#new_district').val(JSON.stringify(new_district));
+
+                //监听提交
+                 form.on('submit(component-form-element)', function(data){
+                    // console.log(data.field); 
+                    // 将--“增加”--弹窗里的值  加到table的表格里
+                    var yf_table = table.cache["table_yunfei"];  
+                    var yf_data=data.field;                     
+                    if( yf_data.choose_province){
+                       
+                    } else{
+                        layer.msg("请选择城市", {icon: 1,time:1000});
+                        return;
+                    }                      
+                     
+                    yf_data.choose_area=eval(data.field.choose_area); 
+                    yf_data.choose_province=eval(data.field.choose_province);   
+                    yf_table.push(yf_data);                     
+                    table.reload('table_yunfei',{  
+                        data : yf_table  
+                    });  
+                    layer.close(index);
+                    
+                    
+
+                });   
+                });
+            }
+        });        
+    }       
+    });
+    // 运费设置--工具条
+    table.on('tool(table_yunfei)',function(e){
+        // console.log(e);
+        var data=e.data;
+        if(e.event==='edit'){
+        admin.popup({
+            title: "编辑运费模板",
+            area: admin.screen() < 2 ? ['95%', '90%'] :["600px", "450px"],
+            id: "LAY-popup-add_yunfei",
+            success: function(layero, index){
+                view(this.id).render('/freight/add_yunfei',data).done(function() {
+                form.render(null, 'add_yunfei'); // 弹窗的lay-filter值
+                //监听提交
+                form.on('submit(component-form-element)', function(data){
+                    // console.log(data);
+                    // console.log(e);                    
+                    e.update({//更新数据表格相应字段
+                        'begin_yf': data.field.begin_yf,
+                        'begin_price_yf': data.field.begin_price_yf,
+                        'inc_yf': data.field.inc_yf,
+                        'inc_price_yf': data.field.inc_price_yf,
+                        'choose_area': data.field.choose_area
+                    });
+                    tableYunfei.choose_area=data.field.choose_area;
+
+                    layui.table.reload('table_yunfei');
+                    layer.close(index);  
+                    
+
+                });                   
+                });
+            }
+        });
+        } else if(e.event==='del'){
+        layer.confirm('确认删除此配置?', {icon: 3, title:'提示'}, function(index){           
+            var yf_table =  table.cache["table_yunfei"];
+	            yf_table.splice(e.tr.data('index'),1);
+	            table.reload('table_yunfei',{  
+	                data : yf_table  
+            });  
+	        layer.close(index);   
+        });
+        }
+    });
+
+
+
+
+
+    // 包邮方式
+    table.render({
+        elem: '#table_is_parcel'
+        ,data:tableParcel  
+        ,toolbar: '#test-table-is_parcel'
+        ,cellMinWidth: 80 
+        ,text: { none: '暂无信息' }
+        ,cols: [[
+        {field:'choose_province', title: '地区',align:'center',templet:function(d){
+            var s_list='';
+            for(i in d.choose_province){
+                s_list+=d.choose_province[i].title+",&nbsp;"
+            }
+            return s_list;
+          }}
+        ,{field:'set_type', title: '设置包邮条件',align:'center',templet:'#set_parcel'}
+        ,{fixed: '', title:'操作', width:100, toolbar: '#table_tool_is_parcel',align:'center'}
+        ]]
+    });
+    // 头工具栏事件--- 增加
+    table.on('toolbar(table_is_parcel)', function(obj){
+    if(obj.event === 'addparcel'){
+        admin.popup({
+            title: "增加包邮方式",
+            area: admin.screen() < 2 ? ['95%', '90%'] :["550px", "320px"],
+            id: "LAY-popup-add_parcel",
+            success: function(layero, index){
+                view(this.id).render('/freight/add_parcel').done(function() {
+                form.render(null, 'add_parcel'); // 弹窗的lay-filter值
+                    // 再一次次点击 增加得到默认的值
+                    var by_table = table.cache["table_is_parcel"];
+                    var new_area=[];                     
+                    var new_province=[];                     
+                    var new_district=[];                     
+                    if(by_table!=""){
+                        for( var i in by_table){
+                            new_area.push( eval(by_table[i].choose_area) );
+                            new_province.push(by_table[i].choose_province);
+                            new_district.push(by_table[i].choose_district);
+                        }                        
+                    } else {
+                        new_area=[];                     
+                        new_province=[];                     
+                        new_district=[];                     
+                    }                    
+                    $('#new_area').val( JSON.stringify(new_area));
+                    $('#new_province').val(JSON.stringify(new_province));
+                    $('#new_district').val(JSON.stringify(new_district));
+                    
+                //监听提交
+                form.on('submit(component-form-element)', function(data){                    
+                    // console.log(data.field);                    
+                    // 将--“增加”--弹窗里的值  加到table的表格里
+                    var by_table =  table.cache["table_is_parcel"];  
+                    var by_data=data.field; 
+                    if( by_data.choose_province){
+                       
+                    } else{
+                        layer.msg("请选择城市", {icon: 1,time:1000});
+                        return;
+                    } 
+                    by_data.choose_province=eval(data.field.choose_province);      
+                    by_table.push(by_data);                     
+                    table.reload('table_is_parcel',{  
+                        data : by_table  
+                    });  
+                    layer.close(index);
+                    
+                    
+
+                });   
+                });
+            }
+        });        
+    }       
+    });
+    
+    // 包邮条件---监听工具条事件
+    table.on('tool(table_is_parcel)',function(e){
+        // console.log(e);
+        var data=e.data;
+        if(e.event==='edit'){
+            admin.popup({
+                title: "编辑条件",
+                area: admin.screen() < 2 ? ['95%', '90%'] :["600px", "350px"],
+                id: "LAY-popup-add_parcel",
+                success: function(layero, index){
+                    view(this.id).render('/freight/add_parcel',data).done(function() {
+                    form.render(null, 'add_parcel'); // 弹窗的lay-filter值
+                    //监听提交
+                    
+                    });
+                }
+            });
+        } else if(e.event==='del'){
+            layer.confirm('确认删除此配置?', {icon: 3, title:'提示'}, function(index){     
+                var by_table =  table.cache["table_is_parcel"];
+                by_table.splice(e.tr.data('index'),1);
+                table.reload('table_is_parcel',{  
+                    data : by_table  
+                });  
+                layer.close(index);  
+            }); 
+        }
+    });
+
+
+
+  
+    
+
+   
+
+    
+
+});
+</script>

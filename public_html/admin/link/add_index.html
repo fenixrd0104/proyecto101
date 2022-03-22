@@ -1,0 +1,133 @@
+<div class="layui-form" action="" lay-filter="add_index" style="padding: 20px 30px 0 0;">
+    <div class="layui-form-item">
+        <label class="layui-form-label">链接名称</label>
+        <div class="layui-input-block">   
+            <script type="text/html" template>                        
+            <input type="text" name="title" lay-verify="required" placeholder="" autocomplete="off" class="layui-input" value="{{ d.params.title || '' }}" >
+            <input type="text" name="id" class="layui-input layui-hide" value="{{ d.params.id || '' }}" >
+            </script>    
+        </div>
+    </div>  
+    <div class="layui-form-item">
+        <label class="layui-form-label">链接地址</label>
+        <div class="layui-input-block"> 
+            <script type="text/html" template>                        
+            <input type="text" name="link" lay-verify="required" placeholder="" autocomplete="off" class="layui-input" value="{{ d.params.link || '' }}" >
+            </script>  
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">排序</label>
+        <div class="layui-input-block">  
+            <script type="text/html" template>                        
+            <input type="text" name="sort" lay-verify="required" placeholder="" autocomplete="off" class="layui-input" value="{{ d.params.sort || '255' }}" >
+            </script>
+        </div>
+        <div class="layui-form-mid layui-word-aux" style="margin-left: 110px">排序由小到大显示</div> 
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">链接LOGO</label>
+        <div class="layui-input-inline">
+            <script type="text/html" template> 
+            <input name="portrait" id="portrait" placeholder="图片地址" value="{{ d.params.portrait || '' }}" class="layui-input" style="width:200px;">
+            </script>   
+        </div>
+        <div class="layui-input-inline layui-btn-container" style="width: auto;margin-left:20px;">
+            <button type="button" class="layui-btn" id="LAY_avatarUpload">
+                <i class="layui-icon">&#xe67c;</i>上传图片
+            </button>
+            <a class="layui-btn layui-btn-primary" onclick="see_img();">查看图片</a>
+        </div> 
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">是否新窗口打开</label>
+        <div class="layui-input-block">
+            <script type="text/html" template>    
+            <input type="radio" name="istarget" value="1" title="是" {{ d.params.istarget === 1 ? 'checked' : 'checked' }}>
+            <input type="radio" name="istarget" value="0" title="否" {{ d.params.istarget === 0 ? 'checked' : '' }}>
+            </script>
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">是否显示</label>
+        <div class="layui-input-block">
+            <script type="text/html" template>    
+            <input type="radio" name="isshow" value="1" title="是" {{ d.params.isshow === "1" ? 'checked' : 'checked' }}>
+            <input type="radio" name="isshow" value="0" title="否" {{ d.params.isshow === "0" ? 'checked' : '' }}>
+            </script>
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <div class="layui-input-block">
+            <button type="button" class="layui-btn" lay-submit lay-filter="link_submit"><i class="layui-icon">&#xe654;</i>保存</button>
+            <button type="button" class="layui-btn layui-btn-danger" data-type="close"><i class="layui-icon">&#x1006;</i>返回</button>
+        </div>
+    </div>
+</div>
+
+<script type="text/html" template lay-done="layui.data.sendParams(d.params)"></script>
+<script>
+layui.data.sendParams = function(params){
+
+layui.use(['admin','form','upload','layedit','layer'], function(){
+    var $ = layui.$
+    ,admin = layui.admin
+    ,layedit = layui.layedit
+    ,element = layui.element
+    ,layer = layui.layer
+    ,form = layui.form
+    ,layer = layui.layer
+    ,upload = layui.upload
+    ,router = layui.router();
+
+    element.render();    
+    form.render(null, 'add_index');
+
+
+    //普通图片上传
+    window.see_img=function(){
+        var i = $('#portrait').val();
+        layer.photos({
+            photos: {
+                title: "查看头像",
+                data: [{
+                    src: i
+                }]
+            },
+            shade: 0.5,
+            closeBtn: 1,
+            anim: 5
+        });
+      };
+    //多图片上传
+    upload.render({
+        elem: '#LAY_avatarUpload'
+        ,url: layui.setter.baseUrl+'admin/upload/upload'
+        ,multiple: true
+        ,before: function(obj){
+            //预读本地文件示例，不支持ie8
+            obj.preview(function(index, file, result){
+                $('#upload_goods_images_box').append('<img src="'+ result +'" alt="'+ file.name +'" class="layui-upload-img" style="width:120px;height:120px;margin:0 15px 15px 0px;">')
+            });
+        }
+        ,done: function(res){
+            //上传完毕
+            $('#portrait').val(res.data);
+        }
+    });
+
+    var $ = layui.$, active = {
+        // 返回--按钮
+        close:function(index){ 
+            layer.closeAll('page');
+        }
+    };
+    
+    $('.layui-input-block .layui-btn').on('click', function(){
+    var type = $(this).data('type');
+        active[type] ? active[type].call(this) : '';
+    });
+    
+});
+}
+</script>

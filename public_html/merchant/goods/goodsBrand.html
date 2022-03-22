@@ -1,0 +1,194 @@
+<title>商品品牌</title>
+
+<div class="layui-card layadmin-header">
+  <div class="layui-breadcrumb" lay-filter="breadcrumb">
+    <a>商品管理</a>
+    <a><cite>商品品牌</cite></a>
+  </div>
+</div>
+
+<div class="layui-fluid">
+  <div class="layui-card">
+    <div class="layui-card-header">
+      商品品牌
+    </div>
+    <div class="layui-card-body">
+      <script type="text/html" id="test-table-toolbar-add_goodsbrand">
+            <div class="layui-btn-container">
+                <a data-type="add" class="layui-btn" onclick="add_goodsbrand();"><i class="layui-icon layui-icon-add-1 layuiadmin-button-btn"></i>添加品牌</a>
+            </div>
+        </script>
+      <table id="goods_brand" lay-filter="goods_brand"></table>
+      <!-- 名称 -->
+
+      <!-- 是否推荐 -->
+      <script type="text/html" id="tuijian">
+        <input type="checkbox" name="all_check" lay-skin="switch" lay-text="是|否" lay-filter="all_check" {{ d.is_recom === 1 ? 'checked' : '' }} disabled> 
+    </script>
+
+
+
+      </script>
+      <script type="text/html" id="table_brand_logo">
+      <img src="{{d.logo||'/static/merchant/src/style/res/no_img.jpg'}}" height="100%" alt="">
+    </script>
+      <script type="text/html" id="table_goods_brand">
+        <a class="layui-btn layui-btn-normal layui-btn-xs" lay-event="edit"><i class="layui-icon layui-icon-edit"></i>编辑</a>
+        <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del"><i class="layui-icon layui-icon-delete"></i>删除</a>
+      </script>
+    </div>
+  </div>
+</div>
+
+<script>
+  layui.use(['admin', 'table', 'layer'], function () {
+    var $ = layui.$
+      , admin = layui.admin
+      , element = layui.element
+      , layer = layui.layer
+      , form = layui.form
+      , view = layui.view
+      , table = layui.table
+      , router = layui.router();
+
+    table.render({
+      elem: '#goods_brand'
+      , url: layui.setter.baseUrl + 'merchant/goods/goodsBrand'
+      , parseData: function (res) { //res 即为原始返回的数据
+        return {
+          "code": res.code, //解析接口状态
+          "msg": res.msg, //解析提示文本
+          "count": res.data.count, //解析数据长度
+          "data": res.data.lists //解析数据列表
+        };
+      }
+      , toolbar: '#test-table-toolbar-add_goodsbrand'
+      , cellMinWidth: 80
+      , cols: [[{ field: 'id', width: 80, title: 'ID', align: 'center' }
+        , { field: 'name', title: '品牌名称', align: 'center' }
+        , { field: 'logo', title: 'LOGO', align: 'center', templet: '#table_brand_logo' }
+        , { field: 'cat_name', title: '品牌分类', align: 'center' }
+        , { field: 'is_recom', title: '是否推荐', width: 100, align: 'center', templet: '#tuijian' }
+        , { field: 'order', title: '排序', align: 'center', edit: true }
+        , { fixed: 'right', title: '操作', toolbar: '#table_goods_brand', align: 'center',width:160 }
+      ]],
+      page: true
+    });
+
+
+    // 添加品牌
+    window.add_goodsbrand=function () {
+      admin.popup({
+        title: "添加品牌",
+        area: admin.screen() < 2 ? ['95%', '90%'] : ["700px", "680px"],
+        id: "LAY-popup-add_goodsbrand",
+        success: function (layero, index) {
+          view(this.id).render('/goods/add_brand').done(function () {
+            form.render(null, 'add_brand'); // 弹窗的lay-filter值
+            //监听提交
+            form.on('submit(brand_submit)', function (datas) {
+
+              admin.req({
+                url: layui.setter.baseUrl + 'merchant/goods/addGoodsBrand' //实际使用请改成服务端真实接口
+                , data: datas.field,
+                type: 'post',
+                success: function (res) {
+
+                  if (res.code == 1) {
+                    layer.msg(res.msg, { icon: 1, time: 1000 }, function () {
+                      setTimeout(function () {
+                        layer.close(index); //执行关闭 
+                        layui.table.reload('goods_brand'); //重载表格
+                      }, 1000);
+
+                    });
+                  } else {
+                    layer.msg(res.msg, { icon: 5, anim: 6, shade: 0.5, time: 1000 });
+                  }
+                }
+              });
+
+            });
+
+          });
+        }
+      });
+    };
+    // 操作
+    table.on('tool(goods_brand)', function (e) {
+      // console.log(e);
+      var data = e.data;
+      var id = e.data.id;
+      if (e.event === 'edit') {
+        admin.popup({
+          title: "编辑品牌",
+          area: admin.screen() < 2 ? ['95%', '90%'] : ["700px", "680px"],
+          id: "LAY-popup-edit_goodsbrand",
+          success: function (layero, index) {
+            view(this.id).render('/goods/add_brand', data).done(function () {
+              form.render(null, 'add_brand'); // 弹窗的lay-filter值
+              //监听提交
+              form.on('submit(brand_submit)', function (datas) {
+                // console.log(data);
+                datas.field.id = id;
+                admin.req({
+                  url: layui.setter.baseUrl + 'merchant/goods/editGoodsBrand' //实际使用请改成服务端真实接口
+                  , data: datas.field,
+                  type: 'post',
+                  success: function (res) {
+
+                    if (res.code == 1) {
+                      layer.msg(res.msg, { icon: 1, time: 1000 }, function () {
+                        setTimeout(function () {
+                          layer.close(index); //执行关闭 
+                          layui.table.reload('goods_brand'); //重载表格
+                        }, 1000);
+
+                      });
+                    } else {
+                      layer.msg(res.msg, { icon: 5, anim: 6, shade: 0.5, time: 1000 });
+                    }
+                  }
+                });
+
+              });
+
+            });
+          }
+        });
+      } else {
+        layer.confirm('确认删除此品牌?', { icon: 3, title: '提示' }, function (index) {
+          admin.req({
+            url: layui.setter.baseUrl + 'merchant/goods/delGoodsBrand' //实际使用请改成服务端真实接口
+            , data: { id: id },
+            type: 'get',
+            success: function (res) {
+              if (res.code == 1) {               
+                  e.del();
+                  layer.close(index);
+              } else {
+                layer.msg(res.msg, { icon: 5, anim: 6, shade: 0.5, time: 1000 });
+              }
+            }
+          });
+        });
+      }
+    });
+    table.on('edit(goods_brand)', function (e) {
+      admin.req({
+        url: layui.setter.baseUrl + 'merchant/goods/editGoodsBrand' //实际使用请改成服务端真实接口
+        , data: e.data,
+        type: 'post',
+        success: function (res) {
+          if(res.code==1){
+              
+            }else{
+              layer.msg(res.msg, {icon: 5,anim: 6,shade:0.5,time: 1000});
+            }
+        }
+      });
+
+    });
+
+});
+</script>

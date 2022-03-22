@@ -1,0 +1,340 @@
+{include file="public/header"/}
+<link rel="stylesheet" type="text/css" href="http://www.jq22.com/jquery/font-awesome.4.6.0.css">
+<link href="/static/wap/css/froala_editor.min.css" rel="stylesheet" type="text/css">
+<style>
+    .op_cream {
+        text-indent: 0;
+        padding-left: 0.1rem;
+    }
+
+    .op_cream p {
+        color: #666;
+        font-size: 0.12rem;
+        line-height: 0.22rem;
+    }
+
+    .editor {
+        width: 100%;
+        margin: auto;
+        text-align: left;
+    }
+
+    .editor label {
+        padding: 0;
+        float: initial;
+        width: 50%;
+        font-size: 0.14rem;
+        color: #bbb;
+    }
+
+    .editor label>span {
+        color: #f00;
+        font-weight: bold;
+    }
+
+    .froala-editor span.f-sep {
+        border-right: solid 1px rgba(192, 192, 192, 0.2);
+    }
+
+    .froala-editor {
+        background: rgba(192, 192, 192, 0.2);
+    }
+
+    .froala-editor button.fr-bttn,
+    .froala-editor button.fr-trigger {
+        color: #c0a065;
+    }
+
+    .froala-popup button:not(.fr-bttn):not(.fr-trigger).f-ok {
+        background: #c0a065;
+    }
+
+    .froala-popup.froala-image-popup div.f-popup-line button.f-browse,
+    .froala-popup.froala-file-popup div.f-popup-line button.f-browse {
+        color: #aaa;
+    }
+
+    .froala-editor .fr-trigger:after,
+    .froala-popup.froala-image-popup div.f-popup-line+div.f-popup-line,
+    .froala-popup.froala-file-popup div.f-popup-line+div.f-popup-line {
+        border-top-color: #bbb;
+    }
+
+    .froala-editor .froala-popup {
+        background: #434343;
+    }
+
+    .froala-editor .froala-popup h4,
+    .froala-popup.froala-image-popup div.f-popup-line.drop-upload div.f-upload,
+    .froala-popup.froala-file-popup div.f-popup-line.drop-upload div.f-upload,
+    .froala-editor .froala-popup div.f-popup-line label {
+        color: #bbb;
+    }
+
+    .fr-table,
+    .froala-editor .fr-dropdown.fr-color-picker .fr-dropdown-menu>div:first-child,
+    .fr-family,
+    button.f-browse,
+    button[data-cmd='insertVideo'] {
+        display: none !important;
+    }
+
+    .froala-editor .fr-dropdown .fr-dropdown-menu {
+        right: 0;
+        left: unset;
+    }
+
+    .froala-popup.froala-image-popup div.f-popup-line.drop-upload div.f-upload,
+    .froala-popup.froala-file-popup div.f-popup-line.drop-upload div.f-upload {
+        min-width: 290px;
+    }
+
+    html,
+    body {
+        position: relative;
+        height: 100%;
+        min-height: 100%;
+    }
+</style>
+</head>
+
+<body style="background: #f0f0f0;">
+    <header class="mui-bar mui-bar-nav bg_white" id="header">
+        <a class="back-page mui-icon mui-icon-left-nav mui-pull-left" href="javascript:;"></a>
+        <a id="menu" class="mui-action-menu mui-icon mui-icon-bars mui-pull-right" href="javascript:void(0);"></a>
+        <h1 class="mui-title">Auction application</h1>
+    </header>
+    <div class="mui-content" style="padding-bottom: 1.4rem !important;">
+        <div class="open_list">
+            <div class="op_title"><i class="op_icon"></i>Basic Information</div>
+            <form class="mui-input-group open_form">
+                <div class="mui-input-row">
+                    <label><span>*</span>Auction item name</label>
+                    <input type="text" placeholder="Please fill in the product name" id="goods_name">
+                </div>
+            </form>
+        </div>
+        <div class="mb10"></div>
+        <div class="open_list">
+            <div class="op_title"><i class="op_icon"></i>Product Information</div>
+            <form class="mui-input-group open_form">
+                <!-- <div class="op_cream">
+                        <p>1. When applying for a store, the company must upload the business license within the validity period, and the original photo</p>
+                        <p>2. To apply for a store, please upload a photo of your ID card</p>
+                    </div> -->
+                <div class="mui-input-row">
+                    <div class="ocomm_row">
+                        <div class="groupImg">
+                            <input type="file" class="choose" accept="image/*" multiple>
+                            <ul class="img-list">
+                                <div class="upload img_add"><i class="iconfont icon-jia"></i>
+                                    <p class="text-mini">Add a picture</p>
+                                </div>
+                            </ul>
+                            <div class="mui-clearfix"></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="editor">
+                    <label><span>*</span>Product Details</label>
+                    <div class="edit">
+
+                    </div>
+                </div>
+                <div class="mui-input-row">
+                    <label><span>*</span>Public or not</label>
+                    <div class="op_switch op_switchon">
+                        <div class="op_handle"></div>
+                    </div>
+                </div>
+                <div class="mui-input-row long_time">
+                    <label><span>*</span>Private Password</label>
+                    <input type="password" value="" id="password" placeholder="private password" style="width: 80%;">
+                </div>
+                <div class="mui-input-row">
+                   <label><span>*</span>Evaluation</label>
+                    <input type="number" placeholder="Please fill in your valuation" id="valuation">
+                </div>
+                <div class="mui-input-row">
+                    <label><span>*</span>Contact</label>
+                    <input type="text" placeholder="Please fill in your mobile number" id="contact">
+                </div>
+                <div class="mb15"></div>
+            </form>
+        </div>
+        <div class="mb10"></div>
+        <div class="open_down" style="z-index: 10000;">
+            <p class="op_agree">
+                <!-- Agree to the <a href="javascript;;">Mall Service Agreement</a> -->
+            </p>
+            <input class="op_submit bg-gold" id="submit_btn" type="button" value="OK" name="">
+        </div>
+
+    </div>
+
+
+
+    {include file="public/head_nav"/}
+    {include file="public/footer"/}
+    <script src="/static/wap/js/jq1.js"></script>
+    <script src="/static/wap/js/froala_editor.min.js?id=3"></script>
+    <script src="/static/wap/js/plugins/tables.min.js"></script>
+    <script src="/static/wap/js/plugins/lists.min.js"></script>
+    <script src="/static/wap/js/plugins/colors.min.js"></script>
+    <script src="/static/wap/js/plugins/media_manager.min.js"></script>
+    <script src="/static/wap/js/plugins/font_family.min.js"></script>
+    <script src="/static/wap/js/plugins/font_size.min.js"></script>
+    <script src="/static/wap/js/plugins/block_styles.min.js"></script>
+    <script src="/static/wap/js/plugins/video.min.js"></script>
+    <script src="/static/wap/js/plugins/zh_cn.js"></script>
+    <script>
+        var id = getQueryString('id');
+        if (id) {
+            $get('/api/auction/get_now_auction', { id: id }, (data) => {
+                if (data.status == 1) {
+                    $('#goods_name').val(data.data.goods_name);
+                    if (data.data.goods_content) {
+                        $('.froala-element').html(data.data.goods_content);
+                        $('.froala-element').attr('data-placeholder', '');
+                    }
+                    if (data.data.is_private == 1) {
+                        is_private = 1;
+                        $('.op_switch').toggleClass('op_switchon');
+                        $('.op_switch').find('.op_handle').css('transform', 'translateX(0%)');
+                        $('.long_time').slideDown();
+                    }
+                    if (data.data.img_tuku.length > 0) {
+                        var str = '';
+                        for (const i of data.data.img_tuku) {
+                            str += '<li><div class="close"><span class="mui-icon mui-icon-closeempty"></span></div><div class="img"><img src="' + i + '" alt="" width="100%"></div></li>';
+                        }
+                        $('.img-list').append(str);
+                    }
+                    $('#valuation').val(data.data.valuation);
+                    $('#contact').val(data.data.contact);
+                }
+            });
+        }
+        var is_private = 0;
+        // upload picture
+        imgFileupload(4, '.choose', '/api/user/upload');
+        // input focus
+        $("input").on("blur", function () {
+            $("body").removeClass("mui-focusin")
+        });
+        $(function () {
+            $('.edit').editable({
+                inlineMode: false,
+                theme: 'gray',
+                alwaysBlank: true,
+                language: "zh_cn",
+                // background color
+                colorsBackground: ['#ef613e', '#db2325', '#777', '#000'],
+                // text color
+                colorText: ['#ef613e', '#db2325', '#777', '#000'],
+                editableDisabled: false,
+                imageUploadURL: '/api/user/upload',
+            });
+            $('button[data-name="formatBlock"]').parent().hide();
+            $('button[data-name="blockStyle"]').parent().hide();
+           $('.froala-element').attr('data-placeholder', 'Edit product details here');
+        });
+
+        mui.init();
+        // expand and hide
+        $('.open_list').on('tap', '.op_title', function () {
+            $(this).siblings('.open_form').toggle();
+            if ($(this).siblings('.open_form').is(':hidden')) {
+                $(this).find('.op_icon').css('transform', 'rotate(-90deg)');
+            } else {
+                $(this).find('.op_icon').css('transform', 'rotate(0deg)');
+            }
+        })
+        //switch
+        $('.op_switch').on('tap', function () {
+            $(this).toggleClass('op_switchon');
+            get_switch(this);
+        });
+        function get_switch($this) {
+            if ($($this).hasClass('op_switchon')) {
+                $($this).find('.op_handle').css('transform', 'translateX(100%)');
+                $('.long_time').slideUp();
+                is_private = 0;
+            } else {
+                $($this).find('.op_handle').css('transform', 'translateX(0%)');
+                $('.long_time').slideDown();
+                is_private = 1;
+            }
+        };
+
+        $('.op_submit').click(function () {
+            console.log($('.froala-element').html());
+            var goods_content = $('.froala-element').html();
+            var pic_url = '';
+            $('.img-list').each(function () {
+                var src = [],_this=$(this);
+                _this.find('li').each(function (i, v) {
+                    var img_src = $(this).attr('data-src');
+                    if (i < _this.find('li').length - 1) {
+                        pic_url += img_src + ',';
+                    } else {
+                        pic_url += img_src;
+                    }
+                });
+            });
+            // alert(goods_cate_id);    
+            var goods_name = $('#goods_name').val();
+            var password = '';
+            if (is_private == 1) {
+                password = $('#password').val();
+            }
+            var valuation = $('#valuation').val();
+            var contact = $('#contact').val();
+
+            if (goods_name == '') {
+               mui.toast('Commodity name cannot be empty');
+            } else if (pic_url == '') {
+                mui.toast('Please upload product image');
+            } else if (goods_content == '<p><br></p>') {
+                mui.toast('Please edit the product details');
+            } else if (is_private == 1 && password == '') {
+                mui.toast('Please set a private password');
+            } else if (valuation == '') {
+                mui.toast('Please enter an estimate');
+            } else if (contact == '') {
+                mui.toast('Please enter the phone number');
+            } else if (contact.search(/^\d{11}$/) == -1) {
+                mui.toast('Mobile phone number format is incorrect');
+            } else {
+                var url = '/api/auction/apply_auction', obj = { goods_name: goods_name, goods_img: pic_url, goods_content: goods_content, is_private: is_private, password: password, contact: contact, valuation: valuation };
+                if (id) {
+                    url = '/api/auction/re_auction';
+                    obj = { auction_id: id, goods_name: goods_name, goods_img: pic_url, goods_content: goods_content, is_private: is_private, password: password, contact: contact, valuation: valuation };
+                }
+                $('.op_submit').html('Submitting...');
+                $('.op_submit').addClass('mui-disabled');
+                $post(url, obj, function (data) {
+                    $('.op_submit').html('OK');
+                    $('.op_submit').removeClass('mui-disabled');
+                    if (data.status == 1) {
+                        mui.toast(data.msg);
+                        setTimeout(() => {
+                            window.location.href = '/wap/user/my_auction.html';
+                        }, 1000);
+                    } else {
+                        mui.toast(data.msg);
+                    }
+                });
+            }
+
+        });
+        // get parameter    
+        function getQueryString(name) {
+            var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)");
+            var r = window.location.search.substr(1).match(reg);
+            if (r != null) return unescape(r[2]); return null;
+        }
+    </script>
+</body>
+
+</html>

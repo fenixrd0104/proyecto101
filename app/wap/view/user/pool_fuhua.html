@@ -1,0 +1,142 @@
+{include file="public/header" /}
+</head>
+<body>
+<header class="mui-bar mui-bar-nav head_line" id="header">
+    <a class="back-page mui-icon mui-icon-left-nav mui-pull-left" href="javascript:;"></a>
+    <a id="menu" class="mui-action-menu mui-icon mui-icon-bars mui-pull-right" href="javascript:;"></a>
+    <h1 class="mui-title">Incubating</h1>
+</header>
+<div class="mui-content">
+    <div class="mb10"></div>
+    <form class="mui-input-group xx_form">
+        <div class="mui-input-row">
+            <label>Balance available for incubation</label>
+            <input type="text" value="0.00" style="color: #e30000;" disabled id="val_1">
+        </div>
+        
+        <div class="mui-input-row">
+            <label>Incubation Amount</label>
+            <input type="number" placeholder="Please enter the hatching amount, the minimum is a multiple" id="val_3">
+        </div>
+        <div class="mui-input-row">
+            <label>Payment Password</label>
+            <input type="password" placeholder="Please enter payment password" id="val_4">
+        </div>
+        <div class="mui-input-row">
+            <label>Captcha</label>
+            <button class="btn_code fr " style="margin-right: 0.05rem;text-align: center;" onclick="return false;">Get verification code</button>
+            <input type="number" placeholder="CAPTCHA" style="width: 46%;" id="val_5">
+        </div>
+        <div class="mui-button-row mui_p">
+            <p>The Hashrate is <span id="num_hz" class="text_red">0.00</span> KRC</p>
+            <p>The computing power of the fund is <span id="num_jj" class="text_red">0.00</span> KRC</p>
+            <p>The remainder is <span id="num_sy" class="text_red">0.00</span> KRC</p>
+        </div>
+        <div class="mb20"></div>
+        <div class="mui-button-row">
+           <button type="button" id="submit_btn" class="submit_btn" onclick="return false;">OK</button>
+        </div>
+    </form>
+    <div class="mb30"></div>
+    <div class="agent_txt">
+        <h3>Warm reminder:</h3>
+        <p>1. Only hatch <span class="beishu"></span> and <span class="beishu"></span> multiples</p>
+        <p>2. The hatched amount will be transferred to the US</p>
+        <p>3. Of the hatched amount, <span id="sxf"></span>% is the handling fee, and <span id="hzsl"></span>% is converted into the hashrate, <span id ="jjsl"></span>% is converted to fund computing power, and transferred to US is the remaining <span id="sy"></span>%</p>
+    </div>
+</div>
+
+{include file="public/head_nav"/}
+{include file="public/footer"/}
+<script type="text/javascript">
+var integral_rate=''; // Ring Oscillation Rate
+var fund_rate=''; // Fund computing power
+var sy_rate=''; // remaining
+var beishu=''; // multiple
+get_data();
+function get_data(){
+    $get('/api/money/change_money',{},function(res){
+        if(res.status==1){
+            beishu=res.beishu;
+            $('#val_3').attr('placeholder','Please enter the hatching amount, the minimum is a multiple of '+beishu+'');
+            $('#val_1').val(res.data);
+            $('.beishu').html(beishu);
+            var vindicate_rate=res.vindicate_rate;
+            $('#sxf').html(vindicate_rate);
+            integral_rate=res.integral_rate;
+            $('#hzsl').html(integral_rate);
+            fund_rate=res.fund_rate;
+            $('#jjsl').html(fund_rate);
+            var all=parseFloat(vindicate_rate)+parseFloat(integral_rate)+parseFloat(fund_rate);
+            sy_rate=100-all;
+            $('#sy').html(sy_rate);
+        }
+    });
+}
+
+// input box change
+$('#val_3').on('change',function () {
+    var reg = /^\d+(\.{0,1}\d+){0,1}$/;
+    var num=$(this).val();
+    if( !reg.test(num) ){
+        mui.toast('Amount cannot be negative');
+        $(this).val('');
+        return
+    } else if(num%beishu!=0){
+        mui.toast('The minimum amount is a multiple of '+beishu+'');
+        $(this).val('');
+        return
+    }
+    
+    var num_hz=num*integral_rate/100;
+    var num_jj=num*fund_rate/100;
+    var num_sy=num*sy_rate/100;
+    $('#num_hz').html(num_hz);
+    $('#num_jj').html(num_jj);
+    $('#num_sy').html(num_sy);
+});
+
+// Send the verification code
+$('body').on('tap','.btn_code',function(){
+    var obj = $('.btn_code');
+    $get('/api/money/send_verify',{check_type:'mobile',remarks:'change_money'},function(res){
+        mui.toast(res.msg);
+        if(res.code==1){
+            settime(obj);
+        }
+    });
+});
+
+// Incubation submission
+$('body').on('tap','#submit_btn',function(){
+    $('#submit_btn').attr("disabled","true"); //Set the grayed out button
+    setTimeout("$('#submit_btn').removeAttr('disabled')",3000); //Submit button display after setting three seconds
+    
+    var tx_money=$('#val_3').val();
+    var password=$('#val_4').val();
+    var verify=$('#val_5').val();
+    if(tx_money==''){
+        mui.toast('The hatch amount cannot be empty!');
+    }else if(password==''){
+        mui.toast('Payment password cannot be empty!');
+    }else if(verify==''){
+        mui.toast('Verification code cannot be empty!');
+    }else{
+        $post('/api/money/change_money',{hatch_money:tx_money,password:password,verify:verify},function(res){
+            mui.toast(res.msg);
+            if(res.status==1){
+               setTimeout(function(){
+                   mui.back();
+               },1500);
+            }
+        });
+
+    }
+});
+
+
+
+
+</script>
+</body>
+</html>

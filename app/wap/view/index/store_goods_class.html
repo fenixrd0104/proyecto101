@@ -1,0 +1,60 @@
+{include file="public/header"/}
+</head>
+<body>
+<header class="mui-bar mui-bar-nav index_header shop_head" id="header">
+    <a class="back-page mui-icon mui-icon-left-nav mui-pull-left" href="javascript:;"></a>
+    <a id="menu" class="mui-action-menu mui-icon mui-icon-bars mui-pull-right" href="javascript:void(0);"></a>
+    <h1 class="mui-title">Best category</h1>
+    </header>
+    <div class="mui-content street_content">
+       <ul class="stor_class">
+            <!-- <li>
+                <p>All categories</p>
+                <a href="store_goodslist.html">See all</a>
+            </li> -->
+       </ul>
+    </div>
+    
+    
+    <div class="search_screenbg"></div>
+    {include file="public/head_nav"/}
+    {include file="public/footer"/}
+    <script type="text/html" id="list">
+        <li>
+            <p>{{value}}</p>
+            <a href="/wap/index/store_goodslist.html?shop_id={{shop_id}}&cat_id={{ids}}">See all</a>
+        </li>
+    </script>
+    <script>
+    var shop_id=getQueryString('shop_id');
+    get_list();
+    function get_list(){
+        $get("/api/merchant/getIndustry",{shop_id:shop_id},function(data){
+            if(data.status==1){
+                // mui.toast(data.msg);
+                var list='<li>'+
+                    '<p>All categories</p>'+
+                    '<a href="/wap/index/store_goodslist.html?shop_id='+shop_id+'">See all</a>'+
+                '</li>';
+            for( var i in data.data ){
+                data.data[i].shop_id=shop_id;
+                list += template('list', data.data[i]);
+            }
+            $('.stor_class').html(list);
+
+            
+        }else{
+            mui.toast(data.msg);            
+        }
+    });
+};
+
+// address bar information    
+function getQueryString(name){
+    var reg = new RegExp("(^|&)"+ name +"=([^&]*)(&|$)");
+    var r = window.location.search.substr(1).match(reg);
+    if(r!=null)return  unescape(r[2]); return null;
+}
+</script>
+</body>
+</html>

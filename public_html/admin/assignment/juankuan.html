@@ -1,0 +1,242 @@
+
+<title>任务管理</title>
+
+<div class="layui-card layadmin-header">
+    <div class="layui-breadcrumb" lay-filter="breadcrumb">
+        <a>任务管理</a>
+        <a><cite>捐款管理</cite></a>
+    </div>
+</div>
+<div class="layui-fluid">
+    <div class="layui-row layui-col-space15">
+        <div class="layui-col-md12">
+            <div class="layui-card">
+                <div class="layui-card-header">捐款管理</div>
+                <div class="layui-card-body">
+               
+                    <table class="layui-hide" id="ar_list" lay-filter="ar_list"></table>
+                   
+                    <script type="text/html" id="test-table-state">
+                        <input type="checkbox" name="status" value="{{d.id}}" lay-skin="switch" lay-text="开启|关闭" class="layui-input" {{ d.status === 1 ? 'checked' : '' }} lay-filter="checkbox_status">
+                    </script>
+                    <script type="text/html" id="test-table-tui">
+                        <input type="checkbox" name="tui" value="{{d.id}}" title="推荐" class="layui-input" {{ d.is_tui === 1 ? 'checked' : '' }} lay-filter="tui_status">
+                    </script>
+                    <script type="text/html" id="test-ar-images">
+                        <img src="{{d.photo||'/static/admin/src/style/res/no_img.jpg'}}" height="100%" alt="">
+                    </script>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    layui.use(['admin','table', 'view', 'form', 'util', 'layedit','setter','layer','ourJs'], function(){
+        var $ = layui.$
+            ,admin = layui.admin
+            ,setter = layui.setter
+            ,element = layui.element
+            ,form = layui.form
+            ,view = layui.view
+            ,layer = layui.layer
+            ,util = layui.util
+            ,layedit = layui.layedit
+            ,table = layui.table
+            ,ourJs = layui.ourJs
+            ,router = layui.router();
+
+
+        table.render({
+            elem: '#ar_list'
+            ,url: layui.setter.baseUrl+'admin/Assignment/juankuan'
+            ,parseData: function(res){ //res 即为原始返回的数据
+                return {
+                    "code": res.code, //解析接口状态
+                    "msg": res.msg, //解析提示文本
+                    "count": res.data.count, //解析数据长度
+                    "data": res.data.lists //解析数据列表
+                };
+            }
+            ,cols: [[
+                {field:'id', width:70, title: 'ID', sort: true, align:'center'}
+                ,{field:'account', title: '账号',width:200, align:'center'}
+                ,{field:'nickname', title: '昵称', align:'center'}
+                ,{field:'number', title: '捐款金额', align:'center'}
+                ,{field:'z_remarks', width:200, title: '备注', align:'center'}
+                ,{field:'create_time', width:200, title: '创建时间', align:'center', templet: function(d) {
+                        return util.toDateString(d.create_time*1000);
+                    }}
+            ]]
+            ,page:true
+        });
+
+
+
+
+        var $ = layui.$, active = {
+            // 添加会员组
+            add:function(){
+                admin.popup({
+                    title: "添加任务",
+                    area: admin.screen() < 2 ? ['95%', '90%'] :["800px", "800px"],
+                    id: "LAY-popup-add_ar",
+                    success: function(layero, index){
+                        view(this.id).render('/assignment/day_add').done(function() {
+                            form.render(null, 'add_article'); // 弹窗的lay-filter值
+
+                            $("#LAY-select").html(list);
+                            form.render('select');
+                            //监听提交
+                            form.on('submit(add_ar)', function(data){
+                                admin.req({
+                                    url: layui.setter.baseUrl+'admin/assignment/addDayPost'
+                                    ,data: data.field,
+                                    type:'post',
+                                    success: function(res){
+                                        if(res.code==1){
+                                            layer.msg(res.msg , {icon: 1,shade:0.5,time: 1000} , function(){
+                                                layer.close(index); //执行关闭
+                                                layui.table.reload('ar_list'); //重载表格
+
+                                            });
+                                        }else{
+                                            layer.msg(res.msg, {icon: 5,anim: 6,shade:0.5,time: 1000});
+                                        }
+                                    }
+                                });
+                            });
+
+                        });
+                    }
+                });
+            }
+            // 搜索
+            ,reload: function(){
+                //执行重载
+                table.reload('ar_list', {
+                    page: {
+                        curr: 1 //重新从第 1 页开始
+                    }
+                    ,where: {
+                        keyWords:  $('#test-table-demoReload').val()
+                    }
+                });
+            }
+        };
+
+        $('.test-table-reload-btn .layui-btn').on('click', function(){
+            var type = $(this).data('type');
+            active[type] ? active[type].call(this) : '';
+        });
+
+        //监听工具条
+        table.on('tool(ar_list)', function(obj){
+            var data = obj.data;
+            if(obj.event === 'del'){
+                layer.confirm('确认删除此任务?', {icon: 3, title:'提示'}, function(index){
+                    admin.req({
+                        url: layui.setter.baseUrl+'admin/Assignment/delItem'
+                        ,data: {id:data.id},
+                        type:'get',
+                        success: function(res){
+                            if(res.code==1){
+                                // console.log(res.msg)
+                                obj.del();
+                                layer.close(index);
+                            }else{
+                                layer.msg(res.msg);
+                            }
+                        }
+                    });
+                });
+            } else if(obj.event === 'edit'){
+                // 编辑
+                // console.log(data);
+                admin.popup({
+                    title: "编辑任务",
+                    area: admin.screen() < 2 ? ['95%', '90%'] :["800px", "800px"],
+                    id: "LAY-popup-edit_ar",
+                    success: function(layero, index){
+                        view(this.id).render('/assignment/day_add',data).done(function() {
+                            form.render(null, 'add_article'); // 弹窗的lay-filter值
+                            for( var i in res_url){
+                                if(res_url[i].name==data.name){
+                                    curr_id=res_url[i].id;
+                                }
+                            }
+                            $("#LAY-select").html(list);
+                            $("#LAY-select").val(curr_id);
+                            form.render('select');
+                            //监听提交
+                            form.on('submit(add_ar)', function(datas){
+                                // console.log(data);
+                                datas.field.id=obj.data.id;
+                                delete datas.field.file;
+                                delete datas.field.editorValue;
+                                delete datas.field.upfile;
+
+                                admin.req({
+                                    url: layui.setter.baseUrl+'admin/Article/editArticle'
+                                    ,data:datas.field,
+                                    type:'post',
+                                    success: function(res){
+                                        if(res.code==1){
+                                            layer.msg(res.msg , {icon: 1,time: 1000} , function(){
+                                                layer.close(index); //执行关闭
+                                                layui.table.reload('ar_list'); //重载表格
+                                            });
+                                        }else{
+                                            layer.msg(res.msg, {icon: 5,anim: 6,shade:0.5,time: 1000});
+                                        }
+                                    }
+                                });
+                            });
+
+                        });
+                    }
+                });
+            }
+        });
+
+        // 监听状态修改
+        form.on('switch(checkbox_status)',function(e){
+            var _this=this,status=e.elem.checked;
+            admin.req({
+                url: layui.setter.baseUrl+'admin/article/stateArticle'
+                ,data: { id:e.value }
+                ,type:'post'
+                ,success: function(res){
+                    if(res.code==1){
+                        ourJs.status_tong(table,_this,status);
+                    }else{
+                        layer.msg(res.msg, {icon: 5,anim: 6,shade:0.5,time: 1000},function(){
+                            layui.table.reload('ar_list'); //重载表格
+                        });
+                    }
+                }
+            });
+
+        });
+        // 推荐
+        form.on('checkbox(tui_status)',function(e){
+            admin.req({
+                url: layui.setter.baseUrl+'admin/Article/tuiArticle'
+                ,data: { id:e.value }
+                ,type:'post'
+                ,success: function(res){
+                    if(res.code==1){
+
+                    }else{
+                        layer.msg(res.msg, {icon: 5,anim: 6,shade:0.5,time: 1000},function(){
+                            layui.table.reload('ar_list'); //重载表格
+                        });
+                    }
+                }
+            });
+
+        });
+
+
+    });
+</script>

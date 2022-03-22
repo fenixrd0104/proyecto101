@@ -1,0 +1,50 @@
+<title>单件退货</title>
+
+<div class="layui-form" id="payment" lay-filter="choose_stock" style="padding: 20px 30px 0 0;">
+    <div class="layui-form-item complet_s">
+        <label class="layui-form-label">退货数量：</label>
+        <div class="layui-input-block">
+            <input type="number" name="refunds_num" id="refunds_num" lay-verify="required" placeholder="请输入商品数量" autocomplete="off" class="layui-input" >
+        </div>
+    </div>
+    <div class="layui-form-item complet_s">
+        <label class="layui-form-label">退还现金：</label>
+        <div class="layui-input-block">
+            <input type="text" name="refunds_price" id="refunds_price" lay-verify="required" placeholder="请输入退还现金" autocomplete="off" class="layui-input" >
+        </div>
+    </div>    
+    <div class="layui-form-item complet_s">
+        <label class="layui-form-label">退还积分：</label>
+        <div class="layui-input-block">
+            <input type="text" name="refunds_integral" id="refunds_integral" lay-verify="required" placeholder="请输入退还积分" autocomplete="off" class="layui-input" >
+        </div>
+    </div>
+    <div class="layui-form-item complet_s">
+        <label class="layui-form-label">退还金额：</label>
+        <div class="layui-input-block">
+            <input type="text" name="refunds_money" id="refunds_money" lay-verify="required" placeholder="请输入退还金额" autocomplete="off" class="layui-input" >
+        </div>
+    </div>
+    <div class="layui-form-item">
+    <div class="layui-input-block">
+        <button type="button" class="layui-btn" lay-submit lay-filter="return_goods"><i class="layui-icon">&#xe654;</i>保存</button>
+    </div>
+    </div>
+</div>
+
+
+
+<script>
+layui.use(['admin','table','form','view','layer'], function(){
+    var $ = layui.$
+    ,admin = layui.admin
+    ,view = layui.view
+    ,setter = layui.setter
+    ,table = layui.table
+    ,layer = layui.layer
+    ,form = layui.form;
+                 
+    
+
+});
+</script>

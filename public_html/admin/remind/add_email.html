@@ -1,0 +1,87 @@
+<form class="layui-form" action="" lay-filter="add_email" style="padding: 20px 30px 0 0;">
+<div class="layui-form-item">
+    <label class="layui-form-label">邮件标识</label>
+    <div class="layui-input-block" style="line-height:38px;">
+        <span id="name"></span>
+    </div>
+</div>  
+<div class="layui-form-item">
+    <label class="layui-form-label">邮件标题</label>
+    <div class="layui-input-block">
+        <input type="text" name="title" id="title" lay-verify="required" value="" autocomplete="off" class="layui-input">
+    </div>
+</div>  
+<div class="layui-form-item">
+    <label class="layui-form-label">邮件模板：（纯文字）</label>
+    <div class="layui-input-block">                   
+        <textarea name="content" placeholder="" id="content" class="layui-textarea" style="resize:none;"></textarea>
+    </div>
+</div>
+<div class="layui-form-item" >    
+    <div class="layui-input-block" id="shuoming" style="color: #1ab394;padding-left: 0;margin-top: 5px;"> 
+        请使用以下参数替换模板中对应的内容<br>
+       
+    </div> 
+</div>
+<div class="layui-form-item">
+    <div class="layui-input-block">
+    <button type="button" class="layui-btn" lay-submit lay-filter="temp_submit_btn"><i class="layui-icon">&#xe654;</i>保存</button>
+    <button type="button" class="layui-btn layui-btn-danger" data-type="close"><i class="layui-icon">&#x1006;</i>返回</button>
+    </div>
+</div>
+</form>
+<script type="text/html" template lay-done="layui.data.sendParams(d.params)"></script>       
+<script>
+layui.data.sendParams = function(params){
+    layui.use(['admin','form','layer'], function(){
+        var $ = layui.$
+        ,admin = layui.admin
+        ,element = layui.element
+        ,layer = layui.layer
+        ,form = layui.form
+        ,layer = layui.layer
+        ,router = layui.router();
+
+        element.render();
+        form.render(null, 'add_email');
+        
+        var $ = layui.$, active = {
+            // 返回
+            close:function(index){ 
+                layer.closeAll('page');
+            }
+        };
+        
+        $('.layui-input-block .layui-btn').on('click', function(){
+            var type = $(this).data('type');
+            active[type] ? active[type].call(this) : '';
+        });
+
+        var id=params.id;
+
+        admin.req({
+            url: layui.setter.baseUrl+'admin/remind/templateinfo' //实际使用请改成服务端真实接口
+            ,data:{id:id,tpname:'email'},
+            type:'get',
+            success: function(res){
+            if(res.code==1){
+                $('#name').html(res.data.info.name);
+                $('#title').val(res.data.tpinfo.title);
+                $('#content').val(res.data.tpinfo.content);
+                $('#shuoming').html('请使用以下参数替换模板中对应的内容<br>'+res.data.info.param);
+            }else{
+                layer.msg(res.msg, {icon: 5,anim: 6,shade:0.5,time: 1500});
+            }
+            }
+        }); 
+
+
+
+
+
+
+
+
+    });
+}
+</script>

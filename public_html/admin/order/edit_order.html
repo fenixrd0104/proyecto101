@@ -1,0 +1,246 @@
+
+<title>订单管理</title>
+    
+<div class="layui-card layadmin-header">
+  <div class="layui-breadcrumb" lay-filter="breadcrumb">
+    <a>订单管理</a>
+    <a><cite>修改订单</cite></a>
+  </div>
+</div>
+<style>
+.layui-form-item{ margin-bottom: 30px; }
+</style>
+
+<div class="layui-fluid">
+<div class="layui-row layui-col-space15">
+<div class="layui-col-md12">
+<div class="layui-card">
+    <div class="layui-card-header">修改订单</div>
+    <div class="layui-card-body">
+        <form class="layui-form" action="" lay-filter="editorder">                 
+            <div class="layui-form-item">
+                <label class="layui-form-label" style="padding-top: 2px;">订单总额</label>
+                <div class="layui-input-block">
+                    <p><b>0.10</b>（商品总价：0.10 运费：0.00）</p>
+                    <p>订单总额 = 商品总价 + 运费</p>
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">收货人</label>
+                <div class="layui-input-block">
+                    <div class="layui-col-sm4">
+                    <input type="text" name="nickname" value=""  autocomplete="off" placeholder="" class="layui-input">            
+                    </div>           
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">手机</label>
+                <div class="layui-input-block">
+                    <div class="layui-col-sm4">
+                    <input type="text" name="nickname" value=""  autocomplete="off" placeholder="" class="layui-input">            
+                    </div>           
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">地址</label>
+                <div class="layui-input-inline" style="width: 120px;">
+                    <select name="province" id="province" lay-filter="province">
+                        <option value="">请选择省</option>
+                    </select>
+                </div>
+                <div class="layui-input-inline" style="width: 120px;">
+                    <select name="city" id="city" lay-filter="city">
+                        <option value="">请选择市</option>
+                    </select>
+                </div>
+                <div class="layui-input-inline" style="width: 120px;">
+                    <select name="area" id="area" lay-filter="area">
+                        <option value="">请选择县/区</option>
+                    </select>
+                </div>
+                <div class="layui-input-inline" style="width: 300px;">                        
+                    <input type="text" name="nickname" value=""  autocomplete="off" placeholder="请输入详细地址" class="layui-input" style="display:inline-block;">
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">支付方式</label>
+                <div class="layui-input-inline">
+                    <div class="">
+                    <select name="city" lay-verify="">
+                        <option value="0">余额支付</option>
+                        <option value="1">支付宝</option>
+                        <option value="2">微信</option>
+                    </select>          
+                    </div>           
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">发票抬头</label>
+                <div class="layui-input-block">
+                    <div class="layui-col-sm4">
+                    <input type="text" name="nickname" value=""  autocomplete="off" placeholder="" class="layui-input">            
+                    </div>           
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">添加商品</label>
+                <div class="layui-input-block">
+                    <button type="button" class="layui-btn" data-html="invalid" data-type="add">添加商品</button>         
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">商品列表</label>
+                <div class="layui-input-block">
+                    <table class="layui-hide" id="test-table-reload" lay-filter="test-table-operate"></table>   
+                    <script type="text/html" id="test-table-operate-barDemo">
+                        <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del"><i class="layui-icon">&#xe640;</i> 删除</a>
+                    </script>             
+                    <script type="text/html" id="test-table-input">
+                        <input type="text" name="title" autocomplete="off" class="layui-input" style="height:100%;text-align:center" value=""> 
+                    </script>   
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">管理员备注</label>
+                <div class="layui-input-block">
+                    <div class="layui-col-sm6">
+                    <textarea name="remarks" placeholder="" class="layui-textarea"></textarea>     
+                    </div>           
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <div class="layui-input-block">
+                    <button type="button" class="layui-btn" lay-submit lay-filter="component-form-element"><i class="layui-icon">&#xe654;</i>保存</button>
+                    <a href="javascript:history.go(-1);" class="layui-btn layui-btn-danger" data-type="close"><i class="layui-icon">&#x1006;</i>返回</a>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+</div>
+</div>
+</div>
+
+<script>
+layui.use(['admin', 'form', 'table', 'view','layer'], function(){
+  var $ = layui.$
+  ,admin = layui.admin
+  ,form = layui.form
+  ,layer = layui.layer
+  ,view = layui.view
+  ,layer = layui.layer
+  ,table = layui.table
+  ,router = layui.router();
+
+    // element.render();
+    form.render(null, 'editorder');
+    table.render({
+      elem: '#test-table-reload'
+      ,url: '/json/table/user.js'
+      ,cols: [[
+        {field:'username', width:259, title: '商品名称' , align:'center'}
+        ,{field:'username', width:208, title: '规格', align:'center' }
+        ,{field:'username', width:122, title: '价格', align:'center'}
+        ,{field:'username', title: '数量', align:'center', templet: '#test-table-input'}
+        ,{fixed: '', title: '操作', align:'center', toolbar: '#test-table-operate-barDemo'}
+      ]]
+    });
+
+    //添加商品
+    var active = {
+      add: function(){
+        admin.popup({
+          title: "添加商品",
+          area: admin.screen() < 2 ? ['95%', '90%'] :["800px", "700px"],
+          id: "LAY-popup-add_menu",
+          success: function(layero, index){
+            view(this.id).render('/order/add_goods').done(function() {
+              form.render(null, 'add_goods'); // 弹窗的lay-filter值
+              
+            });
+          }
+        });
+      }
+    }  
+    $('.layui-form-item .layui-btn').on('click', function(){
+      var type = $(this).data('type');
+      active[type] ? active[type].call(this) : '';
+    });
+    //监听工具条
+    table.on('tool(test-table-operate)', function(obj){
+      var data = obj.data;
+      if(obj.event === 'del'){
+        layer.confirm('确认删除此菜单?', {icon: 3, title:'提示'}, function(index){
+          obj.del();
+          layer.close(index);
+        });
+      } 
+    });
+
+    // 选择省
+    var str='';
+    var cur_data='';
+    admin.req({
+        url: layui.setter.baseUrl+'admin/login/getRegionTree' //实际使用请改成服务端真实接口
+        ,data: {},
+        type:'get',
+        success: function(res){
+            if(res.code==1){
+                str=res.data;
+                // console.log(res.data)
+                var list="<option value=''>请选择省</option>";
+                for( var i in res.data){
+                    list += "<option value='"+res.data[i].value+"'>"+res.data[i].text+"</option> ";
+                }    
+                $("#province").html(list);
+                form.render('select');  
+            }else{
+                layer.msg(res.msg);
+            }            
+        } 
+    }); 
+    form.on('select(province)',function(e){
+        cur_data='';
+        get_city(e.elem.selectedIndex-1);
+        get_area_none();
+    });
+    // 选择市
+    form.on('select(city)',function(e){
+        get_area(e.elem.selectedIndex-1);
+    });
+    // 选择区县
+    form.on('select(area)',function(e){ });
+
+    function get_city(index){
+        var list="<option value=''>请选择市</option>";
+        var data=str[index].children;        
+        cur_data=str[index].children;       
+        
+        for( var i in data){
+            list += "<option value='"+data[i].value+"'>"+data[i].text+"</option> ";
+        }    
+        $("#city").html(list);
+        form.render('select');  
+    }
+    function get_area(index){
+        var list="<option value=''>请选择县/区</option>";
+        if(cur_data[index].children){
+            var data=cur_data[index].children;
+            for( var i in data){
+                list += "<option value='"+data[i].value+"'>"+data[i].text+"</option> ";
+            }   
+        } else{
+            var data=cur_data[index];
+            list = "<option value='"+data.value+"'>"+data.text+"</option> ";
+        }            
+        $("#area").html(list);
+        form.render('select');
+    }
+    function get_area_none(){
+        var list="<option value=''>请选择县/区</option>";        
+        $("#area").html(list);
+        form.render('select');
+    }
+
+});
+</script>

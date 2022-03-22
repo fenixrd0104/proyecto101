@@ -1,0 +1,143 @@
+<title>用户详情</title>
+
+<script type="text/html" template>
+    <link rel="stylesheet" href="{{ layui.setter.base }}style/worker.css?v={{ layui.admin.v }}-1" media="all">
+</script>
+<style>
+     #worker_bottom .layui-form-label{
+        padding:9px 0!important;
+        text-align: left!important;
+    }
+</style>
+
+<div class="layui-fluid">
+<form action="" class="layui-form" id="worker_detail" lay-filter="worker_detail">
+    <div class="layui-row">
+        <div class="layui-col-md3 layui-col-xs12">
+        <div class="layui-input-inline">
+            <div class="layui-upload">
+                <div class="layui-upload-list">
+                    <img class="layui-upload-img" id="test-upload-normal-img" style="width:120px;height:120px;">
+                    <p id="test-upload-demoText"></p>
+                </div>
+                <button type="button" class="layui-btn" id="test-upload-normal"><i class="layui-icon layui-icon-upload"></i>上传图片</button>
+            </div>  
+        </div>
+        </div>
+        <div class="layui-col-md9  layui-col-xs12">
+            <div class="layui-row" id="worker_top">
+                <div class="layui-col-md6">
+                    <p class="layui-input-inline">
+                        <span class="layui-input-inline">归属店铺</span>
+                        <input type="text" name="title" placeholder="请输入" autocomplete="off" class="layui-input">
+                    </p>
+                    <p class="layui-input-inline">
+                        <span>用户类型</span>
+                        <input type="text" name="title" placeholder="请输入" autocomplete="off" class="layui-input">
+                    </p>
+                    <p class="layui-input-inline">
+                        <span>昵称</span>
+                        <input type="text" name="title" placeholder="请输入" autocomplete="off" class="layui-input">
+                    </p>
+                    <p class="layui-input-inline">
+                        <span>排序编号</span>
+                        <input type="text" name="title" placeholder="请输入" autocomplete="off" class="layui-input">
+                    </p>
+                </div>
+                <div class="layui-col-md6">
+                    <p class="layui-input-inline">
+                        <span>登录账号</span>
+                        <input type="text" name="title" placeholder="请输入" autocomplete="off" class="layui-input">
+                    </p>
+                    <p class="layui-input-inline">
+                        <span>用户状态</span>
+                        <input type="text" name="title" placeholder="请输入" autocomplete="off" class="layui-input">
+                    </p>
+                    <p class="layui-input-inline">
+                        <span>邮箱</span>
+                        <input type="text" name="title" placeholder="请输入" autocomplete="off" class="layui-input">
+                    </p>
+                    <p class="layui-input-inline">
+                        <span>联系电话</span>
+                        <input type="text" name="title" placeholder="请输入" autocomplete="off" class="layui-input">
+                    </p>
+                </div>
+            </div>
+            <div class="layui-row" id="worker_bottom">
+                <div class="layui-col-md12">
+                    <p>
+                        <span>备注</span>
+                        <input type="text" name="title" placeholder="请输入" autocomplete="off" class="layui-input" style="width:60%;min-width:200px;">
+                    </p>
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">所属职称：</label>
+                        <div class="layui-input-block" style="line-height: auto;">
+                            <input type="checkbox" name="" title="客服" lay-skin="primary" checked>
+                            <input type="checkbox" name="" title="收银员" lay-skin="primary"> 
+                        </div>
+                    </div>
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">退货权限</label>
+                        <div class="layui-input-block" style="line-height: auto;">
+                            <input type="checkbox" name="" title="退货" lay-skin="primary" checked>
+                        </div>
+                    </div>
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">价格权限</label>
+                        <div class="layui-input-block" style="line-height: auto;">
+                            <input type="checkbox" name="" title="零售价" lay-skin="primary" checked>
+                            <input type="checkbox" name="" title="会员价" lay-skin="primary">
+                            <input type="checkbox" name="" title="批发价" lay-skin="primary">
+                            <input type="checkbox" name="" title="进价" lay-skin="primary">
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="layui-row" id="worker_detail_save">
+                <a class="layui-btn">保存</a>
+            </div>
+        </div>
+    </div>
+</form>
+</div>
+
+<script>
+layui.use(['admin', 'upload','form','layer'], function(){
+    var $ = layui.jquery
+    ,upload = layui.upload
+    ,element = layui.element
+  ,setter = layui.setter
+  ,layer = layui.layer
+    ,form = layui.form;
+
+    form.render(null, 'worker_detail');
+
+    //普通图片上传
+    var uploadInst = upload.render({
+        elem: '#test-upload-normal'
+        ,url: layui.setter.baseUrl+'upload/'
+        ,before: function(obj){
+            //预读本地文件示例，不支持ie8
+            obj.preview(function(index, file, result){
+                $('#test-upload-normal-img').attr('src', result); //图片链接（base64）
+            });
+        }
+        ,done: function(res){
+            //如果上传失败
+            if(res.code > 0){
+            return layer.msg('上传失败');
+            }
+            //上传成功
+        }
+        ,error: function(){
+            //演示失败状态，并实现重传
+            var demoText = $('#test-upload-demoText');
+            demoText.html('<span style="color: #FF5722;">上传失败</span> <a class="layui-btn layui-btn-mini demo-reload">重试</a>');
+            demoText.find('.demo-reload').on('click', function(){
+                uploadInst.upload();
+            });
+        }
+    });
+
+})
+</script>

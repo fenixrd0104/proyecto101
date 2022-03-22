@@ -1,0 +1,176 @@
+{include file="public/header"/}
+
+</head>   
+<body style="background: #f8f8f8;">
+<header class="mui-bar mui-bar-nav index_header shop_head bg_white" id="header">
+    <a class="mui-action-back mui-icon mui-icon-left-nav mui-pull-left" href="javascript:;"></a>
+    <a id="menu" class="mui-action-menu mui-icon mui-icon-bars mui-pull-right" href="javascript:void(0);"></a>
+    <h1 class="mui-title">order details</h1>
+</header>
+<div class="mui-content ord_content">
+    <div class="orderdet_up">
+        <div class="orderdet_tit mui-clearfix">
+            <p class="fl name mui-ellipsis">
+                <img class="or_img" src="__IMG__/packeg.png" alt="">&nbsp;
+                <span class="or_hei"></span>
+            </p>
+            <p class="or_orange fr"></p>
+        </div>
+        <div class="orderdet_div">
+            <div class="orderdet_shop"><a href="/wap/index/goods_info.html">
+                <div class="ors_img"><img src="__IMG__/touxiang.png" alt=""></div>
+                <div class="ors_txt">
+                    <p class="ors_hui mui-ellipsis-2"> </p>
+                    <p class="ors_hei ors_size"></p>
+                </div>
+                <div class="ors_price">
+                    <p class="or_hei">KRC 0.00</p>
+                    <p class="or_hei">x1</p>
+                </div>
+            </a></div>
+        </div>        
+        <div class="orderdet_btn">
+            
+        </div>
+    </div>
+    <ul class="buy_maler" id="person_maler">
+        <li class="orli_tit or_hei">Basic Information</li>
+        <li><p class="m_hei fl">Order number</p><p class="m_hei fr"></p></li>
+        <li><p class="m_hei fl">Order time</p><p class="m_hei fr"></p></li>
+        <li><p class="m_hei fl">Shipping address</p><p class="m_hei fr mui-ellipsis"></p></li>
+        <li><p class="m_hei fl">Consignee</p><p class="m_hei fr"> </p></li>
+        <li><p class="m_hei fl">Payment methods</p><p class="m_hei fr"></p></li>
+        <li><p class="m_hei fl">Shipping method</p><p class="m_hei fr"></p></li>
+        <li><p class="m_hei fl">Order Notes</p><p class="m_hei fr"></p></li>
+        <!-- <li><p class="m_hei fl">Reason for cancellation</p><p class="m_hei fr">You cancelled the order</p></li> -->
+    </ul>
+    <ul class="buy_maler" id="price_maler">
+        <li class="orli_tit or_hei">Price information</li>
+        <li><p class="m_hei fl">Item Amount</p><p class="m_hei fr">&nbsp;0.00 KRC</p></li>
+        <li><p class="m_hei fl">Shipping</p><p class="m_hei fr">&nbsp;0.00 KRC</p></li>
+        <li><p class="m_hei fl">Coupon</p><p class="m_hei fr">-&nbsp;0.00 KRC</p></li>
+        <div class="mb10"></div>
+        <li><p class="m_hei fl">Actual amount paid</p><p class="m_red fr">&nbsp;0.00 KRC</p></li>
+    </ul>
+</div>
+
+
+{include file="public/head_nav"/}
+{include file="public/footer"/}
+<script type="text/html" id="store">
+<!-- <p class="fl name mui-ellipsis">
+    <img class="or_img" src="__IMG__/packeg.png" alt="">&nbsp;
+    <span class="or_hei">{{shop_name}}</span>
+</p> -->
+{{ if now_status==0 }}
+<p class="or_orange fr">Pending payment</p>
+{{ else if now_status==1 }}
+<p class="or_orange fr">Pending Shipment</p>
+{{ else if now_status==2 }}
+<p class="or_orange fr">Pending delivery</p>
+{{ else if now_status==3 }}
+<p class="or_orange fr">To be rated</p>
+{{ else if now_status==4 }}
+<p class="or_orange fr">Refund in progress</p>
+{{ else if now_status==5 }}
+<p class="or_orange fr">Refunded</p>
+{{ else if now_status==6 }}
+<p class="or_orange fr">Successful transaction</p>
+{{ /if end }}
+</script>
+<script type="text/html" id="list">
+    <div class="orderdet_shop"><a href="/wap/index/goods_info.html?id={{goods_id}}">
+        <div class="ors_img"><img src="{{img}}" alt=""></div>
+        <div class="ors_txt">
+            <p class="ors_hui mui-ellipsis-2">{{goods_name}}</p>
+            <p class="ors_hei ors_size">{{spec_key_name}}</p>
+        </div>
+        <div class="ors_price">
+            <p class="or_hei">KRC {{member_goods_price}}</p>
+            <p class="or_hei">x{{goods_num}}</p>
+        </div>
+    </a></div>
+</script>
+<script type="text/html" id="person_list">
+    <li class="orli_tit or_hei">Basic Information</li>
+    <li><p class="m_hei fl">Order Number</p><p class="m_hei fr">{{order_sn}}</p></li>
+    <li><p class="m_hei fl">Order time</p><p class="m_hei fr">{{create_time}}</p></li>
+    <li><p class="m_hei fl">Shipping address</p><p class="m_hei fr mui-ellipsis">{{address_detail}}</p></li>
+    <li><p class="m_hei fl">Consignee</p><p class="m_hei fr">{{consignee}} {{mobile}}</p></li>
+    <li><p class="m_hei fl">Payment methods</p><p class="m_hei fr">{{pay_name}}</p></li>
+    {{ if shipping_name!="" }}
+    <li><p class="m_hei fl">Shipping method</p><p class="m_hei fr">{{shipping_name}}</p></li>
+    {{ else }}
+    <li><p class="m_hei fl">Shipping method</p><p class="m_hei fr">Express shipping</p></li>
+    {{ /if end }}
+    <li><p class="m_hei fl">Order Notes</p><p class="m_hei fr">{{user_note}}</p></li>
+</script>
+<script type="text/html" id="price_list">
+    <li class="orli_tit or_hei">Price information</li>
+    <li><p class="m_hei fl">Goods amount</p><p class="m_hei fr">&nbsp;{{goods_price}}KRC</p></li>
+    <li><p class="m_hei fl">Shipping</p><p class="m_hei fr">&nbsp;{{shipping_price}}KRC</p></li>
+    {{ if integral_money}}
+    <li><p class="m_hei fl">Coupon</p><p class="m_hei fr">-&nbsp;{{integral_money}}pieces</p></li>
+    {{ /if }}
+    {{ if top_cate==2}}
+        {{if now_status==0}}
+        <li><p class="m_hei fl">Voucher required</p><p class="m_hei fr">-&nbsp;{{_df}} KRC</p></li>
+        <div class="mb10"></div>
+        <li><p class="m_hei fl">Actual amount paid</p><p class="m_red fr">&nbsp;{{_sf}}KRC</p></li>
+        {{ else }}
+    <li><p class="m_hei fl">Voucher deduction</p><p class="m_hei fr">-&nbsp;{{_df}} KRC</p></li>
+    <div class="mb10"></div>
+    <li><p class="m_hei fl">Actual amount paid</p><p class="m_red fr">&nbsp;{{_sf}}KRC</p></li>
+        {{ /if}}
+    {{ else }}
+    <li><p class="m_hei fl">Actual amount paid</p><p class="m_red fr">&nbsp;{{user_money}}KRC</p></li>
+    {{ /if }}
+</script>
+<script>
+var order_id=getQueryString('order_id');
+get_data();
+function get_data(){
+    $get('/api/order/order_detail',{order_id:order_id}, function(data) {
+        if (data.status == 1) {
+            var df=accMul((Number(data.data.order_amount)+Number(data.data.user_money)),0.1);
+            var sf=data.data.total_amount-df;
+            data.data._df=df;
+            data.data._sf=sf;
+            var store = template('store', data.data);
+            $('.orderdet_tit').html(store);
+            var list='';
+            for( var i in data.data.goods_list){
+                list += template('list', data.data.goods_list[i]);
+            }
+            $('.orderdet_div').html(list);
+            data.data.create_time=new Date(data.data.create_time*1000).Format("yyyy-MM-dd hh:mm:ss");
+            var person_list = template('person_list', data.data);
+            $('#person_maler').html(person_list);
+            // var btn_list = template('btn_list', data.data);
+            // $('.orderdet_btn').html(btn_list);
+            var to_amount=parseFloat(data.data.user_money)+parseFloat(data.data.order_amount);
+            data.data.to_amount=to_amount.toFixed(2);
+            var price_list = template('price_list', data.data);
+            $('#price_maler').html(price_list);
+        } else {
+            
+        }
+    });
+};
+        //exact multiplication function
+        function accMul(arg1, arg2) {
+            var m = 0, s1 = arg1.toString(), s2 = arg2.toString();
+            try { m += s1.split(".")[1].length } catch (e) { }
+            try { m += s2.split(".")[1].length } catch (e) { }
+            return Number(s1.replace(".", "")) * Number(s2.replace(".", "")) / Math.pow(10, m)
+        }
+
+// address bar information
+function getQueryString(name){
+    var reg = new RegExp("(^|&)"+ name +"=([^&]*)(&|$)");
+    var r = window.location.search.substr(1).match(reg);
+    if(r!=null)return  unescape(r[2]); return null;
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,48 @@
+<title>生成二维码</title>
+
+<div class="layui-card layadmin-header">
+    <div class="layui-breadcrumb" lay-filter="breadcrumb">
+        <a>示例</a>
+        <a><cite>二维码生成</cite></a>
+    </div>
+</div>
+
+<div class="layui-fluid">
+    <div class="layui-row">
+      <div class="layui-card">
+          <div class="layui-card-header">二维码生成</div>
+        <div class="layui-card-body">
+            <div class="layui-form" lay-filter="">             
+              
+                <div class="layui-form-item">
+                  <label class="layui-form-label">二维码</label>
+                  <div class="layui-input-inline">
+                    <img src="https://pic4.ajkimg.com/display/xinfang/efebfa338147159a2af5ca4b69a92391/245x167m.jpg" alt="" style="width:120px;height:120px;">
+                  </div>
+                </div>
+                <div class="layui-form-item">
+                  <div class="layui-input-block">
+                    <button class="layui-btn" lay-submit lay-filter="setmyinfo">保存</button>
+                  </div>
+                </div>
+              </div>
+        </div>
+      </div>
+    </div>
+</div>
+      
+<script>
+  layui.use(['admin', 'upload','form','setter'], function(){
+    var $ = layui.jquery
+    ,admin = layui.admin
+    ,setter = layui.setter
+    ,upload = layui.upload
+    ,element = layui.element
+    ,layer = layui.layer
+    ,form = layui.form;
+    form.render(null, 'component-supplier_edit');
+
+  
+
+  })
+</script>

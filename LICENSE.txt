@@ -1,0 +1,32 @@
+
+ThinkPHP is released under the Apache2 open source license and is free to use.
+Copyright Copyright © 2006-2016 by ThinkPHP (http://thinkphp.cn)
+All rights reserved.
+The trademark and copyright owner of ThinkPHP® is Shanghai Dingxiang Information Technology Co., Ltd.
+
+Apache Licence is a protocol adopted by Apache, a well-known non-profit open source organization.
+This protocol is similar to BSD, encouraging code sharing and respecting the original author's copyright,
+Code modification is permitted before redistribution as open source or commercial software. needs to be satisfied
+conditions of: 
+1. An Apache Licence needs to be given to the user of the code;
+2. If you modify the code, you need to explain in the modified file;
+3. Required in extended code (modified and source-derived code)
+With the original code of the agreement, trademarks, patent notices and other regulations of the original author
+instructions that must be included;
+4. If the redistributed product contains a Notice file, the Notice file
+The content of this agreement must be included in the file. You can add your own in Notice
+License, but may not appear to constitute a change to the Apache Licence.
+Specific protocol reference: http://www.apache.org/licenses/LICENSE-2.0
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+"AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
+FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
+COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
+INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
+BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
+LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN
+ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+POSSIBILITY OF SUCH DAMAGE.

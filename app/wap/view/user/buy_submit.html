@@ -1,0 +1,117 @@
+{include file="public/header"/}
+</head>
+<body>
+<header class="mui-bar mui-bar-nav index_header shop_head" id="header">
+    <a class="mui-icon mui-icon-left-nav mui-pull-left" href="/wap/user/order_list.html?id=1"></a>
+    <a id="menu" class="mui-action-menu mui-icon mui-icon-bars mui-pull-right" href="javascript:void(0);"></a>
+    <h1 class="mui-title">Pay, submit order</h1>
+</header>
+<div class="mui-content buy_content">
+    <div class="mb10"></div>
+    <ul class="sumbit_content">
+        <li>
+            <p class="b_hei fl">Order Amount</p>
+            <p class="b_red fr">KRC <span id="order_amount">0</span>yuan</p>
+        </li>
+    </ul>
+    <div class="sub_paytype">
+        <p class="b_hei">Payment methods</p>
+        <ul>
+            <li data-type='balance'>
+                <i class="iconfont icon-duihao1 icon_radio"></i>
+                <i class="iconfont icon_pic icon-yue text-yellow"></i>
+                <p class="b_hei">Balance payment</p>
+            </li>
+            <li data-type='wxpay'>
+                <i class="iconfont icon-yuan icon_radio"></i>
+                <i class="iconfont icon-weixin1 icon_pic"></i>
+                <p class="b_hei">WeChat Pay</p>
+            </li>
+            <li data-type='alipay'>
+                <i class="iconfont icon-yuan icon_radio"></i>
+                <i class="iconfont icon-zhifubao1 icon_pic"></i>
+                <p class="b_hei">Alipay payment</p>
+            </li>
+        </ul>
+        <button type="button" id="submit_btn" class="sub_soon" disabled>Pay Now</button>
+    </div>
+</div>
+{include file="public/head_nav"/}
+{include file="public/footer"/}
+<script>
+var address_id=getQueryString('address_id');
+var goods_id=getQueryString("goods_id");
+var num=getQueryString("num");
+var goods_spec_key=getQueryString("goods_spec_key");
+// getting information
+var pay_type='balance';
+var order_ids='';
+
+
+var url;
+var ppar={};
+if(goods_id){
+    url='/api/order/purch_order';
+    ppar={goods_id:goods_id,num:num,goods_spec_key:goods_spec_key,address_id:address_id};
+} else{
+    url='/api/order/add_order';
+    ppar={address_id:address_id};
+}
+get_data(url,ppar);
+function get_data($url,$ppar){
+    $get(url,ppar,function(d){
+        if(d.status==1){   
+           $('#order_amount').html(d.data.order_amount);
+           for(var i in d.data.order_id){
+                order_ids += d.data.order_id[i]+',';
+            }
+            order_ids = order_ids.substr(0,order_ids.length-1); 
+            $('#submit_btn').attr('disabled',false);
+        }else{
+            mui.toast(d.msg);
+        }        
+    })
+}
+//payment method
+$('.sub_paytype>ul>li').on('tap',function(){
+    pay_type=$(this).attr('data-type');
+    $(this).find('.icon_radio').addClass('icon-duihao1').removeClass('icon-yuan');
+    $(this).siblings().find('.icon_radio').removeClass('icon-duihao1').addClass('icon-yuan');
+});
+// submit button
+$('#submit_btn').click(function(){
+    if(order_ids==""){
+        layer.open({
+            type: 1,
+            skin: 'store_demo', //style class name
+            closeBtn: 0, // do not display the close button
+            anim: 2,
+            title: false, //do not display the title
+            shadeClose: true, //Turn on the mask to close
+            content: 'No items selected'
+        });
+    } else{
+    $post("/api/order/pay_order",{pay_type:pay_type,order_ids:order_ids},function(d){
+        if(d.code==1){   
+            mui.toast(d.msg);            
+            setTimeout(function(){
+                location.href='/wap/user/order_list.html?id=2';
+            },1000);  
+        }else{
+            mui.toast(d.msg);
+        }        
+    })
+    }
+});
+// address bar information
+function getQueryString(name) {
+    var reg = new RegExp('(^|&)' + name + '=([^&]*)(&|$)', 'i');            
+    var r = window.location.search.substr(1).match(reg);
+    if (r != null) {
+        return unescape(r[2]);
+    }
+    return null;
+}    
+</script>
+</body>
+</html>

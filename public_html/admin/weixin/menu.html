@@ -1,0 +1,267 @@
+<title>微信设置</title>
+<style>
+  .layui-table-body ,.layui-table-main,.layui-form{
+    height:auto!important;
+  }
+</style>
+<div class="layui-card layadmin-header">
+    <div class="layui-breadcrumb" lay-filter="breadcrumb">
+        <a>微信设置</a>
+        <a><cite>菜单设置</cite></a>
+    </div>
+</div>
+
+<div class="layui-fluid">
+<div class="layui-row layui-col-space15">
+<div class="layui-col-md12">
+    <div class="layui-card">
+    <div class="layui-card-header">菜单设置</div>
+    <div class="layui-card-body">
+        <div class="test-table-reload-btn" style="margin-bottom: 10px;">
+            <button type="button" class="layui-btn layuiadmin-btn-admin" style="margin-right: 30px;" data-type="add"><i
+                class="layui-icon layui-icon-add-1 layuiadmin-button-btn"></i>添加菜单</button>
+            <button type="button" class="layui-btn layuiadmin-btn-admin" style="margin-right: 30px;"
+                data-type="addwx">生成微信菜单</button>
+        </div>
+
+        <table class="layui-hide" id="test-table-wxmenu" lay-filter="test-table-wxmenu"></table>
+        <script type="text/html" id="test-table-operate-barDemo">
+            <button type="button" class="layui-btn layui-btn-normal layui-btn-xs" lay-event="edit"><i class="layui-icon layui-icon-edit"></i>编辑</button>
+            <button type="button" class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del"><i class="layui-icon layui-icon-delete"></i>删除</button>
+            <button type="button" class="layui-btn  layui-btn-xs layui-btn-disabled" lay-event="disabled">设置</button>
+        </script>
+    </div>
+    </div>
+</div>
+</div>
+</div>
+
+<script>
+layui.use(['admin', 'table', 'view', 'form', 'treeGrid','layer'], function () {
+    var $ = layui.$
+        ,admin = layui.admin
+        ,element = layui.element
+        ,form = layui.form
+        ,layer = layui.layer
+        ,view = layui.view
+        ,treeGrid = layui.treeGrid
+        ,table = layui.table
+        ,setter = layui.setter
+        ,router = layui.router();
+
+    var ptable=null,
+        tableId ='test-table-wxmenu',
+        curr_data="";
+
+    // 处理数据
+    function deal_data(obj){
+    var list=[];
+    for(var i in obj){
+        list.push(obj[i]);
+        if(obj[i].child){
+            var d=obj[i].child;
+            for(var j in d){
+                list.push(d[j]);
+            }
+        }
+    }
+    return list;
+    }
+    // 请求接口
+    var listurl="";
+    admin.req({
+        url: layui.setter.baseUrl+'admin/weixin/menu' //实际使用请改成服务端真实接口
+        ,data: {}
+        ,type:'get'
+        ,success: function(res){
+            if(res.code==1){
+                // console.log(res)
+                listurl = "<option value='0'>顶级</option>";
+                for (var i in res.data.list) {
+                    listurl += "<option value='" +res.data.list[i].id + "' >" +res.data.list[i].name + "</option> ";
+                }
+                form.render("select");
+            }else{
+                layer.msg(res.msg);
+            }            
+        } 
+    });
+    
+
+    ptable=treeGrid.render({
+        id:tableId
+        ,elem: '#'+tableId
+        ,url:layui.setter.baseUrl+'admin/weixin/menu'
+        ,cellMinWidth: 100
+        ,idField:'id'//必須字段
+        ,treeId:'id'//树形id字段名称
+        ,treeUpId: 'pid'//树形父id字段名称
+        ,treeShowName:'name'//以树形式显示的字段
+        ,heightRemove:[".dHead",10]//不计算的高度,表格设定的是固定高度，此项不生效
+        ,height:'100%'
+        ,isFilter:false
+        ,iconOpen:false//是否显示图标【默认显示】
+        ,isOpenDefault:false//节点默认是展开还是折叠【默认展开】
+        ,loading:true
+        ,method:'post'
+        ,isPage:true
+        ,cols: [[
+            {field: 'id', width: 115, title: 'ID', sort: true, align: 'center'}
+            , {field: 'name', title: '菜单名称', align: 'center' }
+            , {field: 'type', title: '菜单类型', align: 'center', templet: function (d) {
+                return d.type == 1 ? '点击' : d.type == 2 ? '链接': '';
+            }}
+            , { field: 'key_value', title: '菜单关键字', align: 'center' }
+            , { field: 'sort', title: '排序', align: 'center' ,edit:true}
+            , { fixed: '', title: '操作', align: 'center', toolbar: '#test-table-operate-barDemo',minWidth:200 }
+        ]]
+        ,parseData:function (res) {//数据加载后回调
+            res.data=deal_data(res.data.list);
+            return res;
+        }
+    });
+
+    //在表单编辑排序
+    treeGrid.on('edit(test-table-wxmenu)',function(e){  
+        admin.req({
+            url: layui.setter.baseUrl+'admin/weixin/edit_menu' //实际使用请改成服务端真实接口
+            ,data:{id:e.data.id,pid:e.data.pid,name:e.data.name,key_value:e.data.key_value,sort:e.data.sort,type:e.data.type},
+            type:'post',
+            success: function(res){
+                if(res.code==1){
+                    treeGrid.query(tableId,null); //重载表格
+                }else{
+                layer.msg(res.msg, {icon: 5,anim: 6,shade:0.5,time: 1500});
+                }
+            }
+        }); 
+    });
+    var $ = layui.$, active = {
+    // 添加
+    add: function () {
+    admin.popup({
+        title: "添加菜单",
+        area: admin.screen() < 2 ? ['95%', '80%'] : ["600px", "700px"],
+        id: "LAY-popup-add_wxmenu",
+        success: function (layero, index) {
+        view(this.id).render('/weixin/add_menu').done(function () {
+            form.render(null, 'add_wxmenu'); // 弹窗的lay-filter值
+            // 下拉框
+            $('#LAY-menu').html(listurl);            
+            form.render("select");
+            //监听提交
+            form.on('submit(component-form-element)', function (data) {
+            console.log( data);
+            admin.req({
+                url: layui.setter.baseUrl + 'admin/weixin/add_menu' //实际使用请改成服务端真实接口
+                , data: data.field,
+                type: 'post',
+                success: function (res) {
+                if (res.code == 1) {
+                    var lists=deal_data(res.data);
+                    layer.msg(res.msg, { icon: 1 }, function () {
+                    setTimeout(function () {
+                        layer.close(index); //执行关闭 
+                        treeGrid.query(tableId,null); //重载表格
+                    }, 500);
+
+                    });
+                } else {
+                    layer.msg(res.msg, { icon: 5, anim: 6, shade: 0.5, time: 1500 });
+                }
+                }
+            });
+            });
+        });
+        }
+    });
+    },
+    //生成微信菜单
+    addwx:function(){
+        layer.confirm('确认生成微信菜单?', { icon: 3, title: '提示' }, function (index) {
+            admin.req({
+            url:layui.setter.baseUrl+'admin/weixin/wxin_menu',
+            type:'get',
+            success:function(res){
+                if(res.code==1){
+                layer.msg(res.msg, {icon: 1,anim: 6,shade:0.5,time: 1500});
+                }else{
+                layer.msg('生成失败，请稍后再试', {icon: 5,anim: 6,shade:0.5,time: 1000});
+                }
+                
+            }
+            });
+        });
+    }  
+    };
+    $('.test-table-reload-btn .layui-btn').on('click', function () {
+        var type = $(this).data('type');
+        active[type] ? active[type].call(this) : '';
+    });
+
+    //监听工具条
+    treeGrid.on('tool(test-table-wxmenu)', function (obj) {
+        var data = obj.data;
+        if (obj.event === 'del') {
+        layer.confirm('确认删除此菜单?', { icon: 3, title: '提示' }, function (index) {
+            admin.req({
+            url: layui.setter.baseUrl + 'admin/weixin/menu_del' //实际使用请改成服务端真实接口
+            ,data: data
+            ,type: 'get'
+            ,success: function (res) {
+                if (res.code == 1) {
+                layer.msg(res.msg, { icon: 1, time: 1500, anim: 5 }, function () {
+                    obj.del();
+                    layer.close(index);
+                });
+
+                } else {
+                layer.msg(res.msg, { icon: 5, anim: 6, shade: 0.5, time: 1500 });
+                }
+            }
+            });
+        });
+        } else if (obj.event === 'edit') {
+        // 编辑
+        admin.popup({
+            title: "编辑菜单",
+            area: admin.screen() < 2 ? ['95%', '80%'] : ["600px", "700px"],
+            id: "LAY-popup-add_wxmenu",
+            success: function (layero, index) {
+            view(this.id).render('/weixin/add_menu', data).done(function () {
+                form.render(null, 'add_wxmenu'); // 弹窗的lay-filter值\
+                // 编辑的的select
+                $("#LAY-menu").html(listurl);
+                $('#LAY-menu').val(data.pid);
+                form.render('select');  
+                //监听提交
+                form.on('submit(component-form-element)', function (data) {
+                // console.log( layedit.getContent(index) );
+                data.field.id = obj.data.id;
+                admin.req({
+                    url: layui.setter.baseUrl + 'admin/weixin/edit_menu' //实际使用请改成服务端真实接口
+                    ,data: data.field
+                    ,type: 'post'
+                    ,success: function (res) {
+                    if (res.code == 1) {
+                        layer.msg(res.msg, { icon: 1 }, function () {
+                        setTimeout(function () {
+                            layer.close(index); //执行关闭 
+                            treeGrid.query(tableId,null); //重载表格
+                        }, 500);
+                        });
+                    } else {
+                        layer.msg(res.msg, { icon: 5, anim: 6, shade: 0.5, time: 1500 });
+                    }
+                    }
+                });
+                });
+            });
+            }
+        });
+        }
+        
+    });
+
+});
+</script>

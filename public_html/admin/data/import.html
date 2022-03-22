@@ -1,0 +1,55 @@
+<title>数据库还原</title>
+
+<div class="layui-card layadmin-header">
+    <div class="layui-breadcrumb" lay-filter="breadcrumb">
+        <a>数据库管理</a>
+        <a><cite>数据库还原</cite></a>
+    </div>
+</div>
+
+<div class="layui-fluid">
+  <div class="layui-card">
+    <div class="layui-card-header">数据库还原</div>
+    <div class="layui-card-body">      
+      <table id="LAY-data-import" lay-filter="LAY-data-import"></table>   
+      <script type="text/html" id="table-data-import">
+        <a class="layui-btn layui-btn-normal layui-btn-xs" lay-event="edit">还原</a>
+        <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del">删除</a>
+      </script>
+    </div>
+  </div>
+</div>
+
+<script>
+layui.use(['admin', 'table','setter','layer'], function(){
+  var $ = layui.$
+  ,admin = layui.admin
+  ,setter = layui.setter
+  ,view = layui.view
+  ,layer = layui.layer
+  ,table = layui.table
+  ,layer = layui.layer
+  ,form = layui.form;
+
+    table.render({
+        elem: '#LAY-data-import'
+        ,url: '/json/table/user.js'
+        ,cellMinWidth: 80 
+        ,cols: [[
+        {field:'id', width:80, title: 'ID', sort: true,align:'center'}
+        ,{field:'username', title: '备份名称',align:'center'}
+        ,{field:'username',  title: '卷数',templet:function(d){
+            return '['+d.username+']卷'
+        },align:'center', sort: true}
+        ,{field:'sign', title: '压缩', width: 100,align:'center'} 
+        ,{field:'wealth',title: '数据大小',align:'center', sort: true,templet:function(d){
+            return d.wealth+'KB'
+        }}
+        ,{field:'wealth',title: '创建时间',align:'center', sort: true}
+        ,{field:'wealth',title: '状态',align:'center'}
+        ,{fixed: 'right', title:'操作', toolbar: '#table-data-import',align:'center',width:200}
+        ]]
+    });
+
+});
+</script>

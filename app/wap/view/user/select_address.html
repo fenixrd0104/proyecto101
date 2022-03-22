@@ -1,0 +1,84 @@
+{include file="public/header" /}
+
+</head>
+<style>
+  
+</style>
+
+<body class="bg-re address-body select_add">
+        <header class="mui-bar mui-bar-nav index_header" id="header">
+                <a class="back-page mui-icon mui-icon-left-nav mui-pull-left" href="javascript:;"></a>
+                <p id="menu" class="mui-action-menu mui-icon mui-pull-right" href="javascript:void(0);">
+                   <a href="/wap/user/address.html" onclick="">Manage</a>
+                </p>
+                <h1 class="mui-title">Select delivery address</h1>
+            </header>
+    <div class="mui-content">
+        <div class="address-block cont">
+                <ul id="dataList">
+                    
+                 </ul>
+        </div>
+        <div class="null_message" style="display:none">
+                <div class="none2">
+                    <img src="__IMG__/none2.png" alt="">
+                    <p>Sorry you haven't added an address yet! </p>
+                </div>
+                <div class="mb20"></div>
+        </div>
+    </div>
+</body>
+{include file="public/footer"/}
+<script type="text/template" id="address">
+    <li class="address_list add_select">
+            <div>
+                <p>
+                    <span id="name" class="text_hei">{{consignee}}</span>
+                    <span id="phone" class="fr">{{mobile}}</span>
+                </p>
+                <div class="mb10"></div>
+                <p> 
+                    {{if is_default}}
+                    <span class="text_red" style="font-size:0.12rem;">[default address]</span>
+                    {{/if end}}
+                    <span id="address">{{address_detail}}</span>
+                </p>
+            </div>
+    </li>
+</script>
+<script type="text/javascript">
+    //Empty prompt?
+    is_null();
+    function is_null() {  
+        if($('#dataList li').length==0){
+            $('.null_message').show();
+        }else{
+            $('.null_message').hide();
+        }
+    }
+    $get('/api/address/get_addressList',{},function (data) {
+        console.log(data);
+        if(data.status){
+            var obj=data.data;
+            var list='';
+            for(i of obj){
+                list+=template('address',i);
+            }
+            $('#dataList').html(list);
+            is_null();
+        }
+    });
+    $('.add_select').click(function(){
+        var name = $(this).find('#name').html();
+        var phone = $(this).find('#phone').html();
+        var address = $(this).find('#address').html();
+        var obj={
+            name:name,
+            phone:phone,
+            address:address,
+        };    
+    });
+    
+</script>
+
+</html>

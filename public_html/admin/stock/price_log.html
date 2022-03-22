@@ -1,0 +1,66 @@
+<title>日志</title>
+<style>
+.layui-timeline{ padding-left: 32%; }
+</style>
+<div class="layui-row">
+   <!-- 第二步：建立视图。用于呈现渲染结果。 -->
+    <ul class="layui-timeline" id="content"></ul>
+</div>
+<!-- 第一步：编写模版。你可以使用一个script标签存放模板 -->
+<script id="list" type="text/html">
+{{#  layui.each(d, function(index, item){ }}
+    <li class="layui-timeline-item">
+        <i class="layui-icon layui-timeline-axis">&#xe63f;</i>
+        <div class="layui-timeline-content layui-text">
+            <h3 class="layui-timeline-title"></h3>
+            <p>{{item.update_time}}</p>
+            <h4>{{ item.username }}&nbsp;&nbsp;{{item.remark}}</h4>
+            <p>新市场价：{{item.new_market_price}}</p>
+            <p>新本店价：{{item.new_shop_price}}</p>
+            <p>新批发价：{{item.new_trade_price}}</p>
+            <p>新进价：{{item.new_cost_price}}</p>
+        </div>
+    </li>
+{{#  }); }}  
+</script>
+<script type="text/html" template lay-done="layui.data.sendParams(d.params)"></script>
+
+<script>
+layui.data.sendParams = function(params){
+// console.log(params);
+
+  layui.use(['admin','table','form','laydate','view','layer'], function(){
+      var $ = layui.$
+      ,admin = layui.admin
+      ,view = layui.view
+      ,setter = layui.setter
+      ,table = layui.table
+      ,layer = layui.layer
+      ,laytpl = layui.laytpl
+      ,laydate = layui.laydate
+      ,form = layui.form;
+      
+    // 价格日志
+    admin.req({
+        url: layui.setter.baseUrl+'admin/StockInventory/PriceLog'
+        ,data: { spec_id:params }
+        ,type:'get'
+        ,success: function(res){
+            if(res.code==1){
+                var data = res.data.lists;
+                var getTpl = list.innerHTML;
+                var view = document.getElementById('content');
+                laytpl(getTpl).render(data, function(html){
+                    view.innerHTML = html;
+                });
+            
+            }else{
+                layer.msg(res.msg, {icon: 5,anim: 6,shade:0.5,time: 1000});
+            }
+        }
+    }); 
+      
+
+  });
+}
+</script>

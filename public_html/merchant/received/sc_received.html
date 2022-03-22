@@ -1,0 +1,590 @@
+<title>采购收货详情</title>
+<style>
+    table tr:hover input{
+        background:#f2f2f2;
+    }
+</style>
+<div class="layui-card layadmin-header">
+    <div class="layui-breadcrumb" lay-filter="breadcrumb">
+        <a>采购管理</a>
+        <a lay-href="/received/received_list">采购收货</a>
+        <a><cite>采购收货详情</cite></a>
+    </div>
+</div>
+<script type="text/html" template>
+    <link rel="stylesheet" href="{{ layui.setter.base }}style/purchase.css?v={{ layui.admin.v }}-1" media="all">
+</script>
+
+<form class="layui-form"   lay-filter="choose_received_form" style="padding:10px;">
+    <div class="layui-row">
+    <div class="layui-col-md12">
+    <div class="layui-card">
+    <div class="layui-card-header">采购收货详情</div> 
+    <div class="layui-card-body choose_purchase">
+        <div class="layui-row">
+            <div class="layui-btn-group">
+            <button  type="button" lay-submit lay-filter="save_submit" class="layui-btn status_hide">保存</button>
+            <button type="button" class="layui-btn status_hide"  lay-submit lay-filter="wancheng_submit">完成</button>
+            <button type="button" class="layui-btn status_hide"  lay-submit lay-filter="quxiao_submit">取消</button>
+            <button type="button" class="layui-btn"  lay-submit lay-filter="log_submit">日志</button>
+            <button type="button" class="layui-btn" onclick="my_print();">单据打印</button>
+            </div> 
+        </div>
+        <div class="layui-row">
+        <div>
+            <div class="layui-col-lg4 layui-col-md6">
+                <label class="layui-form-label">供应商：</label>
+                <div class="layui-input-block">
+                    <input type="text" name="name" id="name" lay-verify="required"  autocomplete="off" class="layui-input" disabled style="border:none;">
+                </div>
+            </div>
+            <div class="layui-col-lg4 layui-col-md6">
+                <label class="layui-form-label">收货店铺：</label>
+                <div class="layui-input-block" style="line-height: 36px;">
+                    <input type="text" name="shop_name" id="shop_name" lay-verify="required"  autocomplete="off" class="layui-input" disabled style="border:none;">
+                <!-- <span style="color:#4292f1;margin-left: 20px;cursor:pointer;text-decoration: underline;" id="choose">更改店铺</span> -->
+                </div>
+            </div>
+            <!-- <div class="layui-col-lg4 layui-col-md6">
+                <label class="layui-form-label">期望到货：</label>
+                <div class="layui-input-inline">
+                    <input type="text" name="delivery_date" id="date" class="layui-input" placeholder="yyyy-MM-dd">
+                </div>
+            </div> -->
+            <div class="layui-col-lg4 layui-col-md6">
+                <label class="layui-form-label">收 货 人：</label>
+                <div class="layui-input-block">
+                <input type="text" name="consignee" id="consignee" lay-verify="required" placeholder="" autocomplete="off" class="layui-input">
+                </div>
+            </div>
+            <div class="layui-col-lg4 layui-col-md6">
+                <label class="layui-form-label">收货电话：</label>
+                <div class="layui-input-block">
+                <input type="text" name="phone" id="phone" lay-verify="required" placeholder="" autocomplete="off" class="layui-input">
+                </div>
+            </div>
+            <div class="layui-col-lg4 layui-col-md6">
+                <label class="layui-form-label">送货地址：</label>
+                <div class="layui-input-block">
+                <input type="text" name="addr" id="addr" lay-verify="required" placeholder="" autocomplete="off" class="layui-input">
+                </div>
+            </div>
+            <div class="layui-col-lg12 layui-col-md12">
+                <label class="layui-form-label">备注：</label>
+                <div class="layui-input-block">
+                <input type="text" name="remarks" id="remarks"  placeholder="" autocomplete="off" class="layui-input">
+                </div>
+            </div>
+        </div>
+        </div>
+    </div>
+    </div>
+    </div>
+    </div>
+    <input type="hidden" id="receipt_id" name="receipt_id">
+    <div class="layui-row">
+    <div class="layui-col-md12">
+    <div class="layui-card">
+        <div class="layui-card-body">  
+            <div class="layui-btn-container status_hide">
+                <button type="button" class="layui-btn" onclick="add_received();"><i class="layui-icon layui-icon-add-1 layuiadmin-button-btn"></i>添加商品</button>
+                <button type="button" class="layui-btn" onclick="sao_purchase();"><i class="layui-icon layui-icon-edit layuiadmin-button-btn"></i>快捷扫码</button>
+                <button type="button" class="layui-btn" onclick="del();"><i class="layui-icon layui-icon-delete layuiadmin-button-btn"></i>删除商品</button>
+            </div>      
+            <table class="layui-hide" id="test-table-choose_rec" layui-filter="test-table-choose_rec"></table>
+          
+          
+            <script type="text/html" id="choose_remark">
+                <input type="text" name="goods[remarks][]" class="layui-input" style="height:100%;" value='{{d.remarks||""}}'>
+            </script>
+            <script type="text/html" id="price">
+                <input type="text" name="goods[price][]" class="layui-input jisuan this_price" style="height:100%;" value="{{d.receipt_price||'0.00'}}">
+                <input type="hidden" name="goods[spec_id][]" class="layui-input" style="height:100%;" value="{{d.spec_id}}">
+            </script>
+            <script type="text/html" id="num">
+                <input type="text" name="goods[num][]" class="layui-input jisuan this_num" style="height:100%;" value="{{d.receipt_num||'1'}}">
+            </script>
+            <script type="text/html" id="zongjia">
+                <span class="this_zongjia">{{d.total_money||0.00}}</span>
+            </script>
+        </div>
+    </div>
+    </div>
+    </div>
+</form>
+<script>
+layui.use(['admin','table','form','laydate','view','myprint','layer'], function(){
+    var $ = layui.$
+    ,admin = layui.admin
+    ,view = layui.view
+    ,setter = layui.setter
+    ,table = layui.table
+    ,layer = layui.layer
+    ,laydate = layui.laydate
+    ,myprint = layui.myprint
+    ,form = layui.form;
+
+    form.render(null, 'choose_received_form');
+    // 获取传值参数---得到id
+    var router = layui.router();
+    // console.log(router.search);
+    var id = router.search.id; 
+    var supplier_id = router.search.supplier_id; 
+   
+
+
+    
+    
+    // 自定义json
+    var json_data=[];
+    get_data();
+    var myobj=[];//打印头部内容
+
+
+
+
+    // 获取信息 “form” ---请求登入接口
+    admin.req({
+        url: layui.setter.baseUrl+'merchant/Purchase_Receipt/crateReceiptByOrder'
+        ,data: { supplier_id:supplier_id,order_id:id }
+        ,type:'get'
+        ,success: function(res){
+            if(res.code==1){
+                // console.log(res.data);
+                // 赋值
+                var obj={
+                    "name" : res.data.info.supplier_name,
+                    "shop_name" : res.data.info.shop_name,
+                    "consignee" : res.data.info.consignee,
+                    "phone" : res.data.info.phone,
+                    "addr" : res.data.info.addr,
+                    "remarks" : res.data.info.remarks,
+                    "receipt_id" : res.data.info.id,
+                };     
+                form.val("choose_received_form",obj);  
+                myobj['供应商']=res.data.info.supplier_name;            
+                myobj['收货店铺']=res.data.info.shop_name;             
+                myobj['收货人']=res.data.info.consignee;            
+                myobj['收货电话']=res.data.info.phone;            
+                myobj['送货地址']=res.data.info.addr;            
+                myobj['备注']=res.data.info.remarks;           
+                laydate.render({ 
+                    elem: '#date'
+                    ,value: res.data.info.delivery_date
+                });
+                var d=res.data.lists;
+                for(var i in d){
+                    json_data.push(d[i]);
+                    get_data();
+                }
+                // if(res.data.info.receipt_status=='已完成'||res.data.info.return_status=='已完成'){
+                //     $('input').css('border','none').attr({
+                //         'disabled':true,
+                //         'placeholder':''
+                //     });
+                //     $('.status_hide').hide();
+                // }
+                // choose_status(id)
+            }else{
+                layer.msg(res.msg);
+            }
+        }
+    });    
+
+    get_data();
+    function get_data(){
+        console.log(json_data)
+        for(var i in json_data){
+            json_data[i].goods_sku=json_data[i].goods_sn;
+        }
+        table.render({
+            elem: '#test-table-choose_rec'
+            ,data: json_data
+            ,cellMinWidth: 80 //全局定义常规单元格的最小宽度，layui 2.2.1 新增
+            ,cols: [[
+            {type:'checkbox'}
+            ,{field:'goods_id', width:80, title: 'ID', sort: true}
+            ,{field:'goods_sku', width:120, title: '商品条码'}
+            ,{field:'goods_name', title: '商品名称'}
+            ,{field:'spec_name', width:180, title: '规格'}
+            ,{field:'cost_price', title: '价格',width:100,templet:'#price'}
+            ,{field:'num', title: '采购数量',width:100,templet:"#num"}
+            ,{field:'money', title: '采购金额', width: 100,templet:'#zongjia'}
+            ,{field: 'remarks', title:'备注',width:160,templet:'#choose_remark'}   
+            ]]
+            ,where: { supplier_id:supplier_id }
+        });
+        jisuan();
+    }    
+
+    // 添加商品
+    window.add_received=function(){
+        add_received();
+    }
+
+    function add_received(){
+    admin.popup({
+        title: "添加商品",
+        area: ["880px", "600px"],
+        id: "LAY-popup-new_received",
+        success: function(e, i) {
+        view(this.id).render('/received/add_received').done(function() { 
+        table.on('tool(test-table-reload)', function(obj){
+            console.log(obj);
+            var data = obj.data;
+            // console.log(json_data);  
+            if(obj.event === 'choose'){
+                var d=obj.data.spec;            
+                if(obj.data.spec.length>1){
+                admin.popup({
+                    title: "规格",
+                    area: admin.screen() < 2 ? ['95%', '90%'] :["600px", "300px"],
+                    id: "LAY-popup-choose_guige",
+                    success: function(layero, index){
+                        view(this.id).render('/received/choose_guige',d).done(function() {
+                        form.render(null, 'choose_guige_rec'); // 弹窗的lay-filter值
+                        // 提交
+                        form.on('submit(submit_choose_guige)',function(datas){
+                            for(var i in data.spec){
+                                if(data.spec[i].spec_id==datas.field.spec_id){
+                                    data.goods_spec_name=data.spec[i].spec_name;
+                                    data.goods_sku=data.spec[i].spec_sku;
+                                    data.goods_sn=data.spec[i].spec_sku;
+                                    data.receipt_price=data.spec[i].cost_price;
+                                    data.goods_id=data.id; 
+                                }
+                            }
+                            data.spec_id=datas.field.spec_id;
+                            check_data(data);
+                            layer.close(index); //执行关闭  不关闭执行去重会失败
+                        })  
+                        });
+                    }
+                });
+                } else {
+                    var data = obj.data;    
+
+                    data.goods_spec_name=data.spec[0].key_name;
+                    data.goods_sku=data.goods_sn;
+                    data.goods_sn=data.goods_sn;
+                    data.receipt_price=data.spec[0].cost_price;
+                    data.spec_id=data.spec[0].spec_id;                
+                    data.goods_id=data.id;                  
+                    check_data(data);
+                }
+         
+            } 
+        });
+        });
+        }
+    });
+    }
+    // 检查是否已经添加  未重复则进行添加  重复则不进行添加
+
+    function check_data(data){
+        if(json_data==''){
+            json_data.push(data);
+            get_data();
+            layer.msg('添加成功' , {icon: 1,time: 1500});
+        }else{
+            for(var i in json_data){
+
+                if(json_data[i].spec_id==data.spec_id){
+                    layer.msg('不能重复添加', {icon: 5,anim: 6,shade:0.5,time: 1500});
+                    return ;
+                }else{
+                    layer.msg('添加成功' , {icon: 1,time: 1500});
+                }
+            }
+            json_data.push(data);
+            get_data();
+           
+           
+        }
+        jisuan();
+    }
+    //  扫码
+    window.sao_purchase=function(){
+        admin.popup({
+            title: "快捷扫码",
+            area: ["500px",'350px'],
+            
+            id: "LAY-popup-sao_received",
+            success: function(e, i) {
+                view(this.id).render('/received/sao_received').done(function() {
+                    $(document).on('keydown', function(e){ 
+                        if(e.keyCode == 13){
+                            $('#saoma_submit').click();
+                        }
+                    })
+                    form.on('submit(saoma_submit)',function(e){
+                        admin.req({
+                            url: layui.setter.baseUrl+'merchant/goods/searchByGoodsSku'
+                            ,data: { supplier_id:supplier_id,spec_sku:e.field.spec_sku }
+                            ,type:'get'
+                            ,success: function(res){
+                                if(res.code==1){
+                                    var data = res.data;
+
+                                    data.goods_spec_name=data.spec_name;
+                                    data.goods_sku=data.spec.spec_sku;
+                                    data.goods_sn=data.spec.spec_sku;
+                                    data.receipt_price=data.spec.cost_price;
+                                    data.spec_id=data.spec.spec_id;   
+                                    data.goods_id=data.spec.goods_id;         
+                                    data.receipt_num=e.field.num;  
+
+                                    $('#spec_input').val("");
+                                    $('input[name="spec_sku"]').focus();
+                                    check_data(data);              
+                                    var music_html='<audio src="/static/merchant/src/style/res/suc.mp3" controls="controls" autoplay="autoplay"></audio>';
+                                    $('#add_music').html(music_html);                                          
+                                }else{
+                                    $('#spec_input').val("");
+                                    $('input[name="spec_sku"]').focus();             
+                                    var music_html='<audio src="/static/merchant/src/style/res/suc.mp3" controls="controls" autoplay="autoplay"></audio>';
+                                    $('#add_music').html(music_html);       
+                                    layer.msg(res.msg, {icon: 5,anim: 6,shade:0.5,time: 1500});
+                                }
+                            }
+                        });   
+                    });
+
+                });
+            }
+        });
+    }
+
+    
+   
+    // 删除所选
+    window.del=function(){
+        var checkStatus = table.checkStatus('test-table-choose_rec')
+        ,data = checkStatus.data;
+        for(var i in data){
+            for(j in json_data){
+                if(data[i].id==json_data[j].id){
+                    json_data.splice(j, 1);
+                    get_data();
+                }
+            }
+        }
+    }
+        
+    $('.layui-btn-container .layui-btn').on('click', function(){
+        var type = $(this).data('type');
+        if(type){
+            active[type] ? active[type].call(this) : '';
+        }
+    });
+
+
+
+
+    // 保存
+    form.on('submit(save_submit)',function(e){
+        console.log(e);
+        // console.log('列表'+json_data)
+        if(json_data== ''){
+            layer.msg('商品不能为空', {icon: 5,anim: 6,shade:0.5,time: 1500});
+        }else{
+            admin.req({
+                url: layui.setter.baseUrl+'merchant/Purchase_Receipt/saveOrder'
+                ,data: e.field,
+                type:'post',
+                success: function(res){
+                    if(res.code==1){
+                        // layer.msg(res.msg, {icon: 1,anim: 6,shade:0.5,time: 1500});
+                        form.render();
+                    }else{
+                        layer.msg(res.msg, {icon: 5,anim: 6,shade:0.5,time: 1500});
+                    }       
+                } 
+            });
+        }
+    });
+    // 完成操作
+    form.on('submit(wancheng_submit)',function(e){
+        var id=$('#receipt_id').val();
+        if(json_data== ''){
+            layer.msg('商品不能为空', {icon: 5,anim: 6,shade:0.5,time: 1500});
+        }else{
+            admin.req({
+                url: layui.setter.baseUrl+'merchant/Purchase_Receipt/saveOrder'
+                ,data: e.field,
+                type:'post',
+                success: function(res){
+                    if(res.code==1){
+                        admin.req({
+                            url: layui.setter.baseUrl+'merchant/Purchase_Receipt/completeOrder'
+                            ,data: {receipt_id:id},
+                            type:'post',
+                            success: function(res){
+                                if(res.code==1){
+                                    // layer.msg(res.msg, {icon: 1,anim: 6,shade:0.5,time: 1500},function(){
+                                        $('input').css('border','none').attr({
+                                            'disabled':true,
+                                            'placeholder':''
+                                        });
+                                        $('.status_hide').hide();
+                                    // });
+                                    form.render();
+                                }else{
+                                    layer.msg(res.msg, {icon: 5,anim: 6,shade:0.5,time: 1500});
+                                }       
+                            } 
+                        });
+                        form.render();
+                    }else{
+                        layer.msg(res.msg, {icon: 5,anim: 6,shade:0.5,time: 1500});
+                    }       
+                } 
+            });
+        }
+    });
+    // 取消操作
+    form.on('submit(quxiao_submit)',function(e){
+        var id=$('#receipt_id').val();
+
+
+        layer.confirm('是否确认取消采购订单',{icon: 3, title:'取消采购订单'}
+            ,function(){
+                admin.req({
+                url: layui.setter.baseUrl+'merchant/Purchase_Receipt/cancelOrder'
+                ,data: e.field,
+                type:'post',
+                success: function(res){
+                    if(res.code==1){
+                        // layer.msg(res.msg, {icon: 1,anim: 6,shade:0.5,time: 1500},function(){
+                             // get_data();
+                        $('input').css('border','none').attr({
+                            'disabled':true,
+                            'placeholder':''
+                        });
+                        $('.status_hide').hide();
+                        // });
+                       
+                        form.render();
+
+                    }else{
+                        layer.msg(res.msg, {icon: 5,anim: 6,shade:0.5,time: 1500});
+                    }       
+                } 
+            });
+            });
+
+
+    });
+
+
+
+
+
+
+
+
+
+ // 日志
+ form.on('submit(log_submit)',function(e){
+        admin.popup({
+            title: "日志",
+            area: admin.screen() < 2 ? ['95%', '90%'] : ["600px", "500px"],
+            id: "LAY-popup-log_received",
+            success: function(e, i) {
+                view(this.id).render('/received/received_log',id).done(function() {
+             
+                });
+            }
+        });
+
+    });
+
+
+
+
+    // 更改状态
+    function choose_status(id){
+        admin.req({
+        url: layui.setter.baseUrl+'merchant/Purchase_Receipt/saveOrder'
+        ,data: { receipt_id:id }
+        ,type:'get'
+        ,success: function(res){
+            if(res.code==1){
+                // console.log(res.data);
+                // 赋值
+                var obj={
+                    "name" : res.data.info.supplier_name,
+                    "shop_name" : res.data.info.shop_name,
+                    "consignee" : res.data.info.consignee,
+                    "phone" : res.data.info.phone,
+                    "addr" : res.data.info.addr,
+                    "remarks" : res.data.info.remarks,
+                    "receipt_id" : res.data.info.id,
+                }
+                form.val("choose_received_form",obj);   
+                myobj['供应商']=res.data.info.supplier_name;            
+                myobj['收货店铺']=res.data.info.shop_name;            
+                myobj['收货人']=res.data.info.consignee;            
+                myobj['收货电话']=res.data.info.phone;            
+                myobj['送货地址']=res.data.info.addr;            
+                myobj['备注']=res.data.info.remarks;            
+                laydate.render({ 
+                    elem: '#date'
+                    ,value: res.data.info.delivery_date
+                });
+                
+                for(var i in res.data.lists){
+                    res.data.lists[i].id=res.data.lists[i].goods_id;
+                    res.data.lists[i].goods_sku=res.data.lists[i].spec_sku;
+                    res.data.lists[i].goods_spec_name=res.data.lists[i].spec_name;
+                }
+                json_data=res.data.lists;
+                get_data();
+                if(res.data.info.receipt_status=='已完成'||res.data.info.return_status=='已完成'||res.data.info.receipt_status=='已取消'){
+                    $('input').css('border','none').attr({
+                        'disabled':true,
+                        'placeholder':''
+                    });
+                    $('.status_hide').hide();
+                }
+            }else{
+                layer.msg(res.msg);
+            }
+        }
+    });    
+
+    }
+
+
+
+
+
+
+    // 计算
+    
+    $('body').on('blur','.layui-table .jisuan',function(){
+        var items_num=$(this).parents('tr').find('.this_num').val();
+        var items_price=$(this).parents('tr').find('.this_price').val();
+        var zongjia=(items_num*items_price).toFixed(2);
+        // console.log(items_num+'******'+items_num+'*****'+zongjia);
+        $(this).parents('tr').find('.this_zongjia').html(zongjia);
+    });
+
+    function jisuan(){
+        $('.layui-table .jisuan').each(function(){
+            var items_num=$(this).parents('tr').find('.this_num').val();
+            var items_price=$(this).parents('tr').find('.this_price').val();
+            var zongjia=(items_num*items_price).toFixed(2);
+            // console.log(items_num+'******'+items_num+'*****'+zongjia);
+            $(this).parents('tr').find('.this_zongjia').html(zongjia);
+        });
+    }
+
+
+    //打印带头部
+
+    window.my_print=function(){
+        myprint.myprint(myobj,'test-table-choose_rec');
+    };
+});
+</script>

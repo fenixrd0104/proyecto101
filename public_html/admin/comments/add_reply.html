@@ -1,0 +1,62 @@
+<div class="layui-form" action="" lay-filter="add_reply" style="padding: 20px 30px 0 0;">            
+    <div class="layui-form-item">
+        <label class="layui-form-label">回复</label>
+        <div class="layui-input-block">
+            <textarea name="reply_content" lay-verify="required" class="layui-textarea" id="lay_textarea"></textarea>   
+            <input type="text" name="id" id="layinp_id" class="layui-input layui-hide">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <div class="layui-input-block">
+        <button type="button" class="layui-btn" lay-submit="" lay-filter="reply_sub"><i class="layui-icon">&#xe654;</i>保存</button>
+        <button type="button" class="layui-btn layui-btn-danger" data-type="close"><i class="layui-icon">&#x1006;</i>返回</button>
+        </div>
+    </div>
+</div>
+
+<script type="text/html" template lay-done="layui.data.sendParams(d.params)"></script>
+<script>
+layui.data.sendParams = function(params){
+// console.log(params);
+layui.use(['admin','form','setter','layer'], function(){
+    var $ = layui.$
+    ,admin = layui.admin
+    ,setter = layui.setter
+    ,layer = layui.layer
+    ,element = layui.element
+    ,form = layui.form
+    ,layer = layui.layer
+    ,router = layui.router();
+
+    element.render();
+    form.render(null, 'add_reply');
+    // 数据
+    admin.req({
+        url: layui.setter.baseUrl+'admin/goods/add_reply' //实际使用请改成服务端真实接口
+        ,data: { id:params.id }
+        ,type:'get'
+        ,success: function(res){
+            if(res.code==1){ 
+                $('#lay_textarea').val( res.data.reply_content );
+                $('#layinp_id').val( params.id );
+            }else{
+                layer.msg(res.msg, {icon: 5,anim: 6,shade:0.5,time: 1500});
+            }
+        }
+    });
+    
+    var $ = layui.$, active = {
+        // 返回
+        close:function(index){ 
+            layer.closeAll('page');
+        }
+    };
+    
+    $('.layui-input-block .layui-btn').on('click', function(){
+        var type = $(this).data('type');
+        active[type] ? active[type].call(this) : '';
+    });
+
+});
+}
+</script>

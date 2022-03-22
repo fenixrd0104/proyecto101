@@ -1,0 +1,87 @@
+
+
+<title>促销管理</title>
+
+<div class="layui-card layadmin-header">
+    <div class="layui-breadcrumb" lay-filter="breadcrumb">
+        <a>促销管理</a>
+        <a><cite>抢购管理</cite></a>
+    </div>
+</div>
+
+<div class="layui-fluid">
+  <div class="layui-card">
+    <div class="layui-card-header">
+        抢购列表
+    </div>
+    <div class="layui-card-body">
+      
+      <script  type="text/html" id="table-data-index-tool">
+        <button class="layui-btn layuiadmin-btn-useradmin" onclick="add_flash();" data-type="add_flash"><i class="layui-icon layui-icon-add-1"></i>添加活动</button>
+    </script>
+      <table id="LAY-data-index" lay-filter="LAY-data-index"></table>
+   
+      <script type="text/html" id="table-data-index">
+        <a class="layui-btn layui-btn-normal layui-btn-xs" lay-event="edit"><i class="layui-icon layui-icon-edit"></i>编辑</a>
+        <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del"><i class="layui-icon layui-icon-delete"></i>删除</a>
+      </script>
+    </div>
+  </div>
+</div>
+
+<script>
+layui.use(['admin', 'table','layer','setter'], function(){
+  var $ = layui.$
+  ,admin = layui.admin
+  ,view = layui.view
+  ,layer = layui.layer
+  ,table = layui.table
+  ,layer = layui.layer
+  ,setter = layui.setter
+  ,form = layui.form;
+  
+        
+  table.render({
+        elem: '#LAY-data-index'
+        ,url: layui.setter.baseUrl+'json/table/user.js'
+        ,cellMinWidth: 80 //全局定义常规单元格的最小宽度，layui 2.2.1 新增
+        ,toolbar: '#table-data-index-tool'
+        ,cols: [[
+        {field:'id', width:80, title: 'ID', sort: true,align:'center'}
+        ,{field:'username', title: '活动名称',align:'center'}
+        ,{field:'username', title: '活动商品',align:'center'}
+        ,{field:'username', title: '抢购数量',align:'center'}
+        ,{field:'username', title: '抢购价格',align:'center'}
+        ,{field:'username', title: '开始时间',align:'center'}
+        ,{field:'username', title: '结束时间',align:'center'}
+        ,{field:'username', title: '已购买',align:'center'}
+        ,{field:'username', title: '订单数量',align:'center'}
+        ,{field:'wealth',title: '活动状态',align:'center'}
+        ,{fixed: 'right', title:'操作', toolbar: '#table-data-index',align:'center',width:160}
+        ]]
+    });
+
+    
+      //头部事件--添加活动
+      
+       function add_flash(){
+        admin.popup({
+          title: "添加活动",
+          area: admin.screen() < 2 ? ['95%', '90%'] :["800px", "580px"],
+          id: "LAY-popup-add_flash",
+          success: function(layero, index){
+            view(this.id).render('/promotion/add_flash').done(function() {
+              form.render(null, 'add_flash'); // 弹窗的lay-filter值
+             
+            });
+          }
+        });
+      }
+        // 添加活动
+      window.add_flash=function(){
+        add_flash();
+      };
+    
+
+});
+</script>

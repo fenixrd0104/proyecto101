@@ -1,0 +1,52 @@
+<title>发送邮件</title>
+
+<div class="layui-card layadmin-header">
+    <div class="layui-breadcrumb" lay-filter="breadcrumb">
+        <a>示例</a>
+        <a><cite>邮件发送</cite></a>
+    </div>
+</div>
+
+<div class="layui-fluid">
+    <div class="layui-card" id="layuicard" >
+        <div class="layui-card-header">邮件发送</div>
+        <div class="layui-card-body layui-clear">
+            <form class="layui-form" action="" lay-filter="menu_eadit">
+                
+                <div class="layui-form-item">
+                    <label class="layui-form-label">邮箱</label>
+                    <div class="layui-input-block" style="max-width:400px;">
+                    <input type="text" name="title" id="LAY-title" lay-verify="required" placeholder="输入邮箱" autocomplete="off" class="layui-input" >
+                    </div>
+                </div>
+          
+                
+                <!-- <div class="layui-form-item">
+                    <label class="layui-form-label">站点状态</label>
+                    <div class="layui-input-block">
+                    <input type="radio" name="status" value="1" title="开启" checked=""><div class="layui-unselect layui-form-radio layui-form-radioed"><i class="layui-anim layui-icon"></i><div>开启</div></div>
+                    <input type="radio" name="status" value="0" title="关闭"><div class="layui-unselect layui-form-radio"><i class="layui-anim layui-icon"></i><div>关闭</div></div>
+                    </div>                    
+                </div> -->
+                <div class="layui-form-item">
+                    <div class="layui-input-block">
+                    <button class="layui-btn" lay-submit lay-filter="component-form-element"><i class="layui-icon">&#xe654;</i>保存</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+<script>
+    layui.use(['admin', 'upload','form','setter'], function(){
+        var $ = layui.jquery
+        ,admin = layui.admin
+        ,setter = layui.setter
+        ,upload = layui.upload
+        ,element = layui.element
+        ,layer = layui.layer
+        ,form = layui.form;
+        form.render(null, 'component-supplier_edit');
+
+    })
+</script>

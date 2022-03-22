@@ -1,0 +1,32 @@
+{include file="public/header" /}
+<body class="height_auto">
+    <header class="mui-bar mui-bar-nav index_header" id="header">
+        <a class="back-page mui-icon mui-icon-left-nav mui-pull-left" href="javascript:;"></a>
+        <a id="menu" class="mui-action-menu mui-icon mui-icon-bars mui-pull-right" href="javascript:void(0);"></a>
+        <h1 class="mui-title">My Messages</h1>
+            </header>
+            <div class="mui-content" style="padding-bottom:0!important;">
+                <div class="null_message">
+                    <img src="__IMG__/null_message.png" alt="">
+                    <span>No message recorded yet~</span>
+                </div>
+            </div>
+            {include file="public/head_nav"/}
+        </body>
+        {include file="public/footer" /}
+        
+        <script type="text/javascript">
+             /* header navigation bar */
+     $('#menu').click(function(e){
+        $('.login_pop').toggle(); 
+        e.stopPropagation();                     
+    })       
+    $('body').click(function(){
+        $('.login_pop').hide();          
+    }) 
+    $('.i_eye').on('tap', function () {
+        event.stopPropagation();
+    })
+</script>
+
+</html>

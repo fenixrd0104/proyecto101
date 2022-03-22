@@ -1,0 +1,248 @@
+<title>零售单支付</title>
+<style>
+.complet .layui-form-label,
+.complet_s .layui-form-label{
+    padding: 9px 0;
+}
+.complet .layui-input-block,
+.complet_s .layui-input-block{
+    margin-left: 80px;
+}
+.complet .layui-input-inline{
+    width: 15%;
+}
+.complet .layui-input{
+    padding-left: 0  ;
+}
+.complet_s .layui-input-inline{
+    width: 260px;
+}
+.user_label{
+    text-align: left;
+    width: auto;
+}
+.cope_money{
+    color: #ff0000 !important;
+    font-weight: bold;
+    font-size: 20px;
+}
+
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+}
+input[type="number"] {
+    -moz-appearance: textfield;
+}
+</style>
+
+<div class="layui-form" id="payment" lay-filter="choose_stock" style="padding: 20px 30px 0 0;">
+    <div class="layui-row layui-col-space10 complet">
+    <div class="layui-form-item">
+        <label class="layui-form-label">商品数量：</label>
+        <div class="layui-input-inline">
+            <input type="text" name="num_s" id="LAY_num" class="layui-input" style="border:none" disabled>
+            <input type="text" name="order_id" id="lay_order_id" class="layui-input" style="display:none" disabled>
+            <input type="text" name="use_integral" id="use_integral" class="layui-input" style="display:none" disabled>
+            <input type="text" name="use_money" id="use_money" class="layui-input" style="display:none" disabled>
+        </div>
+        <label class="layui-form-label">商品总价：</label>
+        <div class="layui-input-inline">
+            <input type="text" name="goods_price_s" id="goods_price" class="layui-input" style="border:none" disabled >
+        </div>
+        <label class="layui-form-label">总金额：</label>
+        <div class="layui-input-inline">
+            <input type="text" name="total_amount_s" id="total_amount" class="layui-input" style="border:none" disabled  >
+        </div>
+        <label class="layui-form-label">优惠金额：</label>
+        <div class="layui-input-inline">
+            <input type="text" name="discount_s" id="discount"  class="layui-input" style="border:none" disabled  >
+        </div>
+        <label class="layui-form-label">应付余额：</label>
+        <div class="layui-input-inline" style="width: 28%">
+            <div class="layui-form-mid layui-word-aux cope_money" id="order_amount_s"></div>
+        </div>
+        <input type="checkbox" name="moling" id="moling" value="1" lay-skin="primary" lay-filter="checkbox" title="抹零" checked >
+    </div>
+    </div>
+    <div class="layui-form-item complet_s">
+        <label class="layui-form-label">积分抵扣：</label>
+        <div class="layui-input-inline">
+            <input type="number" name="u_integral" id="u_integral_more" lay-verify="required" placeholder="" autocomplete="off" class="layui-input" value="0" >
+        </div>
+        <label class="layui-form-label user_label">可用积分：<span id="user_integral_s"></span></label>
+    </div>
+    <div class="layui-form-item complet_s">
+        <label class="layui-form-label">余额抵扣：</label>
+        <div class="layui-input-inline">
+            <input type="number" name="u_money" id="u_money_more" lay-verify="required" placeholder="请输入余额抵扣" autocomplete="off" class="layui-input" value="0" >
+        </div>
+        <label class="layui-form-label user_label">可用余额：<span id="user_money_s"></span></label>
+    </div>
+    <div class="layui-form-item">
+    <div class="layui-input-block">
+        <button type="button" class="layui-btn" lay-submit lay-filter="component-form-element"><i class="layui-icon">&#xe654;</i>保存</button>
+        <button type="button" class="layui-btn layui-btn-danger" data-type="close" ><i class="layui-icon">&#x1006;</i>关闭</button>
+    </div>
+    </div>
+</div>
+
+
+<script type="text/html" template lay-done="layui.data.sendParams(d.params)"></script>  
+
+<script>
+layui.data.sendParams = function(params){
+console.log(params);
+
+layui.use(['admin','table','form','view','layer'], function(){
+    var $ = layui.$
+    ,admin = layui.admin
+    ,view = layui.view
+    ,setter = layui.setter
+    ,table = layui.table
+    ,layer = layui.layer
+    ,form = layui.form;
+
+                   
+    $('#lay_order_id').val(params);
+    admin.req({
+        url: layui.setter.baseUrl + 'admin/Cashier/complete' 
+        ,data: { order_id:params }
+        ,type: 'get'
+        ,success: function (res) {
+        if (res.code == 1) {
+            // 调接口--获取数据 
+            $('#u_integral_more').attr('placeholder',"最多可用"+res.data.info.exchange_integral+"积分抵扣"+ res.data.info.integral_money+"钱");
+            $('#user_integral_s').html(res.data.user.integral);
+            $('#user_money_s').html(res.data.user.money);
+            $('#order_amount_s').html(res.data.info.order_amount);
+            form.val("choose_stock",{
+                "num_s" : res.data.info.num,
+                "goods_price_s" : res.data.info.goods_price,
+                "total_amount_s" : res.data.info.total_amount,
+                "discount_s" : res.data.info.discount,
+                "use_money" : res.data.user.money,
+                "use_integral" : res.data.user.integral
+            }); 
+
+            // 默认抹零
+            var check = document.getElementById("moling").checked;
+            if(check == true){
+                console.log('选中');
+                var o_amount=res.data.info.order_amount;
+                var o_amount_ss=Math.round(o_amount).toFixed(2);                
+                $('#order_amount_s').html(o_amount_ss);
+            } else{
+                // console.log('nonono');
+            }
+            // 抹零
+            form.on('checkbox(checkbox)', function(data){
+                // console.log(data);
+                
+                //是否被选中，true或者false
+                var ex_integral= res.data.info.exchange_integral;
+                var int_money= res.data.info.integral_money;
+                if( data.elem.checked==true ){
+                    ex_integral=Math.round(ex_integral).toFixed(2);
+                    int_money=Math.round(int_money).toFixed(2);
+                } else{
+                    ex_integral=ex_integral;
+                    int_money=int_money;
+                }
+                $('#u_integral_more').attr('placeholder',"最多可用"+ex_integral+"积分抵扣"+int_money+"钱");
+                // console.log(data.elem.checked); 
+                var or_amount=res.data.info.order_amount;
+                var u_integ =$("#u_integral_more").val(); 
+                var u_mone =$("#u_money_more").val(); 
+                if( data.elem.checked==true ){
+                    var order_value =Math.round(or_amount).toFixed(2)-(u_integ/res.data.info.integral_pi)-u_mone;
+                    $('#order_amount_s').html(order_value.toFixed(2));
+                } else{
+                    var order_value =or_amount-(u_integ/res.data.info.integral_pi)-u_mone;
+                    $('#order_amount_s').html(order_value.toFixed(2));
+                }
+            }); 
+            // Math.round(o_amount).toFixed(2);
+            $('body').on('blur','#u_integral_more',function(){        
+                var value =$(this).val();
+                var u_money =$("#u_money_more").val(); 
+                var user_integral_s =$("#user_integral_s").html(); 
+                var os_amount =res.data.info.order_amount; 
+
+                var ex_integral= res.data.info.exchange_integral;
+                var int_money= res.data.info.integral_money;
+                if( $('#moling').prop('checked')==true ){
+                    ex_integral=Math.round(ex_integral).toFixed(2);
+                    int_money=Math.round(int_money).toFixed(2);
+                } else{
+                    ex_integral=ex_integral;
+                    int_money=int_money;
+                }        
+
+                if( parseInt(value) > parseInt(ex_integral)){
+                                  
+                    $(this).val(ex_integral);
+                    layer.msg("最多可用"+ex_integral+"积分抵扣"+ int_money+"钱");
+                } else if( value > parseInt(user_integral_s) ){ 
+                    layer.msg("积分不足!!!",{time: 1000});
+                } else if( value <0){
+                    $(this).val(0);
+                } else{ 
+                    if( $('#moling').prop('checked')==true ){
+                        os_amount=Math.round(os_amount).toFixed(2);
+                    } else{
+                        os_amount=os_amount;
+                    }        
+                    var order_value =os_amount-(value/res.data.info.integral_pi)-u_money;
+                    $('#order_amount_s').html( (order_value).toFixed(2));
+                    $(this).val(value/res.data.info.integral_pi);
+
+                }
+                
+            });
+            $('body').on('blur','#u_money_more',function(){        
+                var value1 =$(this).val();
+                var use_integral =$("#u_integral_more").val();
+                var user_money_s =$("#user_money_s").html(); 
+                var os_amount =res.data.info.order_amount; 
+
+                if( parseInt(value1) > parseInt(user_money_s)){
+                    layer.msg("余额不足!!!",{time: 1000});
+                } else if (value1 <0){
+                    $(this).val(0);
+                } else{  
+                    if( $('#moling').prop('checked')==true ){
+                        os_amount=Math.round(os_amount).toFixed(2);
+                    } else{
+                        os_amount=os_amount;
+                    }       
+                    var order_value =os_amount -(use_integral/res.data.info.integral_pi)-value1;
+                    $('#order_amount_s').html( (order_value).toFixed(2));
+ 
+                }
+               
+            });
+
+
+           
+        } else {
+            layer.msg(res.msg);
+        }
+        }
+    });
+   
+   //取消按钮
+   var active = {
+        close: function(){     
+            layer.closeAll('page'); //关闭所有页面层
+        }
+    }  
+    $('.layui-input-block .layui-btn').on('click', function(){
+        var type = $(this).data('type');
+        active[type] ? active[type].call(this) : '';
+    });
+
+});
+
+}
+</script>

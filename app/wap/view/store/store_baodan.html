@@ -1,0 +1,62 @@
+{include file="public/header" /}
+<style>
+.mui-popup-inner{
+    background: #fff;
+}
+</style>
+</head>
+<body>
+<header class="mui-bar mui-bar-nav head_line" id="header">
+    <a class="back-page mui-icon mui-icon-left-nav mui-pull-left" href="javascript:;"></a>
+    <a id="menu" class="mui-action-menu mui-icon mui-icon-bars mui-pull-right" href="javascript:void(0);"></a>
+    <h1 class="mui-title">Orders</h1>
+</header>
+<div class="mui-content">
+    <div class="mb10"></div>
+    <ul class="personal_ul">
+       
+        <li>
+            <span>Order account number</span>
+            <div class="mui_row">
+                <input type="text" id="name" placeholder="Please enter the order account number">
+            </div>
+        </li>
+        <li>
+            <span>Number of orders</span>
+            <div class="mui_row">
+                <input type="number" id="num" placeholder="Please enter the order quantity">
+            </div>
+        </li>
+        
+    </ul>
+    <div class="mb30"></div>
+    <button id="submit_btn" type="button" class="submit_btn" onclick="submit();">order now</button>
+    </div>
+    
+    {include file="public/head_nav"/}
+    {include file="public/footer" /}
+    <script type="text/javascript">
+    
+        function submit(){
+            var name=$('#name').val();
+            var num=$('#num').val();
+            if(name==''){
+                mui.toast('The order account cannot be empty');
+            }else if(num==''){
+                mui.toast('The order quantity cannot be empty');
+        }else{
+            $post('/api/merchant/down_line_order',{mobile:name,xf_money:num},function(res){
+                mui.toast(res.msg);
+                if(res.code==1){
+                    setTimeout(function(){
+                        mui.back();
+                    },1500);
+                }
+            });
+        }
+        
+    }
+
+</script>
+</body>
+</html>

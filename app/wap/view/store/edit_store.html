@@ -1,0 +1,95 @@
+{include file="public/header" /}
+<style>
+.mui-popup-inner{
+    background: #fff;
+}
+</style>
+</head>
+<body>
+<header class="mui-bar mui-bar-nav head_line" id="header">
+    <a class="back-page mui-icon mui-icon-left-nav mui-pull-left" href="javascript:;"></a>
+    <a id="menu" class="mui-action-menu mui-icon mui-icon-bars mui-pull-right" href="javascript:void(0);"></a>
+    <h1 class="mui-title">Modify data</h1>
+</header>
+<div class="mui-content">
+    <div class="mb10"></div>
+    <ul class="personal_ul">
+        <li>
+            <span>Store image</span>
+            <div class="groupImg">
+                <input type="hidden" value="" name="avatar">
+                <input type="file" class="choose" id="upload_1" accept="image/*" multiple="">
+                <div class="img-list">
+                    <div class="upload" id="imgdiv1">
+                        <img id="head_img" src="__IMG__/touxiang.png" class="uploadimg" onerror="this.src='__IMG__/touxiang.png'" onclick="return false;">
+                    </div>
+                </div>
+                <div id="picDiv1" style="width: 1px; height: 1px;"></div>
+            </div>
+        </li>
+       
+        <li>
+            <span>Shop Name</span>
+            <div class="mui_row">
+                <input type="text" id="name" placeholder="Please enter store name">
+            </div>
+        </li>
+        
+    </ul>
+    <div class="mb30"></div>
+    <button type="button" id="submit_btn" class="submit_btn">save</button>
+</div>
+
+{include file="public/head_nav"/}
+{include file="public/footer" /}
+<script type="text/javascript">
+
+function getQueryString(name) {
+    var result = window.location.search.match(new RegExp("[\?\&]" + name + "=([^\&]+)", "i"));
+    if (result == null || result.length < 1) {
+        return "";
+    }
+    return result[1];
+}
+var shop_id=getQueryString('id');
+// upload picture
+uploadImg(1, '#upload_1', '/api/user/upload');
+/* ---member information--- */
+user();
+function user(){
+    $get('/api/merchant/edit_merchant_msg',{},function(res){
+        res.data.image=res.data.image||'__IMG__/touxiang.png';
+        $('#head_img').attr('data-src',res.data.image).attr('src',res.data.image);
+        $('#name').val(res.data.name);
+    });
+}
+$('#submit_btn').click(function(){
+    var images=$('#head_img').attr('data-src');
+    var name=$('#name').val();
+    if(name==''){
+        mui.toast('Store name cannot be empty');
+    }else{
+        var user={
+            id:shop_id,
+            image:images,
+            name:name
+        }
+        $post('/api/merchant/edit_merchant_msg',user,function(data){
+            if(data.status==1){
+                mui.toast(data.msg);
+                setTimeout(function(){
+                    mui.back(true);
+                },1500);
+            }else{
+                mui.toast(data.msg);
+            }                
+        });
+    }
+    
+    
+});
+
+
+</script>
+</body>
+</html>

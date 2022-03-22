@@ -1,0 +1,96 @@
+
+
+  <title>会员管理</title>
+
+  <div class="layui-card layadmin-header">
+    <div class="layui-breadcrumb" lay-filter="breadcrumb">
+      <a>会员管理</a>
+      <a><cite>站内信推送</cite></a>
+    </div>
+  </div>
+  
+  <div class="layui-fluid">
+    <div class="layui-row layui-col-space15">
+      <div class="layui-col-md12">
+        <div class="layui-card">
+          <div class="layui-card-header">站内信推送</div>
+          <div class="layui-card-body">
+             
+            <div style="padding-bottom: 10px;">
+              <button type="button" class="layui-btn layuiadmin-btn-admin" data-type="add"><i class="layui-icon layui-icon-add-1 layuiadmin-button-btn"></i>添加推送</button>
+            </div>
+            <table id="LAY-user-back-manage" lay-filter="LAY-user-back-manage"></table> 
+            <script type="text/html" id="test-table-operate-barDemo">
+              <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del"><i class="layui-icon layui-icon-delete"></i>删除</a>
+            </script> 
+
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+<script>
+  layui.use(['admin', 'table',"form",'layer'], function(){
+    var $ = layui.$
+        ,admin = layui.admin
+        ,element = layui.element
+        ,form = layui.form
+        ,layer = layui.layer
+        ,table = layui.table
+        ,layer = layui.layer
+        ,view = layui.view;
+
+    //方法级渲染
+    table.render({
+        elem: '#LAY-user-back-manage'
+        ,url: '/json/table/user.js'
+        ,cols: [[
+            {field:'id', width:85, title: 'ID', sort: true, align:'center'}
+            ,{field:'username', width:235, title: '标题', align:'center'}
+            ,{field:'username', title: '内容', align:'center'}
+            ,{field:'sex', width:155, title: '接收者', align:'center'}
+            ,{field:'sign', width:155, title: '发送时间', align:'center'}
+            ,{fixed: '', width:155, title: '操作', align:'center',  toolbar: '#test-table-operate-barDemo'}
+        ]]
+    });
+   
+    // 添加推送
+    var active = {
+      add: function(){
+        admin.popup({
+          title: "添加推送",
+          area: admin.screen() < 2 ? ['95%', '80%'] :["500px", "460px"],
+          id: "LAY-popup-add_menu",
+          success: function(layero, index){
+            view(this.id).render('/member/add_msg').done(function() {
+              form.render(null, 'add_msg'); // 弹窗的lay-filter值
+               //监听提交
+              
+            });
+          }
+        });
+      }
+    }  
+    $('.layui-btn.layuiadmin-btn-admin').on('click', function(){
+      var type = $(this).data('type');
+      active[type] ? active[type].call(this) : '';
+    });
+
+    //监听工具条
+    table.on('tool(LAY-user-back-manage)', function(obj){
+      var data = obj.data;
+      // console.log(data)
+      if(obj.event === 'del'){
+        // 删除按钮
+        layer.confirm('确认删除此站内信?', {icon: 3, title:'提示'}, function(index){
+          obj.del();
+          layer.close(index); 
+        });
+      } 
+    });
+
+  
+
+  });
+</script>

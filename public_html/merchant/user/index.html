@@ -1,0 +1,257 @@
+
+<title>系统管理</title>
+
+<div class="layui-card layadmin-header">
+  <div class="layui-breadcrumb" lay-filter="breadcrumb">
+    <a>系统管理</a>
+    <a><cite>用户管理</cite></a>
+  </div>
+</div>
+<div class="layui-fluid">
+  <div class="layui-row layui-col-space15">
+    <div class="layui-col-md12">
+      <div class="layui-card">
+        <div class="layui-card-header">用户管理</div>
+        <div class="layui-card-body layui-form"> 
+
+          <div action="" class="layui-form" lay-filter="add_user_search">
+            <div class="test-table-reload-btn" style="margin-bottom: 10px;">
+              <button type="button" class="layui-btn layuiadmin-btn-admin" style="margin-right: 30px;" data-type="add"><i class="layui-icon layui-icon-add-1 layuiadmin-button-btn"></i>添加用户</button>
+              <div class="layui-inline">
+                <input class="layui-input" name="keyWords" placeholder="输入需查询的用户名" id="test-table-demoReload" autocomplete="off">
+              </div>
+              <button type="button" class="layui-btn"  lay-submit lay-filter="search_submit"><i class="layui-icon">&#xe615;</i>搜索</button>
+            </div>  
+
+          </div>
+            
+            
+            
+            
+
+
+            <table class="layui-hide" id="add_user" lay-filter="add_user"></table>    
+            <script type="text/html" id="test-table-add_user">
+              {{# if(d.id!==1){ }}
+              <a class="layui-btn layui-btn-normal layui-btn-xs" lay-event="edit"><i class="layui-icon layui-icon-edit"></i>编辑</a>
+              <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del"><i class="layui-icon layui-icon-delete"></i>删除</a>
+              {{# } }}    
+            </script>     
+            <script type="text/html" id="test-table-images">
+              <img src="/static/merchant/src/style/res/head_default.gif" height="100%" alt="">
+            </script>           
+            <script type="text/html" id="user_status">
+              {{# if(d.id!==1){ }}
+                <input type="checkbox" name="status" lay-skin="switch" lay-text="开启|禁用" lay-filter="user_status" value="{{d.id}}" {{ d.status === 1 ? 'checked' : '' }}>
+              {{# } }}
+              
+            </script>     
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+
+        layui.use(['admin','table', 'view', 'form','layer','ourJs'], function(){
+          var $ = layui.$
+          ,admin = layui.admin
+          ,element = layui.element
+          ,form = layui.form
+          ,view = layui.view
+          ,layer= layui.layer
+          ,setter = layui.setter
+          ,table = layui.table
+          ,ourJs = layui.ourJs
+          ,router = layui.router();
+
+          get_data(0);
+
+          
+          function get_data(d){
+            if(d==0){
+              d='';
+            }
+            table.render({
+              elem: '#add_user'
+              ,url: layui.setter.baseUrl+'merchant/user/index?keyWords='+d
+              ,parseData: function(res){ //res 即为原始返回的数据
+                return {
+                "code": res.code, //解析接口状态
+                "msg": res.msg, //解析提示文本
+                "count": res.data.count, //解析数据长度
+                "data": res.data.lists //解析数据列表
+                };
+              }
+              ,cols: [[
+                {field:'id', width:85, title: 'ID', sort: true,  align:'center'}
+                ,{field:'username', width:225, title: '管理员名称', align:'center'}
+                ,{field:'title', title: '管理员角色', align:'center'}
+                ,{field:'loginnum', title: '登录次数', align:'center'}
+                ,{field:'last_login_ip', title: '上次登录ip', align:'center'}
+                ,{field:'last_login_time', title: '上次登录时间', align:'center',templet: "<div>{{layui.util.toDateString(d.last_login_time, 'yyyy-MM-dd HH:mm:ss')}}</div>"}
+                ,{field:'real_name', title: '真实姓名', align:'center'}
+                ,{field:'status',  width:100, title: '状态', templet: '#user_status', align:'center',unresize: true}
+                ,{fixed: 'right', title: '操作', align:'center',  toolbar: '#test-table-add_user',width:160}
+              ]]
+              ,page:true
+            });
+          }
+         
+
+            
+            var $ = layui.$, active = {
+              // 添加
+              add:function(){
+                admin.popup({
+                  title: "添加用户",
+                  area: admin.screen() < 2 ? ['95%', '80%'] :["600px", "430px"],
+                  id: "LAY-popup-add_user",
+                  success: function(layero, index){
+                    view(this.id).render('/user/add_user').done(function() {
+                      form.render(null, 'add_user'); // 弹窗的lay-filter值
+                      //监听提交
+                      form.on('submit(add_user_submit)',function(datas){
+                        
+                          admin.req({
+                              url: layui.setter.baseUrl+'merchant/user/userAdd' //实际使用请改成服务端真实接口
+                              ,data:datas.field,
+                              type:'post',
+                              success: function(res){
+                                
+                                if(res.code==1){
+                                    layer.msg(res.msg , {icon: 1,time: 1500} , function(){
+                                      setTimeout(function(){
+                                        layer.close(index); //执行关闭 
+                                        layui.table.reload('add_user'); //重载表格
+                                      },1500);
+                                      
+                                    });
+                                }else{
+                                  layer.msg(res.msg, {icon: 5,anim: 6,shade:0.5,time: 1500});
+                                }
+                              }
+                          }); 
+                      });
+                      
+                    });
+                  }
+                });
+              } ,reload: function(){        
+              // 搜索  
+                //执行重载
+                table.reload('test-table-reload', {
+                  page: {
+                    curr: 1 //重新从第 1 页开始
+                  }
+                  ,where: {
+                    keywords: $('#test-table-demoReload').val()
+                  }
+                });
+              }
+            };
+            
+            $('.test-table-reload-btn .layui-btn').on('click', function(){
+              var type = $(this).data('type');
+              active[type] ? active[type].call(this) : '';
+            });
+            
+            //监听工具条
+            table.on('tool(add_user)', function(obj){
+              var data = obj.data;
+              if(obj.event === 'del'){
+                layer.confirm('确认删除此用户?', {icon: 3, title:'提示'}, function(index){
+                  admin.req({
+                  url: layui.setter.baseUrl+'merchant/user/userDel' //实际使用请改成服务端真实接口
+                  ,data: {
+                    id:data.id            
+                  },
+                  type:'post',
+                  success: function(res){
+                    if(res.code==1){
+                        layer.msg(res.msg , {icon: 1,shade:0.3,time: 1500},function(){
+                          obj.del();
+                          layer.close(index);
+                        });
+                    }else{
+                      layer.msg(res.msg, {icon: 5,anim: 6,shade:0.5,time: 1500});
+                    }
+                  }
+              });
+                
+                });
+              } else if(obj.event === 'edit'){
+                // 编辑
+                admin.popup({
+                  title: "编辑用户",
+                  area: admin.screen() < 2 ? ['95%', '80%'] :["600px", "430px"],
+                  id: "LAY-popup-edit_menu",
+                  success: function(layero, index){
+                    view(this.id).render('/user/add_user',data).done(function() {
+                      form.render(null, 'add_user'); // 弹窗的lay-filter值
+                      //监听提交
+                      form.on('submit(add_user_submit)',function(datas){
+                        datas.field.id=data.id;
+                          admin.req({
+                              url: layui.setter.baseUrl+'merchant/user/userEdit' //实际使用请改成服务端真实接口
+                              ,data:datas.field,
+                              type:'post',
+                              success: function(res){
+                                if(res.code==1){
+                                    layer.msg(res.msg , {icon: 1,time: 1500} , function(){
+                                      setTimeout(function(){
+                                        layer.close(index); //执行关闭 
+                                        layui.table.reload('add_user'); 
+                                      },1500);
+                                      
+                                    });
+                                }else{
+                                  layer.msg(res.msg, {icon: 5,anim: 6,shade:0.5,time: 1500});
+                                }
+                              }
+                          }); 
+                      });
+                      
+                      
+                    });
+                  }
+                });
+              } 
+            });
+            // 状态更改
+            // table.on('tool()')
+            form.on('switch(user_status)', function(e){
+              var _this=this,status=e.elem.checked;
+              var id=e.value;
+              admin.req({
+                  url: layui.setter.baseUrl+'merchant/user/userState' //实际使用请改成服务端真实接口
+                  ,data: {
+                    id:id            
+                  },
+                  type:'post',
+                  success: function(res){
+                    if(res.code==1){
+                      ourJs.status_tong(table,_this,status);
+                    }else{
+                      layer.msg(res.msg, {icon: 5,anim: 6,shade:0.5,time: 1500});
+                    }
+                  }
+              }); 
+
+            });
+
+
+            // 搜索
+            form.on('submit(search_submit)',function(e){
+              var keyWords=e.field.keyWords;
+              get_data(keyWords);
+            });
+
+
+
+
+          
+        });
+   
+</script>

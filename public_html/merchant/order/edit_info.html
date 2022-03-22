@@ -1,0 +1,202 @@
+<style>
+#edit_info_row .layui-form-item{ margin-bottom: 20px; }
+</style>
+
+<div class="layui-col-md12" id="edit_info_row">
+<form class="layui-form" action="" lay-filter="edit_info">
+    <div class="layui-form-item">
+        <label class="layui-form-label">收货人</label>
+        <div class="layui-input-inline">
+            <input type="text" name="consignee" value=""  autocomplete="off" placeholder="" class="layui-input">            
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">手机</label>
+        <div class="layui-input-inline">
+            <input type="text" name="mobile" value=""  autocomplete="off" placeholder="" class="layui-input">            
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">地址</label>
+        <div class="layui-input-inline" style="width: 150px;">
+            <select name="province" id="province" lay-filter="province">
+                <option value="">请选择省</option>
+            </select>
+        </div>
+        <div class="layui-input-inline" style="width: 150px;">
+            <select name="city" id="city" lay-filter="city">
+                <option value="">请选择市</option>
+            </select>
+        </div>
+        <div class="layui-input-inline" style="width: 150px;">
+            <select name="district" id="area" lay-filter="area">
+                <option value="">请选择县/区</option>
+            </select>
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">详细地址</label>
+        <div class="layui-input-block">
+            <input type="text" name="address" value=""  autocomplete="off" placeholder="请输入详细地址" class="layui-input" style="display:inline-block;">    
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">邮编</label>
+        <div class="layui-input-block">
+            <input type="text" name="zipcode" value=""  autocomplete="off" placeholder="" class="layui-input">            
+        </div>
+    </div>
+    <!-- <div class="layui-form-item">
+        <label class="layui-form-label">管理员备注</label>
+        <div class="layui-input-block">
+            <textarea name="remarks" placeholder="" class="layui-textarea"></textarea>     
+        </div>
+    </div> -->
+    <div class="layui-form-item">
+        <div class="layui-input-block">
+            <button type="button" class="layui-btn" lay-submit lay-filter="edit_info_submit"><i class="layui-icon">&#xe654;</i>保存</button>
+            <a class="layui-btn layui-btn-danger" data-type="close"><i class="layui-icon">&#x1006;</i>返回</a>
+        </div>
+    </div>
+</form>
+</div>
+
+<script type="text/html" template lay-done="layui.data.sendParams(d.params)"></script> 
+<script> 
+layui.data.sendParams = function(params){
+    console.log(params);
+layui.use(['admin', 'form', 'table', 'view','layer'], function(){
+    var $ = layui.$
+    ,admin = layui.admin
+    ,form = layui.form
+    ,layer = layui.layer
+    ,view = layui.view
+    ,layer = layui.layer
+    ,table = layui.table
+    ,router = layui.router();
+
+        // 选择省
+        var str='';
+        var cur_data='';
+        admin.req({
+            url: layui.setter.baseUrl+'merchant/login/getRegionTree'
+            ,data: {},
+            type:'get',
+            success: function(res){
+                if(res.code==1){
+                    str=res.data;
+                    var list="<option value=''>请选择省</option>";
+                    for( var i in res.data){
+                        list += "<option value='"+res.data[i].value+"'>"+res.data[i].text+"</option> ";
+                    }    
+                    if(params.province){
+                        $("#province").html(list);
+                        $('#province').val(params.province);
+                        for(var i in str){
+                            if(str[i].value===params.province){
+                                var city="";
+                                var city_data=str[i].children;
+                                for(var j in city_data){
+                                    city += "<option value='"+city_data[j].value+"'>"+city_data[j].text+"</option> ";
+                                    if(city_data[j].value===params.city){
+                                        
+                                        var area="";
+                                        var area_data=city_data[j].children;
+                                        
+                                        if(area_data){
+                                            for(var k in area_data){
+                                                area+="<option value='"+area_data[k].value+"'>"+area_data[k].text+"</option> ";
+                                            }
+                                            $("#area").html(area);
+                                            $("#area").val(params.district);
+                                        }else{
+                                            area_data=city_data;
+                                            for(var k in area_data){
+                                                area+="<option value='"+area_data[k].value+"'>"+area_data[k].text+"</option> ";
+                                            }
+                                            $("#area").html(area);
+                                            $("#area").val(params.district);
+                                        }
+                                    }
+                                }
+                                $("#city").html(city);
+                                $("#city").val(params.city);
+                            }
+                        }
+                    }else{
+                        $("#province").html(list);
+                    }  
+                    form.render('select');  
+                }else{
+                    layer.msg(res.msg);
+                }            
+            } 
+        }); 
+
+        // 赋值
+        form.val('edit_info',{
+            'consignee':params.consignee,
+            'mobile':params.mobile,
+            'address':params.address,
+            'zipcode':params.zipcode,
+        });
+
+        form.on('select(province)',function(e){
+            cur_data='';
+            get_city(e.elem.selectedIndex-1);
+            get_area_none();
+        });
+        // 选择市
+        form.on('select(city)',function(e){
+            get_area(e.elem.selectedIndex-1);
+        });
+        // 选择区县
+        form.on('select(area)',function(e){ });
+
+        function get_city(index){
+            var list="<option value=''>请选择市</option>";
+            var data=str[index].children;        
+            cur_data=str[index].children;       
+            
+            for( var i in data){
+                list += "<option value='"+data[i].value+"'>"+data[i].text+"</option> ";
+            }    
+            $("#city").html(list);
+            form.render('select');  
+        }
+        function get_area(index){
+            var list="<option value=''>请选择县/区</option>";
+            if(cur_data[index].children){
+                var data=cur_data[index].children;
+                for( var i in data){
+                    list += "<option value='"+data[i].value+"'>"+data[i].text+"</option> ";
+                }   
+            } else{
+                var data=cur_data[index];
+                list = "<option value='"+data.value+"'>"+data.text+"</option> ";
+            }            
+            $("#area").html(list);
+            form.render('select');
+        }
+        function get_area_none(){
+            var list="<option value=''>请选择县/区</option>";        
+            $("#area").html(list);
+            form.render('select');
+        }
+
+
+        var active = {
+            // 返回--按钮
+            close:function(index){ 
+                layer.closeAll('page');
+            }
+        };
+        $('.layui-form-item .layui-btn').on('click', function(){
+            var type = $(this).data('type');
+            active[type] ? active[type].call(this) : '';
+        });
+
+
+});
+}
+</script>

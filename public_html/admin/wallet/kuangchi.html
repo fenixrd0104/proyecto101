@@ -1,0 +1,128 @@
+<style>
+    .layui-word-aux{
+      line-height: 36px;
+    }
+    #upload_imgs{
+      display: flex;
+      align-content: space-around;
+      align-items: center;
+    }
+    #upload_imgs>div{
+      width:33.33%;
+      text-align: center;
+    }
+    #upload_imgs>div img{
+      width:80%;
+      height:100px;
+      object-fit: cover;
+      border:1px solid #f1f1f1;
+    }
+    .layui-input-block{
+      margin-left:200px;
+    }
+    .layui-form-label{
+      width:150px;
+    }
+  </style>
+<form class="layui-form" action="" lay-filter="kuangchi" style="padding: 20px 30px 0 0;">
+  <div class="layui-form-item">
+      <label class="layui-form-label">当前奖池BTC总数</label>
+      <div class="layui-input-block">
+          <input type="text" name="jc_btc" placeholder="当前奖池BTC总数" autocomplete="off" class="layui-input" readonly value="" >
+      </div>
+  </div>
+  <div class="layui-form-item">
+      <label class="layui-form-label">公司预留</label>
+      <div class="layui-input-block">
+          <input type="text" name="gs_baoliu" placeholder="公司预留" autocomplete="off" class="layui-input" readonly value="" >
+      </div>
+  </div>
+  <div class="layui-form-item">
+      <label class="layui-form-label">预计奖励数量</label>
+      <div class="layui-input-block">
+          <input type="text" name="ff_jiangli" placeholder="预计奖励数量" autocomplete="off" class="layui-input" readonly value="" >
+      </div>
+  </div>
+  
+
+<div class="layui-form-item">
+  <div class="layui-input-block">
+    <button type="button" class="layui-btn" lay-submit lay-filter="kuangchi_submit"><i class="layui-icon layui-icon-ok"></i>确认发放</button>
+  </div>
+</div>
+</form>
+  
+        
+<script type="text/html" template lay-done="layui.data.sendParams(d.params)"></script>    
+<script>
+layui.data.sendParams = function(params){
+     var  id=params.id;
+ 
+     layui.use(['admin','form','upload','layedit','view','setter','layer'], function(){
+      var $ = layui.$
+      ,admin = layui.admin
+      ,setter = layui.setter
+      ,layedit = layui.layedit
+      ,layer = layui.layer
+      ,element = layui.element
+      ,form = layui.form
+      ,layer = layui.layer
+      ,view = layui.view
+      ,upload = layui.upload
+      ,router = layui.router();
+
+    element.render();
+    form.render(null, 'kuangchi');
+
+    var $ = layui.$, active = {
+      // 返回--按钮
+      close:function(index){ 
+       layer.closeAll('page');
+      }
+    };
+    
+    $('.layui-input-block .layui-btn').on('click', function(){
+      var type = $(this).data('type');
+      active[type] ? active[type].call(this) : '';
+    });
+
+
+    admin.req({
+        url: layui.setter.baseUrl + 'admin/member/ff_jchi'
+        , data: {id:id},
+        type: 'get',
+        success: function (res) {
+            console.log(res);
+            form.val('kuangchi',{
+                'jc_btc':res.data.jc_btc,
+                'gs_baoliu':res.data.gs_baoliu,
+                'ff_jiangli':res.data.ff_jiangli
+            });
+            form.render();
+        }
+    });
+
+
+    
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    
+  });
+}
+</script>

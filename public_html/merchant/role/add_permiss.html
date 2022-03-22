@@ -1,0 +1,283 @@
+
+
+<title>系统管理</title>
+
+<div class="layui-card layadmin-header">
+  <div class="layui-breadcrumb" lay-filter="breadcrumb">
+    <a>系统管理</a>
+    <a lay-href="/role/index">角色管理</a>
+    <a><cite>权限分配</cite></a>
+  </div>
+</div>
+
+<style>
+.layui-table thead th{ text-align: center}
+.layui-table[lay-skin=line] td, 
+.layui-table[lay-skin=line] th
+{border-width: 1px;}
+.layui-form-item{margin-bottom: 0;}
+.layui-form-label{width: auto;}
+.permiss_tit:first-child{
+    margin: 10px 0 -5px;
+}
+.permiss_tit{
+    width: 100%;
+    margin: 30px 0 -5px;
+    border: 1px solid #e6e6e6;
+    border-bottom: none;
+    padding: 9px 0;
+    text-align: center;
+}
+.p_list>li:first-child{
+    border-top: none;
+}
+.p_list>li{
+    padding: 8px 15px;
+    border-top: 1px solid #e6e6e6;
+}
+</style>
+
+<div class="layui-fluid">
+<div class="layui-row layui-col-space15">
+<div class="layui-col-md12">
+<div class="layui-card">
+    <div class="layui-card-header">权限分配</div>
+    <div class="layui-card-body">
+        <div class="layui-form" lay-filter="add_permiss" >
+            <!-- 第二步：建立视图 -->     
+            <div class="" id="view"></div>
+           
+             <!-- 第一步：编写模版 -->
+            <script id="demo" type="text/html"> 
+            {{#  layui.each(d, function(index, item){ }}                
+            <blockquote class="layui-elem-quote permiss_tit">
+            {{#  if(item.checked === 1){ }}
+                <input type="checkbox" name="rule[]" value="{{item.id}}" title="{{item.title}}"  lay-filter="all" lay-skin="primary" checked>
+            {{# }else{ }}
+                <input type="checkbox" name="rule[]" value="{{item.id}}" title="{{item.title}}" lay-filter="all" lay-skin="primary">
+            {{#  } }}    
+            </blockquote>
+            <table class="layui-table" lay-skin="line" id="layui_table" lay-filter="layui_table">
+                <colgroup>
+                    <col width="150" />
+                    <col width="150" />
+                    <col width="150" />
+                </colgroup>
+                <thead> <tr></tr> </thead>         
+                <tbody>   
+            {{#  layui.each(item.sub, function(index, item){ }}
+            <tr class="p_first{{item.id}}">
+                <td rowspan="{{ item.sub.length +1 }}">
+                {{#  if(item.checked === 1){ }}
+                    <input type="checkbox" name="rule[]" value="{{item.id}}" title="{{item.title}}" lay-filter="pfirst" lay-skin="primary" checked>
+                {{# }else{ }}
+                    <input type="checkbox" name="rule[]" value="{{item.id}}" title="{{item.title}}" lay-filter="pfirst" lay-skin="primary">
+                {{#  } }}   
+                </td>
+            </tr>
+            {{#  layui.each(item.sub, function(index, aitem){ }}
+            <tr class="p_two{{aitem.pid}}">
+                <td>
+                {{#  if(aitem.checked === 1){ }}
+                    <input type="checkbox" name="rule[]" value="{{aitem.id}}" title="{{aitem.title}}" lay-filter="ptwo" lay-skin="primary" lay-pid="{{aitem.pid}}" checked>
+                {{# }else{ }}
+                    <input type="checkbox" name="rule[]" value="{{aitem.id}}" title="{{aitem.title}}" lay-filter="ptwo" lay-skin="primary" lay-pid="{{aitem.pid}}">
+                {{#  } }}    
+                </td>   
+                <td style="padding:0">
+                    <ul class="p_list">
+                        {{#  layui.each(aitem.sub, function(index, bitem){ }}
+                        <li>
+                        {{#  if(bitem.checked === 1){ }}
+                            <input type="checkbox" name="rule[]" value="{{bitem.id}}" title="{{bitem.title}}" lay-skin="primary" lay-filter="pthree" lay-pid="{{aitem.pid}}" checked>
+                        {{# }else{ }}
+                            <input type="checkbox" name="rule[]" value="{{bitem.id}}" title="{{bitem.title}}" lay-skin="primary" lay-filter="pthree" lay-pid="{{aitem.pid}}">
+                        {{#  } }} 
+                        </li>
+                        {{#  }); }}  
+                    </ul>
+                </td>   
+            </tr> 
+            
+            {{#  }); }}              
+            {{#  }); }}  
+            </tbody>  
+            </table>    
+            {{#  }); }}  
+            </script>
+        <hr>
+        <div class="layui-form-item">
+            <button type="button" class="layui-btn" lay-submit lay-filter="component-form-element">确认分配</button>
+        </div>
+        </div>
+    </div>
+</div>
+</div>
+</div>
+</div>
+
+<script>
+layui.use(['admin','table', 'form','laytpl'], function(){
+  var $ = layui.$
+  ,admin = layui.admin
+  ,element = layui.element
+  ,form = layui.form
+  ,layer = layui.layer
+  ,laytpl = layui.laytpl
+  ,table = layui.table
+  ,router = layui.router();
+
+  form.render(null, 'add_permiss');
+
+    // 获取传值参数---得到id
+    var router = layui.router();
+    // console.log(router.search);
+    var id = router.search.id
+
+    // 获取数据
+    admin.req({
+        url: layui.setter.baseUrl+'merchant/Role/access'
+        ,data: { id:id }
+        ,type:'get'
+        ,success: function(res){
+            if(res.code==1){
+                // console.log(res.data);
+                
+
+                //第三步：渲染模版
+                var getTpl = demo.innerHTML
+                    ,view = document.getElementById('view');
+                laytpl(getTpl).render(res.data, function(html){
+                    view.innerHTML = html;
+                    
+                    form.render(null, 'add_permiss');
+                });
+
+            }else{
+                layer.msg(res.msg, {icon: 5,anim: 6,shade:0.5,time: 1500});
+            }
+        }
+    });  
+
+
+    // 全选
+    form.on('checkbox(all)',function(e){
+        // console.log(e);  
+        var $this = $(e.elem);
+        var child = $(e.elem).parents(".permiss_tit").next(".layui-table").find("input[type='checkbox']");
+        
+        child.each(function () {
+            this.checked = e.elem.checked;
+        });
+        form.render('checkbox');
+
+    });
+    form.on('checkbox(pfirst)',function(e){
+        // console.log(e);  
+        var $this = $(e.elem);
+        var p_child = $(e.elem).parents(".p_first"+e.value+"").nextAll(".p_two"+e.value+"").find("input[type='checkbox']");        
+        p_child.each(function () {
+            this.checked = e.elem.checked;
+        });
+        form.render('checkbox');
+
+        selected_first($this);
+
+    });
+    form.on('checkbox(ptwo)',function(e){
+        // console.log(e);  
+        var $this = $(e.elem);
+        var p_child = $(e.elem).parents("td").next("td").find("input[type='checkbox']");
+        p_child.each(function () {
+            this.checked = e.elem.checked;
+        });
+        form.render('checkbox');
+
+        var pid = $(e.elem).attr("lay-pid");
+        var length = $(".p_first"+pid+"").nextAll(".p_two"+pid+"").find("input[type='checkbox']").length;
+        var length_ch = $(".p_first"+pid+"").nextAll(".p_two"+pid+"").find("input[type='checkbox']:checked").length;
+        // console.log(length, length_ch);        
+        var p_selected = $(".p_first"+pid+"").find("input[type='checkbox']");
+        if( length_ch == 1 ){
+            $(".p_first"+pid+"").find("input").prop('checked',true);
+            form.render();
+        } else if( length_ch == 0 ) {
+            $(".p_first"+pid+"").find("input").prop('checked',false);
+            form.render();
+        }
+
+        selected_first($this);
+
+    });
+    form.on('checkbox(pthree)',function(e){
+        // console.log(e);  
+        var $this = $(e.elem);
+        var pid = $(e.elem).attr("lay-pid");
+        var length = $this.parents(".p_list").find("input[type='checkbox']").length;
+        var length_ch = $this.parents(".p_list").find("input[type='checkbox']:checked").length;
+        // console.log(length, length_ch);
+        if( length_ch == 1 ){
+            $this.parents(".p_two"+pid+"").children("td:first").find("input").prop('checked',true);
+            form.render();
+        } else if( length_ch == 0 ) {
+            $this.parents(".p_two"+pid+"").children("td:first").find("input").prop('checked',false);
+            form.render();            
+        }
+
+        var length_s = $(".p_first"+pid+"").nextAll(".p_two"+pid+"").find("input[type='checkbox']").length;
+        var length_ch_s = $(".p_first"+pid+"").nextAll(".p_two"+pid+"").find("input[type='checkbox']:checked").length;
+        // console.log(length_s, length_ch_s);        
+        var p_selected = $(".p_first"+pid+"").find("input[type='checkbox']");
+        if( length_ch_s >= 1 ){
+            $(".p_first"+pid+"").find("input").prop('checked',true);
+            form.render();
+        } else if( length_ch_s == 0 ) {
+            $(".p_first"+pid+"").find("input").prop('checked',false);
+            form.render();
+        }
+
+        selected_first($this);
+
+    });
+
+
+    // 反选---第一级
+    function selected_first($this){
+        var sele_length = $this.parents(".layui-table").find("tbody").find("input[type='checkbox']").length;
+        var sele_length_ch = $this.parents(".layui-table").find("tbody").find("input[type='checkbox']:checked").length;
+        // console.log(sele_length, sele_length_ch);  
+        if( sele_length_ch >= 1 ){
+            $this.parents(".layui-table").prev(".permiss_tit").find("input").prop('checked',true);
+            form.render();
+        } else if( sele_length_ch == 0 ) {
+            $this.parents(".layui-table").prev(".permiss_tit").find("input").prop('checked',false);
+            form.render();
+        }
+    }
+
+
+
+    // 确定
+    form.on('submit(component-form-element)',function(datas){
+        console.log(datas.field);
+        // return
+        admin.req({
+            url: layui.setter.baseUrl+'merchant/Role/access'
+            ,data: { id:id, rule: datas.field }
+            ,type:'post'
+            ,success: function(res){
+                if(res.code==1){
+                    // console.log(res.data);
+                    layer.msg(res.msg, {icon: 1,time: 1000});
+                   
+
+                }else{
+                    layer.msg(res.msg, {icon: 5,anim: 6,shade:0.5,time: 1500});
+                }
+            }
+        });  
+                        
+    });
+  
+});
+</script>

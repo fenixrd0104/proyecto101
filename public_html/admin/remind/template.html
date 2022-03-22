@@ -1,0 +1,275 @@
+
+<title>通知模版</title>
+
+<div class="layui-card layadmin-header">
+  <div class="layui-breadcrumb" lay-filter="breadcrumb">
+    <a>系统管理</a>
+    <a><cite>通知模版</cite></a>
+  </div>
+</div>
+<div class="layui-fluid">
+  <div class="layui-row layui-col-space15">
+    <div class="layui-col-md12">
+      <div class="layui-card">
+        <div class="layui-card-header">通知模版</div>
+        <div class="layui-card-body"> 
+            <div class="test-table-reload-btn" style="margin-bottom: 10px;">
+                <!-- <button type="button" class="layui-btn layuiadmin-btn-admin" style="margin-right: 30px;" data-type="add"><i class="layui-icon layui-icon-add-1 layuiadmin-button-btn"></i>添加通知模板</button> -->
+                <!-- <div class="layui-inline">
+                  <input class="layui-input" name="keywords" placeholder="输入需查询模板名称" id="test-table-demoReload" autocomplete="off" style="width: 250px;">
+                </div>
+                <button type="button" class="layui-btn" data-type="reload"><i class="layui-icon">&#xe615;</i> 搜索</button> -->
+              </div>
+               
+            <table class="layui-hide" id="temp_list" lay-filter="temp_list"></table>
+              
+            <script type="text/html" id="test-table-operate-sms">
+              <a class="layui-btn layui-btn-xs" lay-event="sms"><i class="layui-icon layui-icon-edit"></i>编辑模板</a>
+            </script>  
+            <script type="text/html" id="test-table-operate-email">
+              <a class="layui-btn layui-btn-xs" lay-event="email"><i class="layui-icon layui-icon-edit"></i>编辑模板</a>
+            </script>  
+            <script type="text/html" id="test-table-operate-mail">
+              <a class="layui-btn layui-btn-xs" lay-event="mail"><i class="layui-icon layui-icon-edit"></i>编辑模板</a>
+            </script>  
+            <script type="text/html" id="test-table-operate-weixin">
+              <a class="layui-btn layui-btn-xs" lay-event="weichat"><i class="layui-icon layui-icon-edit"></i>编辑模板</a>
+            </script>  
+            <script type="text/html" id="test-table-operate-push">
+              <a class="layui-btn layui-btn-xs" lay-event="push"><i class="layui-icon layui-icon-edit"></i>编辑模板</a>
+            </script>  
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+layui.use(['admin','table', 'view', 'form','layer'], function(){
+  var $ = layui.$
+  ,admin = layui.admin
+  ,element = layui.element
+  ,form = layui.form
+  ,setter = layui.setter
+  ,view = layui.view
+  ,layer = layui.layer
+  ,table = layui.table
+  ,router = layui.router();
+
+  table.render({
+      elem: '#temp_list'
+      ,url: layui.setter.baseUrl+'admin/remind/index'
+      ,parseData: function(res){ //res 即为原始返回的数据
+            return {
+            "code": res.code, //解析接口状态
+            "msg": res.msg, //解析提示文本
+            "count": res.data.count, //解析数据长度
+            "data": res.data.lists //解析数据列表
+            };
+        }
+      ,cols: [[
+        {field:'id', width:85, title: 'ID', sort: true,align:'center' }
+        ,{field:'name', width:225, title: '标识' ,align:'center'}
+        ,{field: '', title: '短信', toolbar: '#test-table-operate-sms',align:'center'}
+        ,{field: '', title: '电子邮件', toolbar: '#test-table-operate-email',align:'center'}
+        ,{field: '', title: '站内信',  toolbar: '#test-table-operate-mail',align:'center'}
+        ,{field: '', title: '微信',  toolbar: '#test-table-operate-weixin',align:'center'}
+        ,{field: '', title: '推送',  toolbar: '#test-table-operate-push',align:'center'}
+ 
+      ]],
+      page:true
+    });
+    
+    //监听工具条
+    table.on('tool(temp_list)', function(obj){
+      var data = obj.data;
+      var id=obj.data.id;
+      if(obj.event === 'sms'){
+        // 编辑
+        admin.popup({
+          title: "短信消息提醒模板",
+          area: admin.screen() < 2 ? ['95%', '80%'] :["600px", "500px"],
+          id: "LAY-popup-edit_sms",
+          success: function(layero, index){
+            view(this.id).render('/remind/add_sms',data).done(function() {
+              form.render(null, 'add_sms'); // 弹窗的lay-filter值
+               //监听提交
+               form.on('submit(temp_submit_btn)',function(datas){
+                  form_submit(id,obj.event,datas.field);
+               });
+              
+            });
+          }
+        });
+      } else if(obj.event === 'email'){
+        // 编辑
+        admin.popup({
+          title: "邮件消息提醒模板",
+          area: admin.screen() < 2 ? ['95%', '80%'] :["600px", "480px"],
+          id: "LAY-popup-edit_emails",
+          success: function(layero, index){
+            view(this.id).render('/remind/add_email',data).done(function() {
+              form.render(null, 'add_email'); // 弹窗的lay-filter值
+               //监听提交
+               form.on('submit(temp_submit_btn)',function(datas){
+                  form_submit(id,obj.event,datas.field);
+               });
+              
+            });
+          }
+        });
+      } else if(obj.event === 'mail'){
+        // 编辑
+        admin.popup({
+          title: "站内信消息提醒模板",
+          area: admin.screen() < 2 ? ['95%', '80%'] :["600px", "480px"],
+          id: "LAY-popup-edit_mails",
+          success: function(layero, index){
+            view(this.id).render('/remind/add_mail',data).done(function() {
+              form.render(null, 'add_mail'); // 弹窗的lay-filter值
+               //监听提交
+               form.on('submit(temp_submit_btn)',function(datas){
+                  form_submit(id,obj.event,datas.field);
+               });
+              
+            });
+          }
+        });
+      } else if(obj.event === 'weichat'){
+        // 编辑
+        admin.popup({
+          title: "微信消息提醒模板",
+          area: admin.screen() < 2 ? ['95%', '80%'] :["700px", "600px"],
+          id: "LAY-popup-edit_weixin_s",
+          success: function(layero, index){
+            view(this.id).render('/remind/add_weixin',data).done(function() {
+              form.render(null, 'add_weixin'); // 弹窗的lay-filter值
+               //监听提交
+               form.on('submit(temp_submit_btn)',function(datas){
+                  form_submit(id,obj.event,datas.field);
+               });
+              
+            });
+          }
+        });
+      } else if(obj.event === 'push'){
+        // 编辑
+        admin.popup({
+          title: "推送消息提醒模板",
+          area: admin.screen() < 2 ? ['95%', '80%'] :["600px", "480px"],
+          id: "LAY-popup-edit_push",
+          success: function(layero, index){
+            view(this.id).render('/remind/add_push',data).done(function() {
+              form.render(null, 'add_push'); // 弹窗的lay-filter值
+               //监听提交
+               form.on('submit(temp_submit_btn)',function(datas){
+                  form_submit(id,obj.event,datas.field);
+               });
+              
+            });
+          }
+        });
+      }
+    });
+
+    // 表单提交封装
+    function form_submit(id,type,datas){
+      datas.id=id;
+      datas.tpname=type;
+      if(type=='weichat'){
+        var d_arr=[];
+        var d=JSON.parse(datas.param_data);
+        for(i in d){
+          if(d[i]!=null){
+            d_arr.push(d[i]);
+          }
+        }
+        datas.param_data=d_arr;
+      }
+      admin.req({
+          url: layui.setter.baseUrl+'admin/remind/templateinfo'
+          ,data:datas,
+          type:'post',
+          success: function(res){
+          if(res.code==1){
+            layer.msg(res.msg, {icon: 1,anim: 6,shade:0.5,time: 1500},function(){
+              layer.closeAll();
+            });
+              
+          }else{
+              layer.msg(res.msg, {icon: 5,anim: 6,shade:0.5,time: 1500});
+          }
+          }
+      }); 
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        // 搜索
+        var $ = layui.$, active = { // 添加会员组
+      add:function(){
+        admin.popup({
+          title: "添加会员",
+          area: admin.screen() < 2 ? ['95%', '90%'] :["700px", "550px"],
+          id: "LAY-popup-add_vip",
+          success: function(layero, index){
+            view(this.id).render('/member/add_member').done(function() {
+              form.render(null, 'add_member'); // 弹窗的lay-filter值
+               //监听提交
+               form.on('submit(vip_submit)',function(datas){
+                admin.req({
+                    url: layui.setter.baseUrl+'admin/member/add_member' 
+                    ,data:datas.field,
+                    type:'post',
+                    success: function(res){
+                      if(res.code==1){
+                        layer.msg(res.msg, {icon: 1,shade:0.5,time: 1500},function(){
+                          
+                          layer.close(index);
+                          table.reload('vip_list');
+                        });
+                      }else{
+                          layer.msg(res.msg, {icon: 5,anim: 6,shade:0.5,time: 1500});
+                      }
+                    }
+                });
+               });
+              
+            });
+          }
+        });
+      }
+      ,reload: function(){
+        var demoReload = $('#test-table-demoReload');
+        
+        //执行重载
+        table.reload('temp_list', {
+          page: {
+            curr: 1 //重新从第 1 页开始
+          }
+          ,where: {
+            keywords: demoReload.val()
+          }
+        });
+      }
+    };
+    
+    $('.test-table-reload-btn .layui-btn').on('click', function(){
+      var type = $(this).data('type');
+      active[type] ? active[type].call(this) : '';
+    });
+  
+});
+</script>

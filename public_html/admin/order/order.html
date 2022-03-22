@@ -1,0 +1,238 @@
+
+<title>订单管理</title>
+
+<div class="layui-card layadmin-header">
+  <div class="layui-breadcrumb" lay-filter="breadcrumb">
+    <a>订单管理</a>
+    <a><cite>订单管理</cite></a>
+  </div>
+</div>
+
+<div class="layui-fluid">
+  <div class="layui-row layui-col-space15">
+    <div class="layui-col-md12">
+      <div class="layui-card">
+        <div class="layui-card-header">订单管理</div>
+        <div class="layui-card-body"> 
+            <form class="layui-form" action="" lay-filter="order">
+                <div class="layui-form-item">
+                    <div class="layui-col-md1" style="margin-right: 5px;margin-top: 20px;">
+                      <select name="top_cate" lay-filter="top_cate">
+                          <option value="" >所有模块</option>
+                          <option value="1">VIP商品</option>
+                          <option value="2">优享商品</option>
+                          <option value="3">特惠商品</option>
+                          <option value="4">直购</option>
+                          <option value="5">高端</option>
+                      </select>
+                    </div>
+                    <div class="layui-col-md2" style=" width:150px;margin-right: 5px;margin-top: 20px;"> 
+                        <input type="text" name="start_time" class="layui-input" placeholder="下单开始时间" id="test1">
+                    </div>
+                    <div class="layui-col-md2" style=" width:150px;margin-right: 5px;margin-top: 20px;"> 
+                        <input type="text" name="end_time" class="layui-input" placeholder="下单结束时间" id="test2">
+                    </div>
+                    <div class="layui-col-md1" style="margin-right: 5px;margin-top: 20px;">
+                        <select name="pay_status" id="pay_status">
+                          <option value="">支付状态</option>
+                           <option value="0">未支付</option>
+                           <option value="1">已支付</option>
+                        </select>
+                    </div>         
+                         
+                    <div class="layui-col-md1" style="margin-right: 5px;margin-top: 20px;">
+                        <select name="shipping_status" id="shipping_status">
+                            
+                        </select>
+                    </div>         
+                    <div class="layui-col-md1" style="margin-right: 5px;margin-top: 20px;">
+                        <select name="order_status" id="order_status">
+                           
+                        </select>
+                    </div> 
+                        <div class="layui-col-md2" style="margin-right: 5px;margin-top: 20px;">
+                            <input type="text" name="keywords" autocomplete="off" placeholder="搜索收货人/订单编号" class="layui-input" value=""> 
+                        </div>
+                    <div class="layui-col-md2" style="margin-right: 5px;margin-top: 20px;">
+                        <input type="text" name="user_id" autocomplete="off" placeholder="订单会员id" class="layui-input" value="">
+                    </div>
+                    <div class="layui-col-md2" style="margin-right: 5px;margin-top: 20px;">
+                        <input type="text" name="goodsname" autocomplete="off" placeholder="商品名" class="layui-input" value="">
+                    </div>
+                    <button type="button" class="layui-btn layuiadmin-btn-admin" lay-submit  lay-filter="order_search" style="margin-top: 20px;">搜索</button>
+
+                    
+                    <!-- <button type="button" class="layui-btn layuiadmin-btn-admin" data-type="">导出</button> -->
+                </div>
+            </form>  
+            <hr>
+            <table class="layui-hide" id="order_list" lay-filter="order_list"></table>    
+            <script type="text/html" id="tool_order_list">
+              <a href="/admin/#/order/order_detail/id={{d.order_id}}" class="layui-btn layui-btn-xs" lay-event="see">查看</a>
+             <!--  {{# if(d.pay_status==1){ }}
+              <a class="layui-btn layui-btn-disabled layui-btn-xs">删除</a>
+              {{# }else{ }}  
+                <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del">删除</a>
+              {{# } }}     -->
+              
+            </script>   
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+layui.use(['admin','table', 'view', 'form', 'laydate','layer'], function(){
+  var $ = layui.$
+  ,admin = layui.admin
+  ,element = layui.element
+  ,form = layui.form
+  ,view = layui.view
+  ,layer = layui.layer
+  ,table = layui.table
+  ,laydate = layui.laydate
+  ,router = layui.router();
+
+  form.render(null, 'order');
+  //执行一个laydate实例
+  laydate.render({
+    elem: '#test1' //指定元素
+    ,type: 'datetime'
+  });
+  laydate.render({
+    elem: '#test2' //指定元素
+    ,type: 'datetime'
+  });
+  // 初始化变量
+  var is_loading=true;
+  var order_status='';
+  var pay_status="";
+  var shipping_status='';
+
+  form.on('submit(order_search)',function(datas){
+    get_data(datas.field);
+  });
+
+
+  get_data();
+
+
+  function get_data(param){
+    table.render({
+      elem: '#order_list'
+      ,url: layui.setter.baseUrl+'admin/order/index'
+      ,parseData: function(res){ //res 即为原始返回的数据
+        if(is_loading==true){
+          // 筛选条件
+          var list1="<option value=''>支付状态</option>";
+          var list2="<option value=''>支付方式</option>";
+          var list3="<option value=''>发货状态</option>";
+          var list4="<option value=''>订单状态</option>";
+
+          // for(var i in res.data.pay_status){
+          //   list1+="<option value='"+i+"'>"+res.data.pay_status[i]+"</option>";
+          // }
+          for(var i in res.data.pay_name){
+            list2+="<option value='"+res.data.pay_name[i]+"'>"+res.data.pay_name[i]+"</option>";
+          }
+          for(var i in res.data.shipping_status){
+            list3+="<option value='"+i+"'>"+res.data.shipping_status[i]+"</option>";
+          }
+          for(var i in res.data.order_status){
+            list4+="<option value='"+i+"'>"+res.data.order_status[i]+"</option>";
+          }
+          
+          //$('#pay_status').html(list1);
+          $('#pay_name').html(list2);
+          $('#shipping_status').html(list3);
+          $('#order_status').html(list4);
+
+          order_status=res.data.order_status;
+          pay_status=res.data.pay_status;
+          shipping_status=res.data.shipping_status;
+
+
+          is_loading=false;
+          form.render();
+        }
+        return {
+        "code": res.code, //解析接口状态
+        "msg": res.msg, //解析提示文本
+        "count": res.data.count, //解析数据长度
+        "data": res.data.list, //解析数据列表
+         "sum": res.data.sum //解析数据列表
+        };
+      }
+      ,toolbar: '#tool_order_lists'
+      ,cols: [[
+        {field:'order_id', width:80, title: 'ID', sort: true, align:'center',totalRowText: '总合计'}
+        ,{field:'user_id', title: '会员ID', align:'center'}
+        ,{field:'order_sn', title: '订单编号' , align:'center'}
+        ,{field:'consignee', title: '收货人', align:'center' }
+        ,{field:'total_amount', width:100, title: '总金额', align:'center',totalRowText: ''}
+        ,{field:'order_amount', width:100, title: '应付金额', align:'center',totalRowText: ''}
+        ,{field:'goodsname', width:100, title: '商品名', align:'center',totalRowText: ''}
+        ,{field:'goodsnum', width:100, title: '数量', align:'center',totalRowText: ''}
+        ,{field:'catename', width:100, title: '订单类型', align:'center',totalRowText: ''}
+        ,{field:'user_money', width:100, title: 'KRC抵扣', align:'center',totalRowText: ''}
+        ,{field:'integral_money', width:100, title: '优惠券抵扣', align:'center',totalRowText: ''}
+        ,{field:'order_status', width:110, title: '订单状态', align:'center',templet:function(d){
+          for(var i in order_status){
+            if(d.order_status==i){
+              return order_status[i];
+            }
+          }
+        }}
+        ,{field:'pay_status', width:110, title: '支付状态', align:'center',templet:function(d){
+          for(var i in pay_status){
+            if(d.pay_status==i){
+              return pay_status[i];
+            }
+          }
+        }}
+        ,{field:'shipping_status', width:110, title: '发货状态', align:'center',templet:function(d){
+          for(var i in shipping_status){
+            if(d.shipping_status==i){
+              return shipping_status[i];
+            }
+          }
+        }}
+        ,{field:'pay_name', title: '支付方式', align:'center'}
+        ,{field:'create_time', title: '下单时间', align:'center'}
+        ,{field:'pay_time', title: '支付时间', align:'center'}
+            ,{field:'addr', title: '收货地址', align:'center'}
+            ,{field:'mobile', title: '联系电话', align:'center'}
+            ,{field:'user_note', title: '订单备注', align:'center'}
+        ,{fixed: 'right', title: '操作', align:'center', toolbar: '#tool_order_list',width:120}
+      ]] ,totalRow: true
+        ,done:function(res){
+            //修改 结算后余额 统计单元格文本
+            this.elem.next().find('.layui-table-total td[data-field="total_amount"] .layui-table-cell').text(res.sum.total_amount);
+            this.elem.next().find('.layui-table-total td[data-field="order_amount"] .layui-table-cell').text(res.sum.order_amount);
+            this.elem.next().find('.layui-table-total td[data-field="user_money"] .layui-table-cell').text(res.sum.user_money);
+            this.elem.next().find('.layui-table-total td[data-field="integral_money"] .layui-table-cell').text(res.sum.integral_money);
+        }
+      ,page:true,
+      limits:[10,20,50,100,500,1000,5000,10000,100000],
+      where:param
+    });
+  }
+
+  
+    
+    //监听工具条
+    table.on('tool(test-table-operate)', function(obj){
+      var data = obj.data;
+      if(obj.event === 'del'){
+        layer.confirm('确认删除此订单?', {icon: 3, title:'提示'}, function(index){
+          obj.del();
+          layer.close(index);
+        });
+      } else if(obj.event === 'see'){
+       
+      } 
+    });
+  
+});
+</script>

@@ -1,0 +1,189 @@
+<title>付款方式</title>
+
+<div class="layui-card layadmin-header">
+  <div class="layui-breadcrumb" lay-filter="breadcrumb">
+    <a>店铺管理</a>
+    <a><cite>付款方式</cite></a>
+  </div>
+</div>
+
+<div class="layui-fluid">
+<div class="layui-row layui-col-space15">
+<div class="layui-col-md12">
+<div class="layui-card">
+<div class="layui-card-header">付款方式</div>
+<div class="layui-card-body">
+    <table class="layui-hide" id="pay_type" lay-filter="pay_type"></table>
+    <script type="text/html" id="test-table-toolbar-payment">
+<!--        <div class="layui-btn-container">-->
+<!--            <button type="button" class="layui-btn" lay-event="add"><i class="layui-icon layui-icon-add-1 layuiadmin-button-btn"></i>添加</button>-->
+<!--        </div>-->
+    </script>
+    <script type="text/html" id="tool_pay_type">
+    {{# if( d.shop_id === 0 ){ }}
+        <button type="button" class="layui-btn layui-btn-normal layui-btn-xs layui-btn-disabled" lay-event="edit" disabled><i class="layui-icon layui-icon-edit"></i>编辑</button>
+        <button type="button" class="layui-btn layui-btn-danger layui-btn-xs layui-btn-disabled" lay-event="del" disabled><i class="layui-icon layui-icon-delete"></i>删除</button>        
+    {{# }else{ }}            
+        <button type="button" class="layui-btn layui-btn-normal layui-btn-xs" lay-event="edit"><i class="layui-icon layui-icon-edit"></i>编辑</button>
+        <button type="button" class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del"><i class="layui-icon layui-icon-delete"></i>删除</button>        
+    {{# } }}
+    </script>
+    <script type="text/html" id="test-table-status">
+    {{# if( d.shop_id === 0 ){ }}
+        <input type="checkbox" name="status" value="{{d.id}}" lay-skin="switch" lay-text="开启|禁止" class="layui-input" {{ d.status === 1 ? 'checked' : '' }} lay-filter="checkbox_status" disabled>
+    {{# }else{ }}            
+        <input type="checkbox" name="status" value="{{d.id}}" lay-skin="switch" lay-text="开启|禁止" class="layui-input" {{ d.status === 1 ? 'checked' : '' }} lay-filter="checkbox_status">
+    {{# } }}
+    </script>
+    <script type="text/html" id="test-table-images">
+        <img src="/static/merchant/src/style/res/no_img.jpg" height="100%" alt="">
+    </script>
+</div>
+</div>
+</div>
+</div>
+</div>
+
+<script>
+  layui.use(['admin', 'table', 'view', 'form', 'layer', 'ourJs'], function () {
+    var $ = layui.$
+      , admin = layui.admin
+      , element = layui.element
+      , form = layui.form
+      , view = layui.view
+      , layer = layui.layer
+      , setter = layui.setter
+      , table = layui.table
+      , ourJs = layui.ourJs
+      , router = layui.router();
+
+    table.render({
+      elem: '#pay_type'
+      , url: layui.setter.baseUrl + 'merchant/shop/payLists'
+      , toolbar: '#test-table-toolbar-payment'
+      , parseData: function (res) { //res 即为原始返回的数据
+        return {
+            "code": res.code, //解析接口状态
+            "msg": res.msg, //解析提示文本
+            "count": res.data.count, //解析数据长度
+            "data": res.data.lists //解析数据列表
+        };
+       }
+      , cols: [[
+        { field: 'id', width:150, title: 'ID', align: 'center' }
+        , { field: 'name', title: '名称', align: 'center' }
+        , { field: 'status', title: '状态', templet: '#test-table-status', align: 'center' }
+        , { fixed: '', title: '操作', align: 'center', toolbar: '#tool_pay_type', width: 200 }
+      ]]
+    });
+
+    table.on("toolbar(pay_type)", function (e) {
+    // console.log(e);
+    if (e.event === 'add') {
+    admin.popup({
+        title: "添加",
+        area: ["500px", "270px"],
+        id: "LAY-popup-worker_detail",
+        success: function (e,index) {
+        view(this.id).render("/worker/add_payment").done(function () { 
+        element.render();
+        form.render(null, 'add_payment');
+        form.on('submit(component-form-element)', function (data) {
+            // console.log(data.field);
+            admin.req({
+            url: layui.setter.baseUrl + 'merchant/shop/payAdd'
+            ,data: data.field
+            ,type: 'post'
+            ,success: function (res) {
+                if (res.code == 1) {
+                    layer.msg(res.msg, { icon: 1, time: 1000 }, function () {
+                        layer.close(index); //执行关闭 
+                        table.reload('pay_type'); //重载表格
+                    });
+                } else {
+                    layer.msg(res.msg, { icon: 5, anim: 6, shade: 0.5, time: 1000 });
+                }
+            }
+            });
+            
+        });
+        });
+        }
+    });
+    } 
+    });
+    // 编辑--删除
+    table.on("tool(pay_type)", function (data) {
+    // console.log(data);
+    if (data.event === 'edit') {
+        admin.popup({
+            title: "编辑",
+            area: ["500px", "270px"],
+            id: "LAY-popup-worker_detail",
+            success: function (e,index) {
+                view(this.id).render("/worker/add_payment", data.data).done(function () {
+                element.render();
+                form.render(null, 'add_payment');
+                form.on('submit(component-form-element)', function (data) {
+                    console.log(data.field);
+                    admin.req({
+                    url: layui.setter.baseUrl + 'merchant/shop/payEdit'
+                    ,data: data.field
+                    ,type: 'post'
+                    ,success: function (res) {
+                        if (res.code == 1) {
+                            layer.msg(res.msg, { icon: 1, time: 1000 }, function () {
+                                layer.close(index); //执行关闭 
+                                table.reload('pay_type'); //重载表格
+                            });
+                        } else {
+                            layer.msg(res.msg, { icon: 5, anim: 6, shade: 0.5, time: 1000 });
+                        }
+                    }
+                    });
+                    
+                });
+                });
+            }
+        });
+    } else if(data.event === 'del'){        
+        layer.confirm('确认删除此付款方式?', { icon: 3, title: '提示' }, function (index) {
+            admin.req({
+                url: layui.setter.baseUrl + 'merchant/shop/payDel' //实际使用请改成服务端真实接口
+                ,data: { id: data.data.id }
+                ,type: 'get'
+                ,success: function (res) {
+                    if (res.code == 1) {
+                        layer.close(index);
+                        data.del();
+                    } else {
+                        layer.msg(res.msg, { icon: 5, anim: 6, shade: 0.5, time: 1000 });
+                    }
+                }
+            });
+        });
+    }
+    });
+    
+
+    // 监听状态修改
+    form.on('switch(checkbox_status)', function (e) {
+    var _this = this, status = e.elem.checked;
+    // console.log(e);      
+    admin.req({
+        url: layui.setter.baseUrl + 'merchant/shop/payStatus'
+        ,data: { id: e.value }
+        ,type: 'post'
+        ,success: function (res) {
+            if (res.code == 1) {
+                layer.msg(res.msg, { icon: 1, anim: 6, shade: 0.5, time: 1000 });
+            } else {
+                layer.msg(res.msg, { icon: 5, anim: 6, shade: 0.5, time: 1000 });
+            }
+        }
+    });
+
+    });
+
+  });
+</script>

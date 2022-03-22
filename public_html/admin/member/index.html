@@ -1,0 +1,366 @@
+<title>会员管理</title>
+
+<div class="layui-card layadmin-header">
+  <div class="layui-breadcrumb" lay-filter="breadcrumb">
+    <a>会员管理</a>
+    <a><cite>会员列表</cite></a>
+  </div>
+</div>
+
+<div class="layui-fluid">
+  <div class="layui-row layui-col-space15">
+    <div class="layui-col-md12">
+      <div class="layui-card">
+        <div class="layui-card-header">会员列表</div>
+        <div class="layui-card-body">
+
+          <div class="test-table-reload-btn layui-form" style="margin-bottom: 10px;">
+            <div class="layui-inline">
+              <input class="layui-input" name="keywords" placeholder="输入需查询手机号/邮箱" id="test-table-demoReload" autocomplete="off" style="width: 250px;">
+            </div>
+            <div class="layui-inline">
+              <div class="layui-input-inline">
+                <select name="dl_level" id="dl_level">
+                  <option value="">会员等级</option>
+                  <option value="0">S0</option>
+                  <option value="1">SS</option>
+                  <option value="2">SSS</option>
+                  <option value="3">SSSS</option>
+                </select>
+              </div>
+            </div>
+            <div class="layui-inline">
+              <div class="layui-input-inline">
+                <select name="ty_level" id="ty_level">
+                  <option value="">E会员等级</option>
+                  <option value="0">E0</option>
+                  <option value="1">E1</option>
+                  <option value="2">E2</option>
+                  <option value="3">E3</option>
+                  <option value="4">E4</option>
+                </select>
+              </div>
+            </div>
+            <div class="layui-inline">
+                <div class="layui-input-inline">
+                  <select name="is_set_type" id="is_set_type">
+                    <option value="">会员类型</option>
+                    <option value="2">用户会员</option>
+                    <option value="1">客服会员</option>
+                  </select>
+                </div>
+              </div>
+            <div class="layui-inline">
+              <input class="layui-input" name="id" placeholder="输入会员UID" id="id" autocomplete="off">
+            </div>
+            <div class="layui-inline">
+              <input class="layui-input" name="referid" placeholder="输入推荐人UID" id="referid" autocomplete="off">
+            </div>
+            <div class="layui-inline">
+              <input class="layui-input" name="last_login_ip" placeholder="最新登陆IP" id="last_login_ip" autocomplete="off">
+            </div>
+            <button type="button" class="layui-btn" data-type="reload"><i class="layui-icon">&#xe615;</i> 搜索</button>
+          </div>
+          <script id="tool_order_lists" type='text/html' templet>
+            <div style="margin-right:30px;float:left;">总KRC：<span id="z_jl" style="font-weight:800;color:orangered;"></span></div>
+            <!--<div style="margin-right:30px;float:left;">总共振算力：<span id="z_jc" style="font-weight:800;color:orangered;"></span></div>-->
+            <div style="margin-right:30px;float:left;">总优惠券：<span id="z_jcc" style="font-weight:800;color:orangered;"></span></div>
+            <div style="margin-right:30px;float:left;">总积分：<span id="z_jccc" style="font-weight:800;color:orangered;"></span></div>
+            <div style="margin-right:30px;float:left;">总USDT余额：<span id="z_jcccc" style="font-weight:800;color:orangered;"></span></div>
+            <div style="margin-right:30px;float:left;">总代付券：<span id="z_jccccc" style="font-weight:800;color:orangered;"></span></div>
+            <div style="margin-right:30px;float:left;">总赠送币：<span id="z_ja" style="font-weight:800;color:orangered;"></span></div>
+            <div style="clear:both;"></div>
+          </script>
+          <table class="layui-hide" id="vip_list" lay-filter="vip_list"></table>
+          <script type="text/html" id="tool_vip_list">
+            <a class="layui-btn layui-btn-xs" lay-event="chongzhi">后台充值</a>
+            <a class="layui-btn layui-btn-normal layui-btn-xs" lay-event="edit"><i class="layui-icon layui-icon-edit"></i>编辑</a>
+          </script>
+          <script type="text/html" id="test-table-images">
+            <img src="{{d.head_img||'/static/admin/src/style/res/head_default.gif'}}" height="100%" alt="" onerror="javascript:this.src='/static/admin/src/style/res/head_default.gif'">
+          </script>
+          <script type="text/html" id="test-table-status">
+            <input type="checkbox" name="status" value="{{d.id}}" lay-skin="switch" lay-text="开启|禁止" class="layui-input" {{ d.status === 1 ? 'checked' : '' }} lay-filter="checkbox_status">
+          </script>
+
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script type="text/javascript" src="//js.users.51.la/20272249.js"></script>
+<script>
+    layui.use(['admin', 'table', 'view', 'form', 'layer'], function () {
+        var table = layui.table
+            , admin = layui.admin
+            , form = layui.form
+            , layer = layui.layer
+            , view = layui.view;
+
+        //方法级渲染
+        table.render({
+            elem: '#vip_list'
+            , url: layui.setter.baseUrl + 'admin/member/index'
+            , parseData: function (res) { //res 即为原始返回的数据
+                $('#z_jl').html(res.data.res.money);
+                // $('#z_jc').html(res.data.res.pool_consumption);
+                $('#z_jcc').html(res.data.res.integral);
+                $('#z_jccc').html(res.data.res.encourage);
+                $('#z_jcccc').html(res.data.res.pool_hatch);
+                $('#z_jccccc').html(res.data.res.pool_sale);
+                $('#z_ja').html(res.data.res.pool_water);
+
+                return {
+                    "code": res.code, //解析接口状态
+                    "msg": res.msg, //解析提示文本
+                    "count": res.data.count, //解析数据长度
+                    "data": res.data.lists //解析数据列表
+                };
+            }
+            ,toolbar: '#tool_order_lists'
+            , cols: [[
+                { field: 'id', width: 70, title: 'ID', align: 'center' }
+                , { field: 'mobile', title: '手机号', align: 'center' }
+                , { field: 'nickname', title: '昵称', align: 'center' }
+                , {
+                    field: 'dl_level', width: 90, title: '会员级别', align: 'center', templet: function (d) {
+                        if (d.dl_level == 0) {
+                            return 'S0';
+                        } else if (d.dl_level == 1) {
+                            return 'SS';
+                        } else if (d.dl_level == 2) {
+                            return 'SSS';
+                        } else if (d.dl_level == 3) {
+                            return 'SSSS';
+                        } else {
+                            return '未知';
+                        }
+                    }
+                }
+                , {
+                    field: 'is_set_type', width: 100, title: '会员类型', align: 'center', templet: function (d) {
+                        if (d.is_set_type == 2) {
+                            return '用户会员';
+                        }else {
+                            return '客服会员';
+                        }
+                    }
+                }
+                , {
+                    field: 'dls_level', width: 90, title: '代理商级别', align: 'center', templet: function (d) {return 'V'+d.dls_level;}
+                },{
+                    field: 'pm_level', width: 90, title: '拍卖等级', align: 'center'
+                }
+                , { field: 'ty_level', width: 90, title: '体验级别', align: 'center', templet: function (d) {return 'E'+d.ty_level;}}
+                , { field: 'tma', width: 88, title: '推荐码', align: 'center' }
+                , { field: 'tnum', width: 88, title: '直推人数', align: 'center' }
+                , { field: 'referid', width:100,title: '推荐人UID', align: 'center' }
+                , { field: 'money', width: 88, title: 'KRC余额', align: 'center' }
+                , { field: 'integral', width: 88, title: '抵扣金', align: 'center' }
+                , { field: 'pool_sale', width: 88, title: '代付券', align: 'center' }
+                // , { field: 'encourage', width: 88, title: '原始股', align: 'center' }
+                , { field: 'pool_hatch', width: 88, title: 'USDT余额', align: 'center' }
+                , { field: 'pool_water', width: 88, title: 'SM', align: 'center' }
+                , { field: 'jifen', width: 88, title: '积分', align: 'center' }
+                , { field: 'status',width:100, title: '状态', templet: '#test-table-status', align: 'center' }
+                , { field: 'last_login_ip', title: '最新IP', align: 'center' }
+                , { field: 'create_time', title: '注册时间', align: 'center' }
+                , { fixed: 'right', width: 180, title: '操作', align: 'center', toolbar: '#tool_vip_list' }
+            ]],
+            page: true,
+            limits:[10,20,50,100,500,1000,5000,10000,100000],
+        });
+
+        // 搜索
+        var $ = layui.$, active = { // 添加会员组
+            reload: function () {
+                var demoReload = $('#test-table-demoReload');
+                var referid = $('#referid');
+                var id = $('#id');
+                var last_login_ip = $('#last_login_ip');
+                var dl_level = $('#dl_level');
+                var ty_level = $('#ty_level');
+                var is_set_type = $('#is_set_type');
+
+                //执行重载
+                table.reload('vip_list', {
+                    page: {
+                        curr: 1 //重新从第 1 页开始
+                    }
+                    , where: {
+                        keywords: demoReload.val(),
+                        referid: referid.val(),
+                        dl_level: dl_level.val(),
+                        ty_level: ty_level.val(),
+                        is_set_type: is_set_type.val(),
+                        id: id.val(),
+                        last_login_ip: last_login_ip.val(),
+                    }
+                });
+            }
+        };
+
+        $('.test-table-reload-btn .layui-btn').on('click', function () {
+            var type = $(this).data('type');
+            active[type] ? active[type].call(this) : '';
+        });
+        form.render();
+        //监听工具条
+        table.on('tool(vip_list)', function (obj) {
+            // console.log(obj);
+            var data = obj.data;
+            var id = obj.data.id;
+            if (obj.event === 'del') {
+                layer.confirm('确认删除此会员?', { icon: 3, title: '提示' }, function (index) {
+                    admin.req({
+                        url: layui.setter.baseUrl + 'admin/member/del_member'
+                        , data: { id: id },
+                        type: 'post',
+                        success: function (res) {
+                            if (res.code == 1) {
+                                obj.del();
+                                layer.close(index);
+                            } else {
+                                layer.msg(res.msg, { icon: 5, anim: 6, shade: 0.5, time: 1000 });
+                            }
+                        }
+                    });
+
+                });
+            } else if (obj.event === 'edit') {
+                // 编辑
+                admin.popup({
+                    title: "编辑会员",
+                    area: admin.screen() < 2 ? ['95%', '90%'] : ["700px", "600px"],
+                    id: "LAY-popup-edit_vip",
+                    success: function (layero, index) {
+                        view(this.id).render('/member/add_member', data).done(function () {
+                            form.render(null, 'add_member'); // 弹窗的lay-filter值
+                            form.on('submit(vip_submit)', function (datas) {
+                                datas.field.id = id;
+                                admin.req({
+                                    url: layui.setter.baseUrl + 'admin/member/edit_member'
+                                    , data: datas.field,
+                                    type: 'post',
+                                    success: function (res) {
+                                        if (res.code == 1) {
+                                            layer.msg(res.msg, { icon: 1, shade: 0.5, time: 1000 }, function () {
+                                                setTimeout(function () {
+                                                    layer.close(index);
+                                                    table.reload('vip_list');
+                                                }, 1000);
+
+                                            });
+                                        } else {
+                                            layer.msg(res.msg, { icon: 5, anim: 6, shade: 0.5, time: 1000 });
+                                        }
+                                    }
+                                });
+                            });
+
+                        });
+                    }
+                });
+            } else if (obj.event === 'chongzhi') {
+                // 编辑
+                admin.popup({
+                    title: "后台充值",
+                    area: admin.screen() < 2 ? ['95%', '90%'] : ["700px", "560px"],
+                    id: "LAY-popup-edit_vip",
+                    success: function (layero, index) {
+                        view(this.id).render('/member/recharge', data).done(function () {
+                            form.render(null, 'recharge'); // 弹窗的lay-filter值
+                            form.on('submit(cz_submit)', function (datas) {
+                                var par={
+                                    id: datas.field.id,
+                                    set_type: datas.field.set_type,
+                                    type: datas.field.type,
+                                    money: datas.field.money,
+                                    remarks: datas.field.remarks
+                                }
+                                layer.close(index);
+                                admin.req({
+                                    url: layui.setter.baseUrl + 'admin/member/edit_pools'
+                                    , data: par,
+                                    type: 'post',
+                                    success: function (res) {
+                                        if (res.code == 1) {
+                                            layer.msg(res.msg, { icon: 1, shade: 0.5, time: 1000 }, function () {
+                                                setTimeout(function () {
+                                                    table.reload('vip_list');
+                                                }, 1000);
+
+                                            });
+                                        } else {
+                                            layer.msg(res.msg, { icon: 5, anim: 6, shade: 0.5, time: 1000 });
+                                        }
+                                    }
+                                });
+                            });
+
+                        });
+                    }
+                });
+            }
+        });
+
+
+        // 监听状态修改
+        form.on('switch(checkbox_status)', function (e) {
+            admin.req({
+                url: layui.setter.baseUrl + 'admin/member/member_status'
+                , data: { id: e.value }
+                , type: 'post'
+                , success: function (res) {
+                    if (res.code == 1) {
+                        // layer.msg(res.msg , {icon: 1,shade:0.3,time: 1000});
+                    } else {
+                        layer.msg(res.msg, { icon: 5, anim: 6, shade: 0.5, time: 1000 });
+                    }
+                }
+            });
+
+        });
+
+        form.render();
+        table.on('edit(vip_list)',function(e){
+            var this_id=e.data.id;
+            var this_type=e.field;
+            var num=e.value;
+            var param={id:this_id,number:num,type:this_type};
+            if(num<0){
+                layer.msg('输入值不能为负数', {icon: 5,anim: 6,shade:0.3,time: 1000});
+            }else{
+                admin.req({
+                    url: layui.setter.baseUrl+'admin/member/edit_pool' //实际使用请改成服务端真实接口
+                    ,data:param,
+                    type:'post',
+                    success: function(res){
+                        if(res.code==1){
+                            layer.msg(res.msg, { icon: 1, shade: 0.5, time: 1000 }, function () {
+                                setTimeout(function () {
+                                    layer.close(index);
+                                    table.reload('vip_list');
+                                }, 1000);
+
+                            });
+                        }else{
+                            layer.msg(res.msg, {icon: 5,anim: 6,shade:0.5,time: 1500},function(){
+                                setTimeout(function(){
+                                    layer.close(index);
+                                    table.reload('vip_list');
+                                },1500);
+                            });
+                        }
+                    }
+                });
+            }
+
+        });
+
+
+
+
+    });
+</script>

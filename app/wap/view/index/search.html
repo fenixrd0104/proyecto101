@@ -1,0 +1,40 @@
+{include file="public/header"/}
+
+</head>
+<body>
+<header class="mui-bar mui-bar-nav index_header shop_head" id="header">
+    <a class="back-page mui-icon mui-icon-left-nav mui-pull-left" href="javascript:;"></a>
+    <a id="menu" class="mui-action-menu mui-icon mui-icon-bars mui-pull-right" href="javascript:void(0);"></a>
+   <h1 class="mui-title">Search</h1>
+   </header>
+   <div class="mui-content street_content">
+       <div class="search_up mui-clearfix">
+           <input name="searchgoods" type="text" placeholder="Search Goods">
+           <button class="sea_btn"><i class="iconfont icon-search"></i></button>
+       </div>
+       <!-- <div class="serach_txt">
+           <h1>Popular searches</h1>
+           <ul class="mui-cliearfix">
+               <li><a href="javascript:void(0);">Mobile</a></li>
+               <li><a href="javascript:void(0);">Mobile</a></li>
+               <li><a href="javascript:void(0);">Mobile</a></li>
+           </ul>
+       </div> -->
+       
+   </div>
+   
+   {include file="public/head_nav"/}
+   {include file="public/footer"/}
+   <script>
+   //search
+   $('.sea_btn').on('tap',function(){
+       var sear_inp=$("input[name = searchgoods]").val();
+       if(sear_inp == ""){
+           mui.toast("Please enter the search content");
+    }else{
+        window.location.href='/wap/index/goods_list/searchname/'+ sear_inp;
+    }
+});
+</script>
+</body>
+</html>

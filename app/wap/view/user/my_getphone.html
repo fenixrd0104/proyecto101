@@ -1,0 +1,125 @@
+{include file="public/header" /}
+</head>
+<body>
+<header class="mui-bar mui-bar-nav" id="header">
+    <a class="back-page mui-icon mui-icon-left-nav mui-pull-left" href="javascript:;"></a>
+    <a id="menu" class="mui-action-menu mui-icon mui-icon-bars mui-pull-right" href="javascript:;"></a>
+    <h1 class="mui-title">Modify phone number or email</h1>
+</header>
+<div class="mui-content register-content">
+    <!-- <div class="mui_type">
+        <span data-type="mobile" class="active">Modify phone number</span>
+        <span data-type="email">Modify Email</span>
+    </div> -->
+    <div class="goods_fenlei_tab">
+        <div class="on" data-type="mobile">Modify phone number</div>
+        <div data-type="email">Modify Email</div data-type="email">
+   </div>
+    <div class="mb10"></div>
+    <div class="mb10"></div>
+    <form class="mui-input-group xx_form">
+        <div class="mui-input-row mui_phone">
+            <label>Old phone number</label>
+            <input type="tel" id="old_mobile" placeholder="Please enter the old mobile number" readonly>
+        </div>
+        <div class="mui-input-row mui_email hide">
+            <label>Old mailbox</label>
+            <input type="tel" id="old_email" placeholder="Please enter the old email address" readonly>
+        </div>
+        <div class="mui-input-row">
+            <label>Captcha</label>
+            <input type="text" id="verify" placeholder="Please enter the verification code" style="width: 46%;float: left;">
+            <button class="btn_code fr bg-gold" id="btn_code" type="button" style="margin-right: 0.05rem;">Get verification code</button>
+        </div>
+       
+    </form>
+    <div class="mb30"></div>
+    <div class="mui-button-row">
+        <button type="button" id="submit_btn" class="submit_btn bg-gold" onclick="return false;">Next step</button>
+    </div>
+</div>
+
+{include file="public/head_nav"/}
+{include file="public/footer"/}
+<script type="text/javascript">window.onpageshow = function (event) {
+    if(localStorage.getItem('load_list')=='true'){
+        setTimeout(() => {
+            get_list();
+            localStorage.setItem('load_list','false');
+        }, 1000);
+        
+    }else{
+        get_list();
+    }
+
+};
+// Email or mobile number
+$('.goods_fenlei_tab>div').click(function(){
+    $(this).addClass('on').siblings().removeClass('on');
+    var type=$(this).attr('data-type');
+    if(type=="mobile"){
+        $('.mui_phone').show();
+        $('.mui_email').hide();
+    } else{
+        $('.mui_email').show();
+        $('.mui_phone').hide();
+    }
+});
+// Modify phone number or email
+$('#submit_btn').on('tap', function () {
+    var phone = '';
+    var verify = $('#verify').val();
+    var check_type = $('.goods_fenlei_tab .on').attr('data-type');
+
+    if(check_type=="email"){
+        phone = $('#old_email').val();
+    } else{
+        phone = $('#old_mobile').val();
+    }
+
+    if (phone=="") {
+        mui.toast('Please enter your phone number or email');
+    } else if (verify=="") {
+        mui.toast('Please enter the verification code');
+    } else {
+        $get("/api/user/oldphone_verify", { phone:phone,verify:verify,check_type:check_type }, function (d) {
+        mui.toast(d.msg);
+            if (d.code == 1) {
+                setTimeout(function(){
+                    window.location.href='/wap/user/my_phone.html?type='+check_type;
+                },1000);                  
+            } else{
+            }
+        });
+       
+    }
+});
+// get default information
+function get_list() {
+$get('/api/user/getuserinfo',{},function(data){
+    if(data.code==1){
+        $('#old_mobile').val(data.data.mobile);
+        $('#old_email').val(data.data.email);
+    }else{
+        // mui.toast(data.msg);
+    }
+}); }
+// get verification code
+$('#btn_code').click(function(){    
+    var check_type = $('.mui_type .active').attr('data-type');
+    var obj = $('#btn_code');
+    if(check_type==""){
+        return;
+    }
+
+    $get("/api/user/send_verify", { check_type:check_type }, function (d) {
+        mui.toast(d.msg);
+        if (d.code == 1) {
+            settime(obj);
+        } else{
+        }
+    });
+});
+</script>
+</body>
+</html>

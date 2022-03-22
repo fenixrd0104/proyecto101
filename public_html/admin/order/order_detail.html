@@ -1,0 +1,731 @@
+
+<title>订单管理</title>
+    
+<div class="layui-card layadmin-header">
+  <div class="layui-breadcrumb" lay-filter="breadcrumb">
+    <a>订单管理</a>
+    <a lay-href="/order/order">订单管理</a>
+    <a><cite>订单详情</cite></a>
+  </div>
+</div>
+
+<style>
+.ncap-order-details { padding: 0 20px; }
+.ncap-order-details h4 {
+    font-weight: 600;
+    margin-bottom: 10px;
+}
+.ncap-order-details .tabs-panels dt {
+    color: #999;
+    width: 100px;
+    text-align: right;
+}
+.ncap-order-details .tabs-panels dd {
+    color: #333;
+    min-width: 150px;
+}
+.ncap-order-details .tabs-panels dt,
+.ncap-order-details .tabs-panels dd {
+    font-size: 12px;
+    line-height: 20px;
+    vertical-align: top;
+    display: inline-block;
+}
+dl { margin-bottom: 10px; }
+dt { font-weight: 700; }   
+hr{ margin: 20px 0; }  
+.layui-table td, .layui-table th{ text-align: center; }  
+</style>
+
+<div class="layui-fluid">
+<div class="layui-row layui-col-space15">
+<div class="layui-col-md12">
+<div class="layui-card">
+    <div class="layui-card-header">订单详情</div>
+    <div class="layui-card-body">
+        <!-- <div class="layui-form-item order_type">
+            <a href="/admin/#/order/edit_order" class="layui-btn" data-type="close">修改订单</a>
+        </div> -->
+        <div class="ncap-order-details">
+            <h4>基本信息</h4>
+            <div class="tabs-panels" id="info1_view">
+               
+            </div>
+        </div>
+        <script type="text/html" id="info1">
+            <dl>
+                <dt>订单ID：</dt>
+                <dd>{{d.order_id}}</dd>
+                <dt>订单号：</dt>
+                <dd>{{d.order_sn}}</dd>
+                <dt>会员ID：</dt>
+                <dd>{{d.user_id}}</dd>
+            </dl>
+            <dl>
+                <dt>E-mail：</dt>
+                <dd>{{d.email}}</dd>
+                <dt>电话：</dt>
+                <dd>{{d.mobile}}</dd>
+                <dt>应付金额：</dt>
+                <dd>{{d.order_amount}}</dd>
+            </dl>
+            <dl>
+                <dt>订单状态：</dt>
+                <dd>{{d.order_status}}</dd>
+                <dt>下单时间：</dt>
+                <dd>{{layui.util.toDateString(d.add_time*1000, 'yyyy-MM-dd HH:mm:ss')}}</dd>
+                <dt>支付时间：</dt>
+                <dd>{{layui.util.toDateString(d.pay_time*1000, 'yyyy-MM-dd HH:mm:ss')}}</dd>
+            </dl>
+            <dl>
+                <dt>支付方式：</dt>
+                <dd>{{d.pay_name}}</dd>
+                <!-- <dt>发票抬头：</dt>
+                <dd>{{d.invoice_title}}</dd> -->
+                {{# if(d.top_cate == 2){ }}
+                <dt>代付ID</dt>
+                <dd>{{d.take_id}}</dd>
+                {{# } }}
+                
+            </dl>
+        </script>
+        <div class="ncap-order-details">
+            <hr>
+            <h4>
+                收货信息
+                <!-- <button class="layui-btn layui-btn-normal layui-btn-xs" data-type="edit_info" id="edit_info" style="display: none;"><span>修改收货信息</span></button> -->
+            </h4>
+            <div class="tabs-panels" id="info2_view">
+             
+            </div>
+        </div>   
+        <script type="text/html" id="info2">
+            <dl>
+                <dt>收货人：</dt>
+                <dd>{{d.consignee}}</dd>
+                <dt>联系方式：</dt>
+                <dd>{{d.mobile}}</dd>
+            </dl>
+            <dl>
+                <dt>收货地址：</dt>
+                <dd>{{d.addr}}</dd>
+            </dl>
+            <dl>
+                <dt>邮编：</dt>
+                <dd>{{d.zipcode}}</dd>
+            </dl>
+            <dl>
+                <dt>配送方式：</dt>
+                <dd>{{d.shipping_name}}</dd>
+            </dl>
+            <dl>
+                <dt>发货单号：</dt>
+                <dd>{{d.invoice_no}}</dd>
+            </dl>
+            <dl>
+                <dt>留言：</dt>
+                <dd>{{d.user_note}}</dd>
+            </dl>
+        </script>         
+        <div class="ncap-order-details layui-clear">
+            <hr>
+            <h4>商品信息</h4>
+            <div class="layui-row">
+                <table class="layui-table layuiadmin-page-table" id="order_goods_info" lay-skin="line" lay-filter="order_goods_info"></table>
+                <script type="text/html" id="order_goods_info_img">
+                    <img src="{{d.img||''}}" alt="" style="height:100%;">
+                </script>
+            </div>
+            <!-- <p style="float:right;margin-bottom:0;">商品总额：￥2533.00</p> -->
+        </div>
+        <div class="ncap-order-details">
+            <hr>
+            <h4>费用信息 
+                <!-- <button class="layui-btn layui-btn-normal layui-btn-xs" data-type="price" id="show_edit" style="display: none;"><span>修改费用</span></button></h4> -->
+            <div class="tabs-panels" id="info3_view">
+                
+            </div>
+            <script type="text/html" id="info3">
+                <dl>
+                    <dt>小计：</dt>
+                    <dd>{{d.goods_price}}</dd>
+                    <dt>物流费用：</dt>
+                    <dd>+{{d.shipping_price}}</dd>
+                    <dt>积分（-{{d.integral}}）：</dt>
+                    <dd>-{{d.integral_money}}</dd>
+                </dl>
+                <dl>
+                    <dt>余额抵扣：</dt>
+                    <dd>-{{d.user_money}}</dd>
+                    <!-- <dt>优惠卷抵扣：</dt>
+                    <dd>-{{d.coupon_price}}</dd> -->
+                    <dt>价格调整：</dt>
+                    <dd>
+                        {{# if(d.discount > 0){ }}
+                           加
+                        {{# } else if(d.discount < 0) { }}
+                           减 
+                        {{# }else{ }}  
+                           无
+                        {{# } }}    
+                    </dd>
+                </dl>
+                <dl>
+                    <dt>应付：</dt>
+                    <dd style="color:red">{{d.total_amount}}</dd>
+                </dl>
+            </script>
+        </div>
+        <div class="ncap-order-details layui-clear order_type">
+            <hr>
+            <h4>操作信息</h4>
+            <form class="layui-form" lay-filter="order_detail">
+                <!-- <div class="layui-form-item">
+                    <label class="layui-form-label">操作备注</label>
+                    <div class="layui-input-block">
+                        <div class="layui-col-sm4">
+                        <textarea name="note" placeholder="请输入操作备注" class="layui-textarea" style="width: 530px; min-height: 54px;"></textarea>
+                        </div>
+                    </div>
+                </div> -->
+                <div class="layui-form-item">
+                    <label class="layui-form-label">操作</label>
+                    <div class="layui-input-block" id="form_btn">
+                        <!-- <button type="button" class="layui-btn" data-html="remove" data-type="pay">付款</button> -->
+                    </div>
+                </div>
+            </form>
+        </div>
+        <div class="ncap-order-details layui-clear">
+            <hr>
+            <h4>操作记录</h4>
+            <div class="layui-row">
+            <table class="layui-table layuiadmin-page-table" id="caozuo_list" lay-skin="line" lay-filter="caozuo_list"></table>
+            </div>
+            <hr>
+        </div>
+
+    </div>
+</div>
+</div>
+</div>
+</div>
+
+<script>
+layui.use(['admin', 'table', 'form', 'view','layer'], function(){
+  var $ = layui.$
+  ,admin = layui.admin
+  ,table = layui.table
+  ,form = layui.form
+  ,layer = layui.layer
+  ,view = layui.view
+  ,laytpl = layui.laytpl
+  ,element = layui.element
+  ,router = layui.router();
+
+  var id=router.search.id;
+  var order_type=router.search.order_type;
+
+  // 初始化变量
+  var order_status='';
+  var pay_status="";
+  var shipping_status='';
+  var wuliu='';
+  var pay_type='';
+  var edit_info='';
+
+
+    // 获取订单详情
+  get_data();
+  function get_data(){
+    admin.req({
+          url: layui.setter.baseUrl+'admin/order/detail' //实际使用请改成服务端真实接口
+          ,data: {id:id},
+          type:'get',
+          success: function(res){
+            if(res.code==1){
+                var data=res.data;
+
+                // 变量赋值
+                order_status=res.data.order_status;
+                pay_status=res.data.pay_status;
+                shipping_status=res.data.shipping_status;
+                wuliu=res.data.shipping;
+                pay_type=res.data.pay_lists;
+                edit_info=data.info;
+
+                if(data.info.pay_status==0 && data.info.shipping_status==0){
+                    $('#show_edit').show();
+                }
+                if(data.info.order_status==3){
+                    $('#show_edit').hide();
+                }
+                if(data.info.shipping_status==0){
+                    $('#edit_info').show();
+                }
+
+                for(var i in order_status){
+                    if(data.info.order_status==i){
+                        data.info.order_status= order_status[i];
+                    }
+                }
+
+                var getTpl = info1.innerHTML
+                ,view1 = document.getElementById('info1_view');
+                laytpl(getTpl).render(data.info, function(html){
+                    view1.innerHTML = html;
+                });
+                var getTpl2 = info2.innerHTML
+                ,view2 = document.getElementById('info2_view');
+                laytpl(getTpl2).render(data.info, function(html){
+                    view2.innerHTML = html;
+                });
+                var getTpl3 = info3.innerHTML
+                ,view3 = document.getElementById('info3_view');
+                laytpl(getTpl3).render(data.info, function(html){
+                    view3.innerHTML = html;
+                });
+
+                // 商品信息列表
+                table.render({
+                    elem: '#order_goods_info'
+                    ,data:res.data.goodsList
+                    ,cols: [[
+                        {field:'goods_sn', title: '商品编号', align:'center'}
+                        ,{field:'img', title: '商品图片', align:'center',templet:'#order_goods_info_img'}
+                        ,{field:'goods_name', title: '商品名称', align:'center'}
+                        ,{field:'spec_key_name', title: '规格属性', align:'center'}
+                        ,{field:'goods_num', title: '数量', align:'center'}
+                        ,{field:'goods_price', title: '单品价格', align:'center'}
+                        ,{field:'member_goods_price', title: '会员折扣价', align:'center'}
+                        ,{field:'goods_num', title: '小计', align:'center',templet:function(d){
+                            var n=d.goods_num;
+                            var p=d.member_goods_price;
+                            var np=(n*p).toFixed(2);
+                            return np;
+                        }}
+                    ]]
+                });
+                // 操作记录
+                table.render({
+                    elem: '#caozuo_list'
+                    ,data:res.data.orderAction
+                    ,cols: [[
+                        {field:'action_user', title: '操作者', align:'center',templet:function(d){
+                            if(d.action_user_type==0){
+                                return '用户：'+d.action_user;
+                            }else{
+                                return '系统管理员';
+                            }
+                            
+                        }}
+                        ,{field:'log_time', title: '操作时间', align:'center',templet: "<div>{{layui.util.toDateString(d.log_time*1000, 'MM-dd HH:mm:ss')}}</div>"}
+                        ,{field:'order_status', title: '订单状态', align:'center',templet:function(d){
+                            for(var i in order_status){
+                                if(d.order_status==i){
+                                return order_status[i];
+                                }
+                            }
+                        }}
+                        ,{field:'pay_status', title: '付款状态', align:'center',templet:function(d){
+                            for(var i in pay_status){
+                                if(d.pay_status==i){
+                                return pay_status[i];
+                                }
+                            }
+                        }}
+                        ,{field:'shipping_status', title: '发货状态', align:'center',templet:function(d){
+                            for(var i in shipping_status){
+                                if(d.shipping_status==i){
+                                return shipping_status[i];
+                                }
+                            }
+                        }}
+                        ,{field:'status_desc', title: '描述', align:'center'}
+                        ,{field:'action_note', title: '备注', align:'center'}
+                           
+                    ]]
+                });
+                // 设置操作按钮
+                var btn_list='';
+                for(var i in res.data.orderManagerBtn){
+                    btn_list+='<button type="button" lay-submit class="layui-btn" data-html="'+res.data.orderManagerBtn[i]+'" lay-filter="'+i+'">'+res.data.orderManagerBtn[i]+'</button>'
+                }
+                $('#form_btn').html(btn_list);
+
+
+
+                if(order_type){
+                    $('.order_type').hide();
+                }
+
+            }else{
+              layer.msg(res.msg, {icon: 5,anim: 6,shade:0.5,time: 1500});
+            }
+          }
+      }); 
+  }
+
+    // element.render();
+    form.render(null, 'order_detail');
+    var active = {
+        price:function(index){                
+            admin.popup({
+                title: "修改费用",
+                area: admin.screen() < 2 ? ['95%', '90%'] :["600px", "580px"],
+                id: "LAY-popup-edit_order_price",
+                success: function(layero, index){
+                    view(this.id).render('/order/edit_price',id).done(function() {
+                        form.render(null, 'edit_price'); // 弹窗的lay-filter值
+                        form.on('submit(edit_price_submit)',function(obj){
+                            obj.field.id=id;
+                            admin.req({
+                                url: layui.setter.baseUrl+'admin/order/editprice'
+                                ,data: obj.field,
+                                type:'post',
+                                success: function(res){
+                                    if(res.code==1){
+                                        layer.msg(res.msg, {icon: 1,anim: 6,shade:0.5,time: 1500},function(){
+                                            layer.closeAll(); //执行关闭 
+                                            get_data();
+                                        });
+                                    }else{
+                                        layer.msg(res.msg, {icon: 5,anim: 6,shade:0.5,time: 1500});
+                                    }
+                                }
+                            });
+
+                        });
+                    });
+                }
+            });
+        },
+        edit_info:function(index){  
+            admin.popup({
+                title: "修改收货信息",
+                area: admin.screen() < 2 ? ['95%', '90%'] :["650px", "440px"],
+                id: "LAY-popup-edit_order_info",
+                success: function(layero, index){
+                    view(this.id).render('/order/edit_info',edit_info).done(function() {
+                        form.render(null, 'edit_info'); // 弹窗的lay-filter值
+                        form.on('submit(edit_info_submit)',function(obj){
+                            obj.field.id=id;
+                            admin.req({
+                                url: layui.setter.baseUrl+'admin/order/editConsignee'
+                                ,data: obj.field,
+                                type:'post',
+                                success: function(res){
+                                    if(res.code==1){
+                                        layer.msg(res.msg, {icon: 1,anim: 6,shade:0.5,time: 1500},function(){
+                                            layer.closeAll(); //执行关闭 
+                                            get_data();
+                                        });
+                                    }else{
+                                        layer.msg(res.msg, {icon: 5,anim: 6,shade:0.5,time: 1500});
+                                    }
+                                }
+                            });
+
+                        });
+                    });
+                }
+            });
+        }
+    };
+    $('.layui-form-item .layui-btn,.layui-btn').on('click', function(){
+        var type = $(this).data('type');
+        active[type] ? active[type].call(this) : '';
+    });
+
+    // 操作按钮
+
+    /* 1 */
+    // 设为未付款 
+    form.on('submit(pay_cancel)',function(datas){
+        admin.popup({
+          title:$(this).html(),
+          area: admin.screen() < 2 ? ['95%', '80%'] :["500px", "300px"],
+          id: "LAY-popup-pay_cancel",
+          success: function(layero, index){
+            view(this.id).render('/order/beizhu').done(function() {
+              form.render(null, 'beizhu'); // 弹窗的lay-filter值
+               //监听提交
+                form.on('submit(beizhu_submit)',function(obj){
+                    obj.field.id=id;
+                    do_order('orderPayCancel',obj.field);
+               });
+            });
+          }
+        });
+    });
+    /* 2 */
+    // 设为确认   
+    // form.on('submit(confirm)',function(datas){
+    //     admin.popup({
+    //       title: "订单分配",
+    //       area: admin.screen() < 2 ? ['95%', '80%'] :["700px", "635px"],
+    //       id: "LAY-popup-fukuan",
+    //       success: function(layero, index){
+    //         view(this.id).render('/order/queren').done(function() {
+    //         form.render(null, 'queren');               
+    //         // 选择
+    //         table.on('tool(dianpu_list)',function(e){
+    //         // console.log(e.data);
+    //         var data=e.data.id;
+    //         if(e.event==="edit"){
+    //         admin.popup({
+    //             title: "选择店铺",
+    //             area: admin.screen() < 2 ? ['95%', '90%'] :["500px", "300px"],
+    //             id: "LAY-popup-edit_supplierlist",
+    //             success: function(layero, index) {
+    //             view(this.id).render('/order/queren_detail',data).done(function() {
+    //             form.render(null, 'queren_detail'); // 弹窗的lay-filter值
+    //             //监听提交
+    //             form.on('submit(queren_submit)',function(obj){
+    //             obj.field.id=id;  
+    //             admin.req({
+    //                 url: layui.setter.baseUrl+'admin/order/orderConfirmShop'
+    //                 ,data: obj.field,
+    //                 type:'post',
+    //                 success: function(res){
+    //                 if(res.code==1){
+    //                     layer.closeAll(); //执行关闭 
+    //                     get_data();
+    //                     layer.msg(res.msg, {icon: 1,time: 1000}); 
+    //                 }else{
+    //                     layer.msg(res.msg, {icon: 5,anim: 6,shade:0.5,time: 1500});
+    //                 }
+    //                 }
+    //             });
+    //             });
+    //             });
+    //             }
+    //         });
+    //         }
+    //         });               
+    //         });
+    //       }
+    //     });
+    // });
+    // 设为确认   
+    form.on('submit(confirm)',function(datas){
+        admin.popup({
+            title: "去确认",
+            area: admin.screen() < 2 ? ['95%', '80%'] :["500px", "390px"],
+            id: "LAY-popup-fahuo",
+            success: function(layero, index){
+                view(this.id).render('/order/confirm',wuliu).done(function() {
+                    form.render(null, 'fahuo'); // 弹窗的lay-filter值
+                    //监听提交
+                    form.on('submit(fahuo_submit)',function(obj){
+                        obj.field.id=id;
+                        admin.req({
+                            url: layui.setter.baseUrl+'admin/order/orderConfirm'
+                            ,data: obj.field,
+                            type:'get',
+                            success: function(res){
+                                if(res.code==1){
+                                    layer.msg(res.msg, {icon: 1,anim: 6,shade:0.5,time: 1500},function(){
+                                        layer.closeAll(); //执行关闭
+                                        get_data();
+                                    });
+
+                                }else{
+                                    layer.msg(res.msg, {icon: 5,anim: 6,shade:0.5,time: 1500});
+                                }
+                            }
+                        });
+                    });
+                });
+            }
+        });
+    });
+    /* 3 */
+    // 设为无效 
+    form.on('submit(invalid)',function(datas){
+        admin.popup({
+          title:$(this).html(),
+          area: admin.screen() < 2 ? ['95%', '80%'] :["500px", "300px"],
+          id: "LAY-popup-invalid",
+          success: function(layero, index){
+            view(this.id).render('/order/beizhu').done(function() {
+              form.render(null, 'beizhu'); // 弹窗的lay-filter值
+               //监听提交
+                form.on('submit(beizhu_submit)',function(obj){
+                    obj.field.id=id;
+                    do_order('orderInvalid',obj.field);
+               });
+            });
+          }
+        });
+    });
+    /* 4 */
+    // 取消分配   
+    form.on('submit(cancel)',function(datas){
+        admin.popup({
+          title:$(this).html(),
+          area: admin.screen() < 2 ? ['95%', '80%'] :["500px", "300px"],
+          id: "LAY-popup-cancel",
+          success: function(layero, index){
+            view(this.id).render('/order/beizhu').done(function() {
+              form.render(null, 'beizhu'); // 弹窗的lay-filter值
+               //监听提交
+                form.on('submit(beizhu_submit)',function(obj){
+                    obj.field.id=id;
+                    do_order('orderConfirmShopCancel',obj.field);
+               });
+            });
+          }
+        });
+    });
+    /* 5 */
+    // 去发货   
+    form.on('submit(delivery)',function(datas){
+        admin.popup({
+          title: "去发货",
+          area: admin.screen() < 2 ? ['95%', '80%'] :["500px", "390px"],
+          id: "LAY-popup-fahuo",
+          success: function(layero, index){
+            view(this.id).render('/order/fahuo',wuliu).done(function() {
+              form.render(null, 'fahuo'); // 弹窗的lay-filter值
+               //监听提交
+                form.on('submit(fahuo_submit)',function(obj){
+                    obj.field.id=id;
+                    admin.req({
+                      url: layui.setter.baseUrl+'admin/order/orderDelivery'
+                      ,data: obj.field,
+                      type:'post',
+                      success: function(res){
+                        if(res.code==1){
+                            layer.msg(res.msg, {icon: 1,anim: 6,shade:0.5,time: 1500},function(){
+                                layer.closeAll(); //执行关闭 
+                                get_data();
+                            });
+                            
+                        }else{
+                          layer.msg(res.msg, {icon: 5,anim: 6,shade:0.5,time: 1500});
+                        }
+                      }
+                  });
+               });
+            });
+          }
+        });
+    });
+    /* 6 */
+    // 移除订单 
+    form.on('submit(remove)',function(datas){
+        admin.popup({
+          title:$(this).html(),
+          area: admin.screen() < 2 ? ['95%', '80%'] :["500px", "300px"],
+          id: "LAY-popup-remove",
+          success: function(layero, index){
+            view(this.id).render('/order/beizhu').done(function() {
+              form.render(null, 'beizhu'); // 弹窗的lay-filter值
+               //监听提交
+                form.on('submit(beizhu_submit)',function(obj){
+                    obj.field.id=id;
+                    do_order('orderRemove',obj.field);
+               });
+            });
+          }
+        });
+    });
+    /* 7 */
+    // 确认发货 
+    form.on('submit(delivery_confirm)',function(datas){
+        admin.popup({
+          title:$(this).html(),
+          area: admin.screen() < 2 ? ['95%', '80%'] :["500px", "300px"],
+          id: "LAY-popup-delivery_confirm",
+          success: function(layero, index){
+            view(this.id).render('/order/beizhu').done(function() {
+              form.render(null, 'beizhu'); // 弹窗的lay-filter值
+               //监听提交
+                form.on('submit(beizhu_submit)',function(obj){
+                    obj.field.id=id;
+                    do_order('orderDeliveryConfirm',obj.field);
+               });
+            });
+          }
+        });
+    });
+    /* 8 */
+    // 申请退货 
+    form.on('submit(refund)',function(datas){
+        admin.popup({
+          title:$(this).html(),
+          area: admin.screen() < 2 ? ['95%', '80%'] :["500px", "300px"],
+          id: "LAY-popup-refund",
+          success: function(layero, index){
+            view(this.id).render('/order/beizhu').done(function() {
+              form.render(null, 'beizhu'); // 弹窗的lay-filter值
+               //监听提交
+                form.on('submit(beizhu_submit)',function(obj){
+                    obj.field.id=id;
+                    do_order('refund',obj.field);
+               });
+            });
+          }
+        });
+    });
+    /* 9 */
+    // 付款 
+    form.on('submit(pay)',function(datas){
+        admin.popup({
+          title: "去付款",
+          area: admin.screen() < 2 ? ['95%', '80%'] :["500px", "340px"],
+          id: "LAY-popup-fukuan",
+          success: function(layero, index){
+            view(this.id).render('/order/fukuan',pay_type).done(function() {
+              form.render(null, 'fukuan'); // 弹窗的lay-filter值
+               //监听提交
+                form.on('submit(fukuan_submit)',function(obj){
+                    obj.field.id=id;
+                    admin.req({
+                      url: layui.setter.baseUrl+'admin/order/orderPay'
+                      ,data: obj.field,
+                      type:'post',
+                      success: function(res){
+                        if(res.code==1){
+                            layer.msg(res.msg, {icon: 1,anim: 6,shade:0.5,time: 1500},function(){
+                                layer.closeAll(); //执行关闭 
+                                get_data();
+                            });
+                            
+                        }else{
+                          layer.msg(res.msg, {icon: 5,anim: 6,shade:0.5,time: 1500});
+                        }
+                      }
+                  });
+               });
+            });
+          }
+        });
+    });
+
+    // 操作函数封装
+    function do_order(url,params){
+        params.id=id;
+        admin.req({
+            url: layui.setter.baseUrl+'admin/order/'+url
+            ,data: params,
+            type:'post',
+            success: function(res){
+                if(res.code==1){
+                    layer.msg(res.msg, {icon: 1,anim: 6,shade:0.5,time: 1500},function(){
+                        layer.closeAll(); //执行关闭 
+                        get_data();
+                    });
+                }else{
+                    layer.msg(res.msg, {icon: 5,anim: 6,shade:0.5,time: 1500});
+                }
+            }
+        });
+    }
+
+
+    
+  
+});
+</script>

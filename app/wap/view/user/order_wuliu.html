@@ -1,0 +1,87 @@
+{include file="public/header" /}
+</head>
+<body style="background: #f8f8f8;">
+<header class="mui-bar mui-bar-nav bg_white" id="header">
+    <a class="mui-action-back mui-icon mui-icon-left-nav mui-pull-left" href="javascript:;"></a>
+    <a id="menu" class="mui-action-menu mui-icon mui-icon-bars mui-pull-right" href="javascript:;"></a>
+    <h1 class="mui-title">View Logistics</h1>
+</header>
+<div class="mui-content">
+    <div class="express">
+        <img id="logo" src="__IMG__/touxiang.png" alt="">
+        <div class="express_p">
+            <p class="expName">Express company:</p>
+            <p class="number">Express tracking number:</p>
+        </div>
+    </div>
+    <div class="wuliu hide">
+        <ul class="layui-timeline" id="expr_list">
+
+        </ul>
+    </div>
+    <div class="null_message hide">
+        <div class="mb50"></div>
+        <div class="mb10"></div>
+        <div class="none2">
+            <img src="__IMG__/none4.png" alt="">
+            <p>No logistics information yet~</p>
+        </div>
+    </div>
+</div>
+
+{include file="public/head_nav"/}
+{include file="public/footer"/}
+<script type="text/html" id="list">
+<li class="layui-timeline-item">
+    <i class="layui-icon layui-timeline-axis"></i>
+    <div class="layui-timeline-content layui-text expr_txt">
+        <p>{{status}}</p>
+        <h3 class="layui-timeline-title">{{time}}</h3>
+    </div>
+</li>
+</script>
+<script type="text/javascript">
+var order_id=getQueryString('order_id');
+var id=getQueryString('id');
+var url='/api/order/get_send_info',obj={order_id:order_id};
+if(id){
+    url='/api/auction/get_send_info';
+    obj={id:id};
+}
+get_data();
+function get_data(){
+    $get(url,obj, function(data) {        
+        if (data.status == 1) {
+           $('.expName').html("Express company: "+data.order.shipping_name);
+            $('.number').html("Express order number: "+data.order.invoice_no);
+            if(data.result.msg=='ok'){
+                $('.expName').html("Express company: "+data.result.result.expName);
+                $('.number').html("Express tracking number: "+data.result.result.number);
+                $('#logo').attr('src',data.result.result.logo);
+                var list='';
+                for( var i in data.result.result.list){
+                    list += template('list', data.result.result.list[i]);
+                }
+                $('#expr_list').html(list);
+                $('.wuliu').show();
+                $('.null_message').hide();
+            }else {
+                $('.null_message').show();
+                $('.wuliu').hide();
+            }
+           
+        } else {
+           
+        }
+    });
+};
+
+// address bar information    
+function getQueryString(name){
+    var reg = new RegExp("(^|&)"+ name +"=([^&]*)(&|$)");
+    var r = window.location.search.substr(1).match(reg);
+    if(r!=null)return  unescape(r[2]); return null;
+}
+</script>
+</body>
+</html>

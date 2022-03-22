@@ -1,0 +1,299 @@
+
+<title>栏目分类</title>
+<style>
+    html, body {
+        height: 100%;
+        margin:0;padding:0;
+        font-size: 12px;
+    }
+    div{
+        -moz-box-sizing: border-box;  /*Firefox3.5+*/
+        -webkit-box-sizing: border-box; /*Safari3.2+*/
+        -o-box-sizing: border-box; /*Opera9.6*/
+        -ms-box-sizing: border-box; /*IE8*/
+        box-sizing: border-box; /*W3C标准(IE9+，Safari5.1+,Chrome10.0+,Opera10.6+都符合box-sizing的w3c标准语法)*/
+    }
+    .dHead {
+        height:85px;
+        width:100%;
+        position: fixed;
+        z-index:5;
+        top:0;
+        overflow-x: auto;
+        padding: 10px;
+    }
+    .dBody {
+        width:100%;
+        overflow:auto;
+        top:90px;
+        position:absolute;
+        z-index:10;
+        bottom:5px;
+    }
+    .layui-btn-xstree {
+        height: 35px;
+        line-height: 35px;
+        padding: 0px 5px;
+        font-size: 12px;
+    }
+</style>
+<div class="layui-card layadmin-header">
+    <div class="layui-breadcrumb" lay-filter="breadcrumb">
+        <a>栏目管理</a>
+        <a><cite>栏目分类</cite></a>
+    </div>
+</div>
+
+<div class="layui-fluid">
+    <div class="layui-card">
+        <div class="layui-card-header">
+            栏目分类
+        </div>
+
+        <div class="layui-card-body">
+
+
+            <div class="layui-btn-container">
+                <button type="button" class="layui-btn" onclick="add_goodscate();"><i class="layui-icon layui-icon-add-1 layuiadmin-button-btn"></i>新增分类</button>
+            </div>
+            <table id="goods_category" lay-filter="goods_category"></table>
+
+
+            <!-- 是否显示-->
+            <script  type="text/html" id="show">
+                <input type="checkbox" name="status" lay-skin="switch" lay-text="是|否" lay-filter="is_show" {{ d.status === 1 ? 'checked' : '' }} value="{{d.id}}">
+            </script>
+            <!-- 排序 -->
+            <script  type="text/html" id="order">
+                <input type="text" name="sort" lay-filter="order" class="layui-input choose_order" style="height:100%; text-align:center;padding-left:0"  value="{{ d.sort || '' }}">
+            </script>
+            <!-- 图片 -->
+            <script  type="text/html" id="gimage">
+                <img src="{{ d.gimage || '' }}" height="100%" alt="">
+            </script>
+            <script type="text/html" id="table_goods_category">
+                <a class="layui-btn layui-btn-normal layui-btn-xs" lay-event="edit"><i class="layui-icon layui-icon-edit"></i>编辑</a>
+                <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del"><i class="layui-icon layui-icon-delete"></i>删除</a>
+            </script>
+        </div>
+    </div>
+</div>
+
+<script>
+    var editObj=null,ptable=null,treeGrid=null,tableId='goods_category',layer=null;
+    layui.use(['admin', 'table','treeGrid','layer'], function(){
+        var $ = layui.$
+            ,admin = layui.admin
+            ,view = layui.view
+            ,layer = layui.layer
+            ,treeGrid = layui.treeGrid
+            ,table = layui.table
+            ,form = layui.form;
+
+        var curr_data="";
+
+        ptable=treeGrid.render({
+            id:tableId
+            ,elem: '#'+tableId
+            ,url:layui.setter.baseUrl+'admin/bar/index'
+            ,cellMinWidth: 100
+            ,idField:'id'//必須字段
+            ,treeId:'id'//树形id字段名称
+            ,treeUpId:'parent_id'//树形父id字段名称
+            ,treeShowName:'gname'//以树形式显示的字段
+            ,heightRemove:[".dHead",10]//不计算的高度,表格设定的是固定高度，此项不生效
+            ,height:'100%'
+            ,isFilter:false
+            ,iconOpen:false//是否显示图标【默认显示】
+            ,isOpenDefault:false//节点默认是展开还是折叠【默认展开】
+            ,loading:true
+            ,method:'post'
+            ,isPage:false
+            ,cols: [[
+                {field:'id', width:80, title: 'ID',align:'center'}
+                ,{field:'gname', title: '分类名称',align:'center'}
+                ,{field:'gimage',  title: '分类图标',align:'center',templet:'#gimage'}
+                ,{field:'status',title: '是否开启',align:'center',templet:'#show'}
+                ,{field:'sort',title: '排序',align:'center',templet:"#order",edit:true}
+                ,{fixed: 'right', title:'操作', toolbar: '#table_goods_category',align:'center',width:160}
+            ]]
+
+        });
+
+        window.add_goodscate=function(){
+            admin.popup({
+                title: "添加栏目分类",
+                area: admin.screen() < 2 ? ['95%', '90%'] :["700px", "600px"],
+                id: "LAY-popup-add_category",
+                success: function(layero, index){
+                    view(this.id).render('/bar/add_bar').done(function() {
+                        form.render(null, 'add_category'); // 弹窗的lay-filter值
+                        //监听提交
+
+                        form.on('submit(category_submit)', function(datas){
+
+                            admin.req({
+                                url: layui.setter.baseUrl+'admin/bar/add_bar' //实际使用请改成服务端真实接口
+                                ,data:datas.field,
+                                type:'post',
+                                success: function(res){
+
+                                    if(res.code==1){
+                                        layer.msg(res.msg , {icon: 1,time: 1000} , function(){
+                                            setTimeout(function(){
+                                                layer.close(index); //执行关闭
+                                                // layui.table.reload('goods_category'); //重载表格
+                                                treeGrid.query(tableId,null);
+                                            },1000);
+
+                                        });
+                                    }else{
+                                        layer.msg(res.msg, {icon: 5,anim: 6,shade:0.5,time: 1000});
+                                    }
+                                }
+                            });
+
+                        });
+
+                    });
+                }
+            });
+        };
+        // 操作
+        treeGrid.on('tool(goods_category)',function(e){
+            // console.log(e);
+            var data=e.data;
+            var id=e.data.id;
+            if(e.event==='edit'){
+                admin.popup({
+                    title: "编辑栏目分类",
+                    area: admin.screen() < 2 ? ['95%', '90%'] :["700px", "600px"],
+                    id: "LAY-popup-edit_goodsbrand",
+                    success: function(layero, index){
+                        view(this.id).render('/bar/edit_bar',data).done(function() {
+                            form.render(null, 'add_category'); // 弹窗的lay-filter值
+                            //监听提交
+                            form.on('submit(category_submit)', function(datas){
+                                // console.log(data);
+                                datas.field.id=id;
+                                admin.req({
+                                    url: layui.setter.baseUrl+'admin/bar/edit_bar' //实际使用请改成服务端真实接口
+                                    ,data:datas.field,
+                                    type:'post',
+                                    success: function(res){
+
+                                        if(res.code==1){
+                                            layer.msg(res.msg , {icon: 1,time: 1000} , function(){
+                                                setTimeout(function(){
+                                                    layer.close(index); //执行关闭
+                                                    // layui.table.reload('goods_category'); //重载表格
+                                                    treeGrid.query(tableId,null);
+                                                },1000);
+
+                                            });
+                                        }else{
+                                            layer.msg(res.msg, {icon: 5,anim: 6,shade:0.5,time: 1000});
+                                        }
+                                    }
+                                });
+
+                            });
+
+                        });
+                    }
+                });
+            }else{
+                layer.confirm('确认删除此栏目分类?', {icon: 3, title:'提示'}, function(index){
+                    admin.req({
+                        url: layui.setter.baseUrl+'admin/bar/del_bar' //实际使用请改成服务端真实接口
+                        ,data: {id:id},
+                        type:'get',
+                        success: function(res){
+                            if(res.code==1){
+                                e.del();
+                                treeGrid.query(tableId,null);
+                                layer.close(index);
+                            }else{
+                                layer.msg(res.msg, {icon: 5,anim: 6,shade:0.5,time: 1000});
+                            }
+                        }
+                    });
+                });
+            }
+        });
+// 更改状态
+        form.on('switch(is_show)',function(e){
+            var id=e.value;
+            console.log(id);
+            admin.req({
+                url: layui.setter.baseUrl+'admin/bar/edit_state' //实际使用请改成服务端真实接口
+                ,data: {
+                    id:id
+                },
+                type:'get',
+                success: function(res){
+
+                    if(res.code==1){
+                        // layer.msg(res.msg , {icon: 1,time: 1000,shade:0.5, anim:5} , function(){
+                        //   setTimeout(function(){
+                        //     layui.table.reload('goods_category'); //重载表格
+                        //   },1000);
+
+                        // });
+                    }else{
+                        layer.msg(res.msg, {icon: 5,anim: 6,shade:0.5,time: 1000});
+                    }
+                }
+            });
+
+        });
+
+        //在表单编辑排序
+        treeGrid.on('edit(goods_category)',function(e){
+            admin.req({
+                url: layui.setter.baseUrl+'admin/bar/edit_sort' //实际使用请改成服务端真实接口
+                ,data:{id:e.data.id,sort:e.data.sort},
+                type:'post',
+                success: function(res){
+                    if(res.code==1){
+                        // layer.msg(res.msg , {icon: 1,shade:0.5,time: 1000},function(){
+                        //   treeGrid.query(tableId,null); //重载表格
+                        // });
+                        layer.msg(res.msg, {icon: 6,shade:0.5,time: 1000});
+                    }else{
+                        layer.msg(res.msg, {icon: 5,anim: 6,shade:0.5,time: 1000});
+                    }
+                }
+            });
+        });
+        // 更改排序
+        // $('body').on('blur','.choose_order',function(){
+
+        //   if(curr_data.order===$(this).val()){
+        //     return ;
+        //   }else{
+        //     curr_data.order=$(this).val();
+        //     admin.req({
+        //       url: layui.setter.baseUrl+'admin/goods/editGoodsCategory' //实际使用请改成服务端真实接口
+        //       ,data:{
+        //         id:curr_data.id,
+        //         order:curr_data.order,
+        //         name:curr_data.name,
+        //         mobile_name:curr_data.mobile_name,
+        //         parent_id:curr_data.parent_id
+        //       },
+        //       type:'post',
+        //       success: function(res){
+
+        //         if(res.code==1){
+        //             layer.msg(res.msg , {icon: 1,time: 1000});
+        //         }else{
+        //           layer.msg(res.msg, {icon: 5,anim: 6,shade:0.5,time: 1000});
+        //         }
+        //       }
+        //   });
+        //   }
+        // });
+    });
+
+</script>

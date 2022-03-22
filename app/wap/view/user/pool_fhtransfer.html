@@ -1,0 +1,125 @@
+{include file="public/header" /}
+</head>
+<body>
+<header class="mui-bar mui-bar-nav head_line" id="header">
+    <a class="back-page mui-icon mui-icon-left-nav mui-pull-left" href="javascript:;"></a>
+    <a id="menu" class="mui-action-menu mui-icon mui-icon-bars mui-pull-right" href="javascript:;"></a>
+    <h1 class="mui-title">Transfers</h1>
+</header>
+<div class="mui-content">
+    <div class="mb10"></div>
+    <form class="mui-input-group xx_form">
+        <div class="mui-input-row">
+            <label>Transferable balance</label>
+            <input type="text" value="0.00" style="color: #e30000;" disabled id="val_1">
+        </div>
+        
+        <div class="mui-input-row">
+            <label>Transfer phone number</label>
+            <input type="tel" id="mobile" placeholder="Please enter the transfer phone number">
+        </div>
+        <div class="mui-input-row">
+            <label>Transfer computing power</label>
+            <input type="number" id="money" placeholder="Please enter the transfer power">
+        </div>
+        <div class="mui-input-row">
+            <label>Payment Password</label>
+            <input type="password" id="password" placeholder="Please enter payment password">
+        </div>
+        <div class="mui-input-row">
+            <label>Captcha</label>
+           <button class="btn_code fr " style="margin-right: 0.05rem;text-align: center;" onclick="return false;">Get verification code</button>
+            <input type="number" placeholder="captcha" style="width: 46%;" id="verify">
+        </div>
+        <div class="mb30"></div>
+        <div class="mui-button-row">
+            <button type="button" id="submit_btn" class="submit_btn" onclick="return false;">OK</button>
+        </div>
+    </form>
+    <div class="mb30"></div>
+    <div class="agent_txt">
+        <h3>Warm reminder:</h3>
+        <p>1. The minimum transfer computing power is a multiple of <span id="beishu"></span></p>
+        <p>2. The handling fee is <span id="fee"></span>%</p>
+    </div>
+</div>
+
+{include file="public/head_nav"/}
+{include file="public/footer"/}
+<script type="text/javascript">
+var beishu='';
+get_data();
+function get_data(){
+    $get('/api/money/pool_hatch_change',{},function(res){
+        if(res.status==1){
+            beishu=res.zz_beishu;
+            $('#val_1').val(res.data);
+            $('#beishu').html(res.zz_beishu);
+            $('#fee').html(res.pool_service);
+        }
+    });
+}
+
+
+// positive integer
+$('#money').on('change',function(){
+    var reg = /^\d+(\.{0,1}\d+){0,1}$/;
+    var value=$(this).val();
+
+    if( !reg.test(value) ){
+        mui.toast('Hashrate cannot be negative');
+        $(this).val('');
+    } else if( value%beishu!=0){
+        mui.toast('The minimum computing power is a multiple of '+beishu+'');
+        $(this).val('');
+    }
+});
+
+// Send the verification code
+$('body').on('tap','.btn_code',function(){
+    var obj = $('.btn_code');
+    $get('/api/money/send_verify',{check_type:'mobile',remarks:'pool_hatch_change'},function(res){
+        mui.toast(res.msg);
+        if(res.code==1){
+            settime(obj);
+        }
+    });
+});
+
+// transfer submission
+$('body').on('tap','#submit_btn',function(){
+    $('#submit_btn').attr("disabled","true"); //Set the grayed out button
+    setTimeout("$('#submit_btn').removeAttr('disabled')",3000); //Submit button display after setting three seconds
+    
+    var mobile=$('#mobile').val();
+    var money=$('#money').val();
+    var password=$('#password').val();
+    var verify=$('#verify').val();
+
+    if(mobile==''){
+       mui.toast('Please enter the transfer phone number');
+    }else if(money==''){
+        mui.toast('Please enter the transfer amount');
+    }else if(password==''){
+        mui.toast('Please enter the payment password');
+    }else if(verify==''){
+        mui.toast('Verification code cannot be empty!');
+    }else{
+        $post('/api/money/pool_hatch_change',{mobile:mobile,money:money,password:password,verify:verify},function(res){
+            mui.toast(res.msg);
+            if(res.status==1){
+               setTimeout(function(){
+                   mui.back();
+               },1500);
+            }
+        });
+
+    }
+});
+
+
+
+
+</script>
+</body>
+</html>

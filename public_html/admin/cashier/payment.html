@@ -1,0 +1,215 @@
+<title>零售单支付</title>
+<style>
+#payment .layui-btn-container{ text-align: center; }
+#pay_up .layui-btn{ 
+    margin-bottom: 20px;
+}
+#pay_down .layui-btn{ 
+    margin-bottom: 20px;
+}
+#pay_down .l50_inp{
+    width: 40%;
+    margin-bottom: 20px;
+    display: inline-block;
+    vertical-align: middle;
+    margin-left: 2px;
+    margin-right: 5px;
+}
+#pay_down>div{
+    float: initial;
+    margin: 0 auto;
+}
+.lay_container{ text-align: center; }
+.payment_list .layui-form-label{ padding: 9px 0;}
+.payment_list .layui-input-inline{ width: 16%;}
+.payment_list .layui-input{ padding-left: 0;}
+.lay_red{
+    color: #ff0000;
+    font-weight: bold;
+    font-size: 20px;
+}
+</style>
+
+<div class="layui-form" id="payment" lay-filter="choose_stock">
+    <div class="layui-row layui-col-space10" style="margin-bottom: 10px;">
+    <div class="layui-form-item payment_list">
+        <label class="layui-form-label">商品数量：</label>
+        <div class="layui-input-inline">
+            <input type="text" name="num_s" id="LAY_num" class="layui-input" style="border:none" disabled>
+        </div>
+        <label class="layui-form-label">商品总价：</label>
+        <div class="layui-input-inline">
+            <input type="text" name="goods_price_s" id="goods_price" class="layui-input" style="border:none" disabled >
+        </div>
+        <label class="layui-form-label">总金额：</label>
+        <div class="layui-input-inline">
+            <input type="text" name="total_amount_s" id="total_amount" class="layui-input" style="border:none" disabled  >
+        </div>
+        <label class="layui-form-label">优惠金额：</label>
+        <div class="layui-input-inline">
+            <input type="text" name="discount_s" id="discount"  class="layui-input" style="border:none" disabled  >
+        </div>
+        <label class="layui-form-label">应付余额：</label>
+        <div class="layui-input-inline" style="width: 30%">
+            <input type="text" name="order_amount_s" id="order_amount" class="layui-input lay_red" style="border:none" disabled  >
+        </div>
+    </div>
+    </div>
+    <fieldset class="layui-elem-field">
+        <legend>线上</legend>
+        <!-- 第二步：建立视图。 -->
+        <div class="layui-btn-container"  id="online"></div> 
+        <!-- 第一步：编写模版。 -->
+        <script id="demo" type="text/html">
+        <div class="layui-row layui-col-space10" style="margin-top:12px;">
+            <div class="layui-col-md1"></div>
+            <div class="layui-col-md10" id="pay_up">
+            {{#  layui.each(d, function(index, item){ }}
+                <button type="button" class="layui-btn layui-btn-lg layui-btn-normal l_btn" lay-submit lay-filter="lay_online" lay-id="{{index}}">{{ item }}</button> 
+            {{#  }); }}  
+            </div>
+            <div class="layui-col-md1"></div>
+        </div>    
+        </script>    
+    </fieldset>
+            
+               
+    <fieldset class="layui-elem-field">
+        <legend>线下</legend>
+        <!-- 第二步：建立视图。 -->
+        <div class="lay_container" id="offline"></div> 
+        <!-- 第一步：编写模版。 -->
+        <script id="of_demo" type="text/html">
+        <div class="layui-row layui-col-space10" style="margin-top:12px;">
+            <div class="layui-col-md1"></div>
+            <div class="layui-col-md12" id="pay_down">
+            {{#  layui.each(d, function(index, item){ }}
+            <div class="layui-col-md8">
+                <button type="button" class="layui-btn layui-btn-lg layui-btn-normal" lay-id="{{index}}">{{ item }}</button>
+                <input type="text" class="layui-input l50_inp pay_focus" data-focus="p_focus" lay-id="{{index}}"> 
+            </div>
+            {{#  }); }} 
+            <div class="layui-col-md12">
+                <button type="button" class="layui-btn layui-btn-lg" lay-submit lay-filter="lay_offline">提交</button>
+            </div> 
+            </div>
+            <div class="layui-col-md1"></div>
+        </div>             
+        </script>    
+    </fieldset>
+</div>
+
+<script type="text/html" template lay-done="layui.data.sendParams(d.params)"></script>  
+<script>
+layui.data.sendParams = function(params){
+console.log(params);
+
+layui.use(['admin','table','form','view','layer','laytpl'], function(){
+    var $ = layui.$
+    ,admin = layui.admin
+    ,view = layui.view
+    ,setter = layui.setter
+    ,table = layui.table
+    ,layer = layui.layer
+    ,laytpl = layui.laytpl
+    ,form = layui.form;
+
+
+    var pay_ids={};
+    admin.req({
+        url: layui.setter.baseUrl+'admin/Cashier/getPayConfig'
+        ,data:  { order_id:params.order_id}
+        ,type: 'get'
+        ,success: function(res){
+        if(res.code==1){
+            // console.log(res.data);
+            // 获取数据 
+            form.val("choose_stock",{
+                "num_s" : res.data.info.num,
+                "goods_price_s" : res.data.info.goods_price,
+                "total_amount_s" : res.data.info.total_amount,
+                "discount_s" : res.data.info.discount,
+                "order_amount_s" : res.data.info.order_amount,
+            }); 
+            
+            //第三步：渲染模版               
+            var getTpl = demo.innerHTML
+                ,online = document.getElementById('online');
+            laytpl(getTpl).render(res.data.online, function(html){
+                online.innerHTML = html;                
+            });
+
+            //第三步：渲染模版               
+            var getTpl_s = of_demo.innerHTML
+                ,offline = document.getElementById('offline');
+            laytpl(getTpl_s).render(res.data.offline, function(html){
+                offline.innerHTML = html;
+            });   
+
+
+            pay_ids=res.data.offline;
+            for(var i in pay_ids){
+                pay_ids[i]='0';
+            }
+            form.render();
+    
+           
+           
+            
+        }else{
+            layer.msg(res.msg, {icon: 5,anim: 6,shade:0.5,time: 1500});
+        }       
+        } 
+    });
+    $('body').on('change','#pay_down .l50_inp',function(){     
+        var val=$(this).val();         
+        var id=$(this).attr('lay-id'); 
+        if(val==""){
+            pay_ids[id]='0';
+        } else{
+            pay_ids[id]=val;
+        }
+        // console.log(pay_ids);       
+    });
+        
+    // 线下支付
+    form.on("submit(lay_offline)", function(e){ 
+        admin.req({
+            url: layui.setter.baseUrl+'admin/Cashier/offlinePay'
+            ,data:  { order_id:params.order_id, pay_ids:pay_ids}
+            ,type: 'post'
+            ,success: function(res){
+                if(res.code==1){
+                    // console.log(res.data);
+                    layer.msg(res.msg, {icon: 1,time: 1000},function(){
+                        location.href="#/cashier/sheetlist_detail/order_id="+params.order_id
+                    });
+                }else{
+                    layer.msg(res.msg, {icon: 5,anim: 6,shade:0.5,time: 1500});
+                }       
+            } 
+        });
+    });
+   
+    $('body').on('keypress',".pay_focus",function(event){
+        if(event.keyCode ==13){
+            // console.log(event);
+            focuspayInput(this)
+        }
+    });
+    function focuspayInput(thisInput){  
+        var inputs = $('input[data-focus="p_focus"]');   
+        for(var i = 0;i<inputs.length;i++){   
+            // 如果是最后一个，则焦点回到第一个   
+            if(i==(inputs.length-1)){   
+                inputs[0].focus(); break;   
+            }else if(thisInput == inputs[i]){   
+                inputs[i+1].focus(); break;   
+            }   
+        }    
+    }   
+    
+
+});
+}
+</script>

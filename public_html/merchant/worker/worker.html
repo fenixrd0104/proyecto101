@@ -1,0 +1,247 @@
+<title>员工列表</title>
+
+<div class="layui-card layadmin-header">
+    <div class="layui-breadcrumb" lay-filter="breadcrumb">
+        <a>店铺管理</a>
+        <a><cite>店铺员工</cite></a>
+    </div>
+</div>
+
+<div class="layui-fluid">
+<div class="layui-row">
+<div class="layui-col-md12">
+<div class="layui-card">
+    <div class="layui-card-header">店铺员工</div>
+    <div class="layui-card-body">
+        <div class="layui-form layuiadmin-card-header-auto goods_list_search" lay-filter="app-content-list" style="margin-bottom: 20px;">
+            <div class="layui-inline">                        
+                <input type="text" name="keyWords" placeholder="账号/姓名" autocomplete="off" class="layui-input">                        
+            </div>
+            <div class="layui-inline">
+                <button class="layui-btn layuiadmin-btn-list" lay-submit lay-filter="worker_search"><i class="layui-icon layui-icon-search layuiadmin-button-btn"></i></button>
+            </div>
+        </div>
+        <table class="layui-hide" id="test-table-add_worker" lay-filter="test-table-add_worker"></table>
+        <script type="text/html" id="test-table-toolbar-add_worker">
+            <div class="layui-btn-container">
+                <button type="button" class="layui-btn" id="add_worker"><i class="layui-icon layui-icon-add-1 layuiadmin-button-btn"></i>添加员工</button>
+            </div>
+        </script>
+        <script type="text/html" id="test-table-status">
+            <input type="checkbox" name="sex" lay-skin="switch" lay-text="启用|禁用" lay-filter="test-table-status" value="{{ d.id}}" {{ d.status == 1 ? 'checked' : '' }}>
+        </script>
+            <script type="text/html" id="test-table-toolbar-add_worker2">
+            <!-- <a class="layui-btn layui-btn-xs layui-btn-normal" lay-event="detail">详情</a>                   -->
+            <!-- <a class="layui-btn layui-btn-xs" lay-event="quanxian" lay-href="/author/author">权限</a> -->
+            <a class="layui-btn layui-btn-xs layui-btn-normal" lay-event="edit">编辑</a>
+            <a class="layui-btn layui-btn-xs layui-btn-danger" lay-event="del">删除</a>
+        </script>
+    </div>
+</div>
+</div>
+</div>
+</div>
+
+<script>
+layui.use(['admin', 'table', 'form', 'laydate', 'layer', 'ourJs'], function () {
+    var $ = layui.$
+        , admin = layui.admin
+        , view = layui.view
+        , table = layui.table
+        , layer = layui.layer
+        , setter = layui.setter
+        , layer = layui.layer
+        , laydate = layui.laydate
+        , ourJs = layui.ourJs
+        , form = layui.form;
+
+    form.render(null, 'app-content-list');
+    //日期时间选择器
+    laydate.render({
+        elem: '#test-laydate-type-datetime-start'
+        , type: 'datetime'
+    });
+    laydate.render({
+        elem: '#test-laydate-type-datetime-end'
+        , type: 'datetime'
+    });
+    
+    var is_loading=true;
+    //获取店铺列表
+    table.render({
+        elem: '#test-table-add_worker'
+        ,url: layui.setter.baseUrl + 'merchant/shop/shop_staff'
+        ,toolbar: '#test-table-toolbar-add_worker'
+        ,cellMinWidth: 80 
+        ,parseData: function (res) { //res 即为原始返回的数据
+            if(is_loading==true){
+                var list = "<option value=''>全部店铺</option>";
+                for (var i in res.data.shop_lists) {
+                    list += "<option value='" + i + "' >" + res.data.shop_lists[i] + "</option>";
+                }
+                $('#worker_shop').html(list);
+                $('#worker_shop').val(0);
+                form.render();
+                is_loading=false;
+            }
+
+            return {
+                "code": res.code, //解析接口状态
+                "msg": res.msg, //解析提示文本
+                "count": res.data.count, //解析数据长度
+                "data": res.data.lists //解析数据列表
+            };
+        }
+        ,cols: [[
+            { field: 'id', width: 80, title: 'ID', sort: true, align: 'center' }
+            ,{ field: 'account', title: '账号', align: 'center' }
+            // ,{ field: 'password', title: '密码', align: 'center' }
+            ,{ field: 'reusername', title: '真实姓名', align: 'center' }
+            ,{ field: 'shop_name', title: '所属商店', align: 'center'}
+            ,{ field: 'status', title: '状态', width: 100, templet: '#test-table-status', unresize: true, align: 'center' } 
+            // ,{ field: 'loginnum', title: '登录次数', align: 'center' }
+            // ,{ field: 'last_login_time', title: '最后登录', align: 'center', templet: "<div>{{layui.util.toDateString(d.last_login_time*1000, 'yyyy-MM-dd HH:mm:ss')}}</div>" }
+            ,{ fixed: 'right', title: '操作', toolbar: '#test-table-toolbar-add_worker2', align: 'center', width: 220 }
+        ]],
+        page: true
+    });
+
+    //监听搜索
+    form.on('submit(worker_search)', function(data){
+        var field = data.field;
+        table.reload('test-table-add_worker', {
+            where: field
+        });
+    });
+          
+    //监听状态操作
+    form.on('switch(test-table-status)', function (e) {
+        var _this = this, status = e.elem.checked;
+        var id = e.value;
+        admin.req({
+            url: layui.setter.baseUrl + 'merchant/shop/status_staff'
+            ,data: { id: id }
+            ,type: 'post'
+            ,success: function (res) {
+                if (res.code == 1) {
+                    layer.msg(res.msg, { icon: 1, anim: 6, shade: 0.5, time: 500 });
+                    ourJs.status_tong(table, _this, status);
+                } else {
+                    layer.msg(res.msg, { icon: 5, anim: 6, shade: 0.5, time: 500 });
+                    e.elem.checked = !e.elem.checked;
+                    console.log(222);
+                    form.render();
+                }
+            }
+        });
+    });
+
+    // 操作
+    table.on("tool(test-table-add_worker)", function (e) {
+        console.log(e);
+        var d = e.data;
+        if (e.event === 'detail') {
+            admin.popup({
+                title: "查看详情",
+                area: ["800px", "600px"],
+                id: "LAY-popup-worker_detail",
+                success: function (e) {
+                    view(this.id).render("/worker/worker_detail", d).done(function () {
+                        form.render(null, "worker_detail")
+                    });
+                }
+            });
+        } else if (e.event === 'edit') {
+            admin.popup({
+                title: "编辑员工",
+                area: admin.screen() < 2 ? ['95%', '90%'] : ["600px", "500px"],
+                id: "LAY-popup-add_worker",
+                success: function (e, i) {
+                view(this.id).render('/worker/add_worker', d).done(function () {
+                    form.render(null, 'add_worker');
+                    form.on('submit(component-form-element)', function (data) {
+                        console.log(data);
+                        data.field.id = d.id;
+                        admin.req({
+                            url: layui.setter.baseUrl + 'merchant/shop/edit_staff'
+                            ,data:  data.field
+                            ,type: 'post'
+                            ,success: function (res) {
+                                if (res.code == 1) {
+                                    layer.msg(res.msg, { icon: 1, shade: 0.5, time: 1000 }, function () {
+                                        setTimeout(function () {
+                                            layer.close(i); //执行关闭 
+                                            table.reload('test-table-add_worker'); //重载表格
+                                        }, 1000);
+                                    });
+                                } else {
+                                    layer.msg(res.msg, { icon: 5, anim: 6, shade: 0.5, time: 1000 });
+                                }
+                            }
+                        });
+                    });
+                });
+                }
+            });
+        } else if (e.event === 'quanxian') {
+            console.log('查看用户权限');
+        } else if (e.event === 'del') {
+            layer.confirm('确认删除此员工?', { icon: 3, title: '提示' }, function (index) {
+                admin.req({
+                    url: layui.setter.baseUrl + 'merchant/shop/del_staff' //实际使用请改成服务端真实接口
+                    ,data: { id: d.id }
+                    ,type: 'get'
+                    ,success: function (res) {
+                        if (res.code == 1) {
+                            layer.close(index);
+                            e.del();
+                        } else {
+                            layer.msg(res.msg, { icon: 5, anim: 6, shade: 0.5, time: 1000 });
+                        }
+                    }
+                });
+            });
+        }
+    });
+
+    // 添加
+    $('body').on('click', '#add_worker', function () {
+        add_worker();
+    });
+    function add_worker() {
+    admin.popup({
+        title: "添加员工",
+        area: admin.screen() < 2 ? ['95%', '80%'] : ["600px", "500px"],
+        id: "LAY-popup-add_worker",
+        success: function (e, i) {
+        view(this.id).render('/worker/add_worker').done(function () {
+            form.render(null, 'add_worker');
+            form.on('submit(component-form-element)', function (data) {
+                console.log(data.field);
+                admin.req({
+                    url: layui.setter.baseUrl + 'merchant/shop/add_staff' //实际使用请改成服务端真实接口
+                    ,data: data.field
+                    ,type: 'post'
+                    ,success: function (res) {
+                        if (res.code == 1) {
+                            layer.msg(res.msg, { icon: 1, shade: 0.5, time: 1000 }, function () {
+                                setTimeout(function () {
+                                    layer.close(i); //执行关闭 
+                                    table.reload('test-table-add_worker'); //重载表格
+                                }, 1000);
+                            });
+                        } else {
+                            layer.msg(res.msg, { icon: 5, anim: 6, shade: 0.5, time: 1000 });
+                        }
+                    }
+                });
+            });
+        });
+        }
+    });
+    }
+    
+  
+   
+});
+</script>

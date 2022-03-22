@@ -1,0 +1,98 @@
+<div class="layui-form" action="" lay-filter="add_wxmenu" style="padding: 20px 30px 0 0;">
+    <div class="layui-form-item">
+        <label class="layui-form-label">菜单类型</label>
+        <div class="layui-input-block" lay-filter="selFilter">
+            <script type="text/html" template>
+            <select name="pid" id="LAY-menu" LAY-filter="LAY-menu">
+                <!-- <option value="0">顶级</option>
+                <option value="1">商城首页</option>
+                <option value="2">用户中心</option>
+                <option value="3">积分商城</option> -->
+            </select>
+        </script>
+
+        </div>
+        <div class="layui-form-mid layui-input-block layui-word-aux">自定义菜单最多包括3个一级菜单，每个一级菜单最多包含5个二级菜单</div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">菜单名称</label>
+        <div class="layui-input-block">
+            <!-- <input type="text" name="fullname" lay-verify="required" autocomplete="off" class="layui-input"> -->
+            <script type="text/html" template>
+        <input type="text" name="name" lay-verify="required" autocomplete="off" class="layui-input" value="{{ d.params.name || '' }}" >
+    </script>
+        </div>
+        <div class="layui-form-mid layui-input-block layui-word-aux">菜单名称（一级菜单最多4个汉字，二级菜单最多7个汉字）</div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">菜单类型</label>
+        <div class="layui-input-block">
+            <script type="text/html" template>
+            <input type="radio" name="type" value="1" title="点击" {{d.params.type==1?'checked':'checked'}} >
+            <input type="radio" name="type" value="2" title="链接" {{d.params.type==2 ?'checked':'' }}>
+        </script>
+
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">菜单关键字</label>
+        <div class="layui-input-block">
+            <script type="text/html" template>
+            <input type="text" name="key_value" lay-verify="required" autocomplete="off" class="layui-input" value="{{ d.params.key_value || '' }}" >
+        </script>
+
+        </div>
+        <div class="layui-form-mid layui-input-block layui-word-aux">菜单值</div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">排序</label>
+        <div class="layui-input-block">
+            <script type="text/html" template>
+            <input type="text" name="sort" lay-verify="required" autocomplete="off" class="layui-input" value="{{ d.params.sort || '255' }}" >
+        </script>
+        </div>
+        <div class="layui-form-mid layui-input-block layui-word-aux">排序（越大越靠前）</div>
+    </div>
+    <div class="layui-form-item">
+        <div class="layui-input-block">
+            <button type="button" class="layui-btn" lay-submit="" lay-filter="component-form-element"><i
+                    class="layui-icon">&#xe654;</i>保存</button>
+            <button type="button" class="layui-btn layui-btn-danger" data-type="close"><i
+                    class="layui-icon">&#x1006;</i>返回</button>
+        </div>
+    </div>
+</div>
+<script type="text/html" template lay-done="layui.data.sendParams(d.params)"></script>
+<script>
+    layui.data.sendParams = function (params) {
+        
+        var chec_id = params.id;
+        var fl_id = params.pid;
+        // console.log(1,params);
+        layui.use(['admin', 'form','setter','layer'], function () {
+            var $ = layui.$
+                , admin = layui.admin
+                , element = layui.element
+                , setter = layui.setter
+                ,layer = layui.layer
+                , form = layui.form
+                , layer = layui.layer
+                , router = layui.router();
+
+            element.render();
+            form.render(null, 'add_wxmenu');
+
+            var $ = layui.$, active = {
+                // 返回
+                close: function (index) {
+                    layer.closeAll('page');
+                }
+            };
+            $('.layui-input-block .layui-btn').on('click', function () {
+                var type = $(this).data('type');
+                active[type] ? active[type].call(this) : '';
+            });
+
+        });
+    }
+</script>

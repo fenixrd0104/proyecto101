@@ -1,0 +1,214 @@
+<title>成本调价</title>
+<style>
+    table tr:hover input{
+        background:#f2f2f2;
+    }
+    .layui-input-block{ margin-left: 80px; }
+    .layui-input{
+        padding-left: 5px;
+        border: none;
+    }
+    .layui-form-mid{ color: #666 !important; }
+    .layui-form-label{padding: 9px 0;}
+    .layui-row .layui-col-lg4{ margin-bottom: 5px !important; }
+</style>
+<script type="text/html" template>
+    <link rel="stylesheet" href="{{ layui.setter.base }}style/purchase.css?v={{ layui.admin.v }}-1" media="all">
+</script>
+<div class="layui-card layadmin-header">
+    <div class="layui-breadcrumb" lay-filter="breadcrumb">
+        <a>库存</a>
+        <a lay-href="/cost/index">成本调价</a>
+        <a><cite>成本调价详情</cite></a>
+    </div>
+</div>
+
+<form class="layui-form layui-fluid"   lay-filter="choose_stock">
+    <div class="layui-row">
+    <div class="layui-card">
+    <div class="layui-card-header">成本调价详情</div> 
+    <div class="layui-card-body choose_purchase">       
+        <div class="layui-btn-group">        
+            <button type="button" class="layui-btn" data-type="print">打印</button>
+        </div> 
+        <hr>
+        <!-- 第二步：建立视图。 -->
+        <div class="layui-row" id="view"> </div>
+        <!--  第一步：编写模版。 -->
+        <script id="demo" type="text/html">
+            <div class="layui-col-lg4 layui-col-md6">
+                <label class="layui-form-label">单号：</label>
+                <div class="layui-input-block">                    
+                    <div class="layui-form-mid layui-word-aux">{{ d.id}}</div>   
+                </div>
+            </div>
+            <div class="layui-col-lg4 layui-col-md6">
+                <label class="layui-form-label">单据状态：</label>
+                <div class="layui-input-block">   
+                {{# if( d.status === "已取消" ) { }}   
+                    <div class="layui-form-mid layui-word-aux" ><span style="color:red">{{ d.status}}</span></div>             
+                {{# } else { }}
+                    <div class="layui-form-mid layui-word-aux">{{ d.status}}</div>      
+                {{# } }}  
+                </div>
+            </div>
+            <div class="layui-col-lg4 layui-col-md6">
+                <label class="layui-form-label">操 作 员：</label>
+                <div class="layui-input-block">
+                    <div class="layui-form-mid layui-word-aux">{{ d.account}}</div>
+                </div>
+            </div>
+            <div class="layui-col-lg4 layui-col-md6">
+                <label class="layui-form-label">店铺：</label>
+                <div class="layui-input-block">
+                    <div class="layui-form-mid layui-word-aux">{{ d.shop_name}}</div>
+                </div>
+            </div>
+            <div class="layui-col-lg4 layui-col-md6">
+                <label class="layui-form-label">创建日期：</label>
+                <div class="layui-input-inline">
+                    <div class="layui-form-mid layui-word-aux">{{ d.create_time}}</div>
+                </div>
+            </div>
+            <div class="layui-col-lg4 layui-col-md6">
+                <label class="layui-form-label">单据日期：</label>
+                <div class="layui-input-inline">
+                    <div class="layui-form-mid layui-word-aux">{{d.update_time}}</div>
+                </div>
+            </div>            
+            <div class="layui-col-lg12 layui-col-md12">
+                <label class="layui-form-label">备注：</label>
+                <div class="layui-input-block">
+                    <div class="layui-form-mid layui-word-aux">{{ d.remarks}}</div>
+                </div>
+            </div>
+        </script>
+    </div>
+    </div>
+    </div>
+    <input type="hidden" id="order_id" name="order_id">
+    <div class="layui-row">
+    <div class="layui-col-md12">
+    <div class="layui-card">
+        <div class="layui-card-body">
+            <table class="layui-hide" id="table_cost_detail" layui-filter="table_cost_detail"></table>
+        </div>
+    </div>
+    </div>
+    </div>
+</form>
+<script>
+layui.use(['admin','table','form','laydate','view','myprint','layer','laytpl'], function(){
+    var $ = layui.$
+    ,admin = layui.admin
+    ,view = layui.view
+    ,setter = layui.setter
+    ,table = layui.table
+    ,layer = layui.layer
+    ,laytpl = layui.laytpl
+    ,laydate = layui.laydate
+    ,myprint = layui.myprint
+    ,form = layui.form;
+
+    form.render(null, 'choose_stock');
+    // 获取传值参数---得到id
+    var router = layui.router();
+    // console.log(router.search);
+    var id = router.search.price_id;
+    
+    get_data();
+    var table_xls;
+    var data_xls;
+    function get_data(){
+        // console.log(json_data)
+        for(var i in json_data){
+            json_data[i].goods_sku=json_data[i].goods_sn;
+        }
+        table_xls = table.render({
+            elem: '#table_cost_detail'
+            ,title: "成本调价"
+            ,data: json_data
+            ,cellMinWidth: 80 //全局定义常规单元格的最小宽度，layui 2.2.1 新增
+            ,toolbar: '#test-table-toolbar'
+            ,cols: [[
+            {type:'checkbox'}
+            ,{field:'spec_id', width:80, title: 'ID',align:"center", sort: true}
+            ,{field:'spec_sku', title: '商品SKU',align:"center"}
+            ,{field:'goods_name', title: '商品名称',align:"center"}
+            ,{field:'spec_name', title: '规格',align:"center"}
+            ,{field:'stock', title: '数量',width: 90,align:"center"}
+            ,{field:'market_price', title: '市场价',width: 90,align:"center"}
+            ,{field:'new_market_price', title: '新市场价',width: 90,align:"center"}
+            ,{field:'shop_price', title: '本店价',width: 90,align:"center"}
+            ,{field:'new_shop_price', title: '新本店价',width: 90,align:"center"}
+            ,{field:'trade_price', title: '批发价',width: 90,align:"center"}
+            ,{field:'new_trade_price', title: '新批发价',width: 90,align:"center"}
+            ,{field:'cost_price', title: '进价',width: 100,align:"center"}
+            ,{field:'new_cost_price', title: '新进价',width: 100,align:"center"}
+            ,{field: 'remarks', title:'调价备注',width:160,align:"center"}   
+            ]]
+            ,limit: 10000
+            ,where: { supplier_id:id }
+            ,done: function (res, page, count){
+                data_xls = res.data;
+                
+            }
+        });
+    }
+
+    var myobj=[];//打印头部    
+    var json_data;
+    // 获取信息 “form” ---请求登入接口
+    admin.req({
+        url: layui.setter.baseUrl+'admin/StockPrice/lists' 
+        ,data: { price_id:id }
+        ,type:'get'
+        ,success: function(res){
+            if(res.code==1){
+                // console.log(res.data);
+                // 赋值
+                //第三步：渲染模版
+                var data = res.data.info;
+                var getTpl = demo.innerHTML
+                    ,view = document.getElementById('view');
+                laytpl(getTpl).render(data, function(html){
+                    view.innerHTML = html;
+                });
+
+                myobj['单号']=res.data.info.id;            
+                myobj['单据状态']=res.data.info.status;            
+                myobj['操 作 员']=res.data.info.account; 
+                myobj['店铺']=res.data.info.shop_name;                 
+                myobj['创建日期']=res.data.info.create_time;  
+                myobj['单据日期']=res.data.info.update_time;         
+                myobj['备注']=res.data.info.remarks;         
+                
+                 // 自定义json
+                json_data = res.data.lists;
+                // console.log(JSON.stringify(json_data));   
+                get_data();
+                form.render();
+            }else{
+                layer.msg(res.msg);
+            }
+        }
+    }); 
+
+    var active = {
+        //打印带头部 
+        print: function () {
+            myprint.myprint(myobj,'table_cost_detail');
+        },
+        // 导出表格
+        export: function () {
+            table.exportFile(table_xls.config.id, data_xls,'xls');
+        }
+    }
+    $('.layui-btn-group .layui-btn').on('click', function () {
+        var type = $(this).data('type');
+        active[type] ? active[type].call(this) : '';
+    });
+   
+
+});
+</script>

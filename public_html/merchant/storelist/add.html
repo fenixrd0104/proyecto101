@@ -1,0 +1,360 @@
+<style>
+.addr_inline{width:27% !important;}
+.addr_inline:last-child{margin-right:0;}
+</style>
+<form class="layui-form" action="" lay-filter="add_storelist" style="padding: 20px 30px 0 0;">
+<script type="text/html" template>
+    {{#  if(d.params.id ){ }}
+   
+    {{# }else{ }}
+    <div class="layui-form-item">
+        <label class="layui-form-label">帐号</label>
+        <div class="layui-input-block">
+            <input type="text" name="username" id="LAY-username" lay-verify="required" placeholder="请输入帐号" value="{{ d.params.username || '' }}" autocomplete="off" class="layui-input" >
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">密码</label>
+        <div class="layui-input-block">
+            <input type="password" name="password" id="LAY-passw" lay-verify="required" placeholder="请输入密码" value="{{ d.params.password || '' }}" autocomplete="off" class="layui-input" >
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">联系人</label>
+        <div class="layui-input-block">
+            <input type="text" name="real_name" id="LAY-rname" lay-verify="required" placeholder="请输入联系人" value="{{ d.params.real_name || '' }}" autocomplete="off" class="layui-input" >
+        </div>
+    </div> 
+    {{#  } }} 
+</script>
+<script type="text/html" template>
+    <div class="layui-form-item" style="display:none">
+        <label class="layui-form-label">id</label>
+        <div class="layui-input-block">
+            <input type="text" name="id" id="LAY-id" placeholder="请输入店铺名称" value="{{ d.params.id || '' }}" class="layui-input" >
+        </div>
+    </div>        
+    <div class="layui-form-item">
+        <label class="layui-form-label">店铺名称</label>
+        <div class="layui-input-block">
+            <input type="text" name="name" id="LAY-name" lay-verify="required" placeholder="请输入店铺名称" value="{{ d.params.name || '' }}" autocomplete="off" class="layui-input" >
+        </div>
+    </div>        
+    <div class="layui-form-item">
+        <label class="layui-form-label">联系电话</label>
+        <div class="layui-input-block">
+            <input type="text" name="phone" id="LAY-phone" lay-verify="phone" placeholder="请输入联系电话" value="{{ d.params.phone || '' }}" autocomplete="off" class="layui-input layui-form-danger" >
+        </div>
+    </div>
+
+
+    <div class="layui-form-item">
+        <label class="layui-form-label">选择地区</label>
+        <div class="layui-input-inline addr_inline">
+            <select name="province" id="province" lay-filter="province">
+                <option value="">请选择省</option>
+            </select>
+        </div>
+        <div class="layui-input-inline addr_inline">
+            <select name="city" id="city" lay-filter="city">
+                <option value="">请选择市</option>
+            </select>
+        </div>
+        <div class="layui-input-inline addr_inline">
+            <select name="area" id="area" lay-filter="area">
+                <option value="">请选择县/区</option>
+            </select>
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">详细地址</label>
+        <div class="layui-input-block">
+            <input type="text" name="address" id="address" lay-verify="required" placeholder="请输入详细地址" value="{{ d.params.address || '' }}" autocomplete="off" class="layui-input" style="display:inline-block;vertical-align: top;width:83%;margin-right: 5px;">            
+            <button type="button" class="layui-btn" id="sreachmap">搜索地图</button>
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">经度</label>
+        <div class="layui-input-block">
+            <input type="text" name="lng" id="LAY-lng" lay-verify="required" placeholder="请输入经度" value="{{ d.params.lng || '' }}" autocomplete="off" class="layui-input" >
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">纬度</label>
+        <div class="layui-input-block">
+            <input type="text" name="lat" id="LAY-lat" lay-verify="required" placeholder="请输入纬度" value="{{ d.params.lat || '' }}" autocomplete="off" class="layui-input" >
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">站点状态</label>
+        <div class="layui-input-block">            
+            {{# if(d.params.id){ }}
+                <input type="radio" name="status" value="1" title="开启" {{ d.params.status=== 1 ? 'checked': '' }} >
+                <input type="radio" name="status" value="0" title="关闭" {{ d.params.status=== 0 ? 'checked': '' }}>
+            
+            {{# }else{ }}
+                <input type="radio" name="status" value="1" title="开启" checked>
+                <input type="radio" name="status" value="0" title="关闭" >
+            {{# } }}
+        </div>                    
+    </div>
+    <div class="layui-form-item">
+        <div class="layui-input-block">
+            <button type="button" class="layui-btn" lay-submit lay-filter="component-form-element">保存</button>
+        </div>
+    </div>
+</script>
+
+<script type="text/html" template lay-done="layui.data.sendParams(d.params)"></script>
+</form>
+
+<script>
+
+layui.data.sendParams = function(params){
+    // console.log(params);
+
+layui.use(['admin', 'upload','form','table','view','layer'], function(){
+    var $ = layui.jquery
+    ,admin = layui.admin
+    ,upload = layui.upload
+    ,view = layui.view
+    ,layer = layui.layer
+    ,setter = layui.setter
+    ,layer = layui.layer
+    ,table = layui.table
+    ,element = layui.element
+    ,form = layui.form;
+
+    form.render(null, 'add_storelist');
+   
+    // 新增分店的-上级下拉列表
+    var list_sj="";
+    admin.req({
+        url: layui.setter.baseUrl+'merchant/shop/shop_tree' //实际使用请改成服务端真实接口
+        ,data: {},
+        type:'get',
+        success: function(res){
+            if(res.code==1){
+                list_sj="<option value=''>选择上级</option>";
+                for( var i in res.data){
+                    list_sj += "<option value='"+res.data[i].id+"'>"+res.data[i].lefthtml+res.data[i].name+"</option> ";
+                } 
+                // if(params.pid){
+                //     $("#LAY-shangji").html(list_sj);
+                //     $('#LAY-shangji').val(params.pid);
+                // }else{
+                //     $("#LAY-shangji").html(list_sj);
+                // }   
+                
+                // 下拉框内容赋给 弹窗
+                $("#LAY-shangji").html(list_sj); 
+                form.render('select');  
+            }else{
+                layer.msg(res.msg);
+            }            
+        } 
+    }); 
+
+    // 类型      
+    form.on('select(LAY-shangji)',function(e){
+        // console.log(e.value);
+        type_tree(e.value);
+    });
+    if(params.type){
+        type_tree(params.pid);
+    }
+    function type_tree(value){
+        admin.req({
+            url: layui.setter.baseUrl+'merchant/shop/type_tree' //实际使用请改成服务端真实接口
+            ,data: {shop_id:value},
+            type:'get',
+            success: function(res){
+                if(res.code==1){
+                    var list="<option value=''>选择类型</option>";
+                    for( var i in res.data){
+                        list += "<option value='"+res.data[i].id+"'>"+res.data[i].lefthtml+res.data[i].name+"</option> ";
+                    }    
+                    $("#LAY-type").html(list);
+                    if(params.type){
+                        $('#LAY-type').val(params.type);
+                    }
+                    
+                    form.render();  
+                }else{
+                    layer.msg(res.msg);
+                }            
+            } 
+        }); 
+    }
+
+
+    // 三级联动
+    var str='';
+    var cur_data='';
+    admin.req({
+        url: layui.setter.baseUrl+'merchant/login/getRegionTree' //实际使用请改成服务端真实接口
+        ,data: {},
+        type:'get',
+        success: function(res){
+            if(res.code==1){
+                str=res.data;
+                var list="<option value=''>请选择省</option>";
+                for( var i in res.data){
+                    list += "<option value='"+res.data[i].value+"'>"+res.data[i].text+"</option> ";
+                }  
+                if(params.province){
+                    $("#province").html(list);
+                    $('#province').val(params.province);
+                    for(var i in str){
+                        if(str[i].value===params.province){
+                            var city="";
+                            var city_data=str[i].children;
+                            for(var j in city_data){
+                                city += "<option value='"+city_data[j].value+"'>"+city_data[j].text+"</option> ";
+                                if(city_data[j].value===params.city){
+                                    
+                                    var area="";
+                                    var area_data=city_data[j].children;
+                                    
+                                    if(area_data){
+                                        for(var k in area_data){
+                                            area+="<option value='"+area_data[k].value+"'>"+area_data[k].text+"</option> ";
+                                        }
+                                        $("#area").html(area);
+                                        $("#area").val(params.area);
+                                    }else{
+                                        area_data=city_data;
+                                        for(var k in area_data){
+                                            area+="<option value='"+area_data[k].value+"'>"+area_data[k].text+"</option> ";
+                                        }
+                                        $("#area").html(area);
+                                        $("#area").val(params.area);
+                                    }
+                                }
+                            }
+                            $("#city").html(city);
+                            $("#city").val(params.city);
+                        }
+                    }
+                }else{
+                    $("#province").html(list);
+                }   
+
+                form.render('select');  
+            }else{
+                layer.msg(res.msg);
+            }            
+        } 
+    }); 
+  
+    form.on('select(province)',function(e){
+        get_tree(e.value,0,0);
+        $("#area").html('');
+        form.render();
+    });
+    // 选择市
+    form.on('select(city)',function(e){
+        get_tree($('#province').val(),e.value,0);
+    });
+    // 选择区县
+    form.on('select(area)',function(e){ });
+    // p 省  c 市  a 区   
+    function get_tree(p,c,a){
+        for(var i in str){
+            if(str[i].value==p){
+                var city="<option value=''>请选择市</option>";
+                var city_data=str[i].children;
+                for(var j in city_data){
+                    city += "<option value='"+city_data[j].value+"'>"+city_data[j].text+"</option> ";
+                    if(city_data[j].value==c){
+                        var area="<option value=''>请选择区/县</option>";
+                        var area_data=city_data[j].children;
+                        
+                        if(area_data){
+                            for(var k in area_data){
+                                area+="<option value='"+area_data[k].value+"'>"+area_data[k].text+"</option> ";
+                            }
+                            $("#area").html(area);
+                            form.render();
+                        }else{
+                            area_data=city_data;
+                            for(var k in area_data){
+                                area+="<option value='"+area_data[k].value+"'>"+area_data[k].text+"</option> ";
+                            }
+                            $("#area").html(area);
+                            
+                            form.render();
+                        }
+                        
+                        
+                    }
+                }
+                $("#city").html(city);
+                if(c!=0){
+                    $("#city").val(c);
+                }
+                
+                form.render();
+            }
+        }
+    }
+
+// 地图搜索
+$(document).on('click','#sreachmap',function(){
+    var province = $("#province option:selected").text();
+    var city = $("#city option:selected").text();
+    var area = $("#area option:selected").text();
+    var address =$("#address").val(); 
+    var LAY_lng = $('#LAY-lng').val( );
+    var LAY_lat =$('#LAY-lat').val( );
+    data_map =[{
+        province: province,city: city,
+        area: area,address: address,
+        LAY_lng:LAY_lng,LAY_lat:LAY_lat
+    }];
+    var pro = $('#province').val();
+    var city = $('#city').val();
+    var area = $('#area').val();
+    if( pro== ''){
+        layer.msg("请选择省", {icon: 1,time:1000});   
+    } else if( city== ""){
+        layer.msg("请选择市", {icon: 1,time:1000});
+    } else if( area== ""){
+        layer.msg("请选择区/县", {icon: 1,time:1000});
+    } else {
+        // console.log('填写成功，弹窗');
+        sreachmap();
+    }
+});
+// 搜索地图--按钮
+var data_map=[];
+function sreachmap(){
+    admin.popup({
+        title: "地图搜索",
+        area: admin.screen() < 2 ? ['95%', '90%'] :["680px", "570px"],
+        id: "LAY-popup-add_flash",
+        success: function(layero, index){
+        view(this.id).render('/storelist/sreachmap',data_map).done(function() {            
+        form.render(null, 'sreachmap');
+        //监听提交
+        form.on('submit(form-save)', function(data){
+            // console.log(data.field);    
+            $('#LAY-lng').val(data.field.lng);
+            $('#LAY-lat').val(data.field.lat);
+            layer.close(index); //执行关闭 
+        
+        }); 
+        });
+        }
+    });
+}
+
+
+
+
+   
+
+});
+  
+}
+</script>

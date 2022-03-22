@@ -1,0 +1,212 @@
+<title>网站配置</title>
+
+<div class="layui-card layadmin-header">
+    <div class="layui-breadcrumb" lay-filter="breadcrumb">
+        <a>系统管理</a>
+        <a><cite>网站配置</cite></a>
+    </div>
+</div>
+<style>
+    .t_l{
+        text-align: left;
+    }
+    .t_c{
+        text-align: center;
+    }
+    .t_r{
+        text-align:right;
+    }
+    @media screen and (max-width: 992px){
+        .t_r{
+            text-align:left;
+        }
+    }
+    form>.layui-row>.layui-form-item>div{
+        line-height: 36px;
+        padding:0px 10px;
+    }
+    form>.layui-row>.layui-form-item .layui-input-inline{
+        margin-bottom: 20px;
+        margin-left: 0;
+    }
+    form>.layui-row>.layui-form-item{
+       padding:25px 0;
+       border-top:1px dashed #f2f2f2;
+       margin-bottom: 0;
+    }
+    .layui-form-switch{
+        margin-top: 0;
+    }
+</style>
+
+<div class="layui-fluid" id="component-tabs">
+<div class="layui-row">
+<div class="layui-col-md12">
+    <div class="layui-card">
+    <div class="layui-card-header">网站配置</div>
+    <div class="layui-card-body">
+    <div class="layui-tab layui-tab-card" lay-filter="demo_title">
+        <ul class="layui-tab-title" id="config_title">
+            <!-- <li class="layui-this">基本配置</li>            
+            <li>内容配置</li>
+            <li>用户配置</li>
+            <li>系统配置</li>
+            <li>微信配置</li>
+            <li>邮箱配置</li>
+            <li>短信配置</li>
+            <li>站内信配置</li>
+            <li>推送配置</li> -->
+        </ul>
+        <script id="demo_ul" type="text/html">
+            {{#  layui.each(d, function(index, item){ }}            
+            <li lay-id="{{index}}">{{item}}配置</li>    
+            {{#  }); }}  
+        </script>
+        <!-- 第二步：建立视图。用于呈现渲染结果。 -->
+        <div class="layui-tab-content" id="config_content">
+            
+        </div>
+        <!-- 第一步：编写模版。你可以使用一个script标签存放模板 -->
+        <script id="demo" type="text/html">
+            
+            {{#  layui.each(d, function(index, item){ }}
+            <div class="layui-tab-item" >
+            <form class="layui-form" action="" lay-filter="config_group1">
+                <div class="layui-row">
+                    {{#  layui.each(item, function(index, aitem){ }}
+                    <div class="layui-form-item">
+                        <div class="layui-col-md3 t_r ">{{aitem.title}}</div>
+                        <div class="layui-col-md4">
+                           
+                            {{# if( aitem.type === 0 ) { }}
+                                <input type="text" name="{{aitem.name}}" value="{{aitem.value}}" lay-verify="required" autocomplete="off" placeholder="" class="layui-input">
+                            {{# } else if( aitem.type === 1 ) { }}
+                                <input type="text" name="{{aitem.name}}" value="{{aitem.value}}" lay-verify="required" autocomplete="off" placeholder="" class="layui-input">
+                            {{# } else if( aitem.type === 2 ) { }}
+                                <textarea name="{{aitem.name}}" lay-verify="required" autocomplete="off" class="layui-textarea">{{aitem.value}}</textarea>
+                            {{# } else if( aitem.type === 3 ) { }}
+                                <textarea name="{{aitem.name}}" lay-verify="required" autocomplete="off" class="layui-textarea">{{aitem.value}}</textarea>                           
+                            {{# } else if( aitem.type === 4 ) { }}
+                             <select name="{{aitem.name}}">
+                                {{#  layui.each(layui.laytpl.spurl(aitem.extra), function(index, bitem){ }}
+                                <option value="{{bitem.substring(0,1)}}" {{ aitem.value === bitem.substring(0,1) ? 'selected' : '' }}>{{ bitem.substring(2) }} </option>  
+                                {{#  }); }}    
+                            </select>                            
+                            {{# } }}   
+                        </div>
+                        <div class="layui-col-md5 layui-word-aux">{{ aitem.remark}}</div>
+                    </div>
+                    {{#  }); }}             
+                    <div class="layui-form-item" style="padding:20px 0;border-top:1px solid #f1f1f1;">
+                        <div class="layui-col-md12 t_c">
+                            <button type="button" class="layui-btn" lay-submit="" lay-filter="component-form-element"><i class="layui-icon layui-icon-file-b" style="vertical-align: middle;"></i>保存</button>
+                        </div>
+                    </div>
+                </div>
+            </form>
+            </div>
+            
+            {{#  }); }} 
+            
+        </script>
+    </div>
+    </div>
+    </div>
+</div>    
+</div>
+</div>
+
+<script>
+layui.use(['admin','table','form','view','upload','layedit','setter','laytpl','layer'], function(){
+    var $ = layui.$
+    ,admin = layui.admin
+    ,setter = layui.setter
+    ,form = layui.form
+    ,table = layui.table
+    ,element = layui.element
+    ,layedit = layui.layedit
+    ,upload = layui.upload
+    ,layer = layui.layer
+    ,laytpl = layui.laytpl
+    ,view = layui.view
+    ,device = layui.device();
+
+    form.render(); 
+    element.render();  
+    // 下拉框---select
+    laytpl.spurl=function (str) {
+        // console.log(str.split("\n"));
+        return str.split("\n");
+    }  
+
+    admin.req({
+        url: layui.setter.baseUrl+'admin/config/group' 
+        ,data: {}
+        ,type:'get'
+        ,success: function(res){
+            if(res.code==1){
+                // console.log(res);
+
+                //第三步：渲染模版
+                //数据 
+                var data_ul=res.data.title;
+                var getTpl_ul = demo_ul.innerHTML
+                    ,view_ul = document.getElementById('config_title');
+                    laytpl(getTpl_ul).render(data_ul, function(html){
+                        view_ul.innerHTML = html;
+                    });
+
+                var data = res.data.lists;
+                // for( var i in res.data.lists){
+                //     for( var j in res.data.lists[i]){
+                //         if( res.data.lists[i][j].extra !="" ){
+                //             res.data.lists[i][j].extra = res.data.lists[i][j].extra.split(",");
+                //             // console.log(res.data.lists[i][j].extra.split(","));
+                //         } else {
+                //             console.log(res.data.lists[i][j].extra);
+                //         }                                            
+                //     }
+                // }               
+                
+                var getTpl = demo.innerHTML
+                    ,view = document.getElementById('config_content');
+                    laytpl(getTpl).render(data, function(html){
+                        view.innerHTML = html;
+                        // console.log(data);
+                        // console.log(view);
+                        
+                    });
+                form.render('select'); 
+                element.tabChange('demo_title', '1'); 
+
+               
+            }else{
+                layer.msg(res.msg, {icon: 5,anim: 6,shade:0.5,time: 1000});
+            }
+        }
+    }); 
+
+    //监听提交
+    form.on('submit(component-form-element)', function(data){ 
+        console.log(data.field);  
+        admin.req({
+            url: layui.setter.baseUrl+'admin/config/save' 
+            ,data:{ config: data.field}  
+            ,type:'post'
+            ,success: function(res){
+                if(res.code==1){
+                    console.log(res);
+                    layer.msg(res.msg, {icon: 1,time: 1000} , function(){
+                    
+                        layui.form.render();  //重载form
+                    });
+                   
+                }else{
+                    layer.msg(res.msg, {icon: 5,anim: 6,shade:0.5,time: 1000});
+                }
+            }
+        }); 
+    });    
+
+});
+</script>

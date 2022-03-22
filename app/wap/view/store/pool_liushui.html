@@ -1,0 +1,92 @@
+{include file="public/header" /}
+</head>
+<body>
+<header class="mui-bar mui-bar-nav head_line" id="header">
+    <a class="back-page mui-icon mui-icon-left-nav mui-pull-left" href="javascript:;"></a>
+    <a id="menu" class="mui-action-menu mui-icon mui-icon-bars mui-pull-right" href="javascript:;"></a>
+    <h1 class="mui-title">Inventory</h1>
+</header>
+<div class="mui-content">
+    <div class="mb10"></div>
+    <form class="mui-input-group xx_form">
+        <div class="mui-input-row">
+            <label>Available Balance</label>
+            <input type="text" value="0.00" style="color: #e30000;" disabled id="val_1">
+        </div>
+        
+        <div class="mui-input-row">
+            <label>Inventory Amount</label>
+            <input type="number" placeholder="Please enter stock amount" id="val_3">
+        </div>
+        <div class="mui-input-row">
+            <label>Payment Password</label>
+            <input type="password" placeholder="Please enter payment password" id="val_4">
+        </div>
+        <div class="mui-input-row">
+            <label>Captcha</label>
+            <button class="btn_code fr" type="button" style="margin-right: 0.05rem;text-align: center;" onclick="return false;">Get verification code</button>
+            <input type="number" placeholder="CAPTCHA" style="width: 46%;" id="val_5">
+        </div>
+    
+        
+        <div class="mb30"></div>
+        <div class="mui-button-row">
+            <button type="button" id="submit_btn" class="submit_btn" onclick="return false;">Sure</button>
+        </div>
+    </form>
+</div>
+
+{include file="public/head_nav"/}
+{include file="public/footer"/}
+<script type="text/javascript">
+
+get_data();
+function get_data(){
+    $get('/api/money/recharge_watter_money',{},function(res){
+        if(res.status==1){
+            $('#val_1').val(res.data);
+        }
+    });
+}
+
+// Send the verification code
+$('body').on('tap','.btn_code',function(){
+    var obj = $('.btn_code');
+    $get('/api/money/send_verify',{check_type:'mobile',remarks:'recharge_water'},function(res){
+        mui.toast(res.msg);
+        if(res.code==1){
+            settime(obj);
+        }
+    });
+});
+
+// stock submission
+$('body').on('tap','#submit_btn',function(){
+    var tx_money=$('#val_3').val();
+    var password=$('#val_4').val();
+    var verify=$('#val_5').val();
+    if(tx_money==''){
+        mui.toast('Inventory amount cannot be empty!');
+    }else if(password==''){
+        mui.toast('Payment password cannot be empty!');
+    }else if(verify==''){
+        mui.toast('Verification code cannot be empty!');
+    }else{
+        $post('/api/money/recharge_watter_money',{cz_money:tx_money,password:password,verify:verify},function(res){
+            mui.toast(res.msg);
+            if(res.status==1){
+               setTimeout(function(){
+                   mui.back();
+               },1500);
+            }
+        });
+
+    }
+});
+
+
+
+
+</script>
+</body>
+</html>

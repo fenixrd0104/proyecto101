@@ -1,0 +1,105 @@
+
+<style>
+    #img_box{
+        line-height: 36px;
+    }
+    #img_box img{
+        margin-right: 15px;
+        margin-bottom: 30px;
+        width:200px;
+        height:200px;
+        object-fit: contain;
+    }
+</style>
+
+<form class="layui-form" action="" lay-filter="edit_book" style="padding: 20px 30px 0 0;">
+    <div class="layui-form-item">
+        <label class="layui-form-label">留言内容</label>
+        <div class="layui-input-block">
+            <textarea  name="content" class="layui-input" value=""  placeholder="请输入留言内容" style="height:150px;line-height: 36px;" disabled> </textarea>
+        </div>
+    </div>
+  
+    <div class="layui-form-item">
+        <label class="layui-form-label">留言图片</label>
+        <div class="layui-input-block" id="img_box">  
+           
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">状态</label>
+        <div class="layui-input-block">
+        <script type="text/html" template>
+            <input type="radio" name="status" value="1" title="审核通过" {{ d.params.status=== 1 ? 'checked': '' }} >
+            <input type="radio" name="status" value="2" title="审核拒绝" {{ d.params.status=== 2 ? 'checked': '' }}>
+        </script>
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <div class="layui-input-block">
+        <button type="button" class="layui-btn" lay-submit="" lay-filter="edit_book_btn"><i class="layui-icon">&#xe654;</i>保存</button>
+        <button type="button" class="layui-btn layui-btn-danger" data-type="close"><i class="layui-icon">&#x1006;</i>返回</button>
+        </div>
+    </div>
+</form>
+<script type="text/html" template lay-done="layui.data.sendParams(d.params)"></script>    
+<script>
+    layui.data.sendParams = function(params){
+        console.log(params);
+        layui.use(['admin','form','setter','layer'], function(){
+            var $ = layui.$
+            ,admin = layui.admin
+            ,setter = layui.setter
+            ,layer = layui.layer
+            ,element = layui.element
+            ,form = layui.form
+            ,router = layui.router();
+
+            element.render();
+            var list='';
+            var obj=params.images;
+            obj=JSON.parse(obj);
+            if(obj==null||obj[0]==''){
+                $('#img_box').html('无图片');
+            }else{
+                for(var i in obj){
+                    list+='<img src="'+obj[i]+'" alt="" >'
+                }
+                $('#img_box').html(list);
+            }
+            
+            form.val('edit_book',{
+                content:params.content
+            })
+            form.render(null, 'edit_book');
+            
+            var $ = layui.$, active = {
+                // 返回
+                close:function(index){ 
+                    layer.closeAll('page');
+                }
+            };
+            
+            
+            $('.layui-input-block .layui-btn').on('click', function(){
+                var type = $(this).data('type');
+                active[type] ? active[type].call(this) : '';
+            });
+            $('#img_box img').on('click', function(){
+                var src = $(this).attr('src');
+                layer.photos({
+                    photos: {
+                        title: "查看",
+                        data: [{
+                            src: src
+                        }]
+                    },
+                    shade: 0.5,
+                    closeBtn: 1,
+                    anim: 5
+                });
+            });
+
+        });
+    }
+</script>

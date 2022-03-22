@@ -1,0 +1,57 @@
+
+<title>库存预警</title>
+
+<div class="layui-card layadmin-header">
+    <div class="layui-breadcrumb" lay-filter="breadcrumb">
+        <a>库存管理</a>
+        <a><cite>库存预警</cite></a>
+    </div>
+</div>
+
+<div class="layui-fluid">
+<div class="layui-row layui-col-space15">
+<div class="layui-col-md12">
+    <div class="layui-card">
+    <div class="layui-card-header">库存预警</div>
+    <div class="layui-card-body"> 
+        <table class="layui-hide" id="table_statistical" lay-filter="table_statistical"></table> 
+        <script type="text/html" id="test-table-images">
+            <img src="{{d.original_img||'/static/merchant/src/style/res/head_default.gif'}}" height="100%" alt="" onerror="javascript:this.src='/static/merchant/src/style/res/head_default.gif'">
+        </script>    
+    </div>
+    </div>
+</div>
+</div>
+</div>
+
+<script>
+layui.use(['admin','table','form','view','myprint','layer','tableMerge'], function(){
+    var $ = layui.$
+    ,admin = layui.admin
+    ,view = layui.view
+    ,table = layui.table
+    ,tableMerge = layui.tableMerge
+    ,form = layui.form;
+
+
+    table.render({
+        elem: '#table_statistical'
+        ,url: layui.setter.baseUrl + 'merchant/stockInventory/yujing'
+        ,toolbar: '#test-table-toolbar'
+        ,title: "库存预警"
+        ,cols: [[
+            {type:'checkbox'}
+            ,{field:'spec_id', width:100, title: 'ID', sort: true, align:"center"}
+            ,{field:'goods_name', title: '商品名称',merge: true, align:"center"}
+            ,{field:'goods_sn', title: 'SN',merge: ['goods_name','goods_sn'], align:"center"}
+            ,{field:'original_img', title: '图片',align:"center", width:100, templet: '#test-table-images',}
+            ,{field:'spec_name', title: '规格', align:"center"}
+            ,{field:'stock', title: '库存', align:"center"} 
+        ]]
+        ,done: function(res){
+            tableMerge.render(this);
+        }
+    }); 
+
+})    
+</script>

@@ -1,0 +1,282 @@
+<title>商品管理</title>
+<div class="layui-card layadmin-header">
+    <div class="layui-breadcrumb" lay-filter="breadcrumb">
+        <a>商品管理</a>
+        <a><cite>商品属性</cite></a>
+    </div>
+</div>
+<div class="layui-fluid">
+<div class="layui-row layui-col-space15">
+<div class="layui-col-md12">
+<div class="layui-card">
+    <div class="layui-card-header">商品属性</div>
+    <div class="layui-card-body">  
+        <div class="layui-form">
+        <div class="layui-form-item">
+            <div class="layui-input-inline">
+                <select name="" id="spec_caidan_id" lay-filter="choose_caidan_id"> </select>
+            </div>
+            <div class="layui-input-inline">
+                <select name="type_id" id="spec_type_id" lay-filter="choose_type_id"> </select>
+            </div> 
+            <div class="layui-input-inline">
+                <input type="text" name="keywords" placeholder="请输入属性名称" autocomplete="off" class="layui-input">
+            </div>  
+            <div class="layui-inline">
+                <button class="layui-btn layuiadmin-btn-list" lay-submit lay-filter="attrib_search" type="button">
+                    <i class="layui-icon layui-icon-search layuiadmin-button-btn"></i>
+                </button>
+            </div>
+        </div>
+        </div>
+
+        <table class="layui-hide" id="table_attr_list" lay-filter="table_attr_list"></table>  
+        <script type="text/html" id="test_table_toolbar">
+            <div class="layui-btn-container">
+                <a data-type="add" onclick="add_attribute();" class="layui-btn" id="add_goodsattr"><i class="layui-icon layui-icon-add-1 layuiadmin-button-btn"></i>添加属性</a>
+            </div>
+        </script>  
+        <script type="text/html" id="tool_table_attr_list">
+            <a class="layui-btn layui-btn-normal layui-btn-xs" lay-event="edit"><i class="layui-icon layui-icon-edit"></i>编辑</a>
+            <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del"><i class="layui-icon layui-icon-delete"></i>删除</a>
+        </script>  
+    </div>
+</div>
+</div>
+</div>
+</div>
+
+<script>
+layui.use(['admin','table', 'view', 'form','setter','layer'], function(){
+    var $ = layui.$
+    ,admin = layui.admin
+    ,setter = layui.setter
+    ,element = layui.element
+    ,layer = layui.layer
+    ,form = layui.form
+    ,view = layui.view
+    ,table = layui.table
+    ,router = layui.router();
+
+    form.render();
+
+    var router = layui.router();
+    var pid = router.search.pid;    // 菜单类型
+    var type = router.search.type;   // 商品类型
+
+    table.render({
+        elem: '#table_attr_list'
+        ,url: layui.setter.baseUrl+'admin/goods/goodsAttribute'
+        ,parseData: function(res){ //res 即为原始返回的数据
+            return {
+            "code": res.code, //解析接口状态
+            "msg": res.msg, //解析提示文本
+            "count": res.data.count, //解析数据长度
+            "data": res.data.lists //解析数据列表
+            };
+        }
+        ,toolbar: '#test_table_toolbar'
+        ,cols: [[
+        {field:'id', width:80, title: 'ID', sort: true,  align:'center',}
+        ,{field:'name', title: '属性名称', align:'center', }
+        ,{field:'type_name', title: '所属商品类型', align:'center', }
+        ,{field:'input_type', title: '属性值的输入方式', align:'center',templet:function(d){
+            if(d.input_type===0){
+                return '手工录入';
+            }else if(d.input_type===1){
+                return '从列表中选择';
+            }else{
+                return '多行文本框';
+            }
+        } }
+        ,{field:'values', title: '可选值列表', align:'center'}
+        ,{field:'order', width:150, title: '排序', align:'center',edit:true}
+        ,{fixed: 'right', title: '操作', align:'center', toolbar: '#tool_table_attr_list',width:160}
+        ]],
+        page:true
+    });
+    // 搜索
+    form.on('submit(attrib_search)',function(datas){
+        //执行重载
+        table.reload('table_attr_list', {
+            page: { curr: 1 }
+            ,where: datas.field
+        });
+    }); 
+    // 搜索-地址栏   
+    if(type){
+        table.reload('table_attr_list', {
+            page: { curr: 1 }
+            ,where: { type_id:type }
+        });
+    }
+
+    // 菜单类型
+    admin.req({
+        url: layui.setter.baseUrl+'admin/goods/catetype' 
+        ,data: {}
+        ,type:'get'
+        ,success: function(res){
+            if(res.code==1){
+                var list="<option value=''>--全部菜单类型--</option>";
+                for( var i in res.data){
+                    list += "<option value='"+res.data[i].id+"' >"+res.data[i].name+"</option> ";
+                }             
+                $('#spec_caidan_id').html(list);
+                if(pid){
+                    $('#spec_caidan_id').val(pid);
+                    get_spselect(pid);
+                }
+                form.render();
+            }else{
+                layer.msg(res.msg);
+            }       
+        } 
+    }); 
+    // 监听点击--菜单类型
+    form.on('select(choose_caidan_id)',function(e){
+        get_spselect(e.value);
+    });
+    // 获取商品类型
+    function get_spselect(params){
+    admin.req({
+        url: layui.setter.baseUrl+'admin/goods/getTypeList' 
+        ,data: {select_id:params},
+        type:'get',
+        success: function(res){
+            if(res.code==1){
+                //var list="<option value=''>--全部商品类型--</option>";
+                var list="";
+                for( var i in res.data){
+                    list += "<option value='"+res.data[i].id+"' >"+res.data[i].name+"</option> ";
+                }     
+                $('#spec_type_id').html(list);  
+                if(type){
+                    $('#spec_type_id').val(type);              
+                }                  
+                form.render();
+            }else{
+                layer.msg(res.msg);
+            }       
+        } 
+    }); 
+    }
+
+
+    // 添加属性
+    window.add_attribute=function(){
+    admin.popup({
+        title: "添加属性",
+        area: admin.screen() < 2 ? ['95%', '80%'] :["800px", "540px"],
+        id: "LAY-popup-add_attr",
+        success: function(layero, index){
+        view(this.id).render('/goods/add_attribute').done(function() {
+            form.render(null, 'add_attribute'); // 弹窗的lay-filter值
+            //监听提交
+            form.on('submit(attr_submit)', function(data){
+                admin.req({
+                    url: layui.setter.baseUrl+'admin/goods/addGoodsAttribute' //实际使用请改成服务端真实接口
+                    ,data:data.field,
+                    type:'post',
+                    success: function(res){
+                    
+                    if(res.code==1){
+                        layer.msg(res.msg , {icon: 1,shade:0.5,time: 1000} , function(){
+                            setTimeout(function(){
+                            layer.close(index); //执行关闭 
+                            layui.table.reload('table_attr_list'); //重载表格
+                            },1000);
+                            
+                        });
+                    }else{
+                        layer.msg(res.msg, {icon: 5,anim: 6,shade:0.5,time: 1000});
+                    }
+                    }
+                }); 
+
+            });
+            
+        });
+        }
+    });
+    }
+    
+    // 监听工具条--编辑&删除
+    table.on('tool(table_attr_list)', function(obj){
+    var data = obj.data;
+    var id = obj.data.id;
+    if(obj.event === 'del'){
+    layer.confirm('确认删除此属性?', {icon: 3, title:'提示'}, function(index){
+        admin.req({
+            //url: layui.setter.baseUrl+'admin/goods/delGoodsSpec' //实际使用请改成服务端真实接口
+            url: layui.setter.baseUrl+'admin/goods/delGoodsAttribute' //实际使用请改成服务端真实接口
+            ,data: {id:id},
+            type:'get',
+            success: function(res){
+            if(res.code==1){
+                obj.del();
+                layer.close(index); 
+            }else{
+                layer.msg(res.msg, {icon: 5,anim: 6,shade:0.5,time: 1000});
+            }
+            }
+        }); 
+    });
+    } else if(obj.event === 'edit'){
+    // 编辑
+    admin.popup({
+        title: "编辑属性",
+        area: admin.screen() < 2 ? ['95%', '80%'] :["800px", "540px"],
+        id: "LAY-popup-add_menu",
+        success: function(layero, index){
+        view(this.id).render('/goods/add_attribute',data).done(function() {
+            form.render(null, 'add_attribute'); // 弹窗的lay-filter值
+            form.on('submit(attr_submit)', function(datas){
+                // console.log(data);
+                datas.field.id=id;
+                admin.req({
+                    url: layui.setter.baseUrl+'admin/goods/editGoodsAttribute' //实际使用请改成服务端真实接口
+                    ,data:datas.field,
+                    type:'post',
+                    success: function(res){
+                    
+                    if(res.code==1){
+                        layer.msg(res.msg , {icon: 1,shade:0.5,time: 1000} , function(){
+                            setTimeout(function(){
+                            layer.close(index); //执行关闭 
+                            layui.table.reload('table_attr_list'); //重载表格
+                            },1000);
+                            
+                        });
+                    }else{
+                        layer.msg(res.msg, {icon: 5,anim: 6,shade:0.5,time: 1000});
+                    }
+                    }
+                }); 
+
+            });
+            
+        });
+        }
+    });
+    } 
+    });
+
+    // 排序
+    table.on('edit(table_attr_list)',function(e){
+    admin.req({
+        url: layui.setter.baseUrl+'admin/goods/editGoodsAttribute' //实际使用请改成服务端真实接口
+        ,data:e.data,
+        type:'post',
+        success: function(res){
+        if(res.code==1){
+            
+        }else{
+            layer.msg(res.msg, {icon: 5,anim: 6,shade:0.5,time: 1000});
+        }
+        }
+    }); 
+    });
+  
+});
+</script>

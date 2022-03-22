@@ -1,0 +1,644 @@
+{include file="public/header"/}
+<style>
+    .addcat_demos .layui-layer-content {
+        padding: 0.16rem !important;
+    }
+
+    .goods_footer .cart p,
+    .goods_footer .gobuy p {
+        line-height: 0.2rem;
+    }
+
+    table.auction_info {
+        background: #242424;
+        width: 100%;
+    }
+
+    table.auction_info td {
+        padding: 0.05rem 0.1rem;
+        color: #aaa;
+        font-size: 0.14rem;
+    }
+
+    table.auction_info td span:first-child {
+        color: #888;
+        font-size: 0.12rem;
+    }
+
+    table.auction_info td span:nth-child(2) {
+        font-size: 0.13rem;
+    }
+
+    .goods_floorul li>span,
+    .gfloor_low>span {
+        width: 20%;
+        color: #999;
+    }
+
+    .gfloor_low,
+    .goods_floorul>li {
+        padding: 0 0.1rem;
+    }
+
+    .auction_ing {
+        position: absolute;
+        bottom: 0;
+        background: #e1d2b7;
+        width: 100%;
+        z-index: 10;
+    }
+
+    .auction_ing>div:nth-child(2) {
+        padding: 0;
+        width: 70%;
+    }
+
+    .auction_ing>div:nth-child(2)>span {
+        color: #91733b;
+        font-size: 0.12rem;
+    }
+
+    .auction_ing>div:nth-child(2)>span:first-child {
+        font-size: 0.14rem;
+    }
+
+    .auction_ing>div:first-child {
+        background: #c0a065;
+        color: #fff;
+        padding: 0.15rem 0.2rem;
+        font-size: 0.16rem;
+    }
+
+    .mui-popup.mui-popup-in {
+        left: 50%;
+        width: 90%;
+    }
+
+    .log_alert {
+        /* max-height:50vh; */
+        height: 40vh;
+        overflow: hidden;
+        text-align: -webkit-auto;
+    }
+
+    .winner_list {
+        padding: 0 15px;
+    }
+
+    .mescroll {
+        /* position: absolute; */
+        top: 10px;
+        left: 0;
+        bottom: 0;
+        height: auto;
+    }
+
+    .winner_list>li {
+        line-height: 25px;
+        color: #ccc;
+        display: inline-flex;
+    }
+    .winner_list>li .text-gold{
+        padding-right: 0.1rem;
+        font-weight: 600;
+    }
+
+    .mui-popup-title+.mui-popup-text {
+        position: relative;
+    }
+
+    .service_pop {
+        background: #1E232F;
+    }
+
+    .service_pop p {
+        color: #eee;
+        padding: 0 0.1rem;
+    }
+
+    .remind_ul {
+        width: 100%;
+    }
+
+    .remind_ul li {
+        background: #d0d5e1;
+        color: #1E232F;
+        margin-right: 0.05rem;
+        padding: 0.03rem 0.05rem;
+        font-size: 0.12rem;
+        border-radius: 3px;
+        transition: linear 0.3s all;
+    }
+
+    .remind_ul li.on {
+        background: #d3bc92;
+        color: #5a4825;
+    }
+
+    .auction_ing div:nth-child(2) span:nth-child(2n+1) {
+        font-size: 0.12rem;
+    }
+</style>
+</head>
+
+<body>
+    <header class="mui-bar mui-bar-nav index_header bg_white" id="header">
+        <a class="mui-action-back mui-icon mui-icon-left-nav mui-pull-left" href="javascript:;"></a>
+        <a id="menu" class="mui-action-menu mui-icon mui-icon-bars mui-pull-right" href="javascript:void(0);"></a>
+        <div class="goodinfo_hd mui-title">
+            <ul>
+                <li class="goodsin_shop">Auction Details</li>
+            </ul>
+        </div>
+    </header>
+    <div class="mui-content goods_content">
+       <!-- Product -->
+        <div class="xq_details details_shop">
+            <div class="swiper-container goods_lunbo">
+                <div class="swiper-wrapper">
+                    <!-- <div class="swiper-slide">
+                    <img src="__IMG__/img_22.png" alt="">
+                </div> -->
+                </div>
+                <div class="swiper-pagination"></div>
+                <div class="auction_ing flex_between">
+                </div>
+            </div>
+            <div class="goods_up" id="goods_up">
+                <!-- <div class="goods_title mui-clearfix">
+                    <p id="goods_name" class="mui-ellipsis-2 fl"></p>
+                </div>
+                <p class="red"><span class="font-12">Current Price</span> <span id="now_price"></span><span
+                        class="font-12">KRC</span></p>
+                <p class="sales flex_between"><span>Visit <span id="view_num"></span> times</span><span>Sign up<span
+                            id="join_num"></span>person</span><span>set reminder<span id="call_num"></span>person</span></p> -->
+            </div>
+            <div class="mb10"></div>
+            <div class="goods_floorlow" onclick="show_member();">
+                <div class="gfloor_low">
+                    <span>markup record</span>
+                    <!-- <span class="goods">Praise rate<span>100</span></p> -->
+                    <p class="people mui-clearfix">View <i class="iconfont icon-rightArrow"></i></p>
+                </div>
+            </div>
+            <div class="mb10"></div>
+            <table class="auction_info">
+                <!-- <tr>
+                    <td>
+                        <span>Auction Type</span>
+                        <span>Public auction</span>
+                    </td>
+                    <td>
+                        <span>Starting price</span>
+                        <span>0.00KRC</span>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <span>Margin</span>
+                        <span>0.00KRC</span>
+                    </td>
+                    <td>
+                        <span>
+                            markup
+                        </span>
+                        <span>
+                            0.00KRC
+                        </span>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <span>
+                           Shooting time
+                        </span>
+                        <span>
+                            202012
+                        </span>
+                    </td>
+                    <td>
+                        <span>
+                            End Time
+                        </span>
+                        <span>
+                            202012
+                        </span>
+                    </td>
+                </tr> -->
+            </table>
+            <div class="mb10"></div>
+            <!-- details -->
+            <div>
+                <div class="xq_goodsbd">
+                    <div class="xq_bdimg"> </div>
+
+                </div>
+            </div>
+            <div class="mb10"></div>
+        </div>
+    </div>
+    <!-- back to top -->
+    <p class="goods_topup hide"><i class="iconfont icon-top"></i></p>
+    <!-- bottom -->
+    <div class="goods_footer">
+        <!-- {{if is_finish==1}}
+        <ul>
+            <li><a onclick="remind({{id}});" href="javascript:void(0);">
+                    <i class="iconfont icon-naozhong"></i>
+                    <p>Reminder</p>
+                </a></li>
+            <li class="gobuy jf_buy" onclick="cart_show();" style="width:100%;">
+                <p>{{start_time}} start auction</p>
+                <p class="font-12">(Margin {{}}KRC)</p>
+            </li>
+        </ul>
+        <ul>
+            <li><a onclick="remind({{id}});" href="javascript:void(0);">
+                    <i class="iconfont icon-naozhong"></i>
+                    <p>Reminder</p>
+                </a></li>
+            <li class="gobuy jf_buy" onclick="cart_show();" style="width:100%;">
+                <p>Participate now</p>
+                <p class="font-12">(margin <span class="margin"></span>)</p>
+            </li>
+        </ul> -->
+    </div>
+    {include file="public/head_nav"/}
+    {include file="public/footer"/}
+    <script type="text/template" id="goods_footer">
+        {{ if is_finish == 1}}
+        <ul>
+            {{if is_call == 1}}
+                <li><a onclick="remind({{id}});" href="javascript:void(0);">
+                    <i class="iconfont icon-naozhong text-gold"></i>
+                    <p class="text-gold">Reminder</p>
+                </a></li>
+            {{ else }}
+                <li><a onclick="remind({{id}},'hh');" href="javascript:void(0);">
+                        <i class="iconfont icon-naozhong"></i>
+                        <p>Reminder</p>
+                    </a></li>
+            {{ /if}}
+            <li class="gobuy jf_buy mui-disabled" style="width:100%;">
+                <p>{{start_time}} start auction</p>
+                <p class="font-12">(Margin {{price*0.2+price_range*0.2}}KRC)</p>
+            </li>
+        </ul>
+        {{ else if is_finish == 2}}
+            {{ if status==1 && pay_status==0}}
+                {{ if is_overdue == 2 }}
+                <ul class="mui-disabled">
+                    <li class="gobuy jf_buy" style="width:100%;">
+                        <p style="line-height:0.45rem">Expired</p>
+                    </li>
+                </ul>
+                {{ else if is_overdue==1}}
+                <ul>
+                    <li class="gobuy jf_buy" style="width:100%;" onclick="renew_auction()">
+                        <p>Make up the balance</p>
+                        <p class="font-12">({{price-price*0.2}}KRC)</p>
+                    </li>
+                </ul>
+                {{ else}}
+                    <ul class="mui-disabled">
+                        <li class="gobuy jf_buy" style="width:100%;">
+                            <p style="line-height:0.45rem;">Auction closed</p>
+                        </li>
+                    </ul>
+                {{ /if}}
+            {{ else }}
+                <ul class="mui-disabled">
+                    <li class="gobuy jf_buy" style="width:100%;">
+                        <p style="line-height:0.45rem;">Auction closed</p>
+                    </li>
+                </ul>
+            {{ /if }}
+        {{ else if is_finish == 3}}
+        <ul>
+            <li class="gobuy jf_buy" onclick="go_buy(this);" style="width:100%;">
+                <p>Participate now</p>
+                <p class="font-12">(Margin <span class="deposit">{{price*0.2+price_range*0.2}}</span>KRC)</p>
+            </li>
+        </ul>
+        {{ else if status == 0}}
+        <ul class="mui-disabled">
+            <li class="gobuy jf_buy" style="width:100%;">
+               <p style="line-height:0.45rem;">Pending review</p>
+            </li>
+        </ul>
+        {{ /if}}
+    </script>
+    <script type="text/template" id="goods_up2">
+        <div class="goods_title mui-clearfix">
+            <p class="mui-ellipsis-2 fl">{{goods_name}}</p>
+        </div>
+        <p class="red">
+            {{ if is_finish == 2}}
+            <span class="font-12">Sold price</span>
+            {{ else if is_finish == 1}}
+            <span class="font-12">Starting price</span>
+            {{ else }}
+                <span class="font-12">Current price</span>
+            {{ /if}}
+            <span class="now_price">{{price}}</span>
+            <span class="font-12">KRC</span>
+        </p>
+        <p class="sales flex_between"><span>Visit {{view_num}} times</span><span>Participate{{join_num}}people</span><span>Set reminders<span class="call_num_span"> {{call_num}}</span>person</span></p>
+    </script>
+    <script type="text/template" id="auction_ing">
+        <div>Auctions</div>
+        <div>
+            <span>Before Auction Ends:</span>
+            <span>{{_time0}}</span>
+            <span>days</span>
+            <span>{{_time1}}</span>
+            <span>time</span>
+            <span>{{_time2}}</span>
+            <span>Points</span>
+            <span>{{_time3}}</span>
+            <span>seconds</span>
+        </div>
+    </script>
+    <script type="text/template" id="auction_info">
+        <tr>
+            <td>
+                <span>Auction Type</span>
+                {{if is_private==1}}
+                <span>Private Auction</span>
+                {{ else }}
+                <span>Public auction</span>
+                {{ /if}}
+            </td>
+            <td>
+                <span>Starting price</span>
+                <span>{{start_price}} KRC</span>
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <span>Margin</span>
+               <span><span class="deposit">{{price*0.2+price_range*0.2}}</span> KRC</span>
+            </td>
+            <td>
+                <span>
+                    markup
+                </span>
+                <span>
+                    {{price_range}}KRC
+                </span>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <span>
+                    Shooting time
+                </span>
+                <span>
+                    {{start_time}}
+                </span>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <span>
+                   End Time
+                </span>
+                <span id="end_time">
+                    {{end_time}}
+                </span>
+            </td>
+        </tr>
+    </script>
+    <script type="text/template" id="member_log">
+        <li><p class="text-gold">{{price}}</p> <p>{{nickname}} bid at {{create_time}} </p></li>
+    </script>
+    <script>
+        var timer = '';
+        (function ($, doc) {
+            $.init();
+            $.ready(function () {
+
+            });
+        })(mui, document);
+        //carousel
+        var mySwiper = new Swiper('.swiper-container', {
+            autoplay: true,
+            pagination: {
+                el: '.swiper-pagination',
+            },
+        });
+        var id = getQueryString("id");
+
+        get_data();
+        function get_data() {
+            $get('/api/auction/get_now_auction', { id: id }, function (data) {
+                if (data.status == 1) {
+                    var lunbo = '<div class="swiper-slide" style="height:375px;"><img src="" alt=""></div>', str = '';
+                    for (var i in data.data.img_tuku) {
+                        if (data.data.img_tuku[i] && data.data.img_tuku[i] != 'undefined') {
+                            str += '<div class="swiper-slide"><img src="' + data.data.img_tuku[i] + '" alt=""></div>';
+                        } else {
+                            str += '<div class="swiper-slide" style="height:375px;"><img src="" alt=""></div>';
+                        }
+                    }
+                    lunbo = str ? str : lunbo;
+                    mySwiper.appendSlide(lunbo);
+                    $('.goods_up').html(template("goods_up2", data.data));
+                    $('.auction_info').html(template("auction_info", data.data));
+                    $('.goods_footer').html(template("goods_footer", data.data));
+                    $('.xq_bdimg').html(data.data.goods_content);
+                    if (data.data.is_finish == 3) {
+                        timer = setInterval(() => {
+                            get_price();
+                        }, 1000);
+                    }
+                } else {
+                    mui.toast(data.msg);
+                }
+            });
+        };
+        //real-time price
+        function get_price() {
+            $get('/api/auction/auction_each', { id: id }, function (data) {
+                if (data.status == 1) {
+                    $('.margin').html(Number(data.data.price) * 0.2);
+                    $('.goods_up').html(template("goods_up2", data.data));
+                    $('#end_time').html(data.data.end_time);
+                    var time = data.data.djs;
+                    time = time.split(':');
+                    data.data._time0 = time[0];
+                    data.data._time1 = time[1];
+                    data.data._time2 = time[2];
+                    data.data._time3 = time[3];
+                    $('.auction_ing').html(template("auction_ing", data.data));
+                    $('.deposit').html(data.data.deposit);
+                } else {
+                    clearInterval(timer);
+                    mui.toast(data.msg);
+                    setTimeout(() => {
+                        get_data();
+                        $('.auction_ing').hide();
+                    }, 1500);
+                }
+            });
+        }
+        // remind
+        function remind(id, o) {
+            if (o) {
+                mui.confirm('<div class="service_pop"><ul class="remind_ul flex"><li dn="2">two minutes</li><li class="on" dn="10">ten Minutes</li><li dn="20">Twenty minutes</li><li dn="30">Half an hour</li></ul><div class="mb10"></div> <p>Click to set advance reminder time, and you will be notified by SMS before the auction starts. After setting the reminder, you can enter the auction in Personal Center - My Auction - My Appointment.</p></div>', 'Set reminder ', ['Cancel', 'OK'], function (e) {
+                    if (e.index == 1) {
+                        var time = $('.remind_ul li.on').attr('d-n');
+                        $('.mui-popup-button:last-child').html('Submitting...');
+                        $('.mui-popup-button:last-child').addClass('mui-disabled');
+                        $get('/api/auction/auction_call', { id: id, time: time }, function (data) {
+                            mui.toast(data.msg);
+                            $('.mui-popup-button:last-child').html('OK');
+                            $('.mui-popup-button:last-child').removeClass('mui-disabled');
+                            if (data.status == 1) {
+                                // $('.goods_footer>ul>li:first-child .iconfont').addClass('text-gold');
+                                // $('.goods_footer>ul>li:first-child p').addClass('text-gold');
+                                // $('.call_num_span').html(Number($('.call_num_span').html()) + 1);
+                                get_data();
+                            }
+                        });
+                    }
+                }, 'div');
+            } else {
+                $get('/api/auction/auction_call', { id: id, time: 0 }, function (data) {
+                    if (data.status == 1) {
+                        mui.toast('Appointment cancelled');
+                        // $('.goods_footer>ul>li:first-child .iconfont').removeClass('text-gold');
+                        // $('.goods_footer>ul>li:first-child p').removeClass('text-gold');
+                        // $('.call_num_span').html(Number($('.call_num_span').html()) - 1);
+                        get_data();
+                    }
+                });
+            }
+        };
+        $('body').on('tap', '.remind_ul li', function () {
+            var d = $(this).attr('d-n');
+            $(this).addClass('on').siblings().removeClass('on');
+        });
+        // make up
+        function renew_auction() {
+            // pop-up window--payment password
+            mui.confirm('<div class="gender_pop" style="padding:5px 10px;"><p><input class="p_inp password" type="password" placeholder="Please enter payment password"></p ></div>', 'Please enter the payment password', ['Cancel', 'OK'], function (e) {
+                if (e.index === 1) {
+                    var password = $('.password').val();
+                    if (password == '') {
+                        mui.toast("Please enter the payment password!");
+                        return false;
+                    } else {
+                        $('.mui-popup-button:last-child').html('Submitting...');
+                        $('.mui-popup-button:last-child').addClass('mui-disabled');
+                        $post("/api/auction/renew_auction", { id: id, password: password }, function (data) {
+                            $('.mui-popup-button:last-child').html('OK');
+                            $('.mui-popup-button:last-child').removeClass('mui-disabled');
+                            if (data.status == 1) {
+                                mui.toast(data.msg);
+                                setTimeout(() => {
+                                    window.location.reload();
+                                }, 1500);
+                            } else {
+                                mui.toast(data.msg);
+                            }
+                        })
+                    }
+                } else {
+                }
+            }, 'div');
+        };
+        function show_member() {
+            mui.alert('<div class="log_alert"><div  id="mescroll" class="mescroll"><ul class="winner_list" id="dataList"></ul></div></div>', 'markup record');
+            mui('.log_alert').scroll();
+            //Create a MeScroll object, the internal pull-down refresh is enabled by default, up.callback is automatically executed, and the list data is refreshed;
+            var mescroll = new MeScroll("mescroll", {
+                up: {
+                    callback: getListData,
+                    isBounce: false,
+                    noMoreSize: 5,
+                    empty: {
+                        icon: "/static/wap/images/none4.png", //icon, default null
+                        tip: "There is no record of price increase at the moment~~", //Tips
+                    },
+                    clearEmptyId: "dataList",
+                    toTop: {
+                        src: "/static/wap/images/top.png", //default scroll to 1000px display, configurable offset modification
+                        offset: 1000
+                    },
+                    lazyLoad: {
+                        use: true // Whether to enable lazy loading, default false
+                    },
+                    page: {
+                        num: 0,
+                        size: 10,
+                        time: null
+                    },
+                    htmlNodata: '<p class="upwarp-nodata">no more</p>',
+                    offset: 150,
+                    loadFull: {
+                        use: false,
+                        delay: 500
+                    }
+                }
+            });
+            function getListData(page) {
+                // load data online
+                // Delay one second, simulate networking
+                setTimeout(function () {
+                    $get('/api/auction/member_auction', { page: page.num, id: id, limit: page.size }, function (d) {
+                        if (d.status == 1) {
+                            var curPageData = d.data;
+                            mescroll.endSuccess(curPageData.length);
+                            var list = '';
+                            for (var i in curPageData) {
+                                curPageData[i].create_time = new Date(curPageData[i].create_time * 1000).Format("yyyy-MM-dd hh:mm:ss");
+                                list += template('member_log', curPageData[i]);
+                            }
+                            $('#dataList').append(list);
+                        } else {
+                            mescroll.endErr();
+                        }
+                    });
+                }, 1000);
+            }
+        };
+        // take the shot now
+        function go_buy(_this) {
+            var yprice = $('.now_price').html();
+            $(_this).addClass('mui-disabled');
+            $(_this).find('p').eq(0).html('Submitting...');
+            $get('/api/auction/auction_price', { id: id, yprice: yprice }, function (d) {
+                $(_this).removeClass('mui-disabled');
+                $(_this).find('p').eq(0).html('Participate in the shooting now');
+                mui.toast(d.msg);
+                if (d.status == 1) {
+                    // window.location.reload();
+                } else {
+
+                }
+            });
+        };
+        //Back to top
+        $('.goods_topup').on('tap', function () {
+            $('body,html').animate({ 'scrollTop': 0 }, 600);
+        });
+        $(window).on('scroll',function(){
+            var st = $(document).scrollTop();
+            if(st>300){
+                $('.goods_topup').fadeIn();
+            }else{
+                $('.goods_topup').fadeOut();
+            }
+        });
+        function getQueryString(name) {
+            var result = window.location.search.match(new RegExp("[\?\&]" + name + "=([^\&]+)", "i"));
+            if (result == null || result.length < 1) {
+                return "";
+            }
+            return result[1];
+        };
+    </script>
+</body>
+
+</html>

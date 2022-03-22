@@ -1,0 +1,178 @@
+<title>奖池数据列表</title>
+<style>
+    form .layui-inline{
+        margin-bottom: 20px;
+    }
+</style>
+<div class="layui-card layadmin-header">
+  <div class="layui-breadcrumb" lay-filter="breadcrumb">
+      <a>财务管理</a>
+      <a><cite>奖池数据列表</cite></a>
+  </div>
+</div>
+<div class="layui-fluid">
+        <div class="layui-row layui-col-space15">
+          <div class="layui-col-md12">
+            <div class="layui-card">
+              <div class="layui-card-header">奖池数据列表</div>
+              <div class="layui-card-body"> 
+                  <div class="test-table-reload-btn" style="margin-bottom: 10px;">
+                    
+                    <div class="layui-input-inline">
+      
+                        <form class="layui-form">
+                            <div class="layui-inline">
+                                <div class="layui-input-inline">
+                                  <input type="text" class="layui-input" id="test-laydate-type-datetime-start" name="start_time" placeholder="开始时间">
+                                </div>
+                              </div>
+                              <div class="layui-inline">
+                                <div class="layui-input-inline">
+                                  <input type="text" class="layui-input"  name="end_time" id="test-laydate-type-datetime-end" placeholder="结束时间">
+                                </div>
+                              </div>
+                             
+                            <div class="layui-inline">
+                                <button class="layui-btn" type="button" lay-submit lay-filter="jc_list_search"><i class="layui-icon">&#xe615;</i>搜索</button>
+                              </div>
+                              
+                        </form>
+                       
+                    </div>
+                   
+                  </div>   
+
+                  <table class="layui-hide" id="jc_list" lay-filter="jc_list"></table>    
+                  <script id="tool_kuangchi" type='text/html' templet>
+                    {{# if(d.update_time==0){ }}
+                    <a class="layui-btn layui-btn-xs" lay-event="kuangchi">GCVVU</a>
+                    {{# }else{ }}  
+                    <a class="layui-btn layui-btn-xs layui-btn-disabled">GCVVU</a>
+                    {{# } }} 
+                  </script> 
+ 
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <script>
+      layui.use(['admin','table', 'view', 'form','layer','laydate'], function(){
+        var $ = layui.$
+        ,admin = layui.admin
+        ,element = layui.element
+        ,form = layui.form
+        ,view = layui.view
+        ,laydate = layui.laydate
+        ,layer = layui.layer
+        ,table = layui.table;
+          //日期时间选择器
+          laydate.render({
+            elem: '#test-laydate-type-datetime-start'
+            ,type: 'datetime'
+        });
+        laydate.render({
+            elem: '#test-laydate-type-datetime-end'
+            ,type: 'datetime'
+        });
+        form.render();
+
+
+        form.on('submit(jc_list_search)',function(datas){
+            get_data(datas.field);
+        });
+       
+      
+          var keywords="";
+          var act="";
+          var n=1;
+          get_data({keywords:''});
+          function get_data(param){
+            table.render({
+              elem: '#jc_list'
+              ,url: layui.setter.baseUrl+'admin/member/jchi'
+              ,toolbar: '#tool_jc_list'
+              ,parseData: function(res){ //res 即为原始返回的数据
+                  return {
+                  "code": res.code, //解析接口状态
+                  "msg": res.msg, //解析提示文本
+                  "count": res.data.count, //解析数据长度
+                  "data": res.data.lists //解析数据列表
+                  };
+              }
+              ,cols: [[
+                {field:'id', width:85, title: '序号', sort: true, align:'center'}
+                ,{field:'power',  title: '奖池算力',align:'center',sort:true}
+                ,{field:'jc_btc',title: '当前奖池BTC数量', align:'center',sort:true}
+                ,{field:'gs_jiangli',title: '当月公司预留', align:'center',sort:true}
+                ,{field:'ff_jiangli',title: '奖励发放数量', align:'center',sort:true}
+                ,{field:'cd_jiangli',title: '奖励沉淀数量', align:'center',sort:true}
+                ,{field:'type',title: '操作类型', align:'center',templet:function(d){
+                    if(d.type==1){
+                        return '产币累积中';
+                    }else if(d.type==2){
+                        return '产币已发放';
+                    }
+                }}
+                ,{field:'create_time', title: '产币开始时间', align:'center',templet: "<div>{{layui.util.toDateString(d.create_time*1000, 'yyyy-MM-dd HH:mm:ss')}}</div>",sort:true}
+                ,{field:'updata_time', title: '产币发放时间', align:'center',sort:true,templet:function(d){
+                  if(d.update_time==0){
+                    return '待发放';
+                  }else{
+                    return layui.util.toDateString(d.updata_time*1000, 'yyyy-MM-dd HH:mm:ss');
+                  }
+                }}
+                ,{fixed:'right', title: '操作', align:'center', toolbar: '#tool_kuangchi',}
+              ]],
+              page:true,
+              where:param
+            });
+          }
+
+          table.on('tool(jc_list)', function(obj){
+            var id=obj.data.id;
+            var data=obj.data;
+            console.log(obj);
+            if(obj.event=='kuangchi'){
+                admin.popup({
+                    title: "发放奖励",
+                    area: admin.screen() < 2 ? ['95%', '90%'] : ["700px", "500px"],
+                    id: "LAY-popup-kuangchi",
+                    success: function (layero, index) {
+                        view(this.id).render('/wallet/kuangchi', data).done(function () {
+                        form.render(null, 'kuangchi'); // 弹窗的lay-filter值
+                        form.on('submit(kuangchi_submit)', function (datas) {
+                            admin.req({
+                              url: layui.setter.baseUrl + 'admin/member/jff_jchi'
+                              , data: {},
+                              type: 'get',
+                              success: function (res) {
+                                  if (res.code == 1) {
+                                  layer.msg(res.msg, { icon: 1, shade: 0.5, time: 1000 }, function () {
+                                      setTimeout(function () {
+                                      layer.close(index);
+                                      table.reload('jc_list');
+                                      }, 1000);
+
+                                  });
+                                  } else {
+                                  layer.msg(res.msg, { icon: 5, anim: 6, shade: 0.5, time: 1000 });
+                                  }
+                              },error:function(err){
+                                console.log(err);
+                              }
+                            });
+                        });
+
+                        });
+                    }
+                    });
+            }
+
+        });
+         
+         
+      
+      });
+      </script>

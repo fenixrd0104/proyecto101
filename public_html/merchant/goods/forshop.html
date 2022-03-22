@@ -1,0 +1,45 @@
+<title>库存详情</title>
+
+<div class="layui-row layui-fluid">
+    <table class="layui-hide" id="table_forshop" lay-filter="table_forshop"></table>
+</div>
+
+<script type="text/html" template lay-done="layui.data.sendParams(d.params)"></script>
+<script>
+layui.data.sendParams = function(params){
+// console.log(params);
+layui.use(['admin','table','form','setter','layer'], function(){
+    var $ = layui.$
+    ,admin = layui.admin
+    ,setter = layui.setter
+    ,view = layui.view
+    ,layer = layui.layer
+    ,table = layui.table
+    ,layer = layui.layer
+    ,form = layui.form;
+
+    
+    
+    table.render({
+        elem: '#table_forshop'
+        ,url: layui.setter.baseUrl+'merchant/goods/goodsSpecForShop'
+        ,cellMinWidth: 80 //全局定义常规单元格的最小宽度，layui 2.2.1 新增
+        ,cols: [[
+          {field:'shop_name', title: '商店名称', align:'center'}
+          ,{field:'stock', title: '库存',align:'center'}
+        ]]
+        ,where:{ spec_id:params }
+    });
+    
+
+    
+
+
+    
+    
+    
+    
+    
+});
+}
+</script>

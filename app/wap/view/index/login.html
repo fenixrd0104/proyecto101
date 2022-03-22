@@ -1,0 +1,125 @@
+{include file="public/header"/}
+<style>
+    body {
+        display: flex;
+        flex-direction: column;
+        min-height: 100vh;
+    }
+</style>
+</head>
+
+<body>
+    <header class="mui-bar mui-bar-nav" id="header">
+        <a class="back-page iconfont icon-close1" href="javascript:;"></a>
+        <h1 class="mui-title"></h1>
+    </header>
+    <div class="mui-content" style="flex:1;">
+        <div class="login_logo"><img src="__IMG__/logo.png?id=1" /></div>
+        <form class="mui-input-group mui_form login_form">
+            <div class="mui-input-row mui_phone">
+                <input type="text" id="phone" placeholder="Please enter phone number/email">
+                <img src="__IMG__/account.png" alt="">
+            </div>
+            <div class="mui-input-row">
+                <input type="password" id="password" placeholder="Please enter password">
+                <img src="__IMG__/pwd.png" alt="">
+            </div>
+            <div class="mui-row" id="jz_pwd_box">
+                <span style="padding:0.15rem 0.15rem 0 0.15rem;width:50%;color:#8b8b8b;font-size: 0.14rem;" class="block fl on" id="jz_pwd">记住密码</span>
+                <a href="/wap/index/findpassword.html" class=" fr t-r text-gray font-14" style="padding:0.15rem 0.15rem 0 0.15rem;">找回密码</a>
+            </div>
+            <!-- <a href="/wap/index/findpassword.html" class="block t-r text-gray font-14" style="padding:0.15rem 0.15rem 0 0.15rem;">找回密码</a> -->
+            <!-- <div class="mui-input-row hide">
+                <input type="text" id="verify" placeholder="Please enter the mobile phone verification code" style="width: 67%;">
+                <button type="button" id="verify_btn" class="btn btn_code">Get verification code</button>
+            </div> -->
+            <div class="mb30"></div>
+            <div class="mui-button-row">
+                <button type="button" id="submit_btn" onclick="submit_fun(this);" class="submit_btn bg-gold">login</button>
+            </div>
+        </form>
+        <!-- <div class="login_group mui-clearfix">
+            <a class="fl" href="/wap/index/findpassword.html">Retrieve Password</a>
+            <a class="fr">New User Registration</a>
+        </div> -->
+    </div>
+    <div class="bot_btn">
+        <p class="t-c text-gray">Don't have an account yet? </p>
+        <button type="button" id="" class="submit_btn" onclick="window.location.href='/wap/index/register.html'">register</button>
+    </div>
+    {include file="public/head_nav"/} {include file="public/footer"/}
+    <script>
+
+        if(localStorage.getItem('cbnk_phone')){
+            $('#phone').val(localStorage.getItem('cbnk_phone'));
+            $('#password').val(localStorage.getItem('cbnk_pwd'));
+        }
+
+        get_select();
+
+        function get_select() {
+            $get("/api/user/get_country_code", {}, function(d) {
+                if (d.code == 1) {
+                    var list = "";
+                    for (var i in d.data) {
+                        list += '<option value="' + d.data[i].id + '">+' + d.data[i].id + d.data[i].name + '</option>';
+                    }
+                    $('#country_code').html(list);
+                } else {
+                    mui.toast(d.msg);
+                }
+            });
+        };
+        // localStorage.setItem('cbnk_phone','phone');
+        //Log in
+                function submit_fun(_this) {
+                    var phone = $('#phone').val();
+                    var password = $('#password').val();
+        
+                    if (phone == "") {
+                        mui.toast('Please enter your phone number or email');
+                    } else if (password == "") {
+                        mui.toast('Please enter your password');
+                    } else {
+                        btn_disabled($(_this),'Login...');
+                $get('/api/user/login', {
+                    phone: phone,
+                    verify: password,
+                    check_type: "password"
+                }, function(data) {
+                    if (data.code==1) {
+                        if($('#jz_pwd_box .on').length>0){
+                            localStorage.setItem('cbnk_phone',phone);
+                            localStorage.setItem('cbnk_pwd',password);
+                        }else{
+                            localStorage.removeItem('cbnk_phone');
+                            localStorage.removeItem('cbnk_pwd');
+                        }
+                        mui.toast(data.msg);
+                        setTimeout(function() {
+                            window.location.href = '/wap/index/index.html';
+                        }, 1000);
+                    } else {
+                        mui.toast(data.msg);
+                    }
+                    setTimeout(() => {
+                       btn_abled($(_this),'login');
+                    }, 1000);
+                },function(){
+                    btn_abled($(_this),'login');
+                });
+            }
+        }
+        $('#jz_pwd').on('tap',function(){
+            $(this).toggleClass('on');
+        });
+        $('.login_form .mui-input-row input').on('focus',function(){
+            $('.bot_btn').hide();
+        });
+        $('.login_form .mui-input-row input').on('blur',function(){
+            $('.bot_btn').show();
+        });
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,562 @@
+{include file="public/header"/}
+<style>
+    .dotey_list{
+        padding:0px 15px;
+    }
+    .dotey_up{
+        padding:10px 0px;
+    }
+    #mescroll{
+        position: fixed;
+        top: 0.9rem;
+        bottom: 0px;
+        left: 0;
+        width: 100%;
+        height:auto;
+    }
+    #slider a{
+        line-height: 45px;
+        position: relative;
+    }
+    #slider{
+        background:#fff;
+        height:45px;
+        touch-action: none;
+    }
+    #slider .mui-active::after{
+        content:'';
+        width:80%;
+        height:2px;
+        position: absolute;
+        bottom:0;
+        left:0;
+        right:0;
+        margin:auto;
+        background:#e30000!important;
+        z-index: 99999;
+    }
+    .order-sum{
+        padding:5px 10px;
+        font-size: 0.14rem;
+    }
+    .pay_cancel a,.pay_cancel button{
+        border:none;
+        padding-top:0.07rem;
+        padding-bottom:0.07rem;
+        height:auto;
+    }
+    .pay_cancel .green_btn:active{
+        background:#159f5c;
+        color:#fff;
+    }
+    .pay_cancel .yellow_btn:active{
+        background: #ffcd42;
+        color:#fff;
+    }
+    .pay_cancel .hui_btn:active{
+        background: #ccc;
+        color:#fff;
+    }
+    .green_btn{
+        background:#159f5c;
+        color:#fff;
+    }
+    .yellow_btn{
+        background: #ffcd42;
+        color:#fff;
+    }
+    .hui_btn{
+        background: #ccc;
+        color:#fff;
+    }
+    .zong_btn{
+        background: #888585;
+        color:#fff;
+    }
+</style>
+</head>
+<body style="background: #f0f0f0;">
+<header class="mui-bar mui-bar-nav bg_white" id="header">
+    <a class="back-page mui-icon mui-icon-left-nav mui-pull-left" href="javascript:;"></a>
+    <a id="menu" class="mui-action-menu mui-icon mui-icon-bars mui-pull-right" href="javascript:void(0);"></a>
+    <h1 class="mui-title">Order Management</h1>
+</header>
+<div class="mui-content">
+
+    <div id="slider" class="mui-slider">
+        <div id="sliderSegmentedControl" class="mui-scroll-wrapper mui-slider-indicator mui-segmented-control mui-segmented-control-inverted" style="overflow:visible!important;">
+            <div class="mui-scroll stored_tab" style="overflow:visible!important;">
+                <a class="mui-control-item mui-active" data-type="0" href="javascript:;">All orders</a>
+                <a class="mui-control-item" data-type="1" href="javascript:;">Pending payment</a>
+                <a class="mui-control-item" data-type="2" href="javascript:;">To be shipped</a>
+                <a class="mui-control-item" data-type="3" href="javascript:;">Pending delivery</a>
+                <!-- <a class="mui-control-item" data-type="4" href="javascript:;">To be evaluated</a> -->
+                <a class="mui-control-item" data-type="5" href="javascript:;">Shipped</a>
+                <a class="mui-control-item" data-type="6" href="javascript:;">Refund</a>
+                <a class="mui-control-item" data-type="7" href="javascript:;">Successful</a>
+                <a class="mui-control-item" data-type="8" href="javascript:;">Obsolete</a>
+                <a class="mui-control-item" data-type="9" href="javascript:;">Cancelled</a>
+            </div>
+        </div>
+    </div>
+    <div class="mescroll dotey_bd" id="mescroll">
+        <div class="dotey_div focus_bd" id="dataList">
+            
+        </div>  
+    </div>      
+</div>
+
+
+{include file="public/head_nav"/}
+{include file="public/footer"/}
+<script type="text/template" id="list">
+    <div class="order-list">
+        <div class="order_member">
+            <div class="omember_top">
+                <div class="omember_shop flex_between">
+                    <a href="javascript:;" class="flex_center">
+                        <img src="__IMG__/ty1.png" alt="">
+                        <span>{{consignee}}</span>
+                    </a>
+                    {{ if pay_status==0 }}
+                   <p class="text_green order-state">Unpaid</p>
+                    {{ else }}
+                    <p class="text_red order-state">{{pay_name}}</p>
+                    {{ /if end }}
+                  
+                </div>
+                <p class="order_number">
+                    <span>Order ID:</span>
+                    <span>{{order_sn}}</span>
+                    <button type="button" title="{{order_sn}}" class='fr s_red span_copy' onclick="span_copy(this);">copy</button>
+                </p>
+            </div>
+            <div class="focus_member_list">
+            {{each goods_list as value index}}
+            <div class="focus_member" data-oid="{{value.order_id}}">
+            <a class="flex" href="/wap/user/order_detail.html?order_id={{value.order_id}}">
+            <!-- <a class="flex" href="javascript:;"> -->
+                <div class="shopimg">
+                    <img src="{{value.img}}">
+                </div>
+                <div class="deleshow">
+                    <p class="product-text mui-ellipsis-2">{{value.goods_name}}</p>
+                    <p class="text_red">KRC {{value.goods_price}}</p>
+                    <p class="num fl">{{value.spec_key_name}} </p>
+                    <p class="num fr">x {{value.goods_num}}</p>
+                </div>
+            </a>
+            </div>
+            {{/each}}
+            </div>
+        </div>
+        <div class="mb10"></div>
+        <div class="order-sum">
+            <span>Total {{goods_num}} items</span>
+            <span>Total order price:</span>
+            <span class="text_red">KRC {{goods_price}}</span>
+            <span>(including shipping</span>
+            <span>KRC {{shipping_price}})</span>
+        </div>
+        
+        <div class="pay_cancel">
+        {{ if order_status == 0 && pay_status == 0 }}
+            <!-- <button type="button" class="red_btn" data-id="{{order_id}}" onclick="">Set as payment</button> -->     
+        {{ else if order_status == 0 && (pay_status == 1) }}
+           <button type="button" class="green_btn" data-id="{{order_id}}" onclick="order_qr({{order_id}},this);">Confirm</button>
+        {{ else if order_status == 1 && (pay_status == 1) && shipping_status == 0 }}
+            <button type="button" class="yellow_btn" data-id="{{order_id}}" onclick="fahuo({{order_id}});">Confirm delivery</button>
+        {{ else if pay_status == 2 }}
+            {{ if return_list.refund_type==1 }}
+                {{ if return_list.shop_addr =='' }}
+                <button type="button" class="zong_btn" data-id="{{return_list.id}}" onclick="tuikuan_btn_s({{return_list.id}});">Confirm return</button>
+                {{ else }}
+                    {{ if return_list.refund_confirm==1 }}
+                    <button type="button" class="hui_btn" readonly>to be received</button>
+                    {{ else if return_list.refund_confirm==2 }}
+                    <button type="button" class="zong_btn" data-id="{{order_id}}" onclick="tuikuan_bth({{order_id}});">Confirm refund</button>
+                    {{ /if end }}
+                {{ /if end }}
+            {{ else }}
+            <button type="button" class="zong_btn" data-id="{{order_id}}" onclick="tuikuan_bth({{order_id}});">Confirm refund</button>
+            {{ /if end }}
+        {{ else if pay_status == 4 }}
+            <button type="button" class="hui_btn" readonly>Rejected</button>
+        {{ /if end }}        
+        </div>
+        <!-- <p style="padding:5px 10px;font-size:0.14rem;">Time: {{add_time}}</p> -->
+            </div>
+        </script>
+        <!-- Set to Ship -->
+        <script type="text/template" id="fahuo">
+        <div class="mark_pop">
+                <div class="mark"></div>
+                <div class="mark_cont">
+                    <div class="mark_title">Confirm Shipment <span class="fr" onclick="close_mark();">Cancel</span></div>
+                    <div class="mui-input-row flex">
+                        <label style="padding-right: 0;font-size: 0.14rem;">Express</label>
+                <div class="mui-navigate-right " href="javascript:;">
+                    <span class="mui-badge_my">
+                        <select id="fahuo_kuaidi" class="mui-select" style="margin:auto; color:#000;font-size: 14px;color: #666;">
+                            
+                        </select>
+                    </span>
+                </div>
+            </div>
+            <div class="mui-input-row flex">
+                <label style="padding-right: 0;font-size: 0.14rem;">Single number</label>
+                <div class="">
+                   <input type="text" id="danhao" placeholder="Please enter the tracking number">
+                </div>
+            </div>
+            <div class="mui-input-row flex">
+                <label style="padding-right: 0;font-size: 0.14rem;">Notes</label>
+                <div class="">
+                   <textarea name="" id="remark" cols="30" rows="10" style="width:100%;height:0.75rem;" placeholder="Please enter shipping remarks"></textarea>
+                </div>
+            </div>
+            <div class="mark_bths flex">
+                <div><button type="button" class='close_mark'>Cancel</button></div>
+                <div><button type="button" id="fahuo_bth">Confirm delivery</button></div>
+            </div>
+        </div>
+    </div>
+</script>
+<!-- Refund -->
+<script type="text/template" id="tuikuan">
+<div class="mark_pop">
+        <div class="mark"></div>
+        <div class="mark_cont">
+            <div class="mark_title">Confirm refund <span class="fr" onclick="close_mark();">Cancel</span></div>
+            <div class="mui-input-row flex">
+                <label style="padding-right: 0;font-size: 0.14rem;">Refund amount</label>
+                <div class="m_right" id="p_1"> </div>
+            </div>
+            <!-- <div class="mui-input-row flex">
+                <label style="padding-right: 0;font-size: 0.14rem;">Refund balance</label>
+                <div class="m_right" id="p_2">
+                </div>
+            </div> -->
+            <div class="mui-input-row flex">
+                <label style="padding-right: 0;font-size: 0.14rem;">Refund points</label>
+                <div class="m_right" id="p_3"> </div>
+            </div>
+            <div class='re_confirm2 hide'>
+                <div class="mui-input-row flex">
+                    <label style="padding-right: 0;font-size: 0.14rem;">Express Type</label>
+                    <div class="m_right" id="p_4"> </div>
+                </div>
+                <div class="mui-input-row flex">
+                    <label style="padding-right: 0;font-size: 0.14rem;">Express tracking number</label>
+                    <div class="m_right" id="p_5"> </div>
+                </div>
+            </div>
+            <div class="mui-input-row flex">
+               <label style="padding-right: 0;font-size: 0.14rem;">Notes</label>
+                <div class="">
+                    <textarea name="" id="remark" cols="30" rows="10" style="width:100%;height:0.75rem;" placeholder="Please enter a note"></textarea>
+                </div>
+            </div>
+            
+            <div class="mark_bths flex">
+                <div><button type="button" id='jujue'>Refused to refund</button></div>
+                <div><button type="button" id="tuikuan_bth">Agree to refund</button></div>
+            </div>
+        </div>
+    </div>
+</script>
+<!-- Return refund -->
+<script type="text/template" id="tuikuan_s">
+    <div class="mark_pop">
+        <div class="mark"></div>
+        <div class="mark_cont">
+            <div class="mark_title">Confirm return refund <span class="fr" onclick="close_mark();">Cancel</span></div>
+            <div class="mui-input-row flex">
+                <label style="padding-right: 0;font-size: 0.14rem;">Return address</label>
+                <div>
+                    <input type="text" id="shop_addr" placeholder="Please enter return address">
+                </div>
+            </div>
+            <div class="mui-input-row flex">
+                <label style="padding-right: 0;font-size: 0.14rem;">Notes</label>
+                <div class="">
+                    <textarea name="" id="remark_s" cols="30" rows="10" style="width:100%;height:0.75rem;" placeholder="Please enter a remark (please enter the consignee when agreeing to return and other related information)"></textarea>
+                </div>
+            </div>
+            <div class="mark_bths flex">
+                <div><button type="button" id='jujue_s'>Reject return</button></div>
+                <div><button type="button" id="tuikuan_btn_s">Agree to return</button></div>
+            </div>
+        </div>
+    </div>
+</script>
+
+<script>
+var this_id='';
+
+var type=0;
+// initialize the menu
+$('.dotey_bd .dotey_div').eq(0).show();
+$(".stored_tab a").click(function() {
+    type = $(this).attr('data-type');
+    $(this).addClass('on').siblings().removeClass('on');
+     // reset the list data
+     mescroll.resetUpScroll();
+    // hide back to top button
+    mescroll.hideTopBtn();
+});
+var cur_data='';
+//Create a MeScroll object, the internal pull-down refresh is enabled by default, up.callback is automatically executed, and the list data is refreshed;
+var mescroll = new MeScroll("mescroll", {
+    up: {
+        callback: getListData,
+        isBounce: false,
+        noMoreSize: 3,
+        empty: {
+            icon: "/static/wap/images/none2.png", //icon, default null
+            tip: "There is no order record for now~~", //Tips
+        },
+        clearEmptyId: "dataList", 
+        toTop: { 
+            src: "/static/wap/images/top.png", //default scroll to 1000px display, configurable offset modification
+            offset: 1000
+        },
+        lazyLoad: {
+            use: true // Whether to enable lazy loading, default false
+        },
+        page: {
+            num: 0,
+            size:10,
+            time: null
+        },
+        htmlNodata:'<p class="upwarp-nodata">--load complete --</p>',
+        offset: 150,
+        loadFull: {
+            use: true,
+            delay: 500
+        }
+    }
+});   
+function getListData(page){
+    // load data online
+         getListDataFromNet(page.num, page.size, function(curPageData) {
+            //mescroll will automatically judge the list according to the passed parameters, if there is no data, it will prompt empty; if there is no next page of data in the list, it will prompt no more data;
+            mescroll.endSuccess(curPageData.length);
+            //set list data
+            setListData(curPageData);
+        }, function() {
+            //Callback for networking failure, hide the status of pull-down refresh and pull-up loading;
+        mescroll.endErr();
+    });
+}
+function setListData(curPageData){
+    var list='';
+    for(var i in curPageData){
+        curPageData[i].this_type=type;
+        curPageData[i].add_time=new Date(curPageData[i].add_time*1000).Format("yyyy-MM-dd hh:mm:ss");
+        list+=template('list',curPageData[i]);
+    }    
+    $('#dataList').append(list);
+}
+function getListDataFromNet(pageNum,pageSize,successCallback,errorCallback) {
+    // Delay one second, simulate networking
+    setTimeout(function () {
+    $get('/api/merchant/order_list',{type:type,page:pageNum,num:pageSize},function(d){
+        if(d.status==1){                      
+            var curPageData=d.data.list;
+            cur_data=d.data.list;
+            var listData = [];            
+            for(var i in curPageData){
+                if(i==curPageData.length) break;
+                listData.push(curPageData[i]);
+            }
+            successCallback(listData);
+        } else {
+            mescroll.endErr();
+        }
+    });
+    },1000);
+}
+
+// Confirm Order
+function order_qr(id, $this){
+    $($this).attr('disabled',true);
+    $get('/api/merchant/orderConfirm',{id:id},function(res){
+        // console.log(res);
+        mui.toast(res.msg);
+        if(res.status==1){
+            mescroll.resetUpScroll();
+            // hide back to top button
+            mescroll.hideTopBtn();
+        }
+    });
+}
+// Ship
+function fahuo(id){
+    this_id=id;
+    $('.mui-content').append(template('fahuo'));
+    $get('/api/merchant/orderDelivery',{id:id},function(res){
+        var list='';
+        for(var i in res.data){
+            list+='<option value='+res.data[i].id+'>'+res.data[i].shipping_name+'</option>'
+        }
+        $('#fahuo_kuaidi').html(list);
+        
+    });
+}
+// tuikuan
+function tuikuan_bth(id){
+    this_id=id;
+    $('.mui-content').append(template('tuikuan'));
+    $get('/api/merchant/shenhe',{id:id},function(res){
+        if(res.code==1){
+            var ref_money=parseFloat(res.data.info.refund_money)+parseFloat(res.data.info.refund_deposit);
+            if(res.data.info.refund_confirm==2){
+                $('.re_confirm2').show();
+            }
+            $('#p_1').html(ref_money.toFixed(2));
+            $('#p_2').html(res.data.info.refund_deposit);
+            $('#p_3').html(res.data.info.refund_integral);
+            $('#p_4').html(res.data.info.refund_kdlx);
+            $('#p_5').html(res.data.info.refund_kddh);
+        }
+    });
+}
+function tuikuan_btn_s(id){
+    this_id=id;   
+    $('.mui-content').append(template('tuikuan_s'));
+}
+// copy the order number
+function span_copy($this) {
+    mui.toast("Copied");
+    var val = $($this).attr('title');    
+    $($this).attr('data-clipboard-text', val);
+    var clipboard = new ClipboardJS('.span_copy');
+}
+
+$('body').on('tap','.close_mark',function(){
+    this_id='';
+    $('.mark_pop').remove();
+});
+
+function close_mark(){
+    this_id='';
+    $('.mark_pop').remove();
+}
+
+
+$('body').on('tap','#fahuo_bth',function(){
+   var danhao=$('#danhao').val();
+   var remark=$('#remark').val();
+   if(danhao==''){
+       mui.toast('Invoice number cannot be empty');
+   }else{
+    $post('/api/merchant/orderDelivery',{id:this_id,invoice_no:danhao,note:remark,shipping_id:$('#fahuo_kuaidi').val()},function(res){
+        mui.toast(res.msg);
+        if(res.code==1){
+            this_id='';
+             // reset the list data
+            mescroll.resetUpScroll();
+            // hide back to top button
+            mescroll.hideTopBtn();
+            $('.mark_pop').remove();
+        }
+        
+    });
+   }
+});
+// Agree to a refund
+$('body').on('tap','#tuikuan_bth',function(){
+    $('#tuikuan_bth').attr("disabled","true"); //Set the grayed out button
+    setTimeout("$('#tuikuan_bth').removeAttr('disabled')",3000); //Submit button after setting three seconds
+
+    var remark=$('#remark').val();
+    $post('/api/merchant/shenhe',{id:this_id,note:remark,status:1},function(res){
+        mui.toast(res.msg);
+        if(res.code==1){
+            this_id='';
+                // reset the list data
+            mescroll.resetUpScroll();
+            // hide back to top button
+            mescroll.hideTopBtn();
+            $('.mark_pop').remove();
+        }
+        
+    });
+   
+});
+$('body').on('tap','#tuikuan_btn_s',function(){
+    $('#tuikuan_btn_s').attr("disabled","true"); //Set the grayed out button
+        setTimeout("$('#tuikuan_btn_s').removeAttr('disabled')",3000); //Set the submit button after three seconds to display
+    
+       var shop_addr=$('#shop_addr').val();
+       var remark=$('#remark_s').val();
+       if(shop_addr==''){
+            mui.toast('Please fill in the return address');
+       } else if(remark==''){
+            mui.toast('Please enter the consignee and other related information');
+       } else{
+        $post('/api/merchant/return_confirm',{id:this_id,note:remark,status:1,shop_addr:shop_addr},function(res){
+            mui.toast(res.msg);
+            if(res.code==1){
+                this_id='';
+                    // reset the list data
+                mescroll.resetUpScroll();
+                // hide back to top button
+            mescroll.hideTopBtn();
+            $('.mark_pop').remove();
+        }
+        
+    });
+   }    
+});
+// reject refund
+$('body').on('tap','#jujue',function(){
+    $('#jujue').attr("disabled","true"); //Set the grayed out button
+    setTimeout("$('#jujue').removeAttr('disabled')",3000); //Set the submit button after three seconds to display
+
+   var remark=$('#remark').val();
+   if(remark==''){
+        mui.toast('Please enter a note');
+   } else{
+    $post('/api/merchant/shenhe',{id:this_id,note:remark,status:-1},function(res){
+        mui.toast(res.msg);
+        if(res.code==1){
+            this_id='';
+                // reset the list data
+            mescroll.resetUpScroll();
+            // hide back to top button
+            mescroll.hideTopBtn();
+            $('.mark_pop').remove();
+        }
+    });
+    }
+});
+$('body').on('tap','#jujue_s',function(){
+    $('#jujue_s').attr("disabled","true"); //Set the grayed out button
+        setTimeout("$('#jujue_s').removeAttr('disabled')",3000); //Set the submit button after three seconds
+    
+       var shop_addr=$('#shop_addr').val();
+       var remark=$('#remark_s').val();
+       if(remark==''){
+            mui.toast('Please enter a note');
+       } else{
+        $post('/api/merchant/return_confirm',{id:this_id,note:remark,status:-1,shop_addr:shop_addr},function(res){
+            mui.toast(res.msg);
+            if(res.code==1){
+                this_id='';
+                    // reset the list data
+                mescroll.resetUpScroll();
+                // hide back to top button
+            mescroll.hideTopBtn();
+            $('.mark_pop').remove();
+        }        
+    });
+    }
+});
+
+
+
+</script>
+</body>
+</html>

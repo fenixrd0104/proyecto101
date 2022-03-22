@@ -1,0 +1,63 @@
+<div class="layui-card">
+<div class="layui-card-body">
+    <form class="layui-form" action="" lay-filter="add_goods">  
+        <div class="layui-form-item">
+            <label class="layui-form-label" style="width:60px;">商品列表</label>
+            <div class="layui-input-block">
+                <div class="layui-col-md2" style="margin-right: 5px;">
+                <select name="city" lay-verify="">
+                    <option value="">所有分类</option>
+                </select>
+                </div>         
+                <div class="layui-col-md2" style="margin-right: 5px;">
+                <select name="city" lay-verify="">
+                    <option value="">所有品牌</option>
+                </select>
+                </div>         
+                <div class="layui-col-md2" style="margin-right: 5px;">
+                <select name="city" lay-verify="">
+                    <option value="">全部</option>
+                    <option value="1">新品</option>
+                    <option value="2">热卖</option>
+                    <option value="3">推荐</option>
+                </select>
+                </div>         
+                <div class="layui-col-md2" style="margin-right: 5px;">
+                <input type="text" name="title" autocomplete="off" placeholder="搜索" class="layui-input" value=""> 
+                </div>         
+                <div class="layui-col-md2" style="margin-right: 5px;">
+                <button type="button" class="layui-btn layuiadmin-btn-admin" data-type="">搜索</button>
+                </div>         
+            </div>
+        </div>
+    </form>
+        
+    <table class="layui-hide" id="test-table-purchase" lay-filter="test-table-operate"></table>
+    <script type="text/html" id="test-table-toolbar-purchase-list">
+        <a class="layui-btn layui-btn-normal layui-btn-xs" lay-event=""><i class="layui-icon">&#xe654;</i>添加</a>
+    </script>   
+</div>
+</div>
+<script>
+layui.use(['admin', 'form', 'table'], function(){
+  var $ = layui.$
+  ,admin = layui.admin
+  ,form = layui.form
+  ,layer = layui.layer
+  ,table = layui.table
+  ,element = layui.element
+  ,router = layui.router();
+
+  form.render(null, 'add_goods');
+  table.render({
+      elem: '#test-table-purchase'
+      ,url: '/json/table/user.js'
+      ,cols: [[
+        {field:'username', width:400, title: '商品名称' }
+        ,{field:'username', title: '价格' }
+        ,{field:'username', title: '库存'}
+        ,{fixed: '', title: '操作',  toolbar: '#test-table-toolbar-purchase-list'}
+      ]]
+    });
+});
+</script>

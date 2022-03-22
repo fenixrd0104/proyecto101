@@ -1,0 +1,256 @@
+<title>店铺信息</title>
+
+<div class="layui-card layadmin-header">
+    <div class="layui-breadcrumb" lay-filter="breadcrumb">
+        <a>分店管理</a>
+        <a><cite>本店信息</cite></a>
+    </div>
+</div>
+<style type="text/css">
+    html,body{margin:0;padding:0;}
+    .iw_poi_title {color:#CC5522;font-size:14px;font-weight:bold;overflow:hidden;padding-right:13px;white-space:nowrap}
+    .iw_poi_content {font:12px arial,sans-serif;overflow:visible;padding-top:4px;white-space:-moz-pre-wrap;word-wrap:break-word}
+</style>
+<script type="text/html" template>
+    <link rel="stylesheet" href="{{ layui.setter.base }}style/store.css?v={{ layui.admin.v }}-1" media="all">
+    <link rel="stylesheet" href="{{ layui.setter.base }}style/bMap.css?v={{ layui.admin.v }}-1" media="all">
+</script>
+
+<div class="layui-fluid" id="component-tabs">
+<div class="layui-row">
+<div class="layui-col-md12">
+<div class="layui-card">
+    <div class="layui-card-header">店铺信息</div>
+    <div class="layui-card-body">
+    <div class="layui-tab">
+        <ul class="layui-tab-title">
+            <li>基本信息</li>
+            <li class="layui-this">地址信息</li>
+            <li>本店介绍</li>
+            <li>二维码</li>
+        </ul>
+        <div class="layui-tab-content">
+            <!-- 基本信息 -->
+            <div class="layui-tab-item">
+            <div class="layui-form" lay-filter="">
+                <div class="layui-form-item">
+                    <label class="layui-form-label">店铺图片</label>
+                    <div class="layui-input-inline">
+                        <input name="avatar" lay-verify="required" id="LAY_avatarSrc" placeholder="图片地址" value="http://cdn.layui.com/avatar/168.jpg" class="layui-input">
+                    </div>
+                    <div class="layui-input-inline layui-btn-container" style="width: auto;">
+                        <button type="button" class="layui-btn" id="LAY_avatarUpload">
+                        <i class="layui-icon">&#xe67c;</i>上传图片
+                        </button>
+                        <button class="layui-btn layui-btn-primary" layadmin-event="avartatPreview">查看图片</button >
+                    </div>
+                    </div>
+                <div class="layui-form-item">
+                    <label class="layui-form-label">店铺类型</label>
+                    <div class="layui-form-mid layui-word-aux">总店</div>
+                </div>
+                <div class="layui-form-item">
+                    <label class="layui-form-label">店铺编码</label>
+                    <div class="layui-form-mid">123456</div>
+                </div>
+                <div class="layui-form-item">
+                    <label class="layui-form-label">店铺名称</label>
+                    <div class="layui-input-inline">
+                    <input type="text" name="nickname" value="贤心" lay-verify="nickname" autocomplete="off" placeholder="请输入店铺名称" class="layui-input">
+                    </div>
+                </div>
+                <div class="layui-form-item">
+                    <label class="layui-form-label">传真</label>
+                    <div class="layui-input-inline">
+                    <input type="text" name="nickname" value="贤心" lay-verify="nickname" autocomplete="off" placeholder="请输入传真" class="layui-input">
+                    </div>
+                </div>
+                <div class="layui-form-item">
+                    <label class="layui-form-label">联系人</label>
+                    <div class="layui-input-inline">
+                    <input type="text" name="nickname" value="贤心" lay-verify="nickname" autocomplete="off" placeholder="请输入联系人" class="layui-input">
+                    </div>
+                </div>
+                <div class="layui-form-item">
+                    <label class="layui-form-label">联系电话</label>
+                    <div class="layui-input-inline">
+                    <input type="text" name="nickname" value="贤心" lay-verify="nickname" autocomplete="off" placeholder="请输入联系电话" class="layui-input">
+                    </div>
+                </div>
+                <div class="layui-form-item">
+                    <label class="layui-form-label">营业时间段</label>
+                    <div class="layui-input-inline" style="width:auto;">
+                        <input type="text" name="nickname" value="00:00"  autocomplete="off" placeholder="开始时间" class="layui-input" style="display:inline-block;width: auto;">                    
+                        <input type="text" name="nickname" value="23:59"  autocomplete="off" placeholder="结束时间" class="layui-input" style="display:inline-block;width: auto;">
+                    </div>
+                    <div class="layui-form-mid layui-word-aux">例：23:59</div>
+                </div>  
+                <div class="layui-form-item">
+                    <label class="layui-form-label">创建时间</label>
+                    <div class="layui-form-mid layui-word-aux">2019/06/18 16:52:33</div>
+                </div>              
+                <div class="layui-form-item layui-form-text">
+                    <label class="layui-form-label">店铺说明</label>
+                    <div class="layui-input-block">
+                    <textarea name="remarks" placeholder="请输入内容" class="layui-textarea"></textarea>
+                    </div>
+                </div>
+                <div class="layui-form-item">
+                    <div class="layui-input-block">
+                    <button class="layui-btn" lay-submit lay-filter="setmyinfo">保存</button>
+                    </div>
+                </div>
+            </div>                
+            </div>
+            <div class="layui-tab-item layui-show">
+            <form class="layui-form"> 
+                <div class="layui-form-item" style="margin-bottom: 0;">
+                    <label class="layui-form-label">选择地区</label>
+                    <div class="layui-input-inline">
+                        <select name="province" id="province" lay-filter="province">
+                            <option value="">请选择省</option>
+                        </select>
+                     </div>
+                    <div class="layui-input-inline">
+                        <select name="city" id="city" lay-filter="city">
+                            <option value="">请选择市</option>
+                        </select>
+                    </div>
+                    <div class="layui-input-inline">
+                        <select name="area" id="area" lay-filter="area">
+                            <option value="">请选择县/区</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="layui-form-item" style="margin-bottom: 25px;">
+                    <label class="layui-form-label">详细地址</label>
+                    <div class="layui-input-block">
+                        <input type="text" id="address" name="address" value=""  autocomplete="off" placeholder="请输入详细地址" class="layui-input" style="display:inline-block;vertical-align: top;max-width:480px;"> 
+                        <button type="button" class="layui-btn" id="sreachMap">搜索地图</button>
+                    </div>   
+                </div>
+                <div class="layui-form-item">
+                    <label class="layui-form-label">地图定位</label>
+                    <div class="layui-input-block">
+                        <!--百度地图容器-->
+                        <div style="width:697px;height:550px;border:#ccc solid 1px;" id="dituContent"></div>
+                    </div>
+                </div>                 
+            </form>
+            </div>
+            <div class="layui-tab-item">
+            <div class="layui-form" lay-filter="">                            
+                <div class="layui-form-item layui-form-text">
+                    <label class="layui-form-label">店铺说明</label>
+                    <div class="layui-input-block">
+                    <textarea name="remarks" placeholder="请输入内容" class="layui-textarea"></textarea>
+                    </div>
+                </div>
+                <div class="layui-form-item">
+                    <div class="layui-input-block">
+                    <button class="layui-btn" lay-submit lay-filter="setmyinfo">保存</button>
+                    </div>
+                </div>
+            </div>
+            </div>
+            <div class="layui-tab-item">
+            <div class="layui-form" lay-filter="">                            
+                <div class="layui-form-item layui-form-text">
+                    <label class="layui-form-label">店铺二维码</label>
+                    <div class="layui-input-block">
+                    <img src="http://mp.weixin.qq.com/cgi-bin/showqrcode?ticket=gQEw8DoAAAAAAAAAASxodHRwOi8vd2VpeGluLnFxLmNvbS9xLy0wTWVla2JsSWJ0WXBFdVJ5Mjk3AAIE9DoeVQMEAAAAAA==" alt="" style="width:150px;height:150px;">
+                    </div>
+                </div>                
+            </div>
+            </div>
+        </div>
+    </div>
+    </div>
+</div>  
+</div>
+</div>      
+</div>
+
+<script>
+layui.use('store', layui.factory('store'))
+    .use('store_map', layui.factory('store_map'))
+    .use(['admin','form','bMap','layer','table'], function(){
+    var $ = layui.$
+    ,admin = layui.admin
+    ,view = layui.view
+    ,layer = layui.layer
+    ,setter = layui.setter
+    ,table = layui.table
+    ,layer = layui.layer
+    ,bMap = layui.bMap
+    ,form = layui.form;
+
+    // 三级联动--省市区
+    var str='';
+    var cur_data='';
+    admin.req({
+        url: layui.setter.baseUrl+'admin/login/getRegionTree' //实际使用请改成服务端真实接口
+        ,data: {}
+        ,type:'get'
+        ,success: function(res){
+            if(res.code==1){
+                str=res.data;
+                // console.log(res.data)
+                var list="<option value='1'>请选择省</option>";
+                for( var i in res.data){
+                    list += "<option value='"+res.data[i].value+"'>"+res.data[i].text+"</option> ";
+                }    
+                $("#province").html(list);
+                form.render('select');  
+            }else{
+                layer.msg(res.msg);
+            }            
+        } 
+    }); 
+    // 选择省
+    form.on('select(province)',function(e){
+        cur_data='';
+        get_city(e.elem.selectedIndex-1);
+        get_area_none();
+    });
+    // 选择市
+    form.on('select(city)',function(e){
+        get_area(e.elem.selectedIndex-1);
+    });
+    // 选择区县
+    form.on('select(area)',function(e){ });
+
+    function get_city(index){
+        var list="<option value='0'>请选择市</option>";
+        var data=str[index].children;        
+        cur_data=str[index].children;  
+        for( var i in data){
+            list += "<option value='"+data[i].value+"'>"+data[i].text+"</option> ";
+        }    
+        $("#city").html(list);
+        form.render('select');  
+    }
+    function get_area(index){
+        var list="<option value='0'>请选择县/区</option>";
+        if(cur_data[index].children){
+            var data=cur_data[index].children;
+            for( var i in data){
+            list += "<option value='"+data[i].value+"'>"+data[i].text+"</option> ";
+        }   
+        }else{
+            var data=cur_data[index];
+            list = "<option value='"+data.value+"'>"+data.text+"</option> ";
+        }            
+        $("#area").html(list);
+        form.render('select');
+    }
+    function get_area_none(){
+        var list="<option value='0'>请选择县/区</option>";        
+        $("#area").html(list);
+        form.render('select');
+    }
+
+    
+
+});    
+</script>

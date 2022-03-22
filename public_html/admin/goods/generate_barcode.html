@@ -1,0 +1,99 @@
+<style>
+.bd_canvas{ margin: 0 auto; }
+</style>
+<div class="body">
+<!--startprint-->
+<div class="bd_canvas" id="bd_canvas">    
+
+</div>
+<!--endprint-->
+</div>
+<!-- 第一步：编写模版 -->
+<script id="demo" type="text/html">
+    {{#  layui.each(d, function(index, item){ }}
+        {{# if( item.type == "text" ) { }}
+            <span class='subobj span_{{index}}' style='width: {{item.width}}px;height:{{item.height}}px;top:{{item.top}}px;left:{{item.left}}px'>{{item.value}}</span>
+        {{# } else { }}
+            <span class='subobj span_{{index}}' style='width: {{item.width}}px;height:{{item.height}}px;top:{{item.top}}px;left:{{item.left}}px'><img id='img_{{index}}' width="{{item.width}}px" height="{{item.height}}px" ></span>
+        {{# } }}  
+    {{#  }); }}
+</script>       
+        
+        
+        
+<script>
+layui.use('JsBarcode.all.min', layui.factory('JsBarcode.all.min'))
+.use(['admin', 'upload','form','table','view','laytpl'], function(){
+    var $ = layui.$
+    ,laytpl = layui.laytpl
+    ,admin = layui.admin
+    ,upload = layui.upload
+    ,element = layui.element
+    ,view = layui.view
+    ,layer = layui.layer
+    ,form = layui.form;
+
+    form.render();
+    // 获取传值参数---得到id
+    var router = layui.router();
+    // console.log(router.search);
+    var spec_id = router.search.spec_id;
+    
+// 打印条形码          
+admin.req({
+    url: layui.setter.baseUrl+'admin/Barcode/barCode' 
+    ,data: { spec_id: spec_id }
+    ,type:'get'
+    ,success: function(res){
+    if(res.code){
+        $('#bd_canvas').width(res.data.width);
+        $('#bd_canvas').height(res.data.height);
+        $('.bd_canvas').css({
+            'position':"relative",
+            'background':'#fff'
+        });
+       
+         //第三步：渲染模版
+         var getTpl = demo.innerHTML
+        ,view = document.getElementById('bd_canvas');
+        laytpl(getTpl).render(res.data.sub, function(html){
+            view.innerHTML = html;
+        });
+        for( var index in res.data.sub ){
+            $('.span_'+index).css({
+                'display':"inline-block",
+                'position':"absolute",
+            });
+            if( res.data.sub[index].type=="img" ){
+                $("#img_"+index).JsBarcode( res.data.sub[index].value );
+            }
+        }  
+        myprint();
+        
+    }else{
+        // layer.msg(res.msg, {icon: 5,anim: 6,shade:0.5,time: 1500});
+    }
+    }
+}); 
+
+
+// 打印
+function myprint(){ 
+    //直接调用浏览器打印功能
+    bdhtml=window.document.body.innerHTML; 
+    //定义打印区域起始字符，根据这个截取网页局部内容     
+    sprnstr="<!--startprint-->"; //打印区域开始的标记
+    eprnstr="<!--endprint-->";   //打印区域结束的标记  
+    prnhtml=bdhtml.substr(bdhtml.indexOf(sprnstr)+17);      
+    prnhtml=prnhtml.substring(0,prnhtml.indexOf(eprnstr));     
+    window.document.body.innerHTML=prnhtml;   
+    //开始打印
+    window.print(); 
+    //还原网页内容     
+    window.document.body.innerHTML=bdhtml; 
+}
+
+    
+
+});
+</script>

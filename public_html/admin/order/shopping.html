@@ -1,0 +1,223 @@
+
+<title>快递列表</title>
+
+<div class="layui-card layadmin-header">
+    <div class="layui-breadcrumb" lay-filter="breadcrumb">
+        <a>快递列表</a>
+        <a><cite>快递列表</cite></a>
+    </div>
+</div>
+<div class="layui-fluid">
+    <div class="layui-row layui-col-space15">
+        <div class="layui-col-md12">
+            <div class="layui-card">
+                <div class="layui-card-header">快递列表</div>
+                <div class="layui-card-body">
+                	<div class="test-table-reload-btn" style="margin-bottom: 10px;">
+                        <button type="button" class="layui-btn layuiadmin-btn-admin" data-type="add"><i class="layui-icon layui-icon-add-1 layuiadmin-button-btn"></i>添加</button>
+                    </div>
+                    <table class="layui-hide" id="table_list" lay-filter="table_list"></table>
+                    <script type="text/html" id="tool_ar_list">
+                        <a class="layui-btn layui-btn-normal layui-btn-xs" lay-event="edit"><i class="layui-icon layui-icon-edit"></i>编辑</a>
+                        <!-- <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del"><i class="layui-icon layui-icon-delete"></i>删除</a> -->
+                    </script>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    layui.use(['admin','table', 'view', 'form', 'util', 'layedit','setter','layer','ourJs'], function(){
+        var $ = layui.$
+            ,admin = layui.admin
+            ,setter = layui.setter
+            ,element = layui.element
+            ,form = layui.form
+            ,view = layui.view
+            ,layer = layui.layer
+            ,util = layui.util
+            ,layedit = layui.layedit
+            ,table = layui.table
+            ,ourJs = layui.ourJs
+            ,router = layui.router();
+
+
+        table.render({
+            elem: '#table_list'
+            ,url: layui.setter.baseUrl+'admin/order/shopping_list'
+            ,parseData: function(res){ //res 即为原始返回的数据
+                return {
+                    "code": res.code, //解析接口状态
+                    "msg": res.msg, //解析提示文本
+                    "count": res.data.count, //解析数据长度
+                    "data": res.data.list //解析数据列表
+                };
+            }
+            ,cols: [[
+                {field:'id', width:70, title: 'ID', sort: true, align:'center'}
+                ,{field:'shipping_name', width:130, title: '快递名称', align:'center'}
+                ,{field:'shipping_desc', title: '快递描述', align:'center'}
+                ,{field:'status',width:130, title: '状态', align:'center',templet:function(d){
+                		if(d.status == 1){
+                			return '正常';
+                		}else{
+                			return '关闭';
+                		}
+                	}
+             	}
+                ,{fixed: 'right', title: '操作', align:'center',  toolbar: '#tool_ar_list',width:160}
+            ]]
+            ,page:true
+        });
+
+        var $ = layui.$, active = {
+            // 添加会员组
+            add:function(){
+                admin.popup({
+                    title: "新增",
+                    area: admin.screen() < 2 ? ['80%', '70%'] :["400px", "400px"],
+                    id: "LAY-popup-add_ar",
+                    success: function(layero, index){
+                        view(this.id).render('/order/add_shopping').done(function() {
+                            form.render(null, 'form_add'); // 弹窗的lay-filter值
+
+                            //$("#LAY-select").html(list);
+                            form.render('select');
+                            //监听提交
+                            form.on('submit(save_button)', function(data){
+                                admin.req({
+                                    url: layui.setter.baseUrl+'admin/order/add_shopping'
+                                    ,data: data.field,
+                                    type:'post',
+                                    success: function(res){
+                                        if(res.code==1){
+                                            layer.msg(res.msg , {icon: 1,shade:0.5,time: 1000} , function(){
+                                                layer.close(index); //执行关闭
+                                                layui.table.reload('table_list'); //重载表格
+                                            });
+                                        }else{
+                                            layer.msg(res.msg, {icon: 5,anim: 6,shade:0.5,time: 1000});
+                                        }
+                                    }
+                                });
+                            });
+
+                        });
+                    }
+                });
+            }
+            // 搜索
+            ,reload: function(){
+                //执行重载
+                table.reload('table_list', {
+                    page: {
+                        curr: 1 //重新从第 1 页开始
+                    }
+                    ,where: {
+                        keyWords:  $('#test-table-demoReload').val()
+                    }
+                });
+            }
+        };
+
+        $('.test-table-reload-btn .layui-btn').on('click', function(){
+            var type = $(this).data('type');
+            active[type] ? active[type].call(this) : '';
+        });
+
+        //监听工具条
+        table.on('tool(table_list)', function(obj){
+            var data = obj.data;
+            if(obj.event === 'del'){
+                layer.confirm('确认删除?', {icon: 3, title:'提示'}, function(index){
+                    admin.req({
+                        url: layui.setter.baseUrl+'admin/order/del_package'
+                        ,data: {id:data.id},
+                        type:'get',
+                        success: function(res){
+                            if(res.code==1){
+                                layer.msg(res.msg);
+                                obj.del();
+                                layer.close(index);
+                            }else{
+                                layer.msg(res.msg);
+                            }
+                        }
+                    });
+                });
+            } else if(obj.event === 'edit'){
+                // 编辑
+                // console.log(data);
+                admin.popup({
+                    title: "编辑",
+                    area: admin.screen() < 2 ? ['80%', '70%'] :["400px", "400px"],
+                    id: "LAY-popup-edit_ar",
+                    success: function(layero, index){
+                        view(this.id).render('/order/edit_shopping',data).done(function() {
+                            form.render(null, 'edit_purch'); 
+                            var select_status ='<option value="">==请选择状态==</option>';
+			                    select_status +='<option value="0" '+ if_status(data.status,0) +'>关闭</option>';
+			                    select_status +='<option value="1" '+ if_status(data.status,1) +'>开启</option>';
+			                $('#select_status').html(select_status);      
+			                  
+                            // 弹窗的lay-filter值
+                            // for( var i in res_url){
+                            //     if(res_url[i].name==data.name){
+                            //         curr_id=res_url[i].id;
+                            //     }
+                            // }
+                            //$("#LAY-select").html(list);
+                            //$("#LAY-select").val(curr_id);
+                            form.render('select');
+                            //监听提交
+                            form.on('submit(form_save)', function(datas){
+                                // console.log(data);
+                                datas.field.id=obj.data.id;
+                                delete datas.field.file;
+                                delete datas.field.editorValue;
+                                delete datas.field.upfile;
+                                admin.req({
+                                    url: layui.setter.baseUrl+'admin/order/add_shopping'
+                                    ,data:datas.field,
+                                    type:'post',
+                                    success: function(res){
+                                        if(res.code==1){
+                                            layer.msg(res.msg , {icon: 1,time: 1000} , function(){
+                                                layer.close(index); //执行关闭
+                                                layui.table.reload('table_list'); //重载表格
+                                            });
+                                        }else{
+                                            layer.msg(res.msg, {icon: 5,anim: 6,shade:0.5,time: 1000});
+                                        }
+                                    }
+                                });
+                            });
+
+                        });
+                    }
+                });
+            }
+        });
+
+        //监听工具条
+        table.on('tool(ar_list)', function(obj){
+            var data = obj.data;
+        });
+
+        // 监听状态修改
+        form.on('switch(checkbox_status)',function(e){
+            var _this=this,status=e.elem.checked;
+        });
+        // 推荐
+        form.on('checkbox(tui_status)',function(e){
+            
+        });
+    });
+
+	function if_status(data,e){
+        if(data == e){
+            return 'selected';
+        }
+    }
+</script>

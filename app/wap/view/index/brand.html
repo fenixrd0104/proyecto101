@@ -1,0 +1,87 @@
+{include file="public/header"/}
+
+</head>
+<body>
+    <header class="mui-bar mui-bar-nav index_header shop_head" id="header">
+        <a class="back-page mui-icon mui-icon-left-nav mui-pull-left" href="javascript:;"></a>
+        <a id="menu" class="mui-action-menu mui-icon mui-icon-bars mui-pull-right" href="javascript:void(0);"></a>
+        <h1 class="mui-title">Brand Street</h1>
+    </header>
+    <div class="mui-content street_content">
+        <!-- Swiper -->
+        <div class="swiper-container brand_swiper">
+            <div class="swiper-wrapper brand_wrapper">
+                <div class="swiper-slide">
+                    <a href="###">
+                        <img src="__IMG__/img_18.jpg"/>
+                        <p class="red">KRC 500.00</p>
+                        <p class="hui">KRC 126.00</p>
+                    </a>                    
+                </div>
+                <div class="swiper-slide">
+                    <a href="###">
+                        <img src="__IMG__/img_18.jpg"/>
+                        <p class="red">KRC 500.00</p>
+                        <p class="hui">KRC 126.00</p>
+                    </a>                    
+                </div>
+                <div class="swiper-slide">
+                    <a href="###">
+                        <img src="__IMG__/img_18.jpg"/>
+                        <p class="red">KRC 500.00</p>
+                        <p class="hui">KRC 126.00</p>
+                    </a>                    
+                </div>
+                <div class="swiper-slide">
+                    <a href="###">
+                        <img src="__IMG__/img_18.jpg"/>
+                        <p class="red">KRC 500.00</p>
+                        <p class="hui">KRC 126.00</p>
+                    </a>                    
+                </div>
+            </div>
+            <div class="swiper-button-next brand_right"></div>
+            <div class="swiper-button-prev brand_left"></div>
+        </div>
+        <div class="brand_down mui-clearfix">
+            <p>Recommended big names</p>
+            <ul>
+                <li><a href="###"><img src="__IMG__/img_20.jpg"/></a></li>
+                <li><a href="###"><img src="__IMG__/img_20.jpg"/></a></li>
+                <li><a href="###"><img src="__IMG__/img_20.jpg"/></a></li>
+                <li><a href="###"><img src="__IMG__/img_20.jpg"/></a></li>
+                <li><a href="###"><img src="__IMG__/img_20.jpg"/></a></li>
+            </ul>
+        </div>
+
+
+
+
+
+    </div>
+    {include file="public/head_nav"/}
+    {include file="public/footer"/}
+    <script>
+        var swiper = new Swiper('.swiper-container', {
+            slidesPerView: 3,
+            pagination: {
+                el: '.swiper-pagination',
+                clickable: true,
+            },
+            navigation: {
+                nextEl: '.swiper-button-next',
+                prevEl: '.swiper-button-prev',
+            },
+        });
+         /* 头部导航栏 */
+         $('#menu').click(function(e){
+            $('.login_pop').toggle(); 
+            e.stopPropagation();                     
+        })       
+        $('body').click(function(){
+            $('.login_pop').hide();          
+        }) 
+        
+    </script>
+</body>
+</html>

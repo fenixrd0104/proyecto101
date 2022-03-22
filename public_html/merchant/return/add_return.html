@@ -1,0 +1,158 @@
+<title>添加商品</title>
+<script type="text/html" template>
+  <link rel="stylesheet" href="{{ layui.setter.base }}style/dtreefont.css?v={{ layui.admin.v }}-1" media="all">
+  <link rel="stylesheet" href="{{ layui.setter.base }}style/dtree.css?v={{ layui.admin.v }}-1" media="all">
+</script>
+<style>
+body .layui-layer-admin .layui-layer-content cite{color: #000;}
+.layui_dtree{ 
+  border: 1px solid #e6e6e6; 
+  height: 500px;
+  overflow-y: auto;
+}
+#LAY-popup-new_purchase{padding: 20px 10px;}
+#demoTree{width: 88%;}
+.dtree-nav-item{padding-left: 8px;}
+</style>
+
+<div class="layui-card-body" style="padding: 0">
+  <div class="layui-col-md3 layui-col-sm3 layui-col-xs4 layui_dtree" >
+      <ul id="demoTree" class="dtree" data-id="0"></ul>
+  </div> 
+  <div class="layui-col-md9 layui-col-sm9 layui-col-xs8" style="padding-left: 10px;">
+    <div class="test-table-reload-btn layui-clear">
+        <div class="layui-form">
+            <div class="layui-inline">
+                <input class="layui-input" name="keywords" placeholder="商品名称/商品货号" style="width: 220px" id="test-table-demoReload" autocomplete="off">
+            </div>
+            <button type="button" class="layui-btn" lay-submit lay-filter="search_submit"><i class="layui-icon">&#xe615;</i>搜索</button>         
+            <!-- <div style="float: right;">
+                <button class="layui-btn" id="layuibtn" data-type="getCheckData">批量添加</button>
+            </div> -->
+          </div>
+  </div> 
+
+  <table class="layui-hide" id="test-table-reload" lay-filter="test-table-reload"></table>    
+  <script type="text/html" id="test-table-ad_list">
+      <button class="layui-btn layui-btn-normal layui-btn-xs" lay-event="choose">选择</button>
+  </script>  
+  </div>
+     
+</div>
+
+<script type="text/html" template lay-done="layui.data.sendParams(d.params)"></script>
+<script>
+layui.data.sendParams = function(params){
+  // console.log(params);
+layui.use(['admin','table','tree','dtree','layer','form'], function(){
+  var $ = layui.$
+  ,admin = layui.admin
+  ,element = layui.element
+  ,tree = layui.tree
+  ,layer = layui.layer
+  ,dtree = layui.dtree
+  ,layer = layui.layer
+  ,table = layui.table
+  ,form = layui.form
+  ,router = layui.router();
+
+
+  // 树形结构
+  var tree_id = '1';
+  admin.req({
+    url: layui.setter.baseUrl+'merchant/goods/getCategoryTree'
+    ,data: { }
+    ,type:'get'
+    ,success: function(res){
+      if(res.code==1){
+        dtree.render({
+          elem: "#demoTree"
+          ,data: res.data
+          ,line: true  // 显示树线
+          ,icon: "-1"  // 隐藏二级图标
+          
+        });
+         // 绑定节点点击
+        dtree.on("node('demoTree')" ,function(obj){
+          // console.log(obj.param);
+          tree_id = obj.param.nodeId;
+          table_tree(tree_id);
+          // layui.table.reload('test-table-reload'); //重载表格
+        });
+      }else{
+          layer.msg(res.msg);
+      }
+    }
+  }); 
+  
+  // 表格数据
+  var supplier_id=params.supplier_id;
+  table_tree(tree_id);
+  function table_tree(tree_id){
+    table.render({
+      elem: '#test-table-reload'
+      ,url: layui.setter.baseUrl+'merchant/goods/getCoodsByCategory'
+      ,parseData: function(res){ //res 即为原始返回的数据
+        return {
+        "code": res.code, //解析接口状态
+        "msg": res.msg, //解析提示文本
+        "count": res.data.count, //解析数据长度
+        "data": res.data.lists //解析数据列表
+        };
+      }
+      ,cols: [[
+        {type:'checkbox'}
+        ,{field:'id', width:80, title: '行号', sort: true, align:'center'}
+        ,{field:'goods_sn', title: '商品条码', align:'center'}
+        ,{field:'goods_name', title: '商品名称', align:'center'}
+        ,{field:'cost_price', width:80, title: '价格', align:'center'}
+        ,{fixed: '', title: '操作', width:90, align:'center',  toolbar: '#test-table-ad_list'}
+      ]]
+      ,page:true     
+      ,where: { cid: tree_id, supplier_id:supplier_id }
+    });
+  }
+
+  //获取选中数据---批量添加
+  var $ = layui.$, active = {   
+      getCheckData: function(){ 
+          var checkStatus = table.checkStatus('test-table-reload')
+              ,data = checkStatus.data;
+          layer.alert(JSON.stringify(data));
+      }
+  };    
+  $('#layuibtn').on('click', function(){
+    var type = $(this).data('type');
+    active[type] ? active[type].call(this) : '';
+  });
+    // 搜索
+    form.on('submit(search_submit)',function(e){
+    table.render({
+      elem: '#test-table-reload'
+      ,url: layui.setter.baseUrl+'merchant/goods/searchByGoodsNameOrGoodsSn'
+      ,parseData: function(res){ //res 即为原始返回的数据
+        return {
+        "code": res.code, //解析接口状态
+        "msg": res.msg, //解析提示文本
+        "count": res.data.count, //解析数据长度
+        "data": res.data.lists //解析数据列表
+        };
+      }
+      ,cols: [[
+        {type:'checkbox'}
+        ,{field:'id', width:80, title: '行号', sort: true, align:'center'}
+        ,{field:'goods_sn', title: '商品条码', align:'center'}
+        ,{field:'goods_name', title: '商品名称', align:'center'}
+        ,{field:'cost_price', width:80, title: '价格', align:'center'}
+        ,{fixed: '', title: '操作', width:90, align:'center',  toolbar: '#test-table-ad_list'}
+      ]]
+      ,page:true  
+      ,where: { keywords: e.field.keywords, supplier_id:supplier_id }
+    });
+  });
+  
+  
+  
+});
+}
+</script>

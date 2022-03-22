@@ -1,0 +1,125 @@
+
+<title>会员等级</title>
+
+<div class="layui-card layadmin-header">
+  <div class="layui-breadcrumb" lay-filter="breadcrumb">
+    <a>会员管理</a>
+    <a><cite>会员等级</cite></a>
+  </div>
+</div>
+<div class="layui-fluid">
+  <div class="layui-row layui-col-space15">
+    <div class="layui-col-md12">
+      <div class="layui-card">
+        <div class="layui-card-header">会员等级</div>
+        <div class="layui-card-body"> 
+            <div class="test-table-reload-btn" style="margin-bottom: 10px;">
+              <button type="button" class="layui-btn layuiadmin-btn-admin" style="margin-right: 30px;" data-type="add"><i class="layui-icon layui-icon-add-1 layuiadmin-button-btn"></i>添加等级</button>
+              <div class="layui-inline">
+                <input class="layui-input" name="id" placeholder="输入需查询等级" id="test-table-demoReload" autocomplete="off">
+              </div>
+              <button type="button" class="layui-btn" data-type="reload"><i class="layui-icon">&#xe615;</i>搜索</button>
+            </div>   
+            <table class="layui-hide" id="test-table-reload" lay-filter="test-table-operate"></table>    
+            <script type="text/html" id="test-table-operate-barDemo">
+              <a class="layui-btn layui-btn-normal layui-btn-xs" lay-event="edit"><i class="layui-icon layui-icon-edit"></i>编辑</a>
+              <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del"><i class="layui-icon layui-icon-delete"></i>删除</a>
+            </script>   
+            <script type="text/html" id="test-table-images">
+              <img src="/static/admin/src/style/res/head_default.gif" height="100%" alt="">
+            </script>     
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+layui.use(['admin','table', 'view', 'form','layer'], function(){
+  var $ = layui.$
+  ,admin = layui.admin
+  ,element = layui.element
+  ,form = layui.form
+  ,view = layui.view
+  ,layer = layui.layer
+  ,table = layui.table
+  ,router = layui.router();
+
+  table.render({
+      elem: '#test-table-reload'
+      ,url: '/json/table/user.js'
+      ,cols: [[
+        {field:'id', title: 'ID', sort: true, align:'center'}
+        ,{field:'username', title: '等级名称', align:'center'}
+        ,{field:'img', title: '图片', templet: '#test-table-images', align:'center'}
+        ,{field:'state',  title: '分值', align:'center'}
+        ,{fixed: '', title: '操作', align:'center',  toolbar: '#test-table-operate-barDemo'}
+      ]]
+    });
+
+     
+     var $ = layui.$, active = {
+      // 添加等级
+      add:function(){
+        admin.popup({
+          title: "添加等级",
+          area: admin.screen() < 2 ? ['95%', '80%'] :["600px", "520px"],
+          id: "LAY-popup-add_menu",
+          success: function(layero, index){
+            view(this.id).render('/member/add_grade').done(function() {
+              form.render(null, 'add_grade'); // 弹窗的lay-filter值
+               
+              
+            });
+          }
+        });
+      }
+      // 搜索
+      ,reload: function(){
+        var demoReload = $('#test-table-demoReload');        
+        //执行重载
+        table.reload('test-table-reload', {
+          page: {
+            curr: 1 //重新从第 1 页开始
+          }
+          ,where: {
+            key: {
+              id: demoReload.val()
+            }
+          }
+        });
+      }
+    };
+    
+    $('.test-table-reload-btn .layui-btn').on('click', function(){
+      var type = $(this).data('type');
+      active[type] ? active[type].call(this) : '';
+    });
+    
+    //监听工具条
+    table.on('tool(test-table-operate)', function(obj){
+      var data = obj.data;
+      if(obj.event === 'del'){
+        layer.confirm('确认删除此等级?', {icon: 3, title:'提示'}, function(index){
+          obj.del();
+          layer.close(index);
+        });
+      } else if(obj.event === 'edit'){
+        // 编辑
+        admin.popup({
+          title: "编辑等级",
+          area: admin.screen() < 2 ? ['95%', '80%'] :["600px", "520px"],
+          id: "LAY-popup-add_menu",
+          success: function(layero, index){
+            view(this.id).render('/member/add_grade',data).done(function() {
+              form.render(null, 'add_grade'); // 弹窗的lay-filter值
+               //监听提交
+              
+            });
+          }
+        });
+      } 
+    });
+  
+});
+</script>

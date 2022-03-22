@@ -1,0 +1,81 @@
+{include file="public/header"/}
+
+</head>
+<body>
+    <header class="mui-bar mui-bar-nav index_header shop_head" id="header">
+        <a class="back-page mui-icon mui-icon-left-nav mui-pull-left" href="javascript:;"></a>
+        <a id="menu" class="mui-action-menu mui-icon mui-icon-bars mui-pull-right" href="javascript:void(0);"></a>
+        <h1 class="mui-title">Store details</h1>
+    </header>
+    <div class="mui-content store_content">
+        <div class="dpabout_title">
+            <div class="goods_storeup mui-clearfix ">
+                <div class="store_img fl"><img src="/static/wap/images/touxiang.png"></div>
+                <p class="name fl mui-ellipsis">His Original</p>
+            </div>
+            <ul class="goods_evaluation">
+                <li>
+                    <p class="up textl">Item&nbsp;<span>3.00 points</span></p>
+                </li>
+                <li>
+                    <p class="up">Service&nbsp;<span>2.57 points</span></p>
+                </li>
+                <li>
+                    <p class="up textr">Logistics&nbsp;<span>3.43 points</span></p>
+                </li>
+            </ul>
+            <ul class="dp_myshin">
+                <li><a href="javascript:void(0);">
+                    <p>21</p>
+                    <span>All items</span>
+                </a></li>
+                <li><a href="javascript:void(0);">
+                    <p>7</p>
+                    <span>New</span>
+                </a></li>
+                <li><a href="javascript:void(0);">
+                    <p>13</p>
+                    <span>Best selling</span>
+                </a></li>
+            </ul>
+        </div>
+        <ul class="dp_mylist">
+            <li>
+                <span>Online Customer Service</span>
+                <i class="iconfont icon-kefu"></i>
+            </li>
+            <li>
+                <span>Store QR code</span>
+                <i class="iconfont icon-erweima"></i>
+            </li>
+            <li>
+                <span>Online Customer Service</span>
+                <i class="iconfont icon-dianhua"></i>
+            </li>
+        </ul>
+        <ul class="dp_open">
+            <li>
+                <span>Opening hours</span>
+                <p class="time fr">2018-02-28</p>
+            </li>
+            <li>
+                <span>Store address</span>
+                <p class="address">Guangdong Province, Guangzhou City, Liwan District</p>
+            </li>
+        </ul>
+    </div>
+    {include file="public/head_nav"/}
+    {include file="public/footer"/}
+    <script>
+
+        /* header navigation bar */
+        $('#menu').click(function(e){
+            $('.login_pop').toggle();
+            e.stopPropagation();
+        })
+        $('body').click(function(){
+            $('.login_pop').hide();    
+        }) 
+    </script>
+</body>
+</html>

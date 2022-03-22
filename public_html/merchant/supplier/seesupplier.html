@@ -1,0 +1,181 @@
+<style>
+#see_supplier .layui-form-label{
+    width: 100px;
+    padding: 9px 0;
+    box-sizing: border-box;
+}
+#see_supplier .layui-input-block{
+    margin-left: 100px;
+}
+#see_supplier .layui-input-block input{
+    border: none;
+    padding-left: 5px;
+}
+#see_supplier #goods_img{
+    width: 250px;
+}
+</style>
+
+<form class="layui-form" id="see_supplier" action="" lay-filter="seesupplier">
+<div class="layui-row layui-col-space10">
+    <div class="layui-col-md12" style="text-align: center;margin: 10px 0;">
+        <div class="layui-input-inline">
+            <input name="supplier_img" lay-verify="required" id="goods_img" placeholder="请上传供应商LOGO" class="layui-input" disabled>            
+        </div>
+        <div class="layui-input-inline layui-btn-container"  style="width: auto;">
+            <!-- <button type="button" class="layui-btn" id="LAY_avatarUpload" style="margin-bottom:0;"><i class="layui-icon">&#xe67c;</i>上传图片</button> -->
+            <a class="layui-btn layui-btn-primary" onclick="see_img();"  style="margin-bottom:0;">查看图片</a>
+        </div>
+    </div>
+    <div class="layui-col-md6">
+        <label class="layui-form-label">供应商名称：</label>
+        <div class="layui-input-block">
+            <input type="text" name="supplier_name" class="layui-input" disabled>
+        </div>
+    </div>
+    <div class="layui-col-md6">
+        <label class="layui-form-label">状态：</label>
+        <div class="layui-input-block">
+            <input type="text" name="supplier_status" class="layui-input" disabled>
+        </div>
+    </div>
+    <div class="layui-col-md6">
+        <label class="layui-form-label">联系人：</label>
+        <div class="layui-input-block">
+            <input type="text" name="supplier_contacts" class="layui-input" disabled>
+        </div>
+    </div>
+    <div class="layui-col-md6">
+        <label class="layui-form-label">联系电话：</label>
+        <div class="layui-input-block">
+            <input type="text" name="supplier_phone" class="layui-input" disabled>
+        </div>
+    </div>
+    <div class="layui-col-md6">
+        <label class="layui-form-label">邮箱：</label>
+        <div class="layui-input-block">
+            <input type="text" name="supplier_email" class="layui-input" disabled>
+        </div>
+    </div>
+    <div class="layui-col-md6">
+        <label class="layui-form-label">传真：</label>
+        <div class="layui-input-block">
+            <input type="text" name="supplier_fax" class="layui-input" disabled>
+        </div>
+    </div>
+    <div class="layui-col-md6">
+        <label class="layui-form-label">公司电话：</label>
+        <div class="layui-input-block">
+            <input type="text" name="supplier_tel" class="layui-input" disabled>
+        </div>
+    </div>
+    <div class="layui-col-md6">
+        <label class="layui-form-label">官网地址：</label>
+        <div class="layui-input-block">
+            <input type="text" name="supplier_web" class="layui-input" disabled>
+        </div>
+    </div>
+    <div class="layui-col-md6">
+        <label class="layui-form-label">开户行：</label>
+        <div class="layui-input-block">
+            <input type="text" name="supplier_bank" class="layui-input" disabled>
+        </div>
+    </div>
+    <div class="layui-col-md6">
+        <label class="layui-form-label">银行账号：</label>
+        <div class="layui-input-block">
+            <input type="text" name="supplier_card" class="layui-input" disabled>
+        </div>
+    </div>
+    <div class="layui-col-md12">
+        <label class="layui-form-label">地址：</label>
+        <div class="layui-input-block">
+            <input type="text" name="supplier_addr" class="layui-input" disabled>
+        </div>
+    </div>
+</div>
+</form>
+
+<script type="text/html" template lay-done="layui.data.sendParams(d.params)"></script>
+<script>
+layui.data.sendParams = function(params){
+// console.log(params);
+    
+layui.use(['admin', 'upload','form','layer','table'], function(){
+    var $ = layui.jquery
+    ,admin = layui.admin
+    ,layer = layui.layer
+    ,element = layui.element
+    ,form = layui.form
+    ,setter = layui.setter
+    ,upload = layui.upload
+    ,view = layui.view
+    ,table = layui.table
+    ,router = layui.router();
+
+    form.render();
+
+    admin.req({
+        url: layui.setter.baseUrl+'merchant/supplier/get'
+        ,data:{ id:params.supplier_id }
+        ,type:'get'
+        ,success: function(res){
+        if(res.code==1){
+            // 赋值
+            form.val("seesupplier",{
+                "supplier_img" : res.data.supplier_img,
+                "supplier_name" : res.data.supplier_name,
+                "supplier_status" : res.data.supplier_status,
+                "supplier_contacts" : res.data.supplier_contacts,
+                "supplier_phone" : res.data.supplier_phone,
+                "supplier_email" : res.data.supplier_email,
+                "supplier_fax" : res.data.supplier_fax,
+                "supplier_tel" : res.data.supplier_tel,
+                "supplier_web" : res.data.supplier_web,
+                "supplier_bank" : res.data.supplier_bank,
+                "supplier_card" : res.data.supplier_card,
+                "supplier_addr" : res.data.supplier_addr,
+            });         
+            }else{
+                layer.msg(res.msg, {icon: 5,anim: 6,shade:0.5,time: 1500});
+            }
+        }
+    });
+
+
+    // 图上传
+    upload.render({
+        elem: '#LAY_avatarUpload'
+        ,url: layui.setter.baseUrl+'merchant/upload/upload'
+        ,multiple: true
+        ,before: function(obj){
+        //预读本地文件示例，不支持ie8
+            obj.preview(function(index, file, result){
+                $('#upload_goods_images_box').append('<img src="'+ result +'" alt="'+ file.name +'" class="layui-upload-img" style="width:120px;height:120px;margin:0 15px 15px 0px;">')
+            });
+        }
+        ,done: function(res){
+        //上传完毕
+
+        $('#goods_img').val(res.data);
+        }
+    });
+    // 查看图片
+    window.see_img=function(){
+        var i = $('#goods_img').val();
+        layer.photos({
+            photos: {
+                title: "查看头像",
+                data: [{
+                    src: i
+                }]
+            },
+            shade: 0.5,
+            closeBtn: 1,
+            anim: 5
+        });
+    };
+
+});
+}
+</script>

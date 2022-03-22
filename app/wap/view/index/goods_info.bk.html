@@ -1,0 +1,609 @@
+{include file="public/header"/}
+<style>
+.addcat_demos .layui-layer-content{
+    padding: 0.16rem !important;
+}
+</style>
+</head>    
+<body>
+<header class="mui-bar mui-bar-nav index_header bg_white" id="header" >
+    <a class="mui-action-back mui-icon mui-icon-left-nav mui-pull-left" href="javascript:;"></a>
+    <a id="menu" class="mui-action-menu mui-icon mui-icon-bars mui-pull-right" href="javascript:void(0);"></a>
+    <div class="goodinfo_hd mui-title">
+        <ul>
+            <li class="goodsin_shop on">Goods</li>
+            <li class="goodsin_more">Details</li>
+            <li class="goodsin_comm">Reviews</li>
+        </ul>
+    </div>
+</header>
+<div class="mui-content goods_content">
+    <!-- Product -->
+    <div class="xq_details details_shop">
+        <div class="swiper-container goods_lunbo">
+            <div class="swiper-wrapper">
+                <!-- <div class="swiper-slide">
+                    <img src="__IMG__/img_22.png" alt="">
+                </div> -->
+            </div>
+            <div class="swiper-pagination"></div>
+        </div>
+        <div class="goods_up" id="goods_up">
+            <div class="goods_title mui-clearfix">
+                <p class="mui-ellipsis-2 fl"></p>
+            </div>
+            <p class="red">KRC</p>
+            <p class="sales">Sales:&nbsp;&nbsp;&nbsp;Current Inventory:</p>
+            <p class="market">Market price: <span></span></p>
+        </div>
+        <div class="mb10"></div>
+        <div class="goods_floor">
+            <ul class="goods_floorul">
+                <li class="goodspop">
+                    <span>Specification</span>
+                    <p>
+                        <span class="size_span"></span>
+                        <span>&nbsp;&nbsp;&nbsp;&nbsp;</span> 
+                        <span class="piece_span">1</span>
+                        <span id="unit"></span>                      
+                    </p>
+                    <i class="iconfont icon-rightArrow"></i>
+                </li>
+            </ul>
+            <ul class="goods_floorul" id="goods_floorul">
+                
+            </ul>
+            <div class="mb10"></div>
+            <div class="goods_floorlow">
+                <div class="gfloor_low">
+                   <span>Review</span>
+                    <!-- <span class="goods">Praise rate<span>100</span></p> -->
+                    <p class="people mui-clearfix"><span id="comment_count">0</span> people rated <i class="iconfont icon-rightArrow"></i></p>
+                </div>
+            </div>
+        </div>
+      
+        
+    </div>
+    <!-- details -->
+    <div class="xq_details hide">
+        <div class="mb10"></div>
+        <ul class="xq_goodshd">
+            <li class="on">Product Details</li>
+            <li>Specifications</li>
+        </ul>
+        <div class="xq_goodsbd">
+            <div class="xq_bdimg"> </div>
+            <div class="xq_table">
+                <p class="name">Principal</p>
+                <table class="mui-clearfix" id="table_menu">
+                    
+                </table>
+            </div>
+        </div>
+    </div>
+    <!-- Comments -->
+    <div class="xq_details details_comm hide">
+        <!-- <ul class="xq_comments">
+            <li class="on"><p>All reviews</p><p>0</p></li>
+            <li><p>Praise</p><p>0</p></li>
+            <li><p>Moderate review</p><p>0</p></li>
+            <li><p>Poor review</p><p>0</p></li>
+            <li><p>With pictures</p><p>0</p></li>
+        </ul> -->
+        <div class="xq_comm_bd">
+
+        </div>
+        <div class="search_none" style="display:none;">
+            <img src="__IMG__/none4.png" alt="">
+            <p class="t_y">No reviews yet~~</p>
+        </div>
+    </div>
+</div>
+<!-- back to top -->
+<p class="goods_topup"><i class="iconfont icon-top"></i></p>
+<!-- Select product attributes -->
+<div class="goods_choose">
+    <div class="goods_chooselow">
+        <div id="goods_shuxing">
+        
+        </div>
+        <div class="gchoose_low">
+            <button class="nojf_cart" type="button" id="addcart_btn" onclick="addcat();">Add to cart</button>
+            <button class="popjf_buy" type="button" id="go_buy">Buy Now</button>
+        </div>
+    </div>      
+</div>
+<div class="goods_choosebg"></div>
+<!-- bottom -->
+<div class="goods_footer">
+    <ul>
+        <!-- <li><a onclick="service_a();" href="javascript:void(0);">
+            <i class="iconfont icon-kefu"></i>
+            <p>Customer Service</p>
+        </a></li>
+        <li class="foot_badge"><a href="/wap/index/shop_cat.html">
+            <span class="mui-badge mui-badge-danger hide" id="badge_num">0</span>
+            <i class="iconfont icon-gouwuche2"></i>
+            <p>Cart</p>
+        </a></li>
+        <li class="cart nojf_cart" onclick="cart_show();"><p>Add to cart</p></li> -->
+        <li class="gobuy jf_buy" onclick="cart_show();" style="width:100%;"><p>Buy Now</p></li>
+    </ul>
+</div>
+{include file="public/head_nav"/}
+{include file="public/footer"/}
+<script type="text/html" id="goods_info">
+    <div class="goods_title mui-clearfix">
+        <p class="mui-ellipsis-2 fl">{{goods_name}}</p>
+        <a class="collection fr" onclick="collection();" href="javascript:void(0);">
+            {{ if is_collection==1 }}
+            <i class="iconfont icon-heart-red"></i>
+            <span>Favorites</span>
+            {{ else }}
+            <i class="iconfont icon-heart"></i>
+            <span>Favorites</span>
+            {{ /if end }}
+        </a>
+    </div>
+    <p class="red">KRC {{shop_price}}</p>
+    <p class="sales">Sales: {{sales_num}}&nbsp;&nbsp;&nbsp;Current Inventory: {{spec_num}}</p>
+    <p class="market">Market price: <span>{{market_price}}</span></p>
+</script>
+<script type="text/html" id="goods_floorlist">
+    <li>
+        <span>Region</span>
+        <p class="mui-ellipsis">{{merchant.address}}</p>
+    </li>
+    <li>
+        <span>Free shipping</span>
+        {{ if is_free_shipping==0 }}
+        <p>Free shipping</p>
+        {{ else }}
+        <p>Free shipping</p>
+        {{ /if end }}
+    </li>
+    <li>
+        <span>Services</span>
+        <p class="mui-ellipsis">Served by {{merchant.name}}</p>
+    </li>
+</script>
+<script type="text/html" id="recommen_list">
+    <li><a href="/wap/index/goods_info.html?id={{id}}">
+        <img src="{{original_img}}">
+        <p class="pinpai mui-ellipsis-2">{{goods_name}}</p>
+        <p class="red">KRC {{shop_price}}</p>
+    </a></li>
+</script>
+<script type="text/html" id="goods_sx">
+    <div class="gchoose_title mui-clearfix">
+        <div class="gchoose_img fl"><img id="orImg" src="{{original_img}}" alt=""></div>
+        <div class="gchoose_txt fl">
+            <p class="name mui-ellipsis-2">{{goods_name}}</p>
+            <p class="red">KRC <span id="shopPrice">{{shop_price}}</span></p>
+            <p class="inventory">Current Inventory: <span id="specNum">{{spec_num}}</span></p>
+        </div>
+        <i class="iconfont icon-close fr"></i>
+    </div>
+    <div class="gchoose_midd">
+        <div class="gchoose_num mui-clearfix">
+            <p class="gchoose_name">Quantity</p>
+            <button class="jian" onclick="jian(this);" disabled>-</button>
+            <input class="num_inp" type="num" value="1">
+            <button class="plus" onclick="plus_add(this);">+</button>
+        </div>
+        <div class="gchoose_size">
+            {{each sepc_arr as value index }}
+            <p class="gchoose_name">Choose {{index}}</p>
+            <ul>
+                {{each value as avalue aindex}}
+                <li class="{{aindex==0?'on':''}}" data-id='{{avalue.id}}_' onclick="spec_size(this);">{{avalue.item}}</li>
+                {{/each}}
+            </ul>
+            {{/each}}
+        </div>
+    </div>     
+</script>
+<script type="text/html" id="table">
+    <thead> </thead>
+    <tbody class="w100">
+    {{each attr_arr as value index}}
+    <tr>
+        <td>{{index}}</td>
+        <td>{{value}}</td>
+    </tr>
+    {{/each}}
+    </tbody>
+</script>
+<script type="text/html" id="commlist">
+<div class="xqcomm_ul">
+    <div class="xqcomm_ul_top flex_center">
+        <img src="{{user_avatar}}" onerror="this.src='__IMG__/touxiang.png'" alt="">
+        <div class="xqcomm_ul_txt">
+            <div class="comm_tstar flex_between">
+                <h3>{{user_nickname}}</h3>
+                <p>
+                {{ if rank==1 }}
+                    <i class="iconfont icon-star_active"></i>
+                {{ else if rank==2 }}
+                    <i class="iconfont icon-star_active"></i>
+                    <i class="iconfont icon-star_active"></i>
+                {{ else if rank==3 }}
+                    <i class="iconfont icon-star_active"></i>
+                    <i class="iconfont icon-star_active"></i>
+                    <i class="iconfont icon-star_active"></i>
+                {{ else if rank==4 }}
+                    <i class="iconfont icon-star_active"></i>
+                    <i class="iconfont icon-star_active"></i>
+                    <i class="iconfont icon-star_active"></i>
+                    <i class="iconfont icon-star_active"></i>
+                {{ else if rank==5 }}
+                    <i class="iconfont icon-star_active"></i>
+                    <i class="iconfont icon-star_active"></i>
+                    <i class="iconfont icon-star_active"></i>
+                    <i class="iconfont icon-star_active"></i>
+                    <i class="iconfont icon-star_active"></i>
+                {{ /if end }}
+                </p>
+            </div>
+            <p>{{c_time}} {{spec_key_name}}</p>
+        </div>
+    </div>
+    <div class="xqcomm_ul_low">
+        <p>{{content}}</p>
+        <div class="xqcomm_ul_img">
+            {{each pic_url as value index}}            
+            <img src="{{value.url}}" alt="">
+            {{/each}}
+        </div>
+    </div>
+</div>
+</script>
+<script type="text/html" id="store_info">
+    <div class="store_img">
+        <a href="/wap/store/store_info.html?shop_id={{shop_id}}"><img src="{{image}}" onerror="this.src='__IMG__/touxiang.png'">
+        </a>
+    </div>
+    <div class="gstore_div">
+        <a class="name mui-ellipsis" href="/wap/store/store_info.html?shop_id={{shop_id}}">{{name}}</a>
+        <div class="gstore_div_p">
+            <a class="bg_red_gradient" href="/wap/store/store_info.html?shop_id={{shop_id}}">Enter the store</a>
+        </div>
+    </div>
+</script>
+<script>
+(function($, doc) {
+$.init();
+$.ready(function() {                
+    // //Three-level linkage
+    // var cityPicker3 = new $.PopPicker({
+    // layer: 3
+    // });
+    // /* ---Get the third-level list of cities--- */
+    // $get('/api/address/get_region_tree',{},function(data){
+    // console.log(data);
+    // if(data.status){
+    // cityPicker3.setData(data.data);
+    // }else{
+    // cityPicker3.setData(cityData3);
+    // }
+    // })
+    // var showCityPickerButton = doc.getElementById('showCityPicker3');
+    // var cityResult3 = doc.getElementById('cityResult3');
+    // showCityPickerButton.addEventListener('tap', function(event) {
+    // cityPicker3.show(function(items) {
+    // cityResult3.innerText = (items[0] || {}).text + " " + (items[1] || {}).text + " " + (items[2] || {}).text ;
+    // //Return false to prevent the selection box from closing
+    // //return false;
+    // });
+    // }, false);
+});
+})(mui, document);
+//carousel
+var mySwiper = new Swiper('.swiper-container', {
+    autoplay: true,
+    pagination: {
+        el: '.swiper-pagination',
+    },
+});
+var id=getQueryString("id");
+
+//
+var specMoney;
+var s_phone='';
+get_data();
+function get_data(){
+    $get('/api/goods/goods_detail',{id:id},function(data){
+        if(data.status==1){
+            if(data.data.exchange_integral>0){
+                $('.nojf_cart').hide();
+                $('.jf_buy').addClass('w50');
+                $('.popjf_buy').addClass('w100');
+            } else{
+                $('.nojf_cart').show();
+                $('.jf_buy').removeClass('w50');
+                $('.popjf_buy').removeClass('w100');
+            }
+
+
+            s_phone=data.data.merchant.phone;
+            var lunbo = "";
+            for(var i in data.data.img_tuku){
+                lunbo+='<div class="swiper-slide"><img src="'+ data.data.img_tuku[i]+'" alt=""></div>';
+            }
+            mySwiper.appendSlide(lunbo);
+            var goods_info =template("goods_info",data.data);
+            $('#goods_up').html(goods_info);
+            var goods_floorlist =template("goods_floorlist",data.data);
+            $('#goods_floorul').html(goods_floorlist);
+            var recommen_list = "";
+            for(var a in data.data.recommend_goods){
+                recommen_list+=template("recommen_list",data.data.recommend_goods[a]);
+            }
+            $('.recommen_ul').html(recommen_list);
+            var goods_sx =template("goods_sx",data.data);
+            $('#goods_shuxing').html(goods_sx);
+            var table =template("table",data.data);
+            $('#table_menu').html(table);
+            data.data.merchant.shop_id=data.data.shop_id;
+            var store_info =template("store_info",data.data.merchant);
+            $('.goods_storeup').html(store_info);
+            // 
+            $('#comment_count').html(data.data.comment_count);
+            $('.xq_bdimg').html(data.data.goods_content);
+            $('#unit').html(data.data.unit);
+            specMoney=data.data.spec_data;
+
+            specChange();
+        }else{    
+            mui.toast(data.msg);            
+        }                
+    });
+    $get('/api/goods/get_cart_goods_num', {},function(data){
+        if(data.status==1){
+            if(data.data>0){
+                $('#badge_num').html(data.data);
+                $('#badge_num').show();
+            }
+        }else{    
+            // mui.toast(data.msg);               
+        }                
+    });
+    $get('/api/goods/comment_list', {goods_id:id},function(data){
+        if(data.status==1){
+            var commlist = "";
+            for(var i in data.data){
+                for( var a in data.data[i].comment_content){
+                    data.data[i].comment_content[a].c_time=new Date(data.data[i].comment_content[a].c_time*1000).Format("yyyy-MM-dd"); 
+                    data.data[i].comment_content[a].spec_key_name=data.data[i].spec_key_name; 
+                    commlist+=template("commlist",data.data[i].comment_content[a]);
+                }                
+            }
+            $('.xq_comm_bd').html(commlist);
+        }else{    
+            // mui.toast(data.msg);
+            $('.search_none').show();            
+        }                
+    });
+};
+// customer service
+function service_a() {
+mui.confirm('<div class="service_pop"><p>Phone number: <span id="s_phone">'+s_phone+'</span></span></div>', 'Contact business', ['OK'], function (e) {
+    if (e.index === 1) {
+       
+    } else {
+    }
+}, 'div');
+}
+// select the specification attribute
+var specInfo="";
+function spec_size($this){
+    $($this).addClass('on').siblings().removeClass('on');
+    specChange();
+}
+// change size and price
+function specChange(){
+    // default specification
+    var str='';
+    $(".gchoose_size").find("li").each(function(index,value){
+        if($(this).hasClass("on")){
+            str += '"'+$(this).text()+'"'+'';
+        }
+    })
+    $('.size_span').html(str);
+    //change key
+    specInfo = "";
+    $(".gchoose_size li.on").each(function(index,value){
+        specInfo += $(value).attr("data-id");
+    })
+    specInfo = specInfo.substr(0,specInfo.length-1);  
+    for(var i in specMoney){
+        if(i == specInfo){
+            $("#shopPrice").text(specMoney[specInfo].shop_price);
+            $("#specNum").text(specMoney[specInfo].spec_num);
+            $("#orImg").attr("src",specMoney[specInfo].img);
+            $('.size_span').html(specMoney[specInfo].key_value);
+        }
+    }
+}
+//add to Shopping Cart
+function addcat(){
+    $('#addcart_btn').attr("disabled","true"); //Set the grayed out button
+    setTimeout("$('#addcart_btn').removeAttr('disabled')",3000); //Set the submit button after three seconds to display
+
+    var goods_num=$('.num_inp').val();
+    $get('/api/goods/add_cart',{goods_id:id,goods_spec_key:specInfo,goods_num:goods_num},function(d){
+        console.log(d);
+        
+        if(d.status==1){
+            layer.confirm('Added successfully!',{
+                title: false,
+                closeBtn: 0,
+                skin: 'addcat_demo',
+                btn: ['Go to shopping cart', 'Go shopping'] //Button
+            }, function(){
+                $('.layui-layer-btn a').attr('href','shop_cat.html');
+            }, function(){
+                $('.layui-layer-btn a').attr('href','javascript:;');
+            });
+        } else if(d.status==0){
+            mui.toast(d.msg);
+        } else{
+           mui.toast('You must be logged in to add to the cart');
+                   }
+               });
+           }
+           // Buy now 
+           $('#go_buy').click(function(){
+               var goods_num=$('.num_inp').val();
+               $get('/api/order/confirm_purch',{goods_id:id,num:goods_num,goods_spec_key:specInfo},function(d){
+                   if(d.status==1){
+                       window.location.href='/wap/user/buy_now.html?goods_id='+id+'&num='+goods_num+'&goods_spec_key='+specInfo;
+                   } else if(d.status==0){
+                       if( d.msg=='Please set the logistics address first'){
+                           layer.confirm('You have not set the logistics address, please set the logistics first!',{
+                               title: false,
+                               closeBtn: 0,
+                               area:['60%'],
+                               skin: 'addcat_demo addcat_demos',
+                               btn: ['OK', 'Cancel'] //Button
+                }, function(){
+                    $('.layui-layer-btn a').attr('href','/wap/user/add_address.html');
+                }, function(){
+                    $('.layui-layer-btn a').attr('href','javascript:;');
+                });
+            } else{
+                mui.toast(d.msg);
+            }
+        } else{
+            mui.toast('Please log in first!');
+        }
+    });
+})
+/* ---Product Reviews--- */
+
+/* ---Item Collection & Cancel item collection--- */
+//collect
+function collection(){
+    $get('/api/goods/collection',{id:id},function(d){
+        // console.log(d);
+        if(d.status==1){
+            mui.toast(d.msg);
+            if(d.msg=='collection successful'){
+                $('.collection').find('i').addClass('icon-heart-red').removeClass('icon-heart');
+                $('.collection').find('p').html('collected');
+            }else if(d.msg == "Cancel the collection successfully"){
+                $('.collection').find('i').addClass('icon-heart').removeClass('icon-heart-red');
+                $('.collection').find('p').html('collection');
+            }
+        }else{
+            layer.open({
+                type: 1,
+                skin: 'store_demo', //style class name
+                closeBtn: 0, // do not display the close button
+                anim: 2,
+                time: 4000,
+                title: false, //do not display the title
+                shadeClose: true, //Turn on the mask to close
+                content: 'You must be logged in to bookmark'
+            });
+        }
+    });
+};
+// evaluation click
+$('.gfloor_low').on('tap',function(){
+    $('.goodinfo_hd ul>li').eq(2).click();
+});
+//Click on product, details, comment
+$('.goodinfo_hd ul>li').on('click',function(){
+    $(this).addClass('on').siblings().removeClass('on');
+    $('.xq_details').eq($(this).index()).show();
+    $('.xq_details').eq($(this).index()).siblings().hide();
+    $('body,html').animate({ scrollTop: 0 }, 300);
+});
+//Detailed ul
+$('.xq_goodshd>li').on('tap',function(){
+    $(this).addClass('on').siblings().removeClass('on');
+    $('.xq_goodsbd>div').eq($(this).index()).show();
+    $('.xq_goodsbd>div').eq($(this).index()).siblings().hide();
+})
+//Comment
+$('.xq_comments>li').on('tap',function(){
+    $(this).addClass('on').siblings().removeClass('on');
+})
+// popup appears 
+function cart_show(){
+    $('.goods_choosebg').show();
+    $('.goods_choosebg').css('opacity','1');
+    $('.goods_choose').css('transform','translateY(0)');
+};  
+$('.goodspop').on('tap',function(){
+    $('.goods_choosebg').show();
+    $('.goods_choosebg').css('opacity','1');
+    $('.goods_choose').css('transform','translateY(0)');
+})
+$('body').on('tap','.icon-close',function(){
+    $('.goods_choosebg').hide();
+    $('.goods_choosebg').css('opacity','0');
+    $('.goods_choose').css('transform','translateY(100%)');            
+})
+$('.goods_choose').click(function(event){
+    if(event.target==this){
+        $('.goods_choosebg').hide();
+        $('.goods_choosebg').css('opacity','0');
+        $('.goods_choose').css('transform','translateY(100%)');   
+    }            
+})
+//add quantity
+function plus_add($this){
+    var arr=$($this).siblings('.num_inp').val();
+    if(arr<200){
+        arr++;
+        $('.jian').removeAttr('disabled');
+        $($this).siblings('.num_inp').val(arr);
+        $('.piece_span').html(arr);
+    }else{
+        $($this).attr('disabled','true');
+        mui.toast("商品数量不能大于200");
+    }    
+}
+//decrement the amount
+function jian($this){
+    var arr=$($this).siblings('.num_inp').val();
+    if(arr>1){
+        arr--;
+        $('.plus').removeAttr('disabled');
+        $($this).siblings('.num_inp').val(arr);
+        $('.piece_span').html(arr);
+    }else{
+        $($this).attr('disabled','true');
+    }
+}
+//quantity input
+$('body').on('blur','.num_inp',function(){
+    var inp_val=$(this).val();
+    $('.piece_span').html(inp_val);
+    if(inp_val>200){
+        $(this).val('200')
+
+    }else if(inp_val<0){
+        $(this).val('1')
+    }
+})
+//Back to top
+$('.goods_topup').on('tap',function(){
+    $('body,html').animate({'scrollTop':0},600);
+})
+// get address bar
+function getQueryString(name) {
+    var reg = new RegExp('(^|&)' + name + '=([^&]*)(&|$)', 'i');
+    
+    var r = window.location.search.substr(1).match(reg);
+    if (r != null) {
+        return unescape(r[2]);
+    }
+    return null;
+}
+</script>
+</body>
+</html>

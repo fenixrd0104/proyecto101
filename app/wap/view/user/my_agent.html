@@ -1,0 +1,203 @@
+{include file="public/header" /}
+<style>
+    .mui-content {
+        padding-bottom: 0 !important;
+    }
+
+    #pwd {
+        /* border:1px solid #f1f1f1; */
+        outline: none;
+        font-size: 0.13rem;
+        color: #c0a065;
+        background: #333;
+        margin-bottom: 0.1rem;
+    }
+
+    .agent_ul span {
+        color: #ddd;
+    }
+
+    .p_indent {
+        padding-left: 2em !important;
+    }
+
+    .s_input input {
+        background: #242424;
+        color: #c0a065;
+    }
+
+    .s_input p {
+        text-align: right;
+    }
+
+    .red {
+        color: #e23435;
+        font-size: 0.12rem;
+        line-height: 0.24rem;
+        display: inline-block;
+    }
+</style>
+</head>
+
+<body>
+    <header class="mui-bar mui-bar-nav bg_red_gradient" id="header">
+        <a class="back-page mui-icon mui-icon-left-nav mui-pull-left" href="javascript:;"></a>
+        <a id="menu" class="mui-action-menu mui-icon mui-icon-bars mui-pull-right" href="javascript:void(0);"></a>
+        <h1 class="mui-title">Voucher purchase</h1>
+    </header>
+    <div class="mui-content">
+        <div class="bg-1515 agent_top">
+            <h1 id="this_num" class="text-gold">0.00</h1>
+            <p>Current balance</p>
+            <!-- <a href="/wap/user/my_pool_yue.html" style="padding:0.02rem 0.15rem;">recharge record</a> -->
+        </div>
+        <div class="mb15"></div>
+        <div class="aggent_p cont">
+            <p>Current level: <span class="huiy"></span></p>
+        </div>
+        <ul class="agent_ul flex_between cont" id="agent_ul">
+            <li class="active">
+                <h1 id="inter_1">10</h1>
+                <span>Zhang</span>
+                <!-- <p>VIP</p> -->
+            </li>
+            <li>
+                <h1 id="inter_2">30</h1>
+                <span>Zhang</span>
+                <!-- <p>Service provider</p> -->
+            </li>
+            <li>
+                <h1 id="inter_3">50</h1>
+                <span>Zhang</span>
+                <!-- <p>Zone Node</p> -->
+            </li>
+            <li>
+                <h1 id="inter_4">100</h1>
+               <span>Zhang</span>
+                <!-- <p>City node</p> -->
+            </li>
+            <li>
+                <h1 id="inter_5">200</h1>
+                <span>Zhang</span>
+                <!-- <p>Provincial node</p> -->
+            </li>
+            <li>
+                <h1 id="inter_6">500</h1>
+                <span>Zhang</span>
+                <!-- <p>Country node</p> -->
+            </li>
+        </ul>
+        <div class="mb10"></div>
+        <div class="cont s_input">
+            <input id="get_bi" type="number" placeholder="Enter purchase quantity" autocomplete="off" value="10" data-v="10">
+            <p class="t-r">Costs <span id="spend_bi" class="text-gold"></span> KRC</p>
+        </div>
+        <div class="mb10"></div>
+        <p class="cont">Transaction password</p>
+        <div class="mb10"></div>
+        <div class="cont" style="margin-bottom:0.4rem;"><input type="password" placeholder="Please enter transaction password" id="pwd"
+                autocomplete="new-password">
+            <a class="red" href="/wap/user/my_paypassword.html">Please set a payment password first?</a>
+        </div>
+        <button class="submit_btn" id="submit_btn" onclick="submit_btn();" style="opacity: 1;">Buy Now</button>
+        <div class="mb20"></div>
+        <div class="mb20"></div>
+        <div class="mb20"></div>
+        <div class="mb20"></div>
+        <div class="mb20"></div>
+    </div>
+
+    {include file="public/head_nav"/}
+    {include file="public/footer" /}
+    <script>
+        $('#agent_ul>li').click(function () {
+            $(this).addClass('active').siblings().removeClass('active');
+            var v = Number($(this).find('h1').html());
+            $('#get_bi').val(v);
+            $('#get_bi').attr('data-v', v);
+            get_bi(v);
+        });
+        $('#get_bi').on('input', function () {
+            var reg = /^\d+(\.{0,1}\d+){0,1}$/;
+            var n = $('#get_bi').val();
+            if (!reg.test(n)) {
+                mui.toast('Amount cannot be negative');
+                $(this).val('');
+                return
+            } else {
+                get_bi(n);
+                get_type(n);
+                $('#get_bi').attr('data-v', n);
+            }
+        });
+        function get_type(p) {
+            var flag = false;
+            for (const i of $('#agent_ul>li>h1')) {
+                var v = Number($(i).html());
+                if (p == v) {
+                    flag = true;
+                    $(i).parent().addClass('active').siblings().removeClass('active');
+                    break;
+                }
+            }
+            if (!flag) {
+                $('#agent_ul>li').removeClass('active');
+            }
+        }
+        get_data();
+        function get_data() {
+            get_bi(10);
+            $get('/api/user/getuserinfo', {}, function (data) {
+                if (data.code == 1) {
+                    var data = data.data;
+                    $('.huiy').html(data.grade.name);
+                    $('#this_num').html(data.money);
+                }
+            });
+        }
+        function get_bi(n) {
+            $('#spend_bi').html('calculating...');
+            setTimeout(() => {
+                $get('/api/user/voucher', { num: n }, (data) => {
+                    if (data.status == 1) {
+                        $('#spend_bi').html(data.data.cbnk);
+                    }
+                });
+            }, 1000);
+
+        }
+
+        // submit
+        function submit_btn() {
+
+            var pwd = $('#pwd').val();
+            var num = $('#get_bi').attr('data-v');
+            if (!num) {
+                mui.toast('Please enter the purchase quantity!');
+            } else if (pwd == '') {
+                mui.toast('Transaction password cannot be empty!');
+            } else {
+                btn_disabled($('#submit_btn'),'Submitting...');
+                $post('/api/user/buy_voucher', { num: num, password: pwd }, function (res) {
+                    btn_abled($('#submit_btn'),'Buy now');
+                    if (res.status == 1) {
+                        mui.toast('Successful purchase');
+                        setTimeout(function () {
+                            window.location.href = "/wap/user/wallet3.html";
+                        }, 1500);
+
+                    } else {
+                        mui.toast(res.msg);
+                        $('#pwd').val('');
+                    }
+                },function(){
+                    btn_abled($('#submit_btn'),'Buy now');
+                });
+            }
+
+        }
+
+    </script>
+</body>
+
+</html>

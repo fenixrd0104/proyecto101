@@ -1,0 +1,200 @@
+<style>
+    .edui-tab-item{
+        line-height: 11px;
+    }
+</style>
+<form class="layui-form" action="" lay-filter="add_tz" style="padding: 20px 30px 0 0;">
+    <div class="layui-form-item">
+        <label class="layui-form-label">任务标题</label>
+        <div class="layui-input-block">
+            <input type="text" name="title" lay-verify="required" placeholder="请输入标题" autocomplete="off" class="layui-input" value="" >
+        </div>
+    </div>
+
+    <div class="layui-form-item">
+        <label class="layui-form-label">任务详情</label>
+        <div class="layui-input-block">
+            <textarea name="content" id=""  placeholder="请输入描述" cols="30" rows="5" class="layui-textarea"></textarea>
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">封面图片</label>
+        <div class="layui-input-block">
+            <div class="layui-input-inline">
+                <input name="cover" id="writer_img" placeholder="图片地址"  class="layui-input">
+            </div>
+            <div class="layui-input-inline layui-btn-container" style="width: auto;">
+                <button type="button" class="layui-btn" id="LAY_avatarUpload2">
+                    <i class="layui-icon">&#xe67c;</i>上传图片
+                </button>
+                <a class="layui-btn layui-btn-primary" onclick="see_img2();">查看图片</a>
+            </div>
+        </div>
+    </div>
+    
+    <div class="layui-form-item">
+        <label class="layui-form-label">奖励KFC数</label>
+        <div class="layui-input-block">
+            <input type="text" name="reward" lay-verify="required" placeholder="请输入奖励KFC数" autocomplete="off" class="layui-input" value="" >
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">消耗积分</label>
+        <div class="layui-input-block">
+            <input type="text" name="integral" lay-verify="required" placeholder="请输入消耗积分" autocomplete="off" class="layui-input" value="" >
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">任务执行时间</label>
+        <div class="layui-input-block">
+            <input type="text" name="rw_hour" lay-verify="required" placeholder="请输入任务执行时间/小时" autocomplete="off" class="layui-input"  >
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">可重复</label>
+        <div class="layui-input-block">
+            <script  type="text/html" template>
+                {{# if(d.params.id){ }}
+                    <input type="checkbox" name="is_repeat" value="0" lay-skin="switch" lay-text="是|否" class="layui-input"  lay-filter="is_repeats" id="v1" {{ d.params.is_repeat=== 1 ? 'checked': '' }}>
+
+                {{# }else{ }}
+                    <input type="checkbox" name="is_repeat" value="0" lay-skin="switch" lay-text="是|否" class="layui-input"  lay-filter="is_repeats" id="v1">
+                {{# } }}
+            </script>
+
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">状态</label>
+        <div class="layui-input-block">
+            <script  type="text/html" template>
+
+                {{# if(d.params.id){ }}
+                    <input type="checkbox" name="status" value="0" lay-skin="switch" lay-text="是|否" class="layui-input"  id="v2" lay-filter="statuss" {{ d.params.status== 1 ? 'checked': '' }} >
+                {{# }else{ }}
+                    <input type="checkbox" name="status" value="0" lay-skin="switch" lay-text="是|否" class="layui-input"  lay-filter="statuss" id="v2">
+                {{# } }}
+            </script>
+            <!--<input type="checkbox" name="status" value="0" lay-skin="switch" lay-text="开启|关闭" class="layui-input" lay-filter="statuss" id="v2">-->
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">排序</label>
+        <div class="layui-input-block">
+            <input type="text" name="orderby" lay-verify="required" placeholder="请输入排序" autocomplete="off" class="layui-input"  >
+        </div>
+    </div>
+
+
+
+
+
+
+    <div class="layui-form-item">
+        <div class="layui-input-block">
+            <button type="button" class="layui-btn" lay-submit="" lay-filter="add_ar">+保存</button>
+        </div>
+    </div>
+    <script type="text/html" template lay-done="layui.data.sendParams(d.params)">
+
+    </script>
+</form>
+<script src="/static/admin/layui/lay/modules/jquery.3.1.1.js"></script>
+<script src="/static/admin/umedit/umeditor.config.js"></script>
+<script src="/static/admin/umedit/umeditor.min.js"></script>
+<script src="/static/admin/umedit/lang/zh-cn/zh-cn.js"></script>
+
+<script>
+    layui.data.sendParams = function(params){
+        console.log(params);
+    
+
+        layui.use(['admin','form','upload','layedit','view','setter','layer'], function(){
+            var $ = layui.$
+                ,admin = layui.admin
+                ,setter = layui.setter
+                ,layedit = layui.layedit
+                ,element = layui.element
+                ,form = layui.form
+                ,view = layui.view
+                ,layer = layui.layer
+                ,upload = layui.upload
+                ,router = layui.router();
+
+            element.render();
+            form.render(null, 'add_tz');
+            form.render();
+
+            if(params.id){
+                form.val('add_tz',{
+                    'status':params.status,
+                    'is_repeat':params.is_repeat,
+                    'rw_hour':params.rw_hour,
+                    'reward':params.reward,
+                    'integral':params.integral,
+                    'content':params.content,
+                    'cover':params.cover,
+                    'title':params.title,
+                    'orderby':params.orderby,
+                });
+                $('#v1').val(params.is_repeat);
+                $('#v2').val(params.status);
+                form.render();
+            }
+       form.on("switch(statuss)", function (data) {
+
+               if(data.elem.checked==true){
+                    $('#v2').val(1)
+               }else{
+                    $('#v2').val(0)
+               }
+               form.render();
+            });
+            form.on("switch(is_repeats)", function (data) {
+
+               if(data.elem.checked==true){
+                    $('#v1').val(1)
+               }else{
+                    $('#v1').val(0)
+               }
+               form.render();
+            });
+            window.see_img2=function(){
+                var i = $('#writer_img').val();
+
+                layer.photos({
+                    photos: {
+                        title: "查看头像",
+                        data: [{
+                            src: i
+                        }]
+                    },
+                    shade: 0.5,
+                    closeBtn: 1,
+                    anim: 5
+                });
+            };
+            //多图片上传
+            upload.render({
+                elem: '#LAY_avatarUpload2'
+                ,url: layui.setter.baseUrl+'admin/upload/upload'
+                ,multiple: true
+                ,before: function(obj){
+                    //预读本地文件示例，不支持ie8
+                    obj.preview(function(index, file, result){
+                        $('#upload_goods_images_box').append('<img src="'+ result +'" alt="'+ file.name +'" class="layui-upload-img" style="width:120px;height:120px;margin:0 15px 15px 0px;">')
+                    });
+                }
+                ,done: function(res){            
+                    //上传完毕
+                    $('#writer_img').val(res.data);
+                    layer.msg(res.msg);
+                }
+            });
+
+
+
+        });
+
+    }
+</script>

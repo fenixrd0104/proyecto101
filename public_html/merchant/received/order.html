@@ -1,0 +1,98 @@
+<title>采购订单</title>
+<script type="text/html" template>
+    <link rel="stylesheet" href="{{ layui.setter.base }}style/supplier.css?v={{ layui.admin.v }}-1" media="all">
+</script>
+<style>
+    @media screen and (max-width: 450px){
+        .layui-form-item .layui-input-inline {
+            display: block;
+            float: none;
+            left: -3px;
+            width: auto;
+            margin: 0;
+        }
+    }
+</style>
+
+<div class="layui-fluid">
+<div class="layui-row">
+  <div class="layui-col-md12">  
+    <form  class="layui-form">
+      <div class="layuiadmin-card-header-auto goods_list_search" lay-filter="app-content-list">
+          <div class="layui-form-item">
+            <div class="layui-inline" style="width:300px;">
+              <div class="layui-input-inline"  style="width:300px;">
+                <input type="text" name="keywords" placeholder="单号/供应商/收货人/收货电话" autocomplete="off" class="layui-input">
+              </div>
+            </div>
+            <div class="layui-inline">
+              <button class="layui-btn layuiadmin-btn-list" lay-submit lay-filter="fo_search" type="button">
+                <i class="layui-icon layui-icon-search layuiadmin-button-btn"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+    </form>
+  </div>
+  <div class="layui-row">
+    <div class="layui-col-md12">
+      <table class="layui-hide" id="test-table-received_order" lay-filter="test-table-received_order"></table>          
+      <script type="text/html" id="test-table-toolbar-received_order">
+        <button type="button" class="layui-btn layui-btn-xs layui-btn-normal" lay-event="edit">生成收货单</button>
+      </script>
+    </div>
+  </div>
+
+</div>
+</div>
+
+<script>
+    layui.use(['admin','table','form','laydate'], function(){
+      var $ = layui.$
+      ,admin = layui.admin
+      ,view = layui.view
+      ,table = layui.table
+      ,setter = layui.setter
+      ,layer = layui.layer
+      ,laydate = layui.laydate
+      ,form = layui.form;
+      
+      form.render(null, 'app-content-list');
+
+    var keywords='';
+    get_data(keywords);
+    function get_data(keywords){
+      table.render({
+        elem: '#test-table-received_order'
+        ,url: layui.setter.baseUrl+'merchant/Purchase_Receipt/purchaseOrder'
+        ,parseData: function(res){ //res 即为原始返回的数据
+          return {
+          "code": res.code, //解析接口状态
+          "msg": res.msg, //解析提示文本
+          "count": res.data.count, //解析数据长度
+          "data": res.data.lists //解析数据列表
+          };
+        }
+        ,cols: [[
+          {field:'id', width:100, title: '采购订单', sort: true,align:"center"}
+          ,{field:'supplier_name', title: '供应商',align:"center"}
+          ,{field:'order_status', title: '单据状态',align:"center"}
+          ,{field:'receipt_status', title: '收货状态',align:"center"}
+          ,{field:'order_money', title: '单据金额',align:"center"}
+          ,{fixed: '', title:'操作',  toolbar: '#test-table-toolbar-received_order', width:140,align:"center"}
+        ]],
+        page:true,
+        where:{keywords:keywords}
+      });
+    }
+    // 搜索
+    form.on('submit(fo_search)',function(e){
+      get_data(e.field.keywords);
+    });
+
+
+   
+  
+    });
+    </script>
+  

@@ -1,0 +1,832 @@
+
+<title>交易数据</title>
+<style>
+.layui-table-view{ margin: 10px 0 !important;}
+.layui-table-view .layui-table td,
+.layui-table-view .layui-table th{
+    border-left: none;
+    border-right: none;
+}
+.layui-table-body .layui-table-cell{
+    height: auto;
+    line-height: 20px;
+    overflow: initial;
+    text-overflow: initial;
+    white-space: initial;
+}
+.goods li{ margin: 0 !important; }
+</style>
+<div class="layui-card layadmin-header">
+    <div class="layui-breadcrumb" lay-filter="breadcrumb">
+        <a>数据统计</a>
+        <a><cite>交易数据</cite></a>
+    </div>
+</div>
+<script type="text/html" template>
+    <link rel="stylesheet" href="{{ layui.setter.base }}style/statistics.css?v={{ layui.admin.v }}-1" media="all">
+</script>
+
+<div class="layui-fluid" id="component-tabs">
+<div class="layui-row">      
+<div class="layui-card">
+<div class="layui-card-header">交易数据</div>
+<div class="layui-card-body">
+<div class="layui-tab layui-tab-brief" lay-filter="component-tabs-brief">
+    <ul class="layui-tab-title">
+        <li class="layui-this">交易概况</li>
+        <li>商品统计</li>
+        <li>订单统计</li>
+        <!-- <li>退换货统计</li> -->
+    </ul>
+    <div class="layui-tab-content">        
+        <div class="layui-tab-item layui-show"> 
+            <blockquote class="layui-elem-quote">实时概况</blockquote>            
+            <blockquote class="layui-elem-quote layui-quote-nm">
+                今日实时数据的统计时间均为截止至当前更新时间。<br><br>付款金额：待发货、待确认、已完成状态的订单金额<br>付款订单数：待发货、待确认、已完成状态的订单数量<br>付款人数：待发货、待确认、已完成状态的订单的下单人数（去重）<br>下单订单数：待付款、待发货、待确认、已完成、退款中、付款后退款成功状态的订单数量<br>下单人数：待付款、待发货、待确认、已完成、退款中、付款后退款成功状态的订单的下单人数（去重）
+            </blockquote>
+            <div class="layui-row layui-col-space10">
+                <div class="layui-col-md3">
+                <div class="layui-card text_pink data_text">
+                    <p>线上付款订单数</p>
+                    <h3 id="xs_dds_all">0</h3>
+                    <p>昨天全天：<span id="xs_dds_zuo">0</span></p>
+                </div>                
+                </div>
+                <div class="layui-col-md3">
+                <div class="layui-card text_org data_text">
+                    <p>线上付款人数</p>
+                    <h3 id="xs_fkrs_all">0</h3>
+                    <p>昨天全天：<span id="xs_fkrs_zuo">0</span></p>
+                </div>                
+                </div>
+                <div class="layui-col-md3">
+                <div class="layui-card text_blue data_text">
+                    <p>线上下单总订单数</p>
+                    <h3 id="xs_zdds_all">0</h3>
+                    <p>昨天全天：<span id="xs_zdds_zuo">0</span></p>
+                </div>                
+                </div>
+                <div class="layui-col-md3">
+                <div class="layui-card text_green data_text">
+                    <p>线上下单总人数</p>
+                    <h3 id="xs_zrs_all">0</h3>
+                    <p>昨天全天：<span id="xs_zrs_zuo">0</span></p>
+                </div>                
+                </div>
+                <!-- <div class="layui-col-md3">
+                <div class="layui-card text_pink_deepen data_text">
+                    <p>线下付款订单数</p>
+                    <h3 id="xx_dds_all">0</h3>
+                    <p>昨天全天：<span id="xx_dds_zuo">0</span></p>
+                </div>                
+                </div>
+                <div class="layui-col-md3">
+                <div class="layui-card text_org_deepen data_text">
+                    <p>线下付款人数</p>
+                    <h3 id="xx_fkrs_all">0</h3>
+                    <p>昨天全天：<span id="xx_fkrs_zuo">0</span></p>
+                </div>                
+                </div>
+                <div class="layui-col-md3">
+                <div class="layui-card text_blue_deepen data_text">
+                    <p>线下下单总订单数</p>
+                    <h3 id="xx_zdds_all">0</h3>
+                    <p>昨天全天：<span id="xx_zdds_zuo">0</span></p>
+                </div>                
+                </div>
+                <div class="layui-col-md3">
+                <div class="layui-card text_green_deepen data_text">
+                    <p>线下下单总人数</p>
+                    <h3 id="xx_zrs_all">0</h3>
+                    <p>昨天全天：<span id="xx_zrs_zuo">0</span></p>
+                </div>                
+                </div> -->
+            </div>  
+            <div class="mb10"></div>          
+            <blockquote class="layui-elem-quote">付款概况</blockquote>                   
+            <blockquote class="layui-elem-quote layui-quote-nm">
+                今日实时数据的统计时间均为截止至当前更新时间。<br><br>付款金额：待发货、待确认、已完成状态的订单金额<br>付款订单数：待发货、待确认、已完成状态的订单数量<br>付款人数：待发货、待确认、已完成状态的订单的下单人数（去重）<br>下单订单数：待付款、待发货、待确认、已完成、退款中、付款后退款成功状态的订单数量<br>下单人数：待付款、待发货、待确认、已完成、退款中、付款后退款成功状态的订单的下单人数（去重）
+            </blockquote>
+            <div class="mb20"></div>
+            <div class="new_payment">
+                <!-- <div class="payment_data">
+                    <span>线上今天付款金额 </span><strong class="live_blue" id="xs_fkjt_strong">0.00</strong>
+                    &nbsp;&nbsp;
+                    <span>线上昨日付款金额 </span><strong class="live_org" id="xs_fkzt_strong">0</strong>
+                </div> -->
+                <div class="layui-carousel layadmin-carousel layadmin-dataview" data-anim="fade" lay-filter="LAY-index-heapline">
+                <div carousel-item id="LAY-index-payment_online">
+                    <div><i class="layui-icon layui-icon-loading1 layadmin-loading"></i></div>
+                </div>
+                </div>
+            </div>
+            <div class="mb10"></div>
+            <div class="new_payment">
+                <!-- <div class="payment_data">
+                    <span>线下今天付款金额 </span><strong class="live_blue" id="xx_fkjt_strong">0.00</strong>
+                    &nbsp;&nbsp;
+                    <span>线下昨日付款金额 </span><strong class="live_org" id="xx_fkzt_strong">0</strong>
+                </div> -->
+                <div class="layui-carousel layadmin-carousel layadmin-dataview" data-anim="fade" lay-filter="LAY-index-heapline">
+                <div carousel-item id="LAY-index-payment_offline">
+                    <div><i class="layui-icon layui-icon-loading1 layadmin-loading"></i></div>
+                </div>
+                </div>
+            </div>
+            <!-- <blockquote class="layui-elem-quote">核心指标</blockquote>                  
+            <blockquote class="layui-elem-quote layui-quote-nm">
+                付款金额：当天时间内，待发货、待确认、已完成状态的订单金额<br>付款订单数：当天时间内，待发货、待确认、已完成状态的订单数量
+            </blockquote>
+            <div class="layui-form layui-row layui-col-space10 laydata_div" style="margin: 10px 0 20px;">
+                <div class="layui-col-md6">
+                    <label class="layui-form-label">筛选日期：</label>
+                    <div class="layui-inline">
+                        <input type="text" name="start" class="layui-input" id="test-laydate-type-datetime-start" placeholder="">
+                    </div>
+                    <label>至</label>
+                    <div class="layui-inline">
+                        <input type="text" name="end" class="layui-input" id="test-laydate-type-datetime-end" placeholder="">
+                    </div>
+                    <div class="layui-inline">
+                        <button class="layui-btn layuiadmin-btn-list" lay-submit lay-filter="hxzb_search">查询</button>
+                    </div>  
+                </div>               
+                <div class="layui-col-md6 order_num" id="hxzb_data">
+                    <button class="layui-btn layui-btn-primary order_active" lay-type="d">日</button>
+                    <button class="layui-btn layui-btn-primary" lay-type="w">周</button>
+                    <button class="layui-btn layui-btn-primary" lay-type="m">月</button>
+                </div>
+            </div>        
+            <div class="layui-carousel layadmin-carousel layadmin-dataview" data-anim="fade" lay-filter="LAY-index-heapline">
+            <div carousel-item id="LAY-index-core_online">
+                <div><i class="layui-icon layui-icon-loading1 layadmin-loading"></i></div>
+            </div>
+            </div>
+            <div class="layui-carousel layadmin-carousel layadmin-dataview" data-anim="fade" lay-filter="LAY-index-heapline">
+            <div carousel-item id="LAY-index-core_offline">
+                <div><i class="layui-icon layui-icon-loading1 layadmin-loading"></i></div>
+            </div>
+            </div>
+            <blockquote class="layui-elem-quote">成交客户</blockquote>  
+            <blockquote class="layui-elem-quote layui-quote-nm">
+                新成交客户付款金额：在指定搜索天之前没有付款成功的订单(待发货、待确认、已完成、付款后退款成功)，在指定搜索天有付款成功订单的实付金额总和<br>新成交客户人数：在指定搜索天之前没有付款成功的订单(待发货、待确认、已完成、付款后退款成功)，在指定搜索天有付款成功订单的客户数（去重）<br>老成交客户付款金额：在指定搜索天之前没有付款成功的订单(待发货、待确认、已完成、付款后退款成功)，在指定搜索天也有付款成功订单的实付金额总和<br>老成交客户人数：在指定搜索天之前没有付款成功的订单(待发货、待确认、已完成、付款后退款成功)，在指定搜索天也有付款成功订单的客户数（去重）<br><br>复购率：在指定搜索天所在周（月）之前有购买过（包含付款后退款成功）且在指定搜索天所在周（月）之内又有成交的客户人数 / 在指定搜索天所在周（月）之内总成交人数 * 100%
+            </blockquote>
+            <div class="clinch">
+                <div class="layui-row">
+                    <div class="layui-col-md5">
+                        <div class="layui-carousel layadmin-carousel layadmin-dataview" data-anim="fade" lay-filter="LAY-index-heapline" >
+                        <div carousel-item id="LAY-index-clinch-money">
+                            <div><i class="layui-icon layui-icon-loading1 layadmin-loading"></i></div>
+                        </div>
+                        </div>
+                    </div>
+                    <div class="layui-col-md5">
+                        <div class="layui-carousel layadmin-carousel layadmin-dataview" data-anim="fade" lay-filter="LAY-index-heapline" >
+                        <div carousel-item id="LAY-index-clinch-people">
+                            <div><i class="layui-icon layui-icon-loading1 layadmin-loading"></i></div>
+                        </div>
+                        </div>
+                    </div>
+                    <div class="layui-col-md2">
+                        <div class="customer c_item">
+                            <p class="p_title">客户复购率</p>
+                            <h3>本周<span id="bz_fgl">0%</span></h3>
+                            <p class="p_hui">
+                                <span>较上一周</span>
+                                <div id="bz_type"><span class="p_red">0.00% <i class="iconfont icon-up"></i></span></div>
+                            </p>
+                        </div>
+                        <div class="customer c_item">
+                            <h3>本月<span id="by_fgl">0%</span> </h3>
+                            <p class="p_hui">
+                                <span>较上一月</span>
+                                <div id="by_type"><span class="p_green">0.00% <i class="iconfont icon-down"></i></span></div>
+                            </p>
+                        </div>                            
+                    </div>
+                </div>
+            </div>  -->     
+           
+        </div>
+        <div class="layui-tab-item">
+            <blockquote class="layui-elem-quote">数据统计</blockquote>            
+            <div class="layui-row goods_all" id="real_time">
+                <div class="layui-col-md2">
+                    <div class="layui-card data_text">
+                        <p>商品种数（种）</p>
+                        <h3 id="spzs">0</h3>
+                    </div>                
+                </div>
+                <div class="layui-col-md2">
+                    <div class="layui-card data_text">
+                        <p>线上已售件数（件）</p>
+                        <h3 id="xsys_js">0</h3>
+                    </div>                
+                </div>
+                <div class="layui-col-md2">
+                    <div class="layui-card data_text">
+                        <p>线下已售件数（件）</p>
+                        <h3 id="xxys_js">0</h3>
+                    </div>
+                </div>
+                <div class="layui-col-md2">
+                    <div class="layui-card data_text">
+                        <p>线上已售商品金额（元）</p>
+                        <h3 id="xsys_je">0.00</h3>
+                    </div>                
+                </div>
+                <div class="layui-col-md2">
+                    <div class="layui-card data_text">
+                        <p>线下已售商品金额（元）</p>
+                        <h3 id="xxys_je">0.00</h3>
+                    </div>
+                </div>
+                <div class="layui-col-md2">
+                    <div class="layui-card data_text">
+                        <p>库存总量（件）</p>
+                        <h3 id="kczl">0</h3>
+                    </div>                
+                </div>
+                <div class="layui-col-md2">
+                    <div class="layui-card data_text">
+                        <p>库存总价值（元）</p>
+                        <h3 id="kcjz">0.00</h3>
+                    </div>                
+                </div>
+            </div>  
+            <blockquote class="layui-elem-quote">商品动销概况</blockquote>
+            <div class="layui-form layui-row layui-col-space10 laydata_div" style="margin: 10px 0 20px;">
+                <div class="layui-col-md6">
+                    <label class="layui-form-label">筛选日期：</label>
+                    <div class="layui-inline">
+                        <input type="text" name="start" class="layui-input" id="test-laydate-type-datetime-start-pin" placeholder="">
+                    </div>
+                    <label>至</label>
+                    <div class="layui-inline">
+                        <input type="text" name="end" class="layui-input" id="test-laydate-type-datetime-end-pin" placeholder="">
+                    </div>
+                    <div class="layui-inline">
+                        <button class="layui-btn layuiadmin-btn-list" lay-submit lay-filter="spdx_search">查询</button>
+                    </div>  
+                </div>               
+                <div class="layui-col-md6 order_num" id="spdx_data">
+                    <button class="layui-btn layui-btn-primary order_active" lay-type="d">日</button>
+                    <button class="layui-btn layui-btn-primary" lay-type="w">周</button>
+                    <button class="layui-btn layui-btn-primary" lay-type="m">月</button>
+                </div>
+            </div> 
+            <div class="layui-carousel layadmin-carousel layadmin-dataview" data-anim="fade" lay-filter="LAY-index-heapline">
+                <div carousel-item id="LAY-index-pin">
+                    <div><i class="layui-icon layui-icon-loading1 layadmin-loading"></i></div>
+                </div>
+            </div> 
+            <blockquote class="layui-elem-quote">商品数量统计</blockquote>
+            <div class="layui-form layui-row layui-col-space10 laydata_div" style="margin: 10px 0 20px;">
+                <div class="layui-col-md6">
+                    <label class="layui-form-label">筛选日期：</label>
+                    <div class="layui-inline">
+                        <input type="text" name="start" class="layui-input" id="test-laydate-type-datetime-month-start-species" placeholder="">
+                    </div>
+                    <label>至</label>
+                    <div class="layui-inline">
+                        <input type="text" name="end" class="layui-input" id="test-laydate-type-datetime-month-end-species" placeholder="">
+                    </div>
+                    <div class="layui-inline">
+                        <button class="layui-btn layuiadmin-btn-list" lay-submit lay-filter="spzl_search">查询</button>
+                    </div>  
+                </div>               
+                <div class="layui-col-md6 order_num" id="spzl_data">
+                    <button class="layui-btn layui-btn-primary order_active" lay-type="d">日</button>
+                    <button class="layui-btn layui-btn-primary" lay-type="w">周</button>
+                    <button class="layui-btn layui-btn-primary" lay-type="m">月</button>
+                </div>
+            </div> 
+            <div class="new_payment">
+                <div class="payment_data">
+                    <span>近30天商品种类柱状图</span>
+                </div>
+                <div class="layui-carousel layadmin-carousel layadmin-dataview" data-anim="fade" lay-filter="LAY-index-heapline">
+                <div carousel-item id="LAY-index-species">
+                    <div><i class="layui-icon layui-icon-loading1 layadmin-loading"></i></div>
+                </div>
+                </div>
+            </div> 
+            <blockquote class="layui-elem-quote">商品线上销售数量统计</blockquote>
+            <div class="layui-form layui-row layui-col-space10 laydata_div" style="margin: 10px 0 20px;">
+                <div class="layui-col-md6">
+                    <label class="layui-form-label">筛选日期：</label>
+                    <div class="layui-inline">
+                        <input type="text" name="start" class="layui-input" id="test-laydate-type-datetime-month-start-spe_num" placeholder="">
+                    </div>
+                    <label>至</label>
+                    <div class="layui-inline">
+                        <input type="text" name="end" class="layui-input" id="test-laydate-type-datetime-month-end-spe_num" placeholder="">
+                    </div>
+                    <div class="layui-inline">
+                        <button class="layui-btn layuiadmin-btn-list" lay-submit lay-filter="spxs_xs_search">查询</button>
+                    </div>  
+                </div>               
+                <div class="layui-col-md6 order_num" id="spxs_xs_data">
+                    <button class="layui-btn layui-btn-primary order_active" lay-type="d">日</button>
+                    <button class="layui-btn layui-btn-primary" lay-type="w">周</button>
+                    <button class="layui-btn layui-btn-primary" lay-type="m">月</button>
+                </div>
+            </div>
+            <div class="new_payment">
+                <div class="payment_data">
+                    <span>近30天商品销售数量柱状图</span>
+                </div>
+                <div class="layui-carousel layadmin-carousel layadmin-dataview" data-anim="fade" lay-filter="LAY-index-heapline">
+                <div carousel-item id="LAY-index-spe_num">
+                    <div><i class="layui-icon layui-icon-loading1 layadmin-loading"></i></div>
+                </div>
+                </div>
+            </div>
+            <blockquote class="layui-elem-quote">商品线下销售数量统计</blockquote>
+            <div class="layui-form layui-row layui-col-space10 laydata_div" style="margin: 10px 0 20px;">
+                <div class="layui-col-md6">
+                    <label class="layui-form-label">筛选日期：</label>
+                    <div class="layui-inline">
+                        <input type="text" name="start" class="layui-input" id="test-laydate-type-datetime-month-start-spe_num1" placeholder="">
+                    </div>
+                    <label>至</label>
+                    <div class="layui-inline">
+                        <input type="text" name="end" class="layui-input" id="test-laydate-type-datetime-month-end-spe_num1" placeholder="">
+                    </div>
+                    <div class="layui-inline">
+                        <button class="layui-btn layuiadmin-btn-list" lay-submit lay-filter="spxx_xs_search">查询</button>
+                    </div>  
+                </div>               
+                <div class="layui-col-md6 order_num" id="spxx_xs_data">
+                    <button class="layui-btn layui-btn-primary order_active" lay-type="d">日</button>
+                    <button class="layui-btn layui-btn-primary" lay-type="w">周</button>
+                    <button class="layui-btn layui-btn-primary" lay-type="m">月</button>
+                </div>
+            </div>
+            <div class="new_payment">
+                <div class="payment_data">
+                    <span>近30天商品销售数量柱状图</span>
+                </div>
+                <div class="layui-carousel layadmin-carousel layadmin-dataview" data-anim="fade" lay-filter="LAY-index-heapline">
+                    <div carousel-item id="LAY-index-spe_money">
+                        <div><i class="layui-icon layui-icon-loading1 layadmin-loading"></i></div>
+                    </div>
+                </div>
+            </div>
+            <blockquote class="layui-elem-quote">商品排行榜</blockquote>
+            <div class="layui-form layui-row layui-col-space10 laydata_div" style="margin: 10px 0 20px;">
+                <div class="layui-col-md6">
+                    <label class="layui-form-label">筛选日期：</label>
+                    <div class="layui-inline">
+                        <input type="text" name="start" class="layui-input" id="test-laydate-type-datetime-month-start" placeholder="">
+                    </div>
+                    <label>至</label>
+                    <div class="layui-inline">
+                        <input type="text" name="end" class="layui-input" id="test-laydate-type-datetime-month-end" placeholder="">
+                    </div>
+                    <div class="layui-inline">
+                        <button class="layui-btn layuiadmin-btn-list" lay-submit lay-filter="sphb_search">查询</button>
+                    </div>  
+                </div>  
+            </div>
+            <div class="layui-row layui-col-space10">
+                <div class="layui-col-md6">
+                    <a class="good_a" href="###">查看更多商品</a>
+                    <ul class="layui-tab-title goods">
+                        <li class="layui-this" style="padding: 0 25px;">线上商品销售数量排行</li>
+                    </ul>
+                    <table class="layui-hide" id="table_xs_sl"></table>
+                </div>
+                <div class="layui-col-md6">
+                    <a class="good_a" href="###">查看更多商品</a>
+                    <ul class="layui-tab-title goods">
+                        <li class="layui-this" style="padding: 0 25px;">线下商品销售数量排行</li>
+                    </ul>
+                    <table class="layui-hide" id="table_xx_sl"></table>
+                </div>
+            </div>
+            <div class="layui-row layui-col-space10">
+                <div class="layui-col-md6">
+                    <a class="good_a" href="###">查看更多商品</a>
+                    <ul class="layui-tab-title goods">
+                        <li class="layui-this" style="padding: 0 25px;">线上商品销售金额排行</li>
+                    </ul>
+                    <table class="layui-hide" id="table_xs_je"></table>
+                </div>
+                <div class="layui-col-md6">
+                    <a class="good_a" href="###">查看更多商品</a>
+                    <ul class="layui-tab-title goods">
+                        <li class="layui-this" style="padding: 0 25px;">线下商品销售金额排行</li>
+                    </ul>
+                    <table class="layui-hide" id="table_xx_je"></table>
+                </div>
+            </div>
+            <div class="layui-row layui-col-space10">
+                <div class="layui-col-md6">
+                    <a class="good_a" href="###">查看更多商品</a>
+                    <ul class="layui-tab-title goods">
+                        <li class="layui-this" style="padding: 0 25px;">商品库存排行</li>
+                    </ul>
+                    <table class="layui-hide" id="table_spkc"></table>
+                </div>
+            </div>
+            
+        </div>
+        <div class="layui-tab-item">
+            <blockquote class="layui-elem-quote">实时统计</blockquote>
+            <div class="layui-row" id="real_time">
+                <div class="layui-col-md3">
+                <div class="layui-card data_text">
+                    <p>线上总订单数（笔）</p>
+                    <h3 id="ss_xs_zdd">0</h3>
+                </div>                
+                </div>
+                <div class="layui-col-md3">
+                <div class="layui-card data_text">
+                    <p>线上总消费金额（元）</p>
+                    <h3 id="ss_xs_zje">0.00</h3>
+                </div>                
+                </div>
+                <div class="layui-col-md3">
+                <div class="layui-card data_text">
+                    <p>线下总订单（笔）</p>
+                    <h3 id="ss_xx_zdd">0</h3>
+                </div>                
+                </div>
+                <div class="layui-col-md3">
+                <div class="layui-card data_text">
+                    <p>线下总消费金额（元）</p>
+                    <h3 id="ss_xx_zje">0.00</h3>
+                </div>                
+                </div>
+            </div>   
+            <div class="layui-row" id="real_time">
+                <div class="layui-col-md3">
+                <div class="layui-card data_text">
+                    <p>线上本月笔数（笔）</p>
+                    <h3 id="ss_xs_ybs">0</h3>
+                </div>                
+                </div>
+                <div class="layui-col-md3">
+                <div class="layui-card data_text">
+                    <p>线上本月金额（元）</p>
+                    <h3 id="ss_xs_yje">0.00</h3>
+                </div>                
+                </div>
+                <div class="layui-col-md3">
+                <div class="layui-card data_text">
+                    <p>线下本月笔数（笔）</p>
+                    <h3 id="ss_xx_ybs">0</h3>
+                </div>                
+                </div>
+                <div class="layui-col-md3">
+                <div class="layui-card data_text">
+                    <p>线下本月金额（元）</p>
+                    <h3 id="ss_xx_yje">0.00</h3>
+                </div>                
+                </div>
+            </div>   
+            <blockquote class="layui-elem-quote">往期统计</blockquote>
+            <div class="layui-row" id="real_time">
+                <div class="layui-col-md3">
+                <div class="layui-card data_text">
+                    <p>线上上月笔数（笔）</p>
+                    <h3 id="ss_xs_sybs">0</h3>
+                    <!-- <p class="p_hui"><span>环比增幅</span>
+                    <span class="p_red">2% <i class="iconfont icon-up"></i></span></p> -->
+                </div>                
+                </div>
+                <div class="layui-col-md3">
+                <div class="layui-card data_text">
+                    <p>线上上月订单金额（元）</p>
+                    <h3 id="ss_xs_syje">0.00</h3>
+                    <!-- <p class="p_hui"><span>环比增幅</span>
+                    <span class="p_green">95% <i class="iconfont icon-down"></i></span></p> -->
+                </div>                
+                </div>
+                <div class="layui-col-md3">
+                <div class="layui-card data_text">
+                    <p>线下上月笔数（笔）</p>
+                    <h3 id="ss_xx_sybs">0</h3>
+                </div>                
+                </div>
+                <div class="layui-col-md3">
+                <div class="layui-card data_text">
+                    <p>线下上月金额（元）</p>
+                    <h3 id="ss_xx_syje">0.00</h3>
+                </div>                
+                </div>
+            </div>       
+            <blockquote class="layui-elem-quote">订单笔数</blockquote>
+            <div class="layui-form layui-row layui-col-space10 laydata_div" style="margin: 10px 0 20px;">
+                <div class="layui-col-md6">
+                    <label class="layui-form-label">筛选日期：</label>
+                    <div class="layui-inline">
+                        <input type="text" name="start" class="layui-input" id="test-laydate-type-datetime-month-start-order" placeholder="">
+                    </div>
+                    <label>至</label>
+                    <div class="layui-inline">
+                        <input type="text" name="end" class="layui-input" id="test-laydate-type-datetime-month-end-order" placeholder="">
+                    </div>
+                    <div class="layui-inline">
+                        <button class="layui-btn layuiadmin-btn-list" lay-submit lay-filter="ddbs_search">查询</button>
+                    </div>  
+                </div>               
+                <div class="layui-col-md6 order_num" id="ddbs_data">
+                    <button class="layui-btn layui-btn-primary order_active" lay-type="d">日</button>
+                    <button class="layui-btn layui-btn-primary" lay-type="w">周</button>
+                    <button class="layui-btn layui-btn-primary" lay-type="m">月</button>
+                </div>
+            </div>  
+            <div class="new_payment">
+                <!-- <div class="payment_data">
+                    <span>近30天线上订单数 </span><strong class="live_blue" id="ddbs_xs_strong">0</strong>
+                    &nbsp;&nbsp;
+                    <span>近30天线下订单数 </span><strong class="live_org" id="ddbs_xx_strong">0</strong>
+                </div> -->
+                <div class="layui-carousel layadmin-carousel layadmin-dataview" data-anim="fade" lay-filter="LAY-index-heapline">
+                <div carousel-item id="LAY-index-order">
+                    <div><i class="layui-icon layui-icon-loading1 layadmin-loading"></i></div>
+                </div>
+                </div>
+            </div>  
+            <blockquote class="layui-elem-quote">订单金额</blockquote>
+            <div class="layui-form layui-row layui-col-space10 laydata_div" style="margin: 10px 0 20px;">
+                <div class="layui-col-md6">
+                    <label class="layui-form-label">筛选日期：</label>
+                    <div class="layui-inline">
+                        <input type="text" name="start" class="layui-input" id="test-laydate-type-datetime-month-start-omoney" placeholder="">
+                    </div>
+                    <label>至</label>
+                    <div class="layui-inline">
+                        <input type="text" name="end" class="layui-input" id="test-laydate-type-datetime-month-end-omoney" placeholder="">
+                    </div>
+                    <div class="layui-inline">
+                        <button class="layui-btn layuiadmin-btn-list" lay-submit lay-filter="ddje_search">查询</button>
+                    </div>  
+                </div>               
+                <div class="layui-col-md6 order_num" id="ddje_data">
+                    <button class="layui-btn layui-btn-primary order_active" lay-type="d">日</button>
+                    <button class="layui-btn layui-btn-primary" lay-type="w">周</button>
+                    <button class="layui-btn layui-btn-primary" lay-type="m">月</button>
+                </div>
+            </div>  
+            <div class="new_payment">
+                <!-- <div class="payment_data">
+                    <span>近30天线上订单金额 </span><strong class="live_blue" id="ddje_xs_strong">0</strong>
+                    &nbsp;&nbsp;
+                    <span>近30天线下订单金额 </span><strong class="live_org" id="ddje_xs_strong">0</strong>
+                </div> -->
+                <div class="layui-carousel layadmin-carousel layadmin-dataview" data-anim="fade" lay-filter="LAY-index-heapline">
+                <div carousel-item id="LAY-index-omoney">
+                    <div><i class="layui-icon layui-icon-loading1 layadmin-loading"></i></div>
+                </div>
+                </div>
+            </div>   
+        </div>
+        <div class="layui-tab-item">
+            <blockquote class="layui-elem-quote">数据统计</blockquote>
+            <div class="layui-row" id="real_time">
+                <div class="layui-col-md3">
+                <div class="layui-card data_text">
+                    <p>线上退货（笔）</p>
+                    <h3 id="tj_xs_th">0</h3>
+                </div>                
+                </div>
+                <div class="layui-col-md3">
+                <div class="layui-card data_text">
+                    <p>退货比例（%）</p>
+                    <h3 id="tj_xs_bl">0</h3>
+                </div>                
+                </div>
+                <div class="layui-col-md3">
+                <div class="layui-card data_text">
+                    <p>线下退货（笔）</p>
+                    <h3 id="tj_xx_th">0</h3>
+                </div>                
+                </div>
+                <div class="layui-col-md3">
+                <div class="layui-card data_text">
+                    <p>退货比例（%）</p>
+                    <h3 id="tj_xx_bl">0</h3>
+                </div>                
+                </div>
+            </div>   
+            <blockquote class="layui-elem-quote">退换货统计</blockquote>
+            <div class="layui-form layui-row layui-col-space10 laydata_div" style="margin: 10px 0 20px;">
+                <div class="layui-col-md6">
+                    <label class="layui-form-label">筛选日期：</label>
+                    <div class="layui-inline">
+                        <input type="text" name="start" class="layui-input" id="test-laydate-type-datetime-month-start-refund" placeholder="">
+                    </div>
+                    <label>至</label>
+                    <div class="layui-inline">
+                        <input type="text" name="end" class="layui-input" id="test-laydate-type-datetime-month-end-refund" placeholder="">
+                    </div>
+                    <div class="layui-inline">
+                        <button class="layui-btn layuiadmin-btn-list" lay-submit lay-filter="thtj_search">查询</button>
+                    </div>  
+                </div>               
+                <div class="layui-col-md6 order_num" id="thtj_data">
+                    <button class="layui-btn layui-btn-primary order_active" lay-type="d">日</button>
+                    <button class="layui-btn layui-btn-primary" lay-type="w">周</button>
+                    <button class="layui-btn layui-btn-primary" lay-type="m">月</button>
+                </div>
+            </div> 
+            <div class="new_payment">
+                <!-- <div class="payment_data">
+                    <span>近30天订单数 </span>
+                    &nbsp;&nbsp;
+                    <span>近30天付款订单数 </span>
+                </div> -->
+                <div class="layui-carousel layadmin-carousel layadmin-dataview" data-anim="fade" lay-filter="LAY-index-heapline">
+                <div carousel-item id="LAY-index-refund_online">
+                    <div><i class="layui-icon layui-icon-loading1 layadmin-loading"></i></div>
+                </div>
+                </div>
+            </div> 
+            <div class="new_payment">
+                <div class="layui-carousel layadmin-carousel layadmin-dataview" data-anim="fade" lay-filter="LAY-index-heapline">
+                <div carousel-item id="LAY-index-refund_offline">
+                    <div><i class="layui-icon layui-icon-loading1 layadmin-loading"></i></div>
+                </div>
+                </div>
+            </div> 
+       
+        </div>
+
+
+    </div>
+</div>
+</div>
+</div>  
+</div>
+</div>
+
+<script>
+layui.use('statistics_echarts', layui.factory('statistics_echarts')).
+     use('statistics_laydate', layui.factory('statistics_laydate')).
+     use(['admin','laydate','table','form','element','laytpl'], function(){
+
+    var $ = layui.$
+    ,admin = layui.admin
+    ,laydate = layui.laydate
+    ,table = layui.table
+    ,form = layui.form
+    ,laytpl = layui.laytpl
+    ,element = layui.element
+    ,router = layui.router(); 
+  
+    // 日-周-月
+    $('.order_num').find('.layui-btn').click(function(){
+        $(this).addClass("order_active").siblings().removeClass("order_active");
+    });
+
+    // 数据统计
+    admin.req({
+        url: layui.setter.baseUrl + 'admin/StatisticStransaction/shangpingtongji' 
+        ,data: {}
+        ,type: 'get'
+        ,success: function (res) {
+            if (res.code == 1) {
+                $('#spzs').html( res.data.shangpinzongshu );
+                $('#xsys_js').html( res.data.xianshang_yishou );
+                $('#xxys_js').html( res.data.xianxia_yishou );
+                $('#xsys_je').html( res.data.xianshang_jine.toFixed(2) );
+                $('#xxys_je').html( res.data.xianxia_jine.toFixed(2) );
+                $('#kczl').html( res.data.kucunshuliang );
+                $('#kcjz').html( res.data.kucunjine.toFixed(2) );
+            } else {
+                layer.msg(res.msg);
+            }
+        }
+    });
+    // 商品排行榜
+    var xs_sl;
+    var xx_sl;
+    var xs_je;
+    var xx_je;
+    var spkc;
+    admin.req({
+        url: layui.setter.baseUrl + 'admin/StatisticStransaction/shangpinpaihang' 
+        ,data: {}
+        ,type: 'get'
+        ,success: function (res) {
+            if (res.code == 1) {
+                xs_sl=res.data.xianshangshuliang;
+                xx_sl=res.data.xianxiashuliang;
+                xs_je=res.data.xianshangjine;
+                xx_je=res.data.xianxiajine;
+                spkc=res.data.stock;
+                table_phb();
+            } else {
+                layer.msg(res.msg);
+            }
+        }
+    });
+    // 实时统计
+    admin.req({
+        url: layui.setter.baseUrl + 'admin/StatisticStransaction/dingdan' 
+        ,data: {}
+        ,type: 'get'
+        ,success: function (res) {
+            if (res.code == 1) {
+               $('#ss_xs_zdd').html( res.data.xianshang_count );
+               $('#ss_xs_zje').html( res.data.xianshang_goods_price.toFixed(2) );
+               $('#ss_xx_zdd').html( res.data.xianxia_count );
+               $('#ss_xx_zje').html( res.data.xianxia_goods_price.toFixed(2) );
+               $('#ss_xs_ybs').html( res.data.xianshang_benyue_count );
+               $('#ss_xs_yje').html( res.data.xianshang_benyue_goods_price.toFixed(2) );
+               $('#ss_xx_ybs').html( res.data.xianxia_benyue_count );
+               $('#ss_xx_yje').html( res.data.xianxia_benyue_goods_price.toFixed(2) );
+               $('#ss_xs_sybs').html( res.data.xianshang_shangyue_count );
+               $('#ss_xs_syje').html( res.data.xianshang_shangyue_goods_price.toFixed(2) );
+               $('#ss_xx_sybs').html( res.data.xianxia_shangyue_count );
+               $('#ss_xx_syje').html( res.data.xianxia_shangyue_goods_price.toFixed(2) );
+            } else {
+                layer.msg(res.msg);
+            }
+        }
+    });
+    // 退货-数据统计
+    // admin.req({
+    //     url: layui.setter.baseUrl + 'admin/StatisticStransaction/tuihuo' 
+    //     ,data: {}
+    //     ,type: 'get'
+    //     ,success: function (res) {
+    //         if (res.code == 1) {
+    //            $('#tj_xs_th').html( res.data.xianshang_tuihuobishu );
+    //            $('#tj_xs_bl').html( res.data.xianshang_tuihuolv );
+    //            $('#tj_xx_th').html( res.data.xianxia_tuihuobishu );
+    //            $('#tj_xx_bl').html( res.data.xianxia_tuihuolv );
+    //         } else {
+    //             layer.msg(res.msg);
+    //         }
+    //     }
+    // });
+
+
+    
+function table_phb(){
+    table.render({
+        elem: '#table_xs_sl'
+        ,data: xs_sl
+        ,cols: [[
+            {field:'goods_id',title:"排名",width:60,align:'center'}
+            ,{field:'goods_name', title: '商品名称'}
+            ,{field:'count', title: '商品销量',width: 90}
+            ,{field:'price', title: '价格范围',width: 90}
+            ,{field:'create_time', title: '创建时间',align:'center'}
+        ]]
+    });
+    table.render({
+        elem: '#table_xx_sl'
+        ,data: xx_sl
+        ,cols: [[
+            {field:'goods_id',title:"排名",width:60,align:'center'}
+            ,{field:'goods_name', title: '商品名称'}
+            ,{field:'count', title: '商品销量',width: 90}
+            ,{field:'price', title: '价格范围',width: 90}
+            ,{field:'create_time', title: '创建时间',align:'center'}
+        ]]
+    });
+    table.render({
+        elem: '#table_xs_je'
+        ,data: xs_je
+        ,cols: [[
+            {field:'goods_id',title:"排名",width:60,align:'center'}
+            ,{field:'goods_name', title: '商品名称'}
+            ,{field:'count', title: '商品销量',width: 90}
+            ,{field:'price', title: '价格范围',width: 90}
+            ,{field:'create_time', title: '创建时间',align:'center'}
+        ]]
+    });
+    table.render({
+        elem: '#table_xx_je'
+        ,data: xx_je
+        ,cols: [[
+            {field:'goods_id',title:"排名",width:60,align:'center'}
+            ,{field:'goods_name', title: '商品名称'}
+            ,{field:'count', title: '商品销量',width: 90}
+            ,{field:'price', title: '价格范围',width: 90}
+            ,{field:'create_time', title: '创建时间',align:'center'}
+        ]]
+    });
+    table.render({
+        elem: '#table_spkc'
+        ,data: spkc
+        ,cols: [[
+            {field:'goods_id',title:"排名",width:60,align:'center'}
+            ,{field:'goods_name', title: '商品名称'}
+            ,{field:'count', title: '商品销量',width: 90}
+            ,{field:'price', title: '价格范围',width: 90}
+            ,{field:'create_time', title: '创建时间',align:'center'}
+        ]]
+    });
+}
+    
+
+
+    
+});
+</script>

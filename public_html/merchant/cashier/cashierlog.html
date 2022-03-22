@@ -1,0 +1,120 @@
+
+<title>收银日志</title>
+
+<div class="layui-card layadmin-header">
+    <div class="layui-breadcrumb" lay-filter="breadcrumb">
+        <a>收银管理</a>
+        <a><cite>收银日志</cite></a>
+    </div>
+</div>
+
+<div class="layui-fluid">
+<div class="layui-row layui-col-space15">
+<div class="layui-col-md12">
+    <div class="layui-card">
+    <div class="layui-card-header">收银日志</div>
+    <div class="layui-card-body"> 
+        <div class="layui-form" lay-filter="layadmin-useradmin-formlist" style="margin-bottom: 20px;">
+            <div class="layui-inline">
+                <input name="startTime" type="text" class="layui-input" id="laydate-datetime-start" placeholder="开始时间">
+            </div>
+            <div class="layui-inline">
+                <input name="endTime" type="text" class="layui-input" id="laydate-datetime-end" placeholder="结束时间">
+            </div>           
+            <div class="layui-inline">
+                <input name="keyWords" type="text" placeholder="收银员名称/内容" autocomplete="off" class="layui-input" id="layui-key">
+            </div>
+            <div class="layui-inline">
+                <button class="layui-btn layuiadmin-btn-admin" lay-submit lay-filter="LAY-user-back-search" >查询</button>
+            </div>
+        </div>
+        <table class="layui-hide" id="table_statistical" lay-filter="table_statistical"></table> 
+        <script type="text/html" id="test-table-images">
+            <img src="{{d.original_img||'/static/merchant/src/style/res/head_default.gif'}}" height="100%" alt="" onerror="javascript:this.src='/static/merchant/src/style/res/head_default.gif'">
+        </script>   
+        <script type="text/html" id="test-table-operation">
+            <button type="button" class="layui-btn layui-btn-normal layui-btn-xs" lay-event="detail">详情</button>
+        </script>           
+    </div>
+    </div>
+</div>
+</div>
+</div>
+
+<script>
+layui.use(['admin','table','form','laydate','view','myprint','layer'], function(){
+    var $ = layui.$
+    ,admin = layui.admin
+    ,view = layui.view
+    ,setter = layui.setter
+    ,table = layui.table
+    ,layer = layui.layer
+    ,laydate = layui.laydate
+    ,myprint = layui.myprint
+    ,form = layui.form;
+
+    //日期时间选择器
+    laydate.render({
+        elem: '#laydate-datetime-start'
+        ,type: 'datetime'
+    });
+    laydate.render({
+        elem: '#laydate-datetime-end'
+        ,type: 'datetime'
+    });
+
+    table.render({
+        elem: '#table_statistical'
+        ,url: layui.setter.baseUrl + 'merchant/stockInventory/stock'
+        ,parseData: function(res){ //res 即为原始返回的数据      
+          return {
+            "code": res.code, //解析接口状态
+            "msg": res.msg, //解析提示文本
+            "count": res.data.count, //解析数据长度
+            "data": res.data.lists //解析数据列表
+          };
+        }
+        ,toolbar: '#test-table-toolbar'
+        ,title: "收银日志"
+        ,cols: [[
+            {field:'id', width:80, title: 'ID',align:"center"}
+            ,{field:'goods_name', title: '店铺名称',align:"center"}
+            ,{field:'goods_sn', title: 'POS机编号',align:"center"}
+            ,{field:'spec_sku', title: 'POS名称',align:"center"}
+            ,{field:'original_img', title: '收银员',align:"center", width:160, templet: '#test-table-images',}
+            ,{field:'spec_name', title: '操作时间',align:"center"} 
+            ,{field:'stock', title: '内容',align:"center",width:120} 
+            // ,{fixed: '', title:'操作', toolbar: '#test-table-operation',align:"center",width:120}
+        ]],
+        page:true
+    });   
+
+    //监听搜索
+    form.on('submit(LAY-user-back-search)', function(data){
+        var field = data.field;
+        // console.log(field);        
+        table.reload('table_statistical', {
+            where: field
+        });
+    });
+
+    // 监听工具条--取消
+    table.on('tool(table_statistical)', function (obj) {
+    var data = obj.data;        
+    if (obj.event === 'detail') {  
+        admin.popup({
+            title: "日志",
+            area: admin.screen() < 2 ? ['95%', '90%'] : ["600px", "500px"],
+            id: "LAY-popup-log_return",
+            success: function(e, i) {
+                view(this.id).render('/stock/statistical_log', data.spec_id).done(function() {
+             
+                });
+            }
+        });
+    }
+    }); 
+
+
+})    
+</script>

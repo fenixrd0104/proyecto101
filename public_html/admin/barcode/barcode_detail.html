@@ -1,0 +1,448 @@
+
+<title>商品条码</title>
+
+<div class="layui-card layadmin-header">
+    <div class="layui-breadcrumb" lay-filter="breadcrumb">
+        <a>系统管理</a>
+        <a><cite>商品条码</cite></a>
+    </div>
+</div>
+<script type="text/html" template>
+    <link rel="stylesheet" href="{{ layui.setter.base }}style/purchase.css?v={{ layui.admin.v }}-1" media="all">
+</script>
+
+<div class="layui-fluid">
+<div class="layui-row layui-col-space15">
+<div class="layui-col-md12">
+<div class="layui-card">
+    <div class="layui-card-header">商品条码</div>
+    <div class="layui-card-body layui-form" lay-filter="barcode"> 
+        <div class="layui-row lay_up">
+            <div class="layui-inline">
+                <label class="layui-form-label">宽</label>
+                <div class="layui-input-inline">
+                    <input type="text" name="width" id="width" placeholder="" class="layui-input lay_up_inp" value="200">
+                </div>
+            </div>
+            <div class="layui-inline">
+                <label class="layui-form-label">高</label>
+                <div class="layui-input-inline">
+                    <input type="text" name="height" id="height" placeholder="" class="layui-input lay_up_inp" value="300">
+                </div>
+            </div>
+            <button type="button" class="layui-btn" lay-submit lay-filter="submit" style="float: right;"><i class="layui-icon layui-icon-add-1 layuiadmin-button-btn"></i>保存</button>
+        </div> 
+        <hr style="margin: 20px 0;">
+        <div class="layui-row">
+            <div class="layui-col-lg2 layui-col-md2">               
+            <ul class="barcode_left" id="barcode_left">
+                <!-- <li><input type="checkbox" name="" title="名称" lay-skin="primary"></li> -->
+            </ul> 
+            <!-- 第一步：编写模版。 -->
+            <script id="demo" type="text/html">
+                {{#  layui.each(d, function(index, item){ }}
+                <li>
+                    <input type="checkbox" name="" title="{{item.title}}" lay-skin="primary" lay-index="{{index}}" lay-filter="checkbox" class="code_inp"  {{ item.checked=== 1 ? 'checked': '' }}>
+                </li>
+                {{#  }); }}
+            </script>
+            </div>
+            <div class="layui-col-lg10 layui-col-md10">
+                <div class="barcode_canvas layui-col-sm12 layui-col-md9 layui-col-lg10"> 
+                    <div class="bd_canvas" id="bd_canvas">
+                        <!-- <p>
+                            <span>商品名称1</span>
+                            <span>商品名称2</span>
+                        </p> -->
+                    </div>
+                </div>
+                <ul id="bar" class="barcode_right layui-col-sm3 layui-col-md3 layui-col-lg2">
+                    <li>
+                        <label>宽</label>
+                        <div class="layui-inline">
+                            <input class="layui-input lay_sc" id="bar_width" placeholder="">
+                        </div>
+                    </li>
+                    <li>
+                        <label>高</label>
+                        <div class="layui-inline">
+                            <input class="layui-input lay_sc" id="bar_height" placeholder="">
+                        </div>
+                    </li>
+                    <li>
+                        <label>上边距</label>
+                        <div class="layui-inline">
+                            <input class="layui-input lay_sc" id="bar_top" placeholder="">
+                        </div>
+                    </li>
+                    <li>
+                        <label>左边距</label>
+                        <div class="layui-inline">
+                            <input class="layui-input lay_sc" id="bar_left" placeholder="">
+                        </div>
+                    </li>
+                    <li>
+                        <label>字体</label>
+                        <div class="layui-inline">
+                            <input class="layui-input lay_sc" id="bar_size" placeholder="">
+                        </div>
+                    </li>
+                    <li>
+                        <label></label>
+                        <input type="checkbox" name="" title="居中" lay-skin="primary" lay-filter="center" id="inp_center">
+                    </li>
+                </ul>
+                   
+            </div>
+        </div>
+    </div>
+</div>
+</div>
+</div>
+</div>
+
+<script>
+layui.use(['admin','table', 'form','laytpl','layer'], function(){
+  var $ = layui.$
+  ,admin = layui.admin
+  ,element = layui.element
+  ,laytpl = layui.laytpl
+  ,form = layui.form
+  ,layer = layui.layer
+  ,table = layui.table
+  ,router = layui.router();
+
+  element.render();
+  form.render(null, 'barcode');
+var json={
+    name:{
+        checked:0,
+        title: "名称",
+        demo: "商品名称商品名称",
+        type:"text"
+    },
+    sn:{
+        checked:0,
+        title: "SN",
+        demo: "/static/admin/src/style/res/sn.png",
+        type:"img"
+    },
+   sku:{
+        checked:0,
+        title: "SKU",
+        demo: "/static/admin/src/style/res/sku.png",
+        type:"img"
+    },
+    price:{
+        checked:0,
+        title: "市场价",
+        demo: "￥100.00",
+        type:"text"
+    },
+    shop:{
+        checked:0,
+        title: "本店价",
+        demo: "￥50.00",
+        type:"text"
+    }
+};
+
+
+// console.log(json);
+
+//第三步：渲染模版
+var getTpl = demo.innerHTML
+,view = document.getElementById('barcode_left');
+laytpl(getTpl).render(json, function(html){
+  view.innerHTML = html;
+});   
+form.render();   
+var json_array={
+    width: 0,
+    height: 0,
+    sub:{}
+};
+
+// 默认宽高
+var default_w=$('#width').val();
+var default_h=$('#height').val();
+$('.bd_canvas').css("width",default_w+"px");
+$('.bd_canvas').css("height",default_h+"px");
+$('#bd_canvas').css("border","1px solid #999");
+json_array.width=parseFloat(default_w);
+json_array.height=parseFloat(default_h);
+// 默认距离顶部距离--居中
+var lg_height=$('.barcode_canvas').height();
+var default_xs_gao= lg_height-default_h;
+$('#bd_canvas').css('top',default_xs_gao/2+"px");
+
+// 宽
+$('body').on('change','#width',function(){        
+    var value=$(this).val();
+    $('.bd_canvas').css("width",value+"px");
+    json_array.width=parseFloat(value);
+    $('#bd_canvas').css("border","1px solid #999");
+});
+// 高
+$('body').on('change','#height',function(){         
+    var value=$(this).val(); 
+    $('.bd_canvas').css("height",value+"px");
+    json_array.height=parseFloat(value);
+    console.log(json_array);   
+    var xs_gao= lg_height-value;
+    $('#bd_canvas').css('top',xs_gao/2+"px")
+});
+
+//  // 请先选择宽高    
+// $('.code_inp').attr('disabled','disabled');
+// $('body').on('change','.lay_up_inp',function(){    
+//     var width =$("#width").val();
+//     var height =$("#height").val();
+//     if( width !=""&& height!="" ){        
+//         $('.code_inp').attr('disabled','');
+//     }
+// });
+
+// 选择属性---复选框
+form.on('checkbox(checkbox)', function(data){
+    // console.log(data.elem.checked);
+    // console.log(index);
+    // console.log(span_html);    
+    var index=$(this).attr('lay-index');    
+    var span=json[index].demo;
+    var span_html;
+    var sub =json_array.sub;
+
+    var obj ={
+        height:0,
+        left:0,
+        top:0,
+        width:0,
+        size:14,
+        center:false
+    }
+    //todo::判断是否存在
+    
+    // 被选中添加--否则删除
+    if( data.elem.checked == true ){   
+        if( json[index].type == "img" ){
+            span_html="<span class='sub_checked subobj' data-name='"+index+"' id='"+index+"'><img src='"+span+"' id='img_"+index+"'></span>";
+            obj.type="img";
+            $('#inp_center').prop('checked',false);
+            $('#bar_size').val("");
+            obj.size=0;
+            
+             // 图片地址
+            var img_url = json[index].demo;
+            // 创建对象
+            var img = new Image();   
+            // 改变图片的src
+            img.src = img_url;
+            // 加载完成执行
+            img.onload = function(){
+                console.log('width:'+img.width+',height:'+img.height);
+            };
+        } else{
+            span_html="<span class='sub_checked subobj' data-name='"+index+"' id='"+index+"'>"+span+"</span>";
+            obj.type="text";
+            $('#inp_center').prop('checked',false);
+            $('#bar_size').val(obj.size);
+        }
+
+
+
+
+
+        form.render();// 复选框被选中****
+        //去除 所有选中
+        $('.subobj').removeClass('sub_checked');
+        $('#bd_canvas').append(span_html);
+        obj.width = $("#"+index).width();
+        obj.height = $("#"+index).height();
+        //TODO::top left size
+
+        //TODO::更新工具
+        $('#bar_height').val(obj.height);
+        $('#bar_width').val(obj.width);
+        $('#bar_top').val(obj.top);
+        $('#bar_left').val(obj.left);
+        json_array.sub[index]=obj;
+        console.log(json_array);
+    } else {
+        //删除 如果是 当前选中元素了 就 置空工具条
+        $('.sub_checked').data('name') == index;
+        if( $("#"+index).hasClass('sub_checked') ){
+            $('#bar_height').val('');
+            $('#bar_width').val('');
+            $('#bar_top').val("");
+            $('#bar_left').val("");
+            $('#bar_size').val("");
+        } else{
+        }
+      
+        $("#"+index).remove(); 
+        console.log(json_array);
+        delete json_array.sub[index];        
+    } 
+    
+});  
+// 是否居中
+form.on('checkbox(center)', function(data){
+    //更新数据
+    var index =$('.sub_checked').data('name');
+    let obj =json_array.sub[index];    
+
+    if( data.elem.checked == true ){
+        var lg_width=$('#bd_canvas').width();
+        var sm_width=$('.sub_checked').width();
+        var pad=lg_width-sm_width;
+        var value= pad/2;
+        $('.sub_checked').css('left',value+"px");
+        $('#bar_left').val(value);
+        $('#inp_center').prop('checked',true);
+        // $('#bar_left').attr("disabled","disabled");
+
+        obj.center=true;
+        obj.left=parseFloat(value);
+    } else {
+        $('.sub_checked').css('left',"0px");
+        $('#inp_center').prop('checked',false);
+        // $('#bar_left').attr("disabled",false);
+        $('#bar_left').val(0);
+        obj.center=false;        
+    }
+    
+    form.render();// 复选框被选中****
+    // console.log(json_array); 
+});
+
+
+//监听元素 被选中 
+$('#bd_canvas').on('click','.subobj',function(){
+    //移出所有选中
+    $('.subobj').removeClass('sub_checked');
+    $(this).addClass('sub_checked');
+    //获取当前name KEY  去取 json_array.sub 里的值
+    let index =$(this).data('name');
+    let obj =json_array.sub[index];
+    // console.log(obj);
+    
+    // size 为0
+    if( obj.type == "img" ){
+        $('#bar_size').val("");
+        obj.size=0;
+    } else{
+        $('#bar_size').val(obj.size);
+    }
+
+    $('#bar_height').val(obj.height);
+    $('#bar_width').val(obj.width);   
+    $('#bar_left').val(obj.left);   
+    $('#bar_top').val(obj.top); 
+    // 居中复选框是否被选中  
+    if( obj.center == true ){
+        $('#inp_center').prop('checked',true);
+    } else {
+        $('#inp_center').prop('checked',false);
+    }
+    
+    form.render();// 复选框被选中****
+    // console.log(json_array);  
+   
+});
+// 监听 工具条数据变化 
+// 高
+$('#bar').on('change','#bar_height',function(){    
+    var value =$(this).val();
+    //找到当前选中的
+   var index =  $('.sub_checked').data('name');   
+    //更新数据
+    let obj =json_array.sub[index];
+    obj.height=parseFloat(value);
+    json_array.sub[index]=obj;  
+    //更新画布
+    $('.sub_checked').height(value);  
+});
+// 宽
+$('#bar').on('change','#bar_width',function(){    
+    var value =$(this).val();
+    //找到当前选中的
+    var index =  $('.sub_checked').data('name');   
+    //更新数据
+    let obj =json_array.sub[index];
+    obj.width=parseFloat(value);
+    json_array.sub[index]=obj;  
+    //更新画布
+    $('.sub_checked').width(value); 
+
+    // 宽改变时---居中--做出调整
+    if( json_array.sub[index].center==true ){
+        var ch_width= $('#bd_canvas').width();
+        var sm_padd= (ch_width-value)/2;        
+        $('.sub_checked').css('left',sm_padd+"px");
+        $('#bar_left').val(sm_padd);
+    }
+
+});
+// 上边距
+$('#bar').on('change','#bar_top',function(){    
+    var value =$(this).val();
+    //找到当前选中的
+    var index =  $('.sub_checked').data('name');   
+    //更新数据
+    let obj =json_array.sub[index];
+    obj.top=parseFloat(value);
+    json_array.sub[index]=obj; 
+    //更新画布
+    $('.sub_checked').css("top",value+"px"); 
+     
+});
+// 左边距
+$('#bar').on('change','#bar_left',function(){    
+    var value =$(this).val();
+    //找到当前选中的
+    var index =  $('.sub_checked').data('name');   
+    //更新数据
+    let obj =json_array.sub[index];
+    obj.left=parseFloat(value);
+    json_array.sub[index]=obj;
+    // 居中的-----复选框是否被选中  
+    if( obj.center == true ){
+        $('#inp_center').prop('checked',false);
+        obj.center=false;        
+    } else {        
+    }  
+    form.render();// 复选框被选中****
+    //更新画布
+    $('.sub_checked').css("left",value+"px");   
+});
+// 字体大小
+$('#bar').on('change','#bar_size',function(){    
+    var value =$(this).val();
+    //找到当前选中的
+    var index =  $('.sub_checked').data('name');   
+    //更新数据
+    let obj =json_array.sub[index];
+    obj.size=parseFloat(value);
+    json_array.sub[index]=obj;  
+    //更新画布
+    $('.sub_checked').css("font-size",value+"px");   
+});
+
+// 保存
+form.on('submit(submit)',function(e){
+    console.log(json_array); 
+});
+
+
+
+
+
+
+
+    
+ 
+  
+});
+
+</script>

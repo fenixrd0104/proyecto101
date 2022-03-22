@@ -1,0 +1,64 @@
+<title>操作日志</title>
+
+<div class="layui-card layadmin-header">
+    <div class="layui-breadcrumb" lay-filter="breadcrumb">
+        <a>示例</a>
+        <a><cite>日志列表</cite></a>
+    </div>
+</div>
+
+<div class="layui-fluid">
+  <div class="layui-row">
+    <div class="layui-card">
+        <div class="layui-card-header">日志列表</div>
+      <div class="layui-card-body">
+          <div class="layui-row">
+              <div class="layui-col-md12">
+                  <div class="layui-card">
+                      <div class="layui-card-body">                      
+                          <table class="layui-hide" id="dotjs"></table>
+                          
+                          <script type="text/html" id="test-table-dotjs">
+                          <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del">删除</a>
+                          </script>
+                      </div>
+                  </div>
+              </div>
+          </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+<script>
+layui.use(['admin', 'upload','form','table','setter'], function(){
+    var $ = layui.jquery
+    ,admin = layui.admin
+    ,setter = layui.setter
+    ,upload = layui.upload
+    ,element = layui.element
+    ,layer = layui.layer
+    ,form = layui.form
+    ,table = layui.table;
+    
+    table.render({
+        elem: '#dotjs'
+        ,url: '/json/table/user.js'
+        ,cellMinWidth: 80 //全局定义常规单元格的最小宽度，layui 2.2.1 新增
+        ,cols: [[
+          {field:'id', width:80, title: 'ID', sort: true}
+          ,{field:'username',width:120, title: '用户ID'}
+          ,{field:'username',  title: '操作用户'}
+          ,{field:'city', width:180, title: '描述'}
+          ,{field:'sign', title: '操作IP', width: 100} //minWidth：局部定义当前单元格的最小宽度，layui 2.2.1 新增
+          ,{field:'experience', title: '地址', width: 100}
+          ,{field:'score', title: '状态', width: 100}
+          ,{field:'wealth', width:100, title: '操作时间'}
+          ,{fixed: 'right', title:'操作', toolbar: '#test-table-dotjs', width:100}
+        ]],
+        page:true
+      });
+  
+
+})
+</script>

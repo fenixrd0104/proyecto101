@@ -1,0 +1,97 @@
+<title>钱包列表</title>
+
+<div class="layui-card layadmin-header">
+    <div class="layui-breadcrumb" lay-filter="breadcrumb">
+        <a>财务管理</a>
+        <a><cite>钱包列表</cite></a>
+    </div>
+</div>
+
+<div class="layui-fluid">
+<div class="layui-row layui-col-space15">
+<div class="layui-col-md12">
+<div class="layui-card">
+    <div class="layui-card-header">钱包列表</div>
+    <div class="layui-card-body"> 
+        <form class="layui-form" style="margin-bottom: 20px;">
+            <div class="layui-inline">
+                <input class="layui-input" name="key" placeholder="搜索会员姓名/手机号"  id="test-table-demoReload" >
+            </div>
+            <div class="layui-inline">
+                <input class="layui-input" name="url" placeholder="搜索钱包地址"   >
+            </div>
+            <!--<div class="layui-inline">-->
+                <!--<input class="layui-input" name="mobile" placeholder="搜索手机号"   >-->
+            <!--</div>-->
+            <button class="layui-btn" type="button" lay-submit lay-filter="wallet_search"><i class="layui-icon">&#xe615;</i>搜索</button>
+        </form>
+        
+        <table class="layui-hide" id="wallet" lay-filter="wallet"></table>    
+            
+    </div>
+</div>
+</div>
+</div>
+</div>
+      
+<script>
+layui.use(['admin','table', 'view', 'form','layer','laydate'], function(){
+    var $ = layui.$
+        ,admin = layui.admin
+        ,element = layui.element
+        ,form = layui.form
+        ,view = layui.view
+        ,laydate = layui.laydate
+        ,layer = layui.layer
+        ,table = layui.table;
+    //日期时间选择器
+    laydate.render({
+        elem: '#test-laydate-type-datetime-start'
+        ,type: 'datetime'
+    });
+    laydate.render({
+        elem: '#test-laydate-type-datetime-end'
+        ,type: 'datetime'
+    });
+    form.render();
+
+    form.on('submit(wallet_search)',function(datas){
+        get_data(datas.field);
+    });
+      
+    var keywords="";
+    var act="";
+    var n=1;
+    get_data({keywords:''});
+    function get_data(param){
+    table.render({
+        elem: '#wallet'
+        ,url: layui.setter.baseUrl+'admin/member/qb_list'
+        ,toolbar: '#tool_wallet_list'
+        ,parseData: function(res){ //res 即为原始返回的数据
+            return {
+            "code": res.code, //解析接口状态
+            "msg": res.msg, //解析提示文本
+            "count": res.data.count, //解析数据长度
+            "data": res.data.lists //解析数据列表
+            };
+        }
+        ,cols: [[
+            {field:'id', width:85, title: '序号', sort: true, align:'center'}
+            ,{field:'uid',  title: '会员ID',align:'center', width:120}
+            ,{field:'realname',  title: '会员姓名',align:'center', width:120}
+            ,{field:'mobile',  title: '会员手机号',align:'center', width:120}
+            ,{field:'url',title: '钱包地址', align:'center'}
+            ,{field:'type',title: '钱包类型', align:'center', width:150}
+            ,{field:'time', title: '时间', align:'center',templet: "<div>{{layui.util.toDateString(d.time*1000, 'yyyy-MM-dd HH:mm:ss')}}</div>",sort:true, width:190}
+            ,{field:'remark', title: '备注', align:'center'}
+        ]],
+        page:true,
+        where:param
+    });
+    }
+    
+    
+
+});
+</script>

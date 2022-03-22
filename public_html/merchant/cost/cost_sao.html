@@ -1,0 +1,82 @@
+<title>供应商选择</title>
+<script type="text/html" template>
+    <link rel="stylesheet" href="{{ layui.setter.base }}style/purchase.css?v={{ layui.admin.v }}-1" media="all">
+</script>
+<div class="layui-col-md12">
+    <form class="layui-form" action="" lay-filter="sao_form">
+        <div class="layui-row layui-col-space10 layui-form-item purchase_sao">
+          <div class="layui-col-lg4 layui-col-md4 layui-col-sm4 layui-col-xs4">
+            <div class="layui-input-block" style="text-align: right;line-height:36px;">
+                商品条码
+            </div>
+          </div>
+          <div class="layui-col-lg6 layui-col-md6 layui-col-sm6 layui-col-xs6">
+            <div class="layui-input-block">
+                <input type="text" name="spec_sku" lay-verify="required" placeholder="" autocomplete="off" class="layui-input">
+            </div>
+          </div>
+          <div class="layui-col-lg2 layui-col-md2  layui-col-sm2 layui-col-xs2">
+           
+          </div>
+        </div>
+        <div class="layui-row layui-col-space10 layui-form-item purchase_sao">
+          <div class="layui-col-lg4 layui-col-md4 layui-col-sm4 layui-col-xs4">
+            <div class="layui-input-block" style="text-align: right;line-height:36px;">
+               数量
+            </div>
+          </div>
+          <div class="layui-col-lg6 layui-col-md6 layui-col-sm6 layui-col-xs6">
+            <div class="layui-input-block">
+                <input type="text" name="num"  placeholder="" autocomplete="off" class="layui-input" id="num" value="1" disabled>
+            </div>
+          </div>
+          <div class="layui-col-lg2 layui-col-md2 layui-col-sm2 layui-col-xs2">
+              
+          </div>
+        </div>
+        <div class="layui-row layui-col-space10 layui-form-item purchase_sao">
+          <div class="layui-col-lg12">
+            <div class="layui-input-block" style="text-align: right; border-top:1px solid #f1f1f1;">
+                <p>
+                    <input type="checkbox" name="num_checkbox" value="" title="扫码输入(勾选时数量固定为1,未勾选时输完条码再输数量)" lay-skin="primary" lay-filter="check_box" checked>
+                </p>
+                <button class="layui-btn" lay-submit lay-filter="saoma_submit" style="margin-top: 20px;" type="button">确定</button>
+            </div>
+          </div>
+         
+        </div>
+    </form>
+</div>
+
+<script>
+  layui.use(['admin', 'upload','form','layer'], function(){
+    var $ = layui.jquery
+    ,upload = layui.upload
+    ,layer = layui.layer
+    ,element = layui.element
+    ,layer = layui.layer
+    ,form = layui.form;
+    
+    form.render();
+    $('input[name="spec_sku"]').focus();
+
+    form.on('checkbox(check_box)',function(e){
+      if(e.elem.checked===true){
+        form.val("sao_form",{
+            "num" : 1
+        }); 
+        $('input[name="num"]').attr('disabled',true);
+      }else{
+        form.val("sao_form",{
+            "num" : ''
+        }); 
+        $('input[name="num"]').attr('disabled',false);
+
+      }
+      $('input[name="spec_sku"]').focus();
+    });
+    form.render();
+  
+
+})
+</script>

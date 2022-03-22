@@ -1,0 +1,35 @@
+<title>运费模板</title>
+
+<div class="layui-card layadmin-header">
+  <div class="layui-breadcrumb" lay-filter="breadcrumb">
+      <a>商品管理</a>
+      <a><cite>运费模板</cite></a>
+  </div>
+</div>
+
+<div class="layui-fluid">
+<div class="layui-row layui-col-space15">
+<div class="layui-col-md12">
+<div class="layui-card">
+    <div class="layui-card-header">运费模板</div>
+    <div class="layui-card-body"> 
+        <div class="test-table-reload-btn" style="margin-bottom: 10px;">
+            <button type="button" class="layui-btn layuiadmin-btn-admin" data-type="add"><i class="layui-icon layui-icon-add-1 layuiadmin-button-btn"></i>添加运费模板</button>
+        </div>
+
+        <table id="add_freight" lay-filter="add_freight"></table>        
+        <script type="text/html" id="table_add_freight">
+            <a class="layui-btn layui-btn-normal layui-btn-xs" lay-event="edit"><i class="layui-icon layui-icon-edit"></i>编辑</a>
+            <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del"><i class="layui-icon layui-icon-delete"></i>删除</a>
+        </script> 
+    </div>
+</div>
+</div>
+</div>
+</div>
+
+<script>
+
+   layui.use('freight',layui.factory('freight'));
+
+</script>

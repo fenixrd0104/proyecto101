@@ -1,0 +1,224 @@
+
+<title>文章管理</title>
+
+<div class="layui-card layadmin-header">
+  <div class="layui-breadcrumb" lay-filter="breadcrumb">
+    <a>文章管理</a>
+    <a><cite>文章分类</cite></a>
+  </div>
+</div>
+<div class="layui-fluid">
+  <div class="layui-row layui-col-space15">
+    <div class="layui-col-md12">
+      <div class="layui-card">
+        <div class="layui-card-header">分类列表</div>
+        <div class="layui-card-body"> 
+            <div class="test-table-reload-btn" style="margin-bottom: 10px;">
+              <button type="button" class="layui-btn layuiadmin-btn-admin" style="margin-right: 30px;" data-type="add"><i class="layui-icon layui-icon-add-1 layuiadmin-button-btn"></i>添加分类</button>
+            </div>   
+            <table class="layui-hide" id="index_cate" lay-filter="index_cate"></table>    
+            <script type="text/html" id="test-table-index_cate">
+              <a class="layui-btn layui-btn-normal layui-btn-xs" lay-event="edit"><i class="layui-icon layui-icon-edit"></i>编辑</a>
+              <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del"><i class="layui-icon layui-icon-delete"></i>删除</a>
+            </script>           
+            <script type="text/html" id="test-index_cate-state">
+              <input type="checkbox" name="status" lay-skin="switch" lay-text="开启|关闭" lay-filter="choose_index_cate_status" {{ d.status === 1 ? 'checked' : '' }} value="{{ d.id}}">
+            </script>     
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+layui.use(['admin','table', 'view', 'form','setter','layer','ourJs'], function(){
+  var $ = layui.$
+  ,admin = layui.admin
+  ,setter = layui.setter
+  ,element = layui.element
+  ,form = layui.form
+  ,view = layui.view
+  ,layer = layui.layer
+  ,table = layui.table
+  ,ourJs = layui.ourJs
+  ,router = layui.router();
+
+  table.render({
+      elem: '#index_cate'
+      ,url: layui.setter.baseUrl+'merchant/Article/indexCate'
+      ,parseData: function(res){ //res 即为原始返回的数据
+            return {
+            "code": res.code, //解析接口状态
+            "msg": res.msg, //解析提示文本
+            "count": res.data.count, //解析数据长度
+            "data": res.data.lists //解析数据列表
+            };
+        }
+      ,cols: [[
+        {field:'id', width:80, title: 'ID', sort: true, align:'center'}
+        ,{field:'name', title: '名称', align:'center'}
+        ,{field:'orderby', width:180, title: '排序', align:'center',edit:true}
+        ,{field:'status', width:100, title: '状态', templet: '#test-index_cate-state', align:'center'}
+        ,{field:'sign', title: '添加时间', align:'center',templet : "<div>{{layui.util.toDateString(d.create_time*1000, 'yyyy/MM/dd HH:mm:ss')}}</div>"}
+        ,{field:'sign', title: '更新时间', align:'center',templet : "<div>{{layui.util.toDateString(d.update_time*1000, 'yyyy/MM/dd HH:mm:ss')}}</div>"}
+        ,{fixed: 'right', title: '操作', align:'center',  toolbar: '#test-table-index_cate',width:160}
+      ]],
+      page:true
+    });
+    // 更改状态
+    form.on('switch(choose_index_cate_status)',function(e){
+      var _this=this,status=e.elem.checked;
+      var id=e.value;
+
+      admin.req({
+          url: layui.setter.baseUrl+'merchant/Article/cateState' //实际使用请改成服务端真实接口
+          ,data: {
+              id:id
+          },
+          type:'post',
+          success: function(res){            
+            if(res.code==1){
+              ourJs.status_tong(table,_this,status);
+            }else{
+              layer.msg(res.msg, {icon: 5,anim: 6,shade:0.5,time: 1000});
+            }
+          }
+      }); 
+
+    });
+
+     
+     var $ = layui.$, active = {
+      // 添加分类
+      add:function(){
+        admin.popup({
+          title: "添加分类",
+          area: admin.screen() < 2 ? ['95%', '80%'] :["500px", "330px"],
+          id: "LAY-popup-add_index_cate",
+          success: function(layero, index){
+            view(this.id).render('/article/add_cate').done(function() {
+              form.render(null, 'add_cate'); // 弹窗的lay-filter值
+               //监听提交
+               form.on('submit(submit_index_cate)', function(data){
+              
+                admin.req({
+                    url: layui.setter.baseUrl+'merchant/Article/addCate' //实际使用请改成服务端真实接口
+                    ,data: {
+                        name:data.field.name,
+                        orderby:data.field.orderby,
+                        status:data.field.status
+                    },
+                    type:'post',
+                    success: function(res){
+                      
+                      if(res.code==1){
+                          layer.msg(res.msg , {icon: 1,time: 1000} , function(){
+                            setTimeout(function(){
+                              layer.close(index); //执行关闭 
+                              layui.table.reload('index_cate'); //重载表格
+                            },1000);
+                            
+                          });
+                      }else{
+                        layer.msg(res.msg, {icon: 5,anim: 6,shade:0.5,time: 1000});
+                      }
+                    }
+                }); 
+
+              }); 
+              
+            });
+          }
+        });
+      }
+    };
+    
+    $('.test-table-reload-btn .layui-btn').on('click', function(){
+      var type = $(this).data('type');
+      active[type] ? active[type].call(this) : '';
+    });
+    
+    //监听工具条
+    table.on('tool(index_cate)', function(obj){
+      var data = obj.data;
+      console.log(data);
+      var id=data.id;
+      if(obj.event === 'del'){
+        layer.confirm('确认删除此文章分类?', {icon: 3, title:'提示'}, function(index){
+          admin.req({
+              url: layui.setter.baseUrl+'merchant/Article/delCate' //实际使用请改成服务端真实接口
+              ,data: {id:data.id},
+              type:'get',
+              success: function(res){
+                if(res.code==1){
+                  // console.log(res.msg)                
+                    obj.del();
+                    layer.close(index); 
+                }else{
+                  layer.msg(res.msg, {icon: 5,anim: 6,shade:0.5,time: 1000});
+                }
+              }
+            }); 
+        });
+      } else if(obj.event === 'edit'){
+        // 编辑
+        admin.popup({
+          title: "编辑分类",
+          area: admin.screen() < 2 ? ['95%', '80%'] :["500px", "330px"],
+          id: "LAY-popup-edit_cate",
+          success: function(layero, index){
+            view(this.id).render('/article/add_cate',data).done(function() {
+              form.render(null, 'add_cate'); // 弹窗的lay-filter值
+               //监听提交
+               form.on('submit(submit_index_cate)', function(data){
+                  admin.req({
+                      url: layui.setter.baseUrl+'merchant/Article/edit' //实际使用请改成服务端真实接口
+                      ,data: {
+                          id:id,
+                          name:data.field.name,
+                          status:data.field.status,
+                          orderby:data.field.orderby
+                      },
+                      type:'post',
+                      success: function(res){
+                        
+                        if(res.code==1){
+                            layer.msg(res.msg , {icon: 1,time: 1000, anim:5} , function(){
+                              setTimeout(function(){
+                                layer.close(index); //执行关闭 
+                                layui.table.reload('index_cate'); //重载表格
+                              },1000);
+                              
+                            });
+                        }else{
+                          layer.msg(res.msg, {icon: 5,anim: 6,shade:0.5,time: 1000});
+                        }
+                      }
+                  }); 
+
+                });
+              
+            });
+          }
+        });
+      } 
+    });
+    // 单元格编辑
+    table.on('edit(index_cate)',function(e){
+      console.log(e);
+      admin.req({
+        url: layui.setter.baseUrl+'merchant/Article/edit'
+        ,data: e.data,
+        type:'post',
+        success: function(res){          
+          if(res.code==1){
+              
+          }else{
+            layer.msg(res.msg, {icon: 5,anim: 6,shade:0.5,time: 1000});
+          }
+        }
+    }); 
+    });
+  
+});
+</script>

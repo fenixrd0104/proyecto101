@@ -1,0 +1,245 @@
+{include file="public/header"/}
+<style>
+#mescroll{
+    position: fixed;
+    top: 1.4rem;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+}
+</style>
+</head>
+<body>
+<header class="mui-bar mui-bar-nav index_header shop_head" id="header">
+    <a class="back-page mui-icon mui-icon-left-nav mui-pull-left" href="javascript:;"></a>
+    <a id="menu" class="mui-action-menu mui-icon mui-icon-bars mui-pull-right" href="javascript:void(0);"></a>
+   <h1 class="mui-title">Store product list</h1>
+   </header>
+   <div class="mui-content street_content">
+       <div class="stroe_search mui-clearfix">
+           <input class="fl" id="seach_inp" type="text">
+           <button class="fr" onclick="seach();"><i class="iconfont icon-search"></i></button>
+       </div>
+       <div class="street_nav saearch_listup">
+           <ul class="mui-clearfix sto_ul_div">
+               <li class="saearch_li on li_synthe">
+                   <a href="javascript:void(0);">
+                       <span>Comprehensive</span>
+                   </a>
+               </li>
+               <li class="saearch_li li_sales">
+                   <a href="javascript:void(0);">
+                       <span>Sales</span>
+                   </a>
+               </li>
+               <li class="saearch_li li_price li_price_arr">
+                   <a href="javascript:void(0);">
+                       <span>Price</span>
+                    <img class="arrow" src="__IMG__/jiantou_1.png" alt="">
+                    <img class="arrow_asc" src="__IMG__/jiantou_2.png" alt="">
+                    <img class="arrow_desc" src="__IMG__/jiantou_3.png" alt="">
+                </a>
+            </li>
+            <li></li>
+            <li>
+                <a href="javascript:void(0);">
+                    <i class="iconfont icon-list1 i_list"></i>
+                </a>
+            </li>
+        </ul>
+    </div>
+    <div class="search_listlow search_small">
+        <div id="mescroll" class="mescroll">
+        <ul id="dataList">
+            <!-- <li><a href="javascript:void(0);">
+                <div class="searimg"><img src="__IMG__/touxiang.png" alt=""></div>
+                <div class="seartxt">
+                    <p class="name mui-ellipsis">Women's clothing</p>
+                    <p class="red">KRC $20.00</p>
+                    <span>0 people paid</span>
+                </div>
+            </a></li> -->
+        </ul>
+        </div>
+    </div>
+    <!-- <div class="search_none">
+        <p>Sorry, there are no relevant results at the moment, try another filter condition</p>
+    </div> -->
+</div>
+   
+<div class="search_screenbg"></div>
+{include file="public/head_nav"/}
+{include file="public/footer"/}
+<script type="text/html" id="list">
+    <li><a href="/wap/index/goods_info.html?id={{id}}">
+        <div class="searimg"><img src="{{original_img}}" alt=""></div>
+        <div class="seartxt">
+            <p class="name mui-ellipsis">{{goods_name}}</p>
+            <p class="red">KRC {{shop_price}}$</p>
+            <span>{{sales_num}} people pay</span>
+        </div>
+    </a></li>
+</script>
+<script>
+var shop_id=getQueryString('shop_id');
+var type=getQueryString('type');
+var cat_id=getQueryString('cat_id');
+var par={
+    shop_id:shop_id,
+    type:type,
+    cat_id:cat_id,
+    page:'',
+    limit:8,
+    keywords:'',
+    order:0
+}
+
+
+//Create a MeScroll object
+var mescroll = new MeScroll("mescroll", {
+    up: {
+        callback: getListData, //Pull-up callback, which can be abbreviated here; equivalent to callback: function (page) { getListData(page); }
+        isBounce: false, //The ios bounce and parsing are prohibited here (be sure to read carefully, especially the last point): http://www.mescroll.com/qa.html#q10
+        noMoreSize: 5, //If the list has no data, you can set the total number of lists to be greater than half a page before displaying no more data; avoid too little list data (for example, only one piece of data), it will not look good to display no more data; Default 5
+        empty: {
+            icon: "/static/wap/images/none2.png", //icon, default null
+            tip: "No data at the moment~~~", //Tips
+
+        },
+        clearEmptyId: "dataList", //equivalent to setting clearId and empty.warpId at the same time; simplified writing; default null; note that this cannot be configured in vue
+        toTop: { //Configure back to top button
+            src: "/static/wap/images/top.png", //default scroll to 1000px display, configurable offset modification
+            offset: 1000
+        },
+        lazyLoad: {
+            use: true // Whether to enable lazy loading, default false
+        },
+        htmlNodata: '<p class="upwarp-nodata">-- END --</p>',
+        page: {
+            num: 0,
+            size: 8,
+            time: null
+        },
+        offset: 150,
+        loadFull: {
+            use: true,
+            delay: 500
+        }
+    }
+});
+
+function getListData(page) {
+   // load data online
+    getListDataFromNet(page.num, page.size, function(curPageData) {
+        //mescroll will automatically judge the list according to the passed parameters, if there is no data, it will prompt empty; if there is no next page of data in the list, it will prompt no more data;
+        mescroll.endSuccess(curPageData.length);
+        //set list data
+        setListData(curPageData);
+    }, function() {
+        //Callback for networking failure, hide the status of pull-down refresh and pull-up loading;
+        mescroll.endErr();
+    });
+}
+
+function setListData(curPageData) {
+    // console.log(curPageData);
+    var list = '';
+    for (var i in curPageData) {
+        list += template('list', curPageData[i]);
+    }
+    $('#dataList').append(list);
+}
+
+function getListDataFromNet(pageNum, pageSize, successCallback, errorCallback) {
+    setTimeout(function() {
+    par.page=pageNum;
+    $get('/api/merchant/merchant_goods_lists', par, function(data) {
+        if (data.status == 1) {
+            var curPageData = data.data.list;
+            var listData = [];
+            //All products (simulate pagination data)
+            for (var i in curPageData) {
+                if (i == curPageData.length) break;
+                listData.push(curPageData[i]);
+            }
+            successCallback(listData);
+        } else {
+            mescroll.endErr();
+        }
+
+    });
+    }, 1000);
+}
+
+// search
+function seach(){
+    var keywords=$('#seach_inp').val();
+    par.keywords=keywords;
+    // reset the list data
+    mescroll.resetUpScroll();
+    // hide back to top button
+    mescroll.hideTopBtn();
+};
+// comprehensive
+$('.li_synthe').on('tap',function(){
+    par.order=0;
+    // reset the list data
+    mescroll.resetUpScroll();
+    // hide back to top button
+    mescroll.hideTopBtn();
+});
+// sales
+$('.li_sales').on('tap',function(){
+    par.order='sales';
+    // reset the list data
+    mescroll.resetUpScroll();
+    // hide back to top button
+    mescroll.hideTopBtn();
+});
+// price
+$('.li_price').on('tap',function(){           
+    if($(this).hasClass('li_price_arr')){
+        $(this).addClass('li_price_asc').removeClass('li_price_arr');  
+        par.order='priceup';
+    }else if($(this).hasClass('li_price_asc')){
+        $(this).addClass('li_price_desc').removeClass('li_price_asc');  
+        par.order='pricedown';
+    }else {
+        $(this).addClass('li_price_asc').removeClass('li_price_desc'); 
+        par.order='priceup';
+    }
+  // reset the list data
+      mescroll.resetUpScroll();
+      // hide back to top button
+      mescroll.hideTopBtn();
+  })
+  
+  //The selected style of 'Comprehensive' 'Sales'...
+  $('.street_nav .saearch_li').on('tap',function(){
+      $(this).addClass('on');
+      $(this).siblings().removeClass('on');
+      if(!$('.li_price').hasClass('on')){
+          $('.li_price').addClass('li_price_arr').removeClass('li_price_asc').removeClass('li_price_desc');
+      }
+  });
+  //Change the graphic list style
+$('.i_list').on('tap',function(){            
+    if($(this).hasClass('icon-list1')){
+        $(this).addClass('icon-list2').removeClass('icon-list1');   
+        $('.search_listlow').addClass('search_big').removeClass('search_small');
+    }else{
+        $(this).addClass('icon-list1').removeClass('icon-list2');
+        $('.search_listlow').addClass('search_small').removeClass('search_big');
+    }                     
+});
+
+
+// address bar information    
+function getQueryString(name){
+    var reg = new RegExp("(^|&)"+ name +"=([^&]*)(&|$)");
+    var r = window.location.search.substr(1).match(reg);
+    if(r!=null)return  unescape(r[2]); return null;
+}
+</script>
+</body>
+</html>

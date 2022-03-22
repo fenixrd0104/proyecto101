@@ -1,0 +1,192 @@
+{include file="public/header" /}
+<style>
+    .mui-popup-inner {
+        background: #1E232F;
+    }
+    
+    .personal_ul span {
+        color: #fff;
+    }
+</style>
+</head>
+
+<body>
+    <header class="mui-bar mui-bar-nav" id="header">
+        <a class="mui-icon mui-icon-left-nav mui-pull-left" href="/wap/user/my.html"></a>
+        <a id="menu" class="mui-action-menu mui-icon mui-icon-bars mui-pull-right" href="javascript:void(0);"></a>
+        <h1 class="mui-title">Profile</h1>
+            </header>
+            <div class="mui-content">
+                <div class="mb10"></div>
+                <ul class="personal_ul">
+                    <li>
+                        <span>avatar</span>
+                <div class="groupImg">
+                    <input type="hidden" value="" name="avatar">
+                    <input type="file" class="choose" id="upload_1" ref="uploadFile" @change="fileChange" accept="image/*" multiple="multiple">
+                    <!-- <input type="file" class="choose" id="upload_1" accept="image/*" multiple=""> -->
+                    <div class="img-list">
+                        <div class="upload" id="imgdiv1">
+                            <img id="head_img" src="__IMG__/touxiang.png" class="uploadimg" onerror="this.src='__IMG__/touxiang.png'" onclick="return false;">
+                        </div>
+                    </div>
+                    <div id="picDiv1" style="width: 1px; height: 1px;"></div>
+                </div>
+            </li>
+            <li>
+                <span>Mobile number</span>
+                <div class="mui_row" style="text-align: right;">
+                    <input class="mui_sj_inp hide" type="text" id="mobile" placeholder="" readonly>
+                    <a class="mui_sj_a hide" href="/wap/user/my_bd_phone.html">Bind phone number</a>
+                </div>
+            </li>
+            <li>
+                <span>Email</span>
+                <div class="mui_row" style="text-align: right;">
+                    <input class="mui_yx_inp hide" type="text" id="email" placeholder="" readonly>
+                    <a class="mui_yx_a hide" href="/wap/user/my_bd_email.html">Bind email</a>
+                </div>
+            </li>
+            <li>
+                <span>Username</span>
+                <div class="mui_row">
+                    <input type="text" id="nickname" placeholder="Please enter username">
+                </div>
+            </li>
+            <li id="edit_gender">
+                <span>Gender</span>
+                <div class="mui_row">
+                    <input type="text" id="sex" placeholder="Please select gender" readonly>
+                </div>
+            </li>
+            <li id="birth-date">
+                <span>Birthday</span>
+                <div class="mui_row">
+                    <input type="text" id="age" placeholder="Please select a date" readonly>
+                </div>
+            </li>
+        </ul>
+        <div class="mb30"></div>
+        <button id="submit_btn" class="submit_btn bg-gold">Save</button>
+    </div>
+
+    {include file="public/head_nav"/} {include file="public/footer" /}
+    <script type="text/javascript">
+        // upload picture
+        uploadImg(1, '#upload_1', '/api/user/upload');
+        /* ---member information--- */
+        var sex_num = '';
+        user();
+
+        function user() {
+            $get('/api/user/getuserinfo', {}, function(data) {
+                if (data.code == 1) {
+                    var data = data.data;
+                    $('#nickname').val(data.nickname);
+                    $('#mobile').val(data.mobile);
+                    $('#email').val(data.email);
+                    $('#age').val(data.age);
+                    $('#head_img').attr('src', data.head_img);
+                    if (data.head_img == null) {
+                        $('#head_img').attr('src', '__IMG__/touxiang.png');
+                    }
+                    if (data.sex == '0') {
+                       $('#sex').val("Secret");
+                    } else if (data.sex == '1') {
+                        $('#sex').val("male");
+                    } else {
+                        $('#sex').val("Female");
+                    }
+                    sex_num = data.sex;
+                    if (data.email == '') {
+                        $('.mui_yx_a').show();
+                    } else {
+                        $('.mui_yx_inp').show();
+                    }
+                    if (data.mobile == null) {
+                        $('.mui_sj_a').show();
+                    } else if (data.mobile == '') {
+                        $('.mui_sj_a').show();
+                    } else {
+                        $('.mui_sj_inp').show();
+                    }
+
+                } else {
+                    mui.toast(data.msg);
+                }
+            })
+        }
+        $('#submit_btn').click(function() {
+            var head_img = $('#head_img').attr('data-src');
+            var nickname = $('#nickname').val();
+            var sex = $('#sex').attr('data-sex');
+            var age = $('#age').val();
+            var user = {
+                head_img: head_img,
+                nickname: nickname,
+                sex: sex,
+                age: age
+            }
+            $get('/api/user/update_info', user, function(data) {
+                if (data.code == 1) {
+                    mui.toast(data.msg);
+                    setTimeout(function() {
+                        mui.back();
+                    }, 1500);
+                } else {
+                    mui.toast(data.msg);
+                }
+            })
+        });
+
+        // gender selection
+        var choose = '';
+        $('body').on('tap', '.gender_pop .mui-input-row', function() {
+            $(this).addClass('active').siblings().removeClass('active');
+            choose = $(this).attr('data-value');
+        });
+        // modify gender
+        $('#edit_gender').on('tap', function() {
+            mui.confirm('<div class="alert_text gender_pop flex"><div class="mui-input-row" data-num="1" data-value="male"><i class="iconfont ic_boy"> </i></div><div class="mui-input-row" data-num="2" data-value="female"><i class="iconfont ic_girl"></i></div ></div>', 'Gender', ['Cancel', 'OK'], function(e) {
+                if (e.index == 1) {
+                    if (choose == '') {
+                        mui.toast('The selection cannot be empty');
+                        return false;
+                    } else {
+                        var sex = 0;
+                        if (choose == 'male') {
+                            sex = 1;
+                        } else if (choose == 'female') {
+                            sex = 2;
+                        } else {
+                            sex = 0;
+                        }
+                        $('#sex').val(choose);
+                        $('#sex').attr('data-sex', sex);
+                        sex_num = sex;
+                    }
+
+                } else {
+
+                }
+            }, 'div');
+            // console.log(sex_num);
+            if (sex_num) {
+                $('.mui-input-row[data-num=' + sex_num + ']').addClass('active')
+            }
+        });
+        // Birthday
+        $("#birth-date").on('tap', function() {
+            var datePicker = new mui.DtPicker({
+                type: 'date', //If only the year, month and day are displayed, the type is date,
+                beginYear: 1900,
+            });
+            datePicker.show(function(selectItems) {
+                var age = selectItems.text;
+                $("#age").val(age);
+            });
+        });
+    </script>
+</body>
+
+</html>

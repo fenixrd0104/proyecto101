@@ -1,0 +1,432 @@
+<title>添加商品</title>
+<div class="layui-card layadmin-header">
+    <div class="layui-breadcrumb" lay-filter="breadcrumb">
+        <a>商品管理</a>
+        <a lay-href="/goods/goods">商品列表</a>
+        <a><cite>添加商品</cite></a>
+    </div>
+</div>
+
+<link href="/static/merchant/umedit/themes/default/css/umeditor.css" type="text/css" rel="stylesheet">
+<script type="text/html" template>
+    <link rel="stylesheet" href="{{ layui.setter.base }}style/goods.css?v={{ layui.admin.v }}-1" media="all">
+</script>
+<style>
+.t_l{ text-align: left; }
+.t_c{ text-align: center; }
+.t_r{ text-align: right; }
+.red{ color: #f00; }
+@media screen and (max-width: 992px) {
+    .t_r { text-align: left; }
+}
+form .layui-row>.layui-form-item>div {
+    line-height: 36px;
+    padding: 0px 10px;
+}
+form .layui-row>.layui-form-item .layui-input-inline {
+    margin-bottom: 20px;
+    margin-left: 0;
+}
+.layui-form-switch{ margin-top: 0; }
+.layui-upload-list img{
+    width:120px;
+    height:120px;
+    margin-right:20px;
+    margin-bottom:20px;
+}
+#tableTpl input{ width:80px; }
+.edui-tab-item{ line-height: 12px!important; }
+</style>
+<div id="component-tabs">
+<div class="layui-fluid">
+<div class="layui-row layui-col-space15">
+<div class="layui-col-md12">
+<div class="layui-card">
+<!-- <div class="layui-card-header">添加商品</div> -->
+<form class="layui-form" action="" lay-filter="add_goods_1">
+<div class="layui-tab layui-tab-card">
+    <ul class="layui-tab-title">
+        <li class="layui-this">通用信息</li>
+        <li>商品相册</li>
+        <li>商品类型</li>
+        <li>积分折扣</li>
+    </ul>
+    <div class="layui-tab-content">
+        <div class="layui-tab-item layui-show">
+        <div class="layui-row">
+            <div class="layui-form-item">
+                <div class="layui-col-md3 t_r ">商品名称</div>
+                <div class="layui-col-md5">
+                    <input type="text" name="goods_name" lay-verify="title" autocomplete="off" placeholder="请输入商品名称" class="layui-input">
+                </div>
+                <div class="layui-col-md4 layui-word-aux"><span class="red">*必填</span> 输入商品的名称</div>
+            </div>
+            <div class="layui-form-item">
+                <div class="layui-col-md3 t_r ">商品简介</div>
+                <div class="layui-col-md5">
+                    <textarea name="goods_remark" placeholder="请输入内容" class="layui-textarea"></textarea>
+                </div>
+                <div class="layui-col-md4 layui-word-aux">请输入对商品的简单介绍</div>
+            </div>
+            <div class="layui-form-item">
+                <div class="layui-col-md3 t_r ">商品货号</div>
+                <div class="layui-col-md5">
+                    <input type="text" name="goods_sn" lay-verify="title" autocomplete="off" placeholder="请输入商品货号" class="layui-input">
+                </div>
+                <div class="layui-col-md4 layui-word-aux">如果不填写会自动生成唯一值</div>
+            </div>
+            <div class="layui-form-item">
+                <div class="layui-col-md3 t_r ">商品条码</div>
+                <div class="layui-col-md5">
+                    <input type="sku" name="title" lay-verify="title" autocomplete="off" placeholder="请输入商品条码" class="layui-input">
+                </div>
+            </div>
+          <!--   <div class="layui-form-item">
+                <div class="layui-col-md3 t_r ">显示位置</div>
+                <div class="layui-col-md5">
+                    <select name="position_id" lay-filter="position_id">
+                        <option value="0" >请选择显示位置</option>
+                        <option value="1">首页中部横向</option>
+                        <option value="2">首页中部竖向</option>
+                        <option value="3">猜你喜欢</option>
+                    </select>
+                </div>
+                <div class="layui-col-md4 layui-word-aux"><span class="red"></span> 请选择显示位置</div>
+            </div> -->
+            <div class="layui-form-item">
+                <div class="layui-col-md3 t_r ">模块分类</div>
+                <div class="layui-col-md5">
+                    <select name="top_cate" lay-filter="top_cate">
+                        <option value="" >请选择模块分类</option>
+                        <option value="1">VIP商品</option>
+                        <option value="2">优享商品</option>
+                        <option value="3">特惠商品</option>
+                        <option value="4">直购</option>
+                        <option value="5">高端</option>
+                    </select>
+                </div>
+                <div class="layui-col-md4 layui-word-aux"><span class="red">*必填</span> 请选择模块分类</div>
+            </div>
+
+            <div class="layui-form-item">
+                <div class="layui-col-md3 t_r ">优享与E区</div>
+                <div class="layui-col-md5">
+                    <select name="fenlei" lay-filter="top_cates">
+                        <option value="0" >默认为其它</option>
+                        <option value="1">优享商品</option>
+                        <option value="2">E商品</option>
+                    </select>
+                </div>
+                <div class="layui-col-md4 layui-word-aux"><span class="red">*必填</span> 模块分类为优享时，请区分优享和E</div>
+            </div>
+
+            <div class="layui-form-item">
+                <div class="layui-col-md3 t_r ">商品单位</div>
+                <div class="layui-col-md5">
+                <input type="text" name="unit" lay-verify="title" autocomplete="off"  placeholder="请输入商品单位" class="layui-input">
+                </div>
+                <div class="layui-col-md4 layui-word-aux">商品单位</div>
+            </div>
+            <!-- <div class="layui-form-item">
+                <div class="layui-col-md3 t_r ">商品分类</div>
+                <div class="layui-col-md9">
+                    <div class="layui-input-inline">
+                        <select name="cat_id_1" id="cat_id_1" lay-filter="cat_id_1"> </select>
+                    </div>
+                    <div class="layui-input-inline">
+                        <select name="cat_id_2" id="cat_id_2" lay-filter="cat_id_2"> </select>
+                    </div>
+                </div>
+            </div> -->
+            <div class="layui-form-item">
+                <div class="layui-col-md3 t_r ">商品品牌</div>
+                <div class="layui-col-md5">
+                    <select name="brand_id" id="brandList"> </select>
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <div class="layui-col-md3 t_r ">本店售价</div>
+                <div class="layui-col-md5">
+                    <input type="text" name="shop_price" lay-verify="title" autocomplete="off" placeholder="请输入本店售价" class="layui-input">
+                </div>
+                <div class="layui-col-md4 layui-word-aux"><span class="red">*必填</span> 会员价</div>
+            </div>
+            <div class="layui-form-item">
+                <div class="layui-col-md3 t_r ">市场价</div>
+                <div class="layui-col-md5">
+                    <input type="text" name="market_price"  lay-verify="title" autocomplete="off" placeholder="请输入市场价" class="layui-input">
+                </div>
+                <div class="layui-col-md4 layui-word-aux"><span class="red">*必填</span> 零售价</div>
+            </div>
+            <div class="layui-form-item">
+                <div class="layui-col-md3 t_r ">商品数量</div>
+                <div class="layui-col-md5">
+                    <input type="text" name="spec_num"  value="0" lay-verify="title" autocomplete="off" placeholder="请输入商品数量" class="layui-input">
+                </div>
+                <div class="layui-col-md4 layui-word-aux">无规格商品数量</div>
+            </div>
+            <div class="layui-form-item">
+                <div class="layui-col-md3 t_r ">限购数量</div>
+                <div class="layui-col-md5">
+                    <input type="text" name="limit_num"  value="0" lay-verify="title" autocomplete="off" placeholder="请输入限购数量" class="layui-input">
+                </div>
+                <!-- <div class="layui-col-md4 layui-word-aux">只用来限制代付商品购买数量</div> -->
+            </div>
+            <!-- <div class="layui-form-item">
+                <div class="layui-col-md3 t_r ">代理价格</div>
+                <div class="layui-col-md5">
+                    <input type="text" name="trade_price" lay-verify="title" autocomplete="off" placeholder="请输入代理价格" class="layui-input">
+                </div>
+                <div class="layui-col-md4 layui-word-aux">批发价</div>
+            </div> -->
+            <!-- <div class="layui-form-item">
+                <div class="layui-col-md3 t_r ">成本价</div>
+                <div class="layui-col-md5">
+                    <input type="text" name="cost_price"  lay-verify="title" autocomplete="off" placeholder="请输入成本价" class="layui-input">
+                </div>
+                <div class="layui-col-md4 layui-word-aux">进货进价</div>
+            </div> -->
+            <!-- <div class="layui-form-item">
+                <div class="layui-col-md3 t_r ">成本价</div>
+                <div class="layui-col-md5">
+                    <input type="text" name="title" lay-verify="title" autocomplete="off"
+                    placeholder="请输入成本价" class="layui-input">
+                </div>
+                <div class="layui-col-md4 layui-word-aux">输入商品的成本价</div>
+            </div> -->
+            <div class="layui-form-item">
+                <div class="layui-col-md3 t_r ">图片上传</div>
+                <div class="layui-col-md9">
+                    <div class="layui-input-inline" style="margin-bottom: 0;">
+                        <input name="original_img" id="goods_img" placeholder="图片地址" value="" class="layui-input">
+                    </div>
+                    <div class="layui-input-inline layui-btn-container" style="width: auto;margin: 0;">
+                        <button type="button" class="layui-btn" id="LAY_avatarUpload" style="margin-bottom: 0;"> <i class="layui-icon">&#xe67c;</i>上传图片
+                        </button>
+                        <a class="layui-btn layui-btn-primary" onclick="see_img();" style="margin-bottom: 0;">查看图片</a>
+                    </div>
+                    <div class="layui-col-md4 layui-word-aux"><span class="red">*必填</span></div>
+                    <div class="layui-form-item" style="margin: 0;">
+                       <p>备注：图片最小尺寸为500px*500px(ps:正方形即可,单位：像素)，大小不能超过500KB。</p>
+                    </div>
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <div class="layui-col-md3 t_r ">商品重量</div>
+                <div class="layui-col-md5">
+                    <input type="text" name="weight" lay-verify="title" autocomplete="off"
+                        placeholder="请输入商品重量" class="layui-input">
+                </div>
+                <div class="layui-col-md4 layui-word-aux">务必设置商品重量, 用于计算物流费.以克为单位</div>
+            </div>
+            <div class="layui-form-item">
+                <div class="layui-col-md3 t_r ">是否包邮</div>
+                <div class="layui-col-md5">
+                    <!-- <input type="checkbox" name="all_check" lay-skin="switch" lay-text="是|否" lay-filter="all_check"> -->
+                    <input type="radio" name="is_free_shipping" value="1" title="是" checked>
+                    <input type="radio" name="is_free_shipping" value="0" title="否">
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <div class="layui-col-md3 t_r ">运费模板</div>
+                <div class="layui-col-md5">
+                    <select name="fid" id="fid"> </select>
+                </div>
+            </div>
+            <!-- <div class="layui-form-item">
+                <div class="layui-col-md3 t_r ">选择供应商</div>
+                <div class="layui-col-md5">
+                    <select name="supplier_id" id="supplier"> </select>
+                </div>
+                <div class="layui-col-md4 layui-word-aux"><span class="red">*必填</span> 选择供应商</div>
+            </div> -->
+            <div class="layui-form-item">
+                <div class="layui-col-md3 t_r ">商品关键词</div>
+                <div class="layui-col-md5">
+                    <input type="text" name="keywords" lay-verify="title" autocomplete="off"  placeholder="请输入商品关键词" class="layui-input">
+                </div>
+                <div class="layui-col-md4 layui-word-aux">多个以逗号隔开</div>
+            </div>
+            <div class="layui-form-item">
+                <div class="layui-col-md3 t_r ">排序</div>
+                <div class="layui-col-md5">
+                    <input type="text" name="sort" lay-verify="title" autocomplete="off"  placeholder="请输入排序" class="layui-input" value="255">
+                </div>
+                <div class="layui-col-md4 layui-word-aux">商品排序</div>
+            </div>
+            <div class="layui-form-item">
+                <div class="layui-col-md3 t_r ">商品状态</div>
+                <div class="layui-col-md5">
+                    <input type="radio" name="status" value="1" title="开启" checked>
+                    <input type="radio" name="status" value="0" title="关闭">
+                </div>
+                <div class="layui-col-md4 layui-word-aux"></div>
+            </div>
+            <div class="layui-form-item">
+                <div class="layui-col-md3 t_r ">商品详情描述</div>
+                <div class="layui-col-md9">
+                    <input type="hidden" name="goods_content" id="get_content">
+                    <script id="editor" type="text/plain" style="width:100%;height:500px;"></script>
+                </div>
+            </div>
+            <div class="layui-form-item" style="padding:20px 0;border-top:1px solid #f1f1f1;">
+                <div class="layui-col-md12 t_c">
+                    <button type="button" class="layui-btn add_submit_btn" lay-submit lay-filter="submit_add_goods_1"><i  class="layui-icon layui-icon-link"></i>保存</button>
+                </div>
+            </div>
+        </div>
+        </div>
+        <div class="layui-tab-item">
+        <div class="layui-row">
+            <div class="layui-form-item">
+                <div class="layui-col-md3 t_r "></div>
+                <div class="layui-col-md9">
+                <div class="layui-card-body">
+                <div class="layui-upload">
+                    <button type="button"  class="layui-btn" id="upload_goods_images"><i class="layui-icon layui-icon-upload-drag"></i>上传商品图</button>
+                    <div class="layui-form-item" style="margin: 15px 0;">
+                        <p>备注：图片最小尺寸为500px*500px(ps:正方形即可,单位：像素)，大小不能超过500KB。</p>
+                    </div>
+                    <blockquote class="layui-elem-quote layui-quote-nm" style="margin-top: 10px;">
+                        <div class="layui-upload-list" id="upload_goods_images_box"> </div>
+                    </blockquote>
+                </div>
+                </div>
+                </div>
+            </div>
+            <div class="layui-form-item" style="padding:20px 0;border-top:1px solid #f1f1f1;">
+                <div class="layui-col-md12 t_c">
+                    <button type="button" class="layui-btn add_submit_btn" lay-submit lay-filter="submit_add_goods_1"><i  class="layui-icon layui-icon-link"></i>保存</button>
+                </div>
+            </div>
+        </div>
+        </div>
+        <div class="layui-tab-item">
+        <div class="layui-row">
+            <div class="layui-form-item">
+                <div class="layui-col-md3 t_r" style="width:25%">商品类型</div>
+                <div class="layui-col-md2">
+                    <select name="caidan_id" id="caidan" lay-filter="choose_caidan_id" lay-verify="required"> </select>
+                </div>
+                <div class="layui-col-md3">
+                    <select name="goods_type" id="leixing" lay-filter="choose_type_id"> </select>
+                </div>
+                <div class="layui-col-md4 layui-word-aux">请选择对应商品类型</div>
+            </div>
+            <div class="layui-form-item">
+                <div class="layui-row">
+                    <div class="layui-col-md7">
+                        <table id="leixing_1" class="table-bordered"></table>
+                    </div>
+                    <div class="layui-col-md1">&nbsp; </div>
+                    <div class="layui-col-md4">
+                        <table id="leixing_2" class="table-bordered"></table>
+                    </div>
+                </div>
+                <div class="layui-row">
+                    <div class="goods_table2 layui-col-md7" >
+                        <table class="table-bordered">
+                            <tbody id="tableTpl"> </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            <div class="layui-form-item" style="padding:20px 0;border-top:1px solid #f1f1f1;">
+            <div class="layui-col-md12 t_c">
+                <button type="button" class="layui-btn add_submit_btn" lay-submit lay-filter="submit_add_goods_1"><i  class="layui-icon layui-icon-link"></i>保存</button>
+            </div>
+            </div>
+        </div>
+        </div>
+        <div class="layui-tab-item">
+        <form class="layui-form" action="" lay-filter="add_goods_jifen">
+        <div class="layui-row">
+            <div class="layui-form-item" id="give_integral">
+                <input type="hidden" name="give_integral" value="0">
+                <!-- <div class="layui-col-md3 t_r ">赠送积分</div>
+                <div class="layui-col-md5">
+                    <input type="text" name="give_integral" autocomplete="off" placeholder="请输入" class="layui-input">
+                </div>
+                <div class="layui-col-md4 layui-word-aux">订单完成后赠送的积分</div> -->
+            </div>
+            <div class="layui-form-item" id="exchange_integral">
+                <input type="hidden" name="exchange_integral" value="0">
+                <!-- <div class="layui-col-md3 t_r ">兑换积分</div>
+                <div class="layui-col-md5">
+                    <input type="text" name="exchange_integral" autocomplete="off" value="0" placeholder="请输入" class="layui-input">
+                </div>
+                <div class="layui-col-md4 layui-word-aux">如果设置0，则不支持积分抵扣</div> -->
+            </div>
+            <div class="layui-form-item"
+            style="padding:20px 0;border-top:1px solid #f1f1f1;">
+                <div class="layui-col-md12 t_c">
+                    <button type="button" class="layui-btn add_submit_btn" lay-submit lay-filter="submit_add_goods_1"><i  class="layui-icon layui-icon-link"></i>保存</button>
+                </div>
+            </div>
+        </div>
+        </form>
+        </div>
+    </div>
+</div>
+</form>
+</div>
+</div>
+</div>
+</div>
+</div>
+
+<script src="/static/admin/layui/lay/modules/jquery.3.1.1.js"></script>
+<script src="/static/admin/umedit/umeditor.config.js"></script>
+<script src="/static/admin/umedit/umeditor.min.js"></script>
+<script src="/static/admin/umedit/lang/zh-cn/zh-cn.js"></script>
+<script>
+    var um = UM.getEditor('editor', {
+        initialFrameWidth:500,
+        initialFrameHeight:350,
+        // imageFieldName:"file" //上传图片的表单的name
+    });
+
+    UM.getEditor('editor').addListener('blur',function(editor){
+        $('#get_content').val(UM.getEditor('editor').getContent());
+    });
+    layui.use('add_goods',layui.factory('add_goods'));
+</script>
+<script>
+layui.use('JsBarcode.all.min', layui.factory('JsBarcode.all.min'))
+.use('JsBarcode.code128.min', layui.factory('JsBarcode.code128.min'))
+.use(['admin','table','setter','layer','ourJs','laytpl'], function(){
+    var $ = layui.$
+    ,admin = layui.admin
+    ,setter = layui.setter
+    ,view = layui.view
+    ,layer = layui.layer
+    ,table = layui.table
+    ,ourJs = layui.ourJs
+    ,laytpl = layui.laytpl
+    ,form = layui.form;
+
+    //监听提交
+    form.on('submit(submit_add_goods_1)', function(datas){
+        admin.req({
+            url: layui.setter.baseUrl+'admin/goods/addGoods' //实际使用请改成服务端真实接口
+            ,data: datas.field,
+            type:'post',
+            success: function(res){
+            if(res.code==1){
+                layer.msg(res.msg , {icon: 1,time: 1500} , function(){
+                setTimeout(function(){
+                    location.href="#/goods/goods"
+                },1000);
+                });
+            }else{
+                layer.msg(res.msg, {icon: 5,anim: 6,shade:0.5,time: 1500});
+            } 
+            }
+        }); 
+    });
+    
+
+
+
+});
+</script>

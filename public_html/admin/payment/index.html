@@ -1,0 +1,121 @@
+<title>扩展工具</title>
+
+<div class="layui-card layadmin-header">
+  <div class="layui-breadcrumb" lay-filter="breadcrumb">
+    <a>扩展工具</a>
+    <a><cite>支付设置</cite></a>
+  </div>
+</div>
+
+<div class="layui-fluid">
+  <div class="layui-row layui-col-space15">
+    <div class="layui-col-md12">
+      <div class="layui-card">
+        <div class="layui-card-header">支付设置</div>
+        <div class="layui-card-body">
+          <table class="layui-hide" id="pay_type" lay-filter="pay_type"></table>
+          <script type="text/html" id="tool_pay_type">
+              {{# if(d.id!==1){ }}
+                <a class="layui-btn layui-btn-xs" lay-event="config">配置</a>
+              {{# }else{ }}
+              <button class="layui-btn layui-btn-xs layui-btn-disabled" disabled>配置</button>
+              {{# } }}  
+              
+            </script>
+          <script type="text/html" id="test-table-status">
+              <input type="checkbox" name="status" value="{{d.id}}" lay-skin="switch" lay-text="开启|禁止" class="layui-input" {{ d.status === 1 ? 'checked' : '' }} lay-filter="checkbox_status">
+            </script>
+          <script type="text/html" id="test-table-images">
+              <img src="/static/admin/src/style/res/no_img.jpg" height="100%" alt="">
+            </script>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  layui.use(['admin', 'table', 'view', 'form', 'layer', 'ourJs'], function () {
+    var $ = layui.$
+      , admin = layui.admin
+      , element = layui.element
+      , form = layui.form
+      , view = layui.view
+      , layer = layui.layer
+      , setter = layui.setter
+      , table = layui.table
+      , ourJs = layui.ourJs
+      , router = layui.router();
+
+    table.render({
+      elem: '#pay_type'
+      , url: layui.setter.baseUrl + 'admin/payment/index'
+      , cols: [[
+        { field: 'id', title: '插件名称', align: 'center' }
+        , { field: 'name', title: '插件描述', align: 'center' }
+        , { field: 'img', title: '插件图片', templet: '#test-table-images', align: 'center' }
+        , { field: 'status', title: '状态', templet: '#test-table-status', align: 'center' }
+        , { fixed: 'right', title: '配置', align: 'center', toolbar: '#tool_pay_type', width: 200 }
+      ]]
+    });
+
+    //监听工具条
+    table.on('tool(pay_type)', function (obj) {
+      var data = obj.data;
+      if (obj.event === 'config') {
+        // 配置
+        admin.popup({
+          title: data.name + '支付配置',
+          area: admin.screen() < 2 ? ['95%', '90%'] : ["700px", "550px"],
+          id: "LAY-popup-edit_pay_type",
+          success: function (layero, index) {
+            view(this.id).render('/payment/pay_zfb', data).done(function () {
+              form.render(null, 'pay_zfb'); // 弹窗的lay-filter值
+              //监听提交
+              form.on('submit(pay_type_submit)', function (datas) {
+                admin.req({
+                  url: layui.setter.baseUrl + 'admin/payment/config' //实际使用请改成服务端真实接口
+                  , data: datas.field,
+                  type: 'post',
+                  success: function (res) {
+                    if (res.code == 1) {
+                      layer.msg(res.msg, { icon: 1, shade: 0.5, time: 1000 }, function () {
+                        setTimeout(function () {
+                          layer.close(index);
+                        }, 1000);
+
+                      });
+                    } else {
+                      layer.msg(res.msg, { icon: 5, anim: 6, shade: 0.5, time: 1000 });
+                    }
+                  }
+                });
+              });
+
+            });
+          }
+        });
+      }
+    });
+
+
+    // 监听状态修改
+    form.on('switch(checkbox_status)', function (e) {
+      var _this = this, status = e.elem.checked;
+      admin.req({
+        url: layui.setter.baseUrl + 'admin/payment/status'
+        , data: { id: e.value }
+        , type: 'post'
+        , success: function (res) {
+          if (res.code == 1) {
+            ourJs.status_tong(table, _this, status);
+          } else {
+            layer.msg(res.msg, { icon: 5, anim: 6, shade: 0.5, time: 1000 });
+          }
+        }
+      });
+
+    });
+
+  });
+</script>

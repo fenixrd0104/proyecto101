@@ -1,0 +1,88 @@
+<style>
+    .t_l{
+        text-align: left;
+    }
+    .t_c{
+        text-align: center;
+    }
+    .t_r{
+        text-align:right;
+    }
+    @media screen and (max-width: 992px){
+        .t_r{
+            text-align:left;
+        }
+    }
+    form>.layui-row>.layui-form-item>div{
+        line-height: 36px;
+        padding:0px 10px;
+    }
+    form>.layui-row>.layui-form-item .layui-input-inline{
+        margin-bottom: 20px;
+        margin-left: 0;
+    }
+    form>.layui-row>.layui-form-item{
+       padding:25px 0;
+       border-top:1px dashed #f2f2f2;
+       margin-bottom: 0;
+    }
+    .layui-form-switch{
+        margin-top: 0;
+    }
+</style>
+<div class="layui-row">
+
+    <form class="layui-form" action="" lay-filter="pay_supplier">
+        <div class="layui-row">
+            <div class="layui-form-item">
+                <div class="layui-col-md3 t_r ">供应商</div>
+                <div class="layui-col-md7">
+                    <input type="text" name="title" lay-verify="title" autocomplete="off" placeholder="请输入供应商" class="layui-input">
+                </div>
+                <div class="layui-col-md2 layui-word-aux">&nbsp;</div>
+            </div>
+            <div class="layui-form-item">
+                <div class="layui-col-md3 t_r ">应付余额</div>
+                <div class="layui-col-md7">
+                    <input type="text" name="title" lay-verify="title" autocomplete="off" placeholder="请输入应付余额" class="layui-input">
+                </div>
+                <div class="layui-col-md2 layui-word-aux">&nbsp;</div>
+            </div>
+            <div class="layui-form-item">
+                <div class="layui-col-md3 t_r ">付款金额</div>
+                <div class="layui-col-md7">
+                    <input type="text" name="title" lay-verify="title" autocomplete="off" placeholder="请输入付款金额" class="layui-input">
+                </div>
+                <div class="layui-col-md2 layui-word-aux">&nbsp;</div>
+            </div>
+           
+            <div class="layui-form-item">
+                <div class="layui-col-md3 t_r ">备注</div>
+                <div class="layui-col-md7">
+                    <input type="text" name="title" lay-verify="title" autocomplete="off" placeholder="请输入备注" class="layui-input">
+                </div>
+                <div class="layui-col-md2 layui-word-aux">&nbsp;</div>
+            </div>
+          
+           
+            <div class="layui-form-item" style="padding:20px 0;border-top:1px solid #f1f1f1;">
+                <div class="layui-col-md12 t_c">
+                    <button type="button" class="layui-btn" lay-submit  lay-filter="to_pay"><i class="layui-icon layui-icon-file-b"></i>支付</button>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+
+<script>
+  layui.use(['admin', 'upload','form'], function(){
+    var $ = layui.jquery
+    ,upload = layui.upload
+    ,layer = layui.layer
+    ,element = layui.element
+    ,form = layui.form;
+    form.render(null, 'component-supplier_edit');
+  
+
+})
+</script>

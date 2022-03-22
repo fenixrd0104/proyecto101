@@ -1,0 +1,330 @@
+<title>供应商列表</title>
+
+<div class="layui-card layadmin-header">
+    <div class="layui-breadcrumb" lay-filter="breadcrumb">
+        <a>采购管理</a>
+        <a><cite>供应商列表</cite></a>
+    </div>
+</div>
+<script type="text/html" template>
+    <link rel="stylesheet" href="{{ layui.setter.base }}style/supplier.css?v={{ layui.admin.v }}-1" media="all">
+</script>
+
+<div class="layui-fluid">
+<div class="layui-row">
+<div class="layui-col-md12">
+<div class="layui-card">
+    <div class="layui-card-header">供应商列表</div>
+    <div class="layui-card-body">
+    <div class="layui-row layui-col-space10">                        
+    <div class="layui-col-md12">
+        <div class="layui-form">
+        <div class="layuiadmin-card-header-auto supplier_list_search" lay-filter="app-content-list">
+            <div class="layui-form-item">
+                <div class="layui-inline">
+                    <div class="layui-input-inline">
+                        <input type="text" name="keywords" placeholder="供应商名称/员工/联系人/联系电话/地址" autocomplete="off" class="layui-input">
+                    </div>
+                </div>
+                <div class="layui-inline">
+                    <button class="layui-btn layuiadmin-btn-list" lay-submit lay-filter="supplier_search" type="button"><i class="layui-icon layui-icon-search layuiadmin-button-btn"></i>查询</button>
+                </div>
+            </div>
+            </div>
+        </div>
+
+        <table class="layui-hide" id="test-table-supplier_list" lay-filter="test-table-supplier_list"></table>
+        <script type="text/html" id="test_tool_supplier_list">
+        <div class="layui-btn-container">
+            <button type="button" class="layui-btn" id="add_supplierlist"><i class="layui-icon layui-icon-add-1 layuiadmin-button-btn"></i>新增供应商</button>
+        </div>
+        </script>
+        <script type="text/html" id="user_status">
+            <input type="checkbox" name="status" lay-skin="switch" lay-text="开启|禁用" lay-filter="user_status" value="{{d.supplier_id}}" {{ d.supplier_status === "正常" ? 'checked' : '' }}>
+        </script>     
+        <script type="text/html" id="test-table-toolbar-supplier_list">
+        <a class="layui-btn layui-btn-xs" lay-event="see" >查看</a>
+        <a class="layui-btn layui-btn-xs layui-btn-normal" lay-event="edit" >编辑</a>
+        <!-- <a class="layui-btn layui-btn-xs" lay-event="pay">付款</a> -->
+        <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del">删除</a>
+        </script>
+    </div>
+    </div>
+    </div>
+</div>
+</div>
+</div>
+</div>
+
+<script>
+layui.use(['admin','table','form','layer'], function(){
+    var $ = layui.$
+    ,admin = layui.admin
+    ,view = layui.view
+    ,setter = layui.setter
+    ,table = layui.table
+    ,layer = layui.layer
+    ,form = layui.form;
+
+    var keywords='';
+    get_data(keywords);
+    function get_data(keywords){
+    table.render({
+        elem: '#test-table-supplier_list'
+        ,url: layui.setter.baseUrl+'admin/supplier/index'
+        ,toolbar: '#test_tool_supplier_list'
+        ,title: "供应商列表"
+        ,totalRow: true
+        ,cellMinWidth: 80 //全局定义常规单元格的最小宽度，layui 2.2.1 新增
+        ,parseData: function(res){ //res 即为原始返回的数据
+            return {
+            "code": res.code, //解析接口状态
+            "msg": res.msg, //解析提示文本
+            "count": res.data.count, //解析数据长度
+            "sum": res.data.sum, //解析数据长度
+            "data": res.data.lists //解析数据列表
+            };
+        }
+        ,cols: [[
+            {field:'supplier_id', width:80, title: 'ID', sort: true,totalRowText: '合计',align:'center'}
+            ,{field:'supplier_name', title: '供应商',align:'center'}
+            ,{field:'supplier_status', width:120, title: '供应商状态',align:'center',templet: '#user_status'}
+            ,{field:'supplier_balance', width:180, title: '应付余额',totalRow: true,align:'center'}
+            ,{field:'supplier_phone', title: '联系信息',align:'center'} //minWidth：局部定义当前单元格的最小宽度，layui 2.2.1 新增
+            ,{field:'supplier_addr', title: '地址',align:'center'}
+            // ,{field:'forShopName', title: '归属信息',align:'center'}
+            ,{field:'create_time', title: '创建时间', width: 150,align:'center'}
+            ,{fixed: 'right', title:'操作', toolbar: '#test-table-toolbar-supplier_list', width:160,align:'center'}
+        ]]
+        ,totalRow: true
+            ,done:function(res){
+            //修改 结算后余额 统计单元格文本
+            this.elem.next().find('.layui-table-total td[data-field="supplier_balance"] .layui-table-cell').text(res.sum);
+        },
+        page:true,
+        where:{keywords:keywords}
+    });
+    }
+        
+    // 添加
+    $('body').on('click','#add_supplierlist',function(){
+        add_supplier();
+    });
+    function add_supplier(){
+    admin.popup({
+        title: "新增供应商",
+        area: admin.screen() < 2 ? ['95%', '90%'] :["800px", "650px"],
+        id: "LAY-popup-add_supplierlist",
+        success: function(layero, index) {
+            view(this.id).render('/supplier/addsupplier').done(function() {
+            form.render(null, 'addsupplier'); // 弹窗的lay-filter值
+            form.on('submit(add_supplier_submit)', function(datas){
+                
+                admin.req({
+                    url: layui.setter.baseUrl+'admin/supplier/add' //实际使用请改成服务端真实接口
+                    ,data:datas.field,
+                    type:'post',
+                    success: function(res){
+                    if(res.code==1){
+                        layer.msg(res.msg , {icon: 1,time: 1500} , function(){
+                            setTimeout(function(){
+                            layer.close(index); //执行关闭 
+                            layui.table.reload('test-table-supplier_list'); //重载表格
+                            },1500);
+                            
+                        });
+                    }else{
+                        layer.msg(res.msg, {icon: 5,anim: 6,shade:0.5,time: 1500});
+                    }
+                    }
+                }); 
+
+            });
+            });
+        }
+    });
+    }
+
+    // 批量修改
+    $('body').on('click','#supplier_edit',function(){
+        var checkStatus = table.checkStatus('test-table-simple')
+        ,checkData = checkStatus.data; //得到选中的数据
+
+        if(checkData.length === 0){
+            return layer.msg('请选择数据');
+        }
+        admin.popup({
+            title: "批量修改",
+            area: ["50%",'32%'],
+            
+            id: "LAY-popup-supplier_edit",
+            success: function(e, i) {
+                view(this.id).render('/supplier/supplier_edit').done(function() {
+                    
+                });
+            }
+        });
+    });
+
+    // 状态更改
+    form.on('switch(user_status)', function(data){
+        var _this=this,status=data.elem.checked;
+        var supplier_id=data.value;
+        admin.req({
+        url: layui.setter.baseUrl+'admin/supplier/state' 
+        ,data: { supplier_id:supplier_id }
+        ,type:'post'
+        ,success: function(res){
+            if(res.code==1){
+                
+            }else{
+                
+            }
+        }
+        }); 
+
+    });
+
+    // 监听工具条
+    table.on('tool(test-table-supplier_list)',function(e){
+        console.log(e);
+        var data=e.data;
+        var id=e.data.supplier_id;
+        var d={ supplier_id:e.data.supplier_id }
+        if(e.event==='edit'){
+            admin.popup({
+                title: "编辑供应商",
+                area: admin.screen() < 2 ? ['95%', '90%'] :["800px", "600px"],
+                id: "LAY-popup-edit_supplierlist",
+                success: function(layero, index) {
+                    view(this.id).render('/supplier/editsupplier',d).done(function() {
+                      form.render(null, 'addsupplier'); // 弹窗的lay-filter值
+                      form.on('submit(add_supplier_submit)', function(datas){
+                        // console.log(datas.field);   
+                        var data_url={
+                          supplier_name:datas.field.supplier_name,supplier_contacts:datas.field.supplier_contacts,
+                          supplier_phone:datas.field.supplier_phone,supplier_email:datas.field.supplier_email,
+                          supplier_fax:datas.field.supplier_fax,supplier_tel:datas.field.supplier_tel,
+                          supplier_web:datas.field.supplier_web,supplier_bank:datas.field.supplier_bank,
+                          supplier_card:datas.field.supplier_card,supplier_addr:datas.field.supplier_addr,
+                          supplier_status:datas.field.supplier_status,supplier_img:datas.field.supplier_img,
+                          supplier_id:datas.field.supplier_id
+                        };                     
+                        datas.field.id=id;
+                        admin.req({
+                            url: layui.setter.baseUrl+'admin/supplier/edit' //实际使用请改成服务端真实接口
+                            ,data: data_url
+                            ,type:'post'
+                            ,success: function(res){
+                              if(res.code==1){
+                                  layer.msg(res.msg , {icon: 1,time: 1500} , function(){
+                                    setTimeout(function(){
+                                      layer.close(index); //执行关闭 
+                                      layui.table.reload('test-table-supplier_list'); //重载表格
+                                    },1500);
+                                    
+                                  });
+                              }else{
+                                layer.msg(res.msg, {icon: 5,anim: 6,shade:0.5,time: 1500});
+                              }
+                            }
+                        }); 
+      
+                      });
+                    });
+                }
+            });
+        } else if(e.event==="del"){
+            layer.confirm('确认删除此供应商吗?', {icon: 3, title:'提示'}, function(index){
+                admin.req({
+                    url: layui.setter.baseUrl+'admin/supplier/del' //实际使用请改成服务端真实接口
+                    ,data: {supplier_id:id},
+                    type:'get',
+                    success: function(res){
+                    if(res.code==1){
+                        layer.msg(res.msg, {icon: 1,time: 1500,anim:5},function(){
+                        e.del();
+                        layui.table.reload('test-table-supplier_list'); //重载表格
+                        layer.close(index);  
+                        });
+                                        
+                    }else{
+                        layer.msg(res.msg, {icon: 5,anim: 6,shade:0.5,time: 1500});
+                    }
+                    }
+                });  
+                });
+        } else if(e.event==="see"){
+            admin.popup({
+                title: "查看供应商",
+                area: admin.screen() < 2 ? ['95%', '90%'] :["700px", "450px"],
+                id: "LAY-popup-edit_supplierlist",
+                success: function(layero, index) {
+                    view(this.id).render('/supplier/seesupplier',data).done(function() {
+                      form.render(null, 'seesupplier'); // 弹窗的lay-filter值
+            
+                    });
+                }
+            });
+        } else{
+            admin.popup({
+                title: "支付",
+                area: admin.screen() < 2 ? ['95%', '90%'] :["800px", "550px"],
+                id: "LAY-popup-pay_supplierlist",
+                success: function(layero, index) {
+                    view(this.id).render('/supplier/supplier_pay',data).done(function() {
+                      form.render(null, 'pay_supplier'); // 弹窗的lay-filter值
+                      form.on('submit(pay_supplier_submit)', function(datas){
+                        datas.field.id=id;
+                        return ;
+                        admin.req({
+                            url: '/admin/supplier/add' //实际使用请改成服务端真实接口
+                            ,data:datas.field,
+                            type:'post',
+                            success: function(res){
+                              if(res.code==1){
+                                  layer.msg(res.msg , {icon: 1,time: 1500} , function(){
+                                    setTimeout(function(){
+                                      layer.close(index); //执行关闭 
+                                      layui.table.reload('test-table-supplier_list'); //重载表格
+                                    },1500);
+                                    
+                                  });
+                              }else{
+                                layer.msg(res.msg, {icon: 5,anim: 6,shade:0.5,time: 1500});
+                              }
+                            }
+                        }); 
+      
+                      });
+                    });
+                }
+            });
+        }
+    });
+      
+  
+    // 导入
+    $('body').on('click','#supplier_import',function(){
+        admin.popup({
+            title: "批量导入",
+            area: ["30%", "45%"],
+            id: "LAY-popup-supplier_import",
+            success: function(e, i) {
+                view(this.id).render('/supplier/supplier_import').done(function() {
+                    
+                });
+            }
+        });
+    });
+
+    // 搜索
+    form.on('submit(supplier_search)',function(e){
+        // console.log(e.field.keywords);
+        get_data(e.field.keywords);
+    });
+  
+      
+     
+});   
+</script>

@@ -1,0 +1,58 @@
+{include file="public/header" /}
+</head>
+<body style="background: #f0f0f0;">
+<header class="mui-bar mui-bar-nav bg_red_head" id="header">
+    <a class="back-page mui-icon mui-icon-left-nav mui-pull-left" href="javascript:;"></a>
+    <a id="menu" class="mui-action-menu mui-icon mui-icon-bars mui-pull-right" href="javascript:void(0);"></a>
+    <h1 class="mui-title">Settings</h1>
+</header>
+<div class="mui-content">
+    <!-- <div class="set_top bg_white">
+        <img src="__IMG__/touxiang.png" alt="">
+        <div class="set_top_txt">
+            <h3>oh_kkk</h3>
+            <p class="huiy">VIP</p>
+            <p class="gold">Merchant Certification</p>
+        </div>
+    </div> -->
+    <ul class="set_ul">
+        <li><a href="/wap/user/my_personal.html">
+            <p>Edit profile</p>
+            <i class="iconfont icon-jiantou"></i>
+        </a></li>
+        <li><a href="/wap/user/my_password.html">
+            <p>Change login password</p>
+            <i class="iconfont icon-jiantou"></i>
+        </a></li>
+        <li><a href="/wap/user/my_paypassword.html">
+            <p>Modify payment password</p>
+            <i class="iconfont icon-jiantou"></i>
+        </a></li>
+        <li><a href="/wap/user/my_getphone.html">
+            <p>Modify phone number or email</p>
+            <i class="iconfont icon-jiantou"></i>
+        </a></li>
+    </ul>
+    <div class="mb20"></div>
+   <button id="return_btn" class="return_btn bg-gold">Sign out</button>
+</div>
+
+{include file="public/head_nav"/}
+{include file="public/footer" /}
+<script>
+// sign out
+$('#return_btn').click(function(){
+    $(this).addClass('mui-disabled');
+    $(this).html('Logout...');
+    $get('/api/user/logout',{},function(d){
+        $(this).removeClass('mui-disabled');
+        $(this).html('Logout');
+        if(d.status==1){
+            window.location.href='/wap/index/index.html';
+        }else{
+        }                
+    })
+}) 
+</script>
+</body>
+</html>

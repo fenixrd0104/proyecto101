@@ -1,0 +1,227 @@
+
+<title>订单管理</title>
+
+<div class="layui-card layadmin-header">
+  <div class="layui-breadcrumb" lay-filter="breadcrumb">
+    <a>订单管理</a>
+    <a><cite>退货管理</cite></a>
+  </div>
+</div>
+
+<div class="layui-fluid">
+  <div class="layui-row layui-col-space15">
+    <div class="layui-col-md12">
+      <div class="layui-card">
+        <div class="layui-card-header">退货管理</div>
+        <div class="layui-card-body"> 
+            <form class="layui-form" action="" lay-filter="order">
+                <div class="layui-form-item">
+                    <div class="layui-col-md2" style="margin-right: 5px;margin-top: 20px;">
+                        <select name="refund_type" id="refund_type">
+                           
+                        </select>
+                    </div>         
+                    <div class="layui-col-md2" style="margin-right: 5px;margin-top: 20px;">
+                        <select name="status_list" id="status_list">
+                            
+                        </select>
+                    </div>         
+                    
+                        <div class="layui-col-md2" style="margin-right: 5px;margin-top: 20px;">
+                            <input type="text" name="keywords" autocomplete="off" placeholder="订单编号" class="layui-input" value=""> 
+                        </div>  
+                        <button type="button" class="layui-btn layuiadmin-btn-admin" lay-submit  lay-filter="return_search" style="margin-top: 20px;"><i class="layui-icon">&#xe615;</i>搜索</button>
+
+                    
+                    <!-- <button type="button" class="layui-btn layuiadmin-btn-admin" data-type="">导出</button> -->
+                </div>
+            </form>  
+
+            <table class="layui-hide" id="return_list" lay-filter="return_list"></table>    
+            <script type="text/html" id="tool_return_list">
+                {{# if(d.is_work==0){ }}
+                  {{# if(d.refund_confirm == 0 && d.refund_confirm == 0 && d.refund_type == 1){ }}
+                    <a class="layui-btn layui-btn-xs" lay-event="refund_confirm">初审</a>
+                  {{# }else { }}
+                    <a class="layui-btn layui-btn-xs" lay-event="audit">审核</a>
+                  {{# } }}
+                <a href="/merchant/#/order/order_detail/id={{d.order_id}}/order_type=return" class="layui-btn layui-btn-xs layui-btn-normal">查看订单</a>
+                {{# }else if(d.is_work==1){ }}
+                <a class="layui-btn layui-btn-xs" style="background-color: orange">管理员审核中...</a>
+                <a href="/merchant/#/order/order_detail/id={{d.order_id}}/order_type=return" class="layui-btn layui-btn-xs layui-btn-normal">查看订单</a>
+                {{# } }}
+
+            </script>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+layui.use(['admin','table', 'form','view', 'laydate','layer'], function(){
+  var $ = layui.$
+  ,admin = layui.admin
+  ,element = layui.element
+  ,view = layui.view
+  ,table = layui.table
+  ,form = layui.form
+  ,layer = layui.layer
+  ,laydate = layui.laydate
+  ,router = layui.router();
+
+
+  var is_loading=true;
+  var refund_type='';
+  var status_list="";
+
+
+
+  form.on('submit(return_search)',function(datas){
+    get_data(datas.field);
+  });
+
+
+  get_data();
+  function get_data(param){
+  table.render({
+      elem: '#return_list'
+      ,url: layui.setter.baseUrl+'admin/order/returngoods?type=0'
+      ,parseData: function(res){ //res 即为原始返回的数据
+        if(is_loading==true){
+          // 筛选条件
+          var list1="<option value=''>退货类型</option>";
+          var list2="<option value=''>退货状态</option>";
+
+
+          for(var i in res.data.refund_type){
+            list1+="<option value='"+i+"'>"+res.data.refund_type[i]+"</option>";
+          }
+          for(var i in res.data.status_list){
+            list2+="<option value='"+i+"'>"+res.data.status_list[i]+"</option>";
+          }
+     
+          $('#refund_type').html(list1);
+          $('#status_list').html(list2);
+  
+          refund_type=res.data.refund_type;
+          status_list=res.data.status_list;
+
+          is_loading=false;
+          form.render();
+        }
+        return {
+        "code": res.code, //解析接口状态
+        "msg": res.msg, //解析提示文本
+        "count": res.data.count, //解析数据长度
+        "data": res.data.lists //解析数据列表
+        };
+      }
+      ,cols: [[
+        {field:'id', width:80, title: 'ID', sort: true, align:'center'}
+        ,{field:'order_sn', title: '订单编号' , align:'center'}
+        ,{field:'shop_name', title: '商户名称' , align:'center'}
+        ,{field:'refund_type', width:155, title: '类型', align:'center',templet:function(d){
+          for(var i in refund_type){
+            if(d.refund_type==i){
+              return refund_type[i];
+            }
+          }
+        } }
+        ,{field:'reason', title: '退货原因', align:'center'}
+        ,{field:'refund_time', title: '申请日期', align:'center',templet: "<div>{{layui.util.toDateString(d.refund_time*1000, 'yyyy-MM-dd HH:mm:ss')}}</div>"}
+        ,{field:'status', width:150, title: '状态', align:'center',templet:function(d){
+          for(var i in status_list){
+            if(d.status==i){
+              return status_list[i];
+            }
+          }
+        }}
+        ,{fixed: 'right', title: '操作', align:'center', toolbar: '#tool_return_list',width:160}
+      ]]
+      ,page:true
+      ,where:param
+    });
+  }
+    
+    //监听工具条
+    table.on('tool(return_list)', function(obj){
+      var data = obj.data;
+      var id=data.id;
+      if(obj.event === 'audit'){
+        admin.popup({
+            title: "退货退款处理",
+            area: admin.screen() < 2 ? ['95%', '90%'] :["700px", "700px"],
+            id: "LAY-popup-add_audit",
+            success: function(layero, index){
+                view(this.id).render('/order/add_audit',id).done(function() {
+                form.render(null, 'add_audit'); // 弹窗的lay-filter值
+                  form.on('submit(audit_submit)',function(datas){
+                    datas.field.id=id;
+                    // 删除多余表单提交字段
+                    delete datas.field.order_sn;
+                    delete datas.field.refund_time;
+                    delete datas.field.user_id;
+                    delete datas.field.reason;
+                    delete datas.field.refund_type;
+                    delete datas.field.describe;
+                    admin.req({
+                      url: layui.setter.baseUrl+'admin/order/shenhe'
+                      ,data: datas.field,
+                      type:'post',
+                      success: function(res){
+                          if(res.code==1){
+                            layer.msg(res.msg, {icon: 1,anim: 6,shade:0.5,time: 1500},function(){
+                                layer.closeAll(); //执行关闭 
+                                get_data();       //页面重新加载数据
+                            });
+                          }else{
+                            layer.msg(res.msg, {icon: 5,anim: 6,shade:0.5,time: 1500});
+                          }
+                      }
+                    });
+                  });
+                });
+            }
+        });
+      }
+
+      if(obj.event === 'refund_confirm'){
+        admin.popup({
+            title: "退货退款处理",
+            area: admin.screen() < 2 ? ['95%', '90%'] :["700px", "700px"],
+            id: "LAY-popup-add_audit",
+            success: function(layero, index){
+                view(this.id).render('/order/refund_confirm',id).done(function() {
+                form.render(null, 'refund_confirm'); // 弹窗的lay-filter值
+                  
+                  form.on('submit(confirm_submit)',function(datas){
+                    datas.field.shop_addr;
+                    datas.field.id =id;
+                   
+                    admin.req({
+                      url: layui.setter.baseUrl+'admin/order/return_confirm'
+                      ,data: {id:datas.field.id,shop_addr:datas.field.shop_addr,note:datas.field.note,status:datas.field.status},
+                      type:'post',
+                      success: function(res){
+                          if(res.code==1){
+                            layer.msg(res.msg, {icon: 1,anim: 6,shade:0.5,time: 1500},function(){
+                                layer.closeAll(); //执行关闭 
+                                get_data();       //页面重新加载数据
+                            });
+                          }else{
+                            layer.msg(res.msg, {icon: 5,anim: 6,shade:0.5,time: 1500});
+                          }
+                      }
+                    });
+                  });
+                  
+                });
+            }
+        });
+      }  
+
+    });
+  
+});
+</script>

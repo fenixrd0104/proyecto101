@@ -1,0 +1,167 @@
+
+<title>商品类型</title>
+
+<div class="layui-card layadmin-header">
+  <div class="layui-breadcrumb" lay-filter="breadcrumb">
+    <a>商品管理</a>
+    <a><cite>商品类型</cite></a>
+  </div>
+</div>
+
+<div class="layui-fluid">
+  <div class="layui-card">
+    <div class="layui-card-header">
+        商品类型
+    </div>
+    <div class="layui-card-body">
+        <script type="text/html" id="test-table-toolbar-add_goodstype">
+            <div class="layui-btn-container">
+                <button type="button" class="layui-btn" onclick="add_goodstype();"><i class="layui-icon layui-icon-add-1 layuiadmin-button-btn"></i>添加类型</button>
+            </div>
+        </script>
+      <table id="goods_type" lay-filter="goods_type"></table>
+     
+      <script type="text/html" id="table_goods_type">
+        <a class="layui-btn layui-btn-xs" lay-href="/goods/goodsAttribute/type={{d.id}}"><i class="layui-icon">&#xe615;</i>属性列表</a>
+        <a class="layui-btn layui-btn-xs" lay-href="/goods/goodsspec/type={{d.id}}"><i class="layui-icon">&#xe615;</i>规格列表</a>
+        <a class="layui-btn layui-btn-normal layui-btn-xs" lay-event="edit"><i class="layui-icon layui-icon-edit"></i>编辑</a>
+        <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del"><i class="layui-icon layui-icon-delete"></i>删除</a>
+      </script>
+    </div>
+  </div>
+</div>
+
+<script>
+layui.use(['admin', 'table','layer'], function(){
+  var $ = layui.$
+  ,admin = layui.admin
+  ,view = layui.view
+  ,layer = layui.layer
+  ,table = layui.table
+  ,form = layui.form;
+
+    table.render({
+        elem: '#goods_type'
+        ,url: layui.setter.baseUrl+'merchant/goods/goodsType'
+        ,parseData: function(res){ //res 即为原始返回的数据
+            return {
+            "code": res.code, //解析接口状态
+            "msg": res.msg, //解析提示文本
+            "count": res.data.count, //解析数据长度
+            "data": res.data.lists //解析数据列表
+            };
+        }
+        ,toolbar: '#test-table-toolbar-add_goodstype'
+        ,cellMinWidth: 80 
+        ,cols: [[{field:'id', width:80, title: 'ID',align:'center'}
+        ,{field:'name', title: '类型名称',align:'center'}
+        ,{fixed: 'right', title:'操作', toolbar: '#table_goods_type',align:'center',width:360}
+        ]],
+        page:true
+    });
+    table.on('tool(goods_type)',function(e){
+        var d=e.data;
+        var id=d.id;
+        if(e.event==='edit'){
+          
+          admin.popup({
+          title: "编辑类型",
+          area: admin.screen() < 2 ? ['95%', '90%'] :["500px", "220px"],
+          id: "LAY-popup-edit_goodstype",
+          success: function(layero, index){
+            view(this.id).render('/goods/add_type',d).done(function() {
+              form.render(null, 'add_type'); // 弹窗的lay-filter值
+                     //监听提交
+                  form.on('submit(component-form-element_add_type)', function(data){
+                  admin.req({
+                      url: layui.setter.baseUrl+'merchant/goods/editGoodsType' //实际使用请改成服务端真实接口
+                      ,data: {
+                          id:id,
+                          name:data.field.name
+                      },
+                      type:'post',
+                      success: function(res){
+                        
+                        if(res.code==1){
+                            layer.msg(res.msg , {icon: 1,time: 1000, anim:5} , function(){
+                              setTimeout(function(){
+                                layer.close(index); //执行关闭 
+                                layui.table.reload('goods_type'); //重载表格
+                              },1000);
+                              
+                            });
+                        }else{
+                          layer.msg(res.msg, {icon: 5,anim: 6,shade:0.5,time: 1000});
+                        }
+                      }
+                  }); 
+
+                });
+              
+            });
+          }
+        });
+        }else{
+             // 删除按钮
+          layer.confirm('确认删除此类型?', {icon: 3, title:'提示'}, function(index){
+            admin.req({
+              url: layui.setter.baseUrl+'merchant/goods/delGoodsType' //实际使用请改成服务端真实接口
+              ,data: {id:d.id},
+              type:'get',
+              success: function(res){
+                if(res.code==1){
+                  // console.log(res.msg)                
+                    e.del();
+                    layer.close(index);                         
+                }else{
+                  layer.msg(res.msg, {icon: 5,anim: 6,shade:0.5,time: 1000});
+                }
+              }
+            });  
+          });
+        }
+    });
+
+    // 添加类型
+    window.add_goodstype=function(){
+        admin.popup({
+          title: "添加类型",
+          area: admin.screen() < 2 ? ['95%', '90%'] :["500px", "220px"],
+          id: "LAY-popup-add_goodstype",
+          success: function(layero, index){
+            view(this.id).render('/goods/add_type').done(function() {
+                form.render(null, 'add_type'); // 弹窗的lay-filter值
+               //监听提交
+               form.on('submit(component-form-element_add_type)', function(data){
+              
+                admin.req({
+                    url: layui.setter.baseUrl+'merchant/goods/addGoodsType' //实际使用请改成服务端真实接口
+                    ,data: {
+                        name:data.field.name
+                    },
+                    type:'post',
+                    success: function(res){
+                      
+                      if(res.code==1){
+                          layer.msg(res.msg , {icon: 1,time: 1000} , function(){
+                            setTimeout(function(){
+                              layer.close(index); //执行关闭 
+                              layui.table.reload('goods_type'); //重载表格
+                            },1000);
+                            
+                          });
+                      }else{
+                        layer.msg(res.msg, {icon: 5,anim: 6,shade:0.5,time: 1000});
+                      }
+                    }
+                }); 
+
+              });
+              
+            });
+          }
+        });
+      };
+
+});
+</script>

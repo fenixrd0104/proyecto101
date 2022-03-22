@@ -1,0 +1,171 @@
+<form class="layui-form" action="" lay-filter="add_weixin" style="padding: 20px 30px 0 0;">
+<div class="layui-form-item">
+    <label class="layui-form-label">微信标识</label>
+    <div class="layui-input-block" style="line-height:38px;">
+        <span id="name"></span>
+    </div>
+</div> 
+<div class="layui-form-item">
+    <label class="layui-form-label">模板ID</label>
+    <div class="layui-input-block">
+        <input type="text" name="tpid" id="tpid" lay-verify="required" value="" autocomplete="off" class="layui-input">
+    </div>
+</div>
+<div class="layui-form-item">
+    <label class="layui-form-label">微信模板：(纯文字)</label>
+    <div class="layui-input-block">      
+        <table class="layui-hide" id="tp_wx" lay-filter="tp_wx"></table>
+        <script type="text/html" id="tp_wx_name">
+            <input type="text" name="param_name" autocomplete="off" class="layui-input" style="height:100%;" value="{{d.param_name}}"> 
+        </script>    
+        <script type="text/html" id="tp_wx_content">
+            <input type="text" name="param_val" autocomplete="off" class="layui-input" style="height:100%;" value="{{d.param_val}}"> 
+        </script>    
+        <script type="text/html" id="tp_wx_color">
+            <input type="text" name="param_color" autocomplete="off" class="layui-input" style="height:100%;" value="{{d.param_color}}"> 
+        </script>    
+        <script type="text/html" id="tool_tp_wx">
+            <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del"><i class="layui-icon layui-icon-delete"></i>删除</a>
+        </script>  
+    </div>
+</div>
+<input type="hidden" name="param_data" id="param_data">
+<div class="layui-form-item" >                    
+    <div class="layui-input-block"> 
+        <button type="button" class="layui-btn layui-btn-xs" lay-filter="component-form-element" onclick="addTable();"><i class="layui-icon layui-icon-edit"></i>添加参数</button>
+    </div> 
+    <div class="layui-input-block" id="shuoming" style="color: #1ab394;padding-left: 0;margin-top: 5px;"> 
+        请使用以下参数替换模板中对应的内容<br>
+    </div> 
+</div>
+<div class="layui-form-item">
+    <div class="layui-input-block">
+        <button type="button" class="layui-btn" lay-submit lay-filter="temp_submit_btn"><i class="layui-icon">&#xe654;</i>保存</button>
+    <button type="button" class="layui-btn layui-btn-danger" data-type="close"><i class="layui-icon">&#x1006;</i>返回</button>
+    </div>
+</div>
+</form>
+<script type="text/html" template lay-done="layui.data.sendParams(d.params)"></script>       
+<script>
+layui.data.sendParams = function(params){
+layui.use(['admin','form', 'table','layer'], function(){
+    var $ = layui.$
+    ,admin = layui.admin
+    ,element = layui.element
+    ,form = layui.form
+    ,layer = layui.layer
+    ,table = layui.table
+    ,router = layui.router();
+
+    element.render();
+    
+    var id=params.id;
+
+    admin.req({
+        url: layui.setter.baseUrl+'admin/remind/templateinfo' //实际使用请改成服务端真实接口
+        ,data:{id:id,tpname:'weichat'},
+        type:'get',
+        success: function(res){
+        if(res.code==1){
+            $('#name').html(res.data.info.name);
+            $('#tpid').val(res.data.tpinfo.tpid);
+            $('#shuoming').html('请使用以下参数替换模板中对应的内容<br>'+res.data.info.param);
+            var datas=res.data.tpinfo.param_data;
+            console.log(datas);
+            if(datas){
+                if(datas!=''){
+                    table.render({
+                        elem: '#tp_wx'
+                        ,cols: [[
+                            {field:'param_name', title: '参数名', templet: '#tp_wx_name'}
+                            ,{field:'param_val', title: '参数内容', templet: '#tp_wx_content'}
+                            ,{field:'param_color', title: '参数颜色', templet: '#tp_wx_color'}
+                            ,{fixed: 'right', align:"center", width:90, title: '操作',  toolbar: '#tool_tp_wx'}
+                        ]]
+                        ,data:datas
+                    });
+                }else{
+                    table.render({
+                        elem: '#tp_wx'
+                        ,cols: [[
+                            {field:'param_name', title: '参数名', templet: '#tp_wx_name'}
+                            ,{field:'param_val', title: '参数内容', templet: '#tp_wx_content'}
+                            ,{field:'param_color', title: '参数颜色', templet: '#tp_wx_color'}
+                            ,{fixed: 'right', align:"center", width:90, title: '操作',  toolbar: '#tool_tp_wx'}
+                        ]]
+                        ,data:[{'param_name':'','param_val':'','param_color':''}]
+                    });
+                }
+            }else{
+                table.render({
+                    elem: '#tp_wx'
+                    ,cols: [[
+                        {field:'param_name', title: '参数名', templet: '#tp_wx_name'}
+                        ,{field:'param_val', title: '参数内容', templet: '#tp_wx_content'}
+                        ,{field:'param_color', title: '参数颜色', templet: '#tp_wx_color'}
+                        ,{fixed: 'right', align:"center", width:90, title: '操作',  toolbar: '#tool_tp_wx'}
+                    ]]
+                    ,data:[{'param_name':'','param_val':'','param_color':''}]
+                });
+            }
+            
+           
+        }else{
+            layer.msg(res.msg, {icon: 5,anim: 6,shade:0.5,time: 1500});
+        }
+        }
+    }); 
+
+    form.render(null, 'add_weixin');
+    
+    // 添加参数
+    window.addTable=function(){  
+        var oldData =  table.cache["tp_wx"];  
+        var data1={"param_name":"","param_val":'',"param_color":""};
+        oldData.push(data1);  
+        table.reload('tp_wx',{  
+            data : oldData  
+        });  
+        get_params();
+    };  
+
+    var $ = layui.$, active = {
+        // 返回--按钮
+        close:function(index){ 
+            layer.closeAll('page');
+        }
+    };
+    $('.layui-input-block .layui-btn').on('click', function(){
+        var type = $(this).data('type');
+        active[type] ? active[type].call(this) : '';
+    });
+    
+    //监听工具条
+    table.on('tool(tp_wx)', function(obj){
+        var data = obj.data;
+        if(obj.event === 'del'){
+            obj.del();
+            get_params();
+        }
+    });
+
+    $('body').on('blur','input',function(){
+        get_params();
+    });
+    var param_data=[];
+    function get_params(){
+        $('table tbody tr').each(function(index){
+            if($(this).find("input[name='param_name']").length>0){
+                param_data[index] = {'param_name':'','param_val':'','param_color':''};
+                param_data[index].param_name = $(this).find("input[name='param_name']").val();
+                param_data[index].param_val = $(this).find("input[name='param_val']").val();
+                param_data[index].param_color = $(this).find("input[name='param_color']").val();
+            }
+           
+        });
+        $('#param_data').val(JSON.stringify(param_data));
+    }
+
+});
+}
+</script>

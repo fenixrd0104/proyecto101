@@ -1,0 +1,130 @@
+<title>充值日志</title>
+
+<div class="layui-card layadmin-header">
+    <div class="layui-breadcrumb" lay-filter="breadcrumb">
+        <a>财务管理</a>
+        <a><cite>充值日志</cite></a>
+    </div>
+</div>
+
+<div class="layui-fluid">
+    <div class="layui-row layui-col-space15">
+        <div class="layui-col-md12">
+            <div class="layui-card">
+                <div class="layui-card-header">充值日志</div>
+                <div class="layui-card-body">
+                    <form class="layui-form" style="margin-bottom: 20px;">
+                        <div class="layui-inline">
+                            <input class="layui-input" name="uid" placeholder="搜索用户UID" id="test-table-demoReloads" autocomplete="off">
+                        </div>
+                        <div class="layui-inline">
+                            <input class="layui-input" name="chongzhi_url" placeholder="搜索钱包地址" id="test-table-demoReload" autocomplete="off">
+                        </div>
+                        <div class="layui-inline" style="width:162px;">
+                            <input class="layui-input" name="currency" placeholder="搜索币名称" id="test-table-demoReloades" autocomplete="off">
+                        </div>
+                        <div class="layui-inline">
+                            <select class="layui-input" name="status">
+                                <option value="">订单状态</option>
+                                <option value="1">未支付</option>
+                                <option value="2">已支付</option>
+                            </select>
+                        </div>
+                        <div class="layui-inline">
+                            <select class="layui-input" name="type">
+                                <option value="">充值类型</option>
+                                <option value="1">后台充值</option>
+                                <option value="2">在线充值</option>
+                            </select>
+                        </div>
+                        <div class="layui-inline">
+                            <button class="layui-btn" type="button" lay-submit lay-filter="usdt_log_search"><i class="layui-icon">&#xe615;</i>搜索</button>
+                        </div>
+                    </form>
+
+                    <table class="layui-hide" id="usdt_log" lay-filter="usdt_log"></table>
+                    <script type="text/html" id="tool_table_type">
+                        {{# if(d.type == 1 ){ }}
+                        <p class="layui-btn layui-btn-xs" style="background:#24b956;">后台充币</p>
+                        {{# }else if(d.type == 2 ){ }}
+                        <p class="layui-btn layui-btn-xs" style="background:#03a9f4;">在线充币</p>
+                        {{# } }}
+                    </script>
+                    <script type="text/html" id="tool_table_status">
+                        {{# if(d.status == 1 ){ }}
+                        <p class="layui-btn layui-btn-xs" style="background:red;">未支付</p>
+                        {{# }else if(d.status == 2 ){ }}
+                        <p class="layui-btn layui-btn-xs" style="background:#03a9f4;">已支付</p>
+                        {{# } }}
+                    </script>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    layui.use(['admin', 'table', 'view', 'form', 'layer', 'laydate'], function () {
+        var $ = layui.$
+                , admin = layui.admin
+                , element = layui.element
+                , form = layui.form
+                , view = layui.view
+                , laydate = layui.laydate
+                , layer = layui.layer
+                , table = layui.table;
+
+        //日期时间选择器
+        laydate.render({
+            elem: '#test-laydate-type-datetime-start'
+            ,type: 'datetime'
+        });
+        laydate.render({
+            elem: '#test-laydate-type-datetime-end'
+            ,type: 'datetime'
+        });
+
+        form.on('submit(usdt_log_search)', function (datas) {
+            get_data(datas.field);
+        });
+
+
+        var n = 1;
+        get_data({ keywords: '' });
+        function get_data(param) {
+            table.render({
+                elem: '#usdt_log'
+                , url: layui.setter.baseUrl + 'admin/wallet/index'
+                , toolbar: '#tool_usdt_log'
+                , parseData: function (res) { //res 即为原始返回的数据
+                    return {
+                        "code": res.code, //解析接口状态
+                        "msg": res.msg, //解析提示文本
+                        "count": res.data.count, //解析数据长度
+                        "data": res.data.lists //解析数据列表
+                    };
+                }
+                , cols: [[
+                    { field: 'id', width: 85, title: 'ID', sort: true, align: 'center' }
+                    , { field: 'uid', title: '会员UID', align: 'center' }
+                    , { field: 'ordnum', title: '订单编号', align: 'center' }
+                    , { field: 'chongzhi_url', title: '钱包地址', align: 'center' }
+                    , { field: 'ti_id', title: '交易哈希值', align: 'center' }
+                    , { field: 'money', title: '充值金额', align: 'center' }
+                    , {field: 'status', title: '状态', align: 'center',toolbar:"#tool_table_status", sort: true}
+                    , { field: 'type', title: '类型', align: 'center',toolbar:"#tool_table_type"  }
+                    , { field: 'mark', title: '备注', align: 'center' }
+                    , { field: 'currency', title: '货币名称', align: 'center' }
+                    , { field: 'created_at', title: '创建时间', align: 'center', sort: true }
+                    , { field: 'updated_at', title: '修改时间', align: 'center', sort: true }
+                ]],
+                page: true,
+                limits:[10,20,50,100,500,1000,5000,10000,100000],
+                where: param
+            });
+        }
+
+
+
+    });
+</script>

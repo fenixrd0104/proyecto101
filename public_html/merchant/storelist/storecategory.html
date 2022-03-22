@@ -1,0 +1,230 @@
+<title>店铺列表</title>
+
+<div class="layui-card layadmin-header">
+    <div class="layui-breadcrumb" lay-filter="breadcrumb">
+        <a>店铺管理</a>
+        <a><cite>分类列表</cite></a>
+    </div>
+</div>
+    
+<div class="layui-fluid">
+<div class="layui-row layui-col-space15">
+<div class="layui-col-md12">
+    <div class="layui-card">
+        <div class="layui-card-header">分类列表</div>
+        <div class="layui-card-body">
+            <div style="padding-bottom: 10px;">
+                <button class="layui-btn layuiadmin-btn-admin" data-type="add">添加分类</button>
+            </div>
+
+            <table id="LAY-store_category" lay-filter="LAY-store_category"></table> 
+            <script type="text/html" id="test-table-title">
+                <div class="layui-table-cell laytable-cell-1-0-1"></div>
+            </script>   
+            <script type="text/html" id="test-table-operate-barDemo">
+                <a class="layui-btn layui-btn-xs" lay-event="edit">编辑</a>
+                <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del">删除</a>
+            </script>   
+            <script type="text/html" id="test-table-images">
+                <img src="http://gyshop.com/static/merchant/images/head_default.gif" height="100%" alt="">
+            </script>         
+            <script type="text/html" id="fendian_status">
+                <input type="checkbox" name="all_check" lay-skin="switch" lay-text="开启|禁止" lay-filter="fendian_status" disabled  {{ d.is_subshop == 1 ? 'checked' : '' }}>
+            </script>         
+            <script type="text/html" id="shangchuan_status">
+                <input type="checkbox" name="all_check" lay-skin="switch" lay-text="是|否" lay-filter="shangchuan_status" disabled  {{ d.is_upload == 1 ? 'checked' : '' }}>
+            </script>  
+        </div>
+    </div>
+</div>
+</div>
+</div>
+
+<script>
+layui.use(['admin', 'table',"form",'layer'], function(){
+    var $ = layui.$
+        ,admin = layui.admin
+        ,element = layui.element
+        ,form = layui.form
+        ,setter = layui.setter
+        ,layer = layui.layer
+        ,table = layui.table
+        ,layer = layui.layer
+        ,view = layui.view;
+
+    form.render(null, 'app-content-list');
+    
+    table.render({
+        elem: '#LAY-store_category'
+        ,url: layui.setter.baseUrl+'merchant/shop/type'
+        ,cellMinWidth: 80 //全局定义常规单元格的最小宽度，layui 2.2.1 新增
+        ,cols: [[
+            {field:'id', width:85, title: 'ID', sort: true, fixed: 'left', align:'center'}
+            ,{field:'name', title: '名称', templet:"#test-table-title",width:300,
+                templet:function(d){
+                if(d.pid==0){
+                    return d.lefthtml+d.name
+                }else if(d.pid==1){
+                    return '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'+d.lefthtml+d.name
+                }else if(d.pid==2){
+                    return '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'+d.lefthtml+d.name
+                }else{
+                    return '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'+d.lefthtml+d.name
+                }
+                }
+            }
+            ,{field:'is_upload', title: '是否允许上传', align:'center',templet: '#shangchuan_status' }
+            ,{field:'is_subshop', title: '是否允许开分店', templet: '#fendian_status', align:'center'}
+            ,{field:'create_time',width:200, title: '添加时间', align:'center', templet : "<div>{{layui.util.toDateString(d.create_time*1000, 'yyyy/MM/dd HH:mm:ss')}}</div>"}
+            ,{fixed: 'right', title: '操作', align:'center',  toolbar: '#test-table-operate-barDemo'}
+        ]]
+    });
+    
+    //头部事件--添加菜单
+    var active = {
+    add: function(){
+        admin.popup({
+        title: "添加分类",
+        area: admin.screen() < 2 ? ['95%', '90%'] :["500px", "400px"],
+        id: "LAY-popup-add_category",
+        success: function(layero, index){
+            view(this.id).render('/storelist/add_category').done(function() {
+            form.render(null, 'category_add'); // 弹窗的lay-filter值
+                //监听提交
+            form.on('submit(submit_add_category)', function(data){
+                var field = data.field; //获取提交的字段
+                console.log(field);
+                // return;
+                var pid=field.pid;
+                var name=field.name;
+                var is_subshop=field.is_subshop;
+                if(field.is_upload){
+                    var is_upload=field.is_upload;
+                }else{
+                    var is_upload=0
+                }
+                if(pid===''){
+                    layer.msg('请选择上级');
+                }else if(name===''){
+                    layer.msg('分类名称不能为空');
+                }else{
+                // 请求登入接口
+                admin.req({
+                    url: layui.setter.baseUrl+'merchant/shop/add_type' //实际使用请改成服务端真实接口
+                    ,data: {
+                        pid:pid, name:name, is_subshop:is_subshop, is_upload:is_upload
+                    },
+                    type:'post',
+                    success: function(res){
+                        if(res.code==1){
+                            // console.log(res.msg)
+                            layer.msg(res.msg , {icon: 1,time: 1500, anim:5} , function(){
+                                layui.table.reload('LAY-store_category'); //重载表格
+                                layer.close(index); //执行关闭 
+                            })
+                        }else{
+                            layer.msg(res.msg, {icon: 5,anim: 6,shade:0.5,time: 1500});
+                        }
+                    }
+                }); 
+                }
+                return false;
+                layui.table.reload('LAY-store_category'); //重载表格
+                layer.close(index); //执行关闭 
+            });
+            });
+        }
+        });
+    }
+    }  
+    $('.layui-btn.layuiadmin-btn-admin').on('click', function(){
+        var type = $(this).data('type');
+        active[type] ? active[type].call(this) : '';
+    });
+
+    //监听工具条
+    table.on('tool(LAY-store_category)', function(obj){
+        var data = obj.data;
+        var id=data.id;
+    // console.log(data)
+    if(obj.event === 'del'){
+        // 删除按钮
+        layer.confirm('确认删除此菜单?', {icon: 3, title:'提示'}, function(index){
+        admin.req({
+            url: layui.setter.baseUrl+'merchant/shop/del_type' //实际使用请改成服务端真实接口
+            ,data: {id:data.id},
+            type:'get',
+            success: function(res){
+            if(res.code==1){
+                layer.msg(res.msg, {icon: 1,time: 1500,anim:5},function(){
+                obj.del();
+                layer.close(index);  
+                });
+                                
+            }else{
+                layer.msg(res.msg, {icon: 5,anim: 6,shade:0.5,time: 1500});
+            }
+            }
+        });  
+        });
+    } else if(obj.event === 'edit'){  
+        // 编辑按钮
+        admin.popup({
+        title: "编辑分类",
+        area: admin.screen() < 2 ? ['95%', '90%'] :["500px", "400px"],
+        id: "LAY-popup-add_menu",
+        success: function(layero, index) {              
+            view(this.id).render('/storelist/edit_category',data).done(function() {
+            form.render(null, "category_eadit"); 
+            form.on('submit(submit_edit_category)', function(data){
+                console.log(data);
+                var field = data.field; //获取提交的字段
+                var pid=field.pid;
+                var name=field.name;
+                var is_subshop=field.is_subshop;
+                if(field.is_upload){
+                    var is_upload=field.is_upload;
+                }else{
+                    var is_upload=0
+                }
+                if(pid===''){
+                    layer.msg('请选择上级');
+                }else if(name===''){
+                    layer.msg('分类名称不能为空');
+                }else{
+                // return ;
+                // 请求登入接口
+                admin.req({
+                    url: layui.setter.baseUrl+'merchant/shop/edit_type' //实际使用请改成服务端真实接口
+                    ,data: {
+                        id:id,
+                        pid:pid,
+                        name:name,
+                        is_subshop:is_subshop,
+                        is_upload:is_upload
+                    },
+                    type:'post',
+                    success: function(res){
+                        if(res.code==1){
+                            // console.log(res.msg)
+                            layer.msg(res.msg , {icon: 1,time: 1500, anim:5} , function(){
+                            layui.table.reload('LAY-store_category'); //重载表格
+                            layer.close(index); //执行关闭 
+                            })
+                        }else{
+                        layer.msg(res.msg, {icon: 5,anim: 6,shade:0.5,time: 1500});
+                        }
+                    }
+                }); 
+                }
+                return false;
+                layui.table.reload('LAY-store_category'); //重载表格
+                layer.close(index); //执行关闭 
+            });  
+            });
+        }
+        });        
+    } 
+    });
+});
+</script>

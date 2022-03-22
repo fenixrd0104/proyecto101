@@ -1,0 +1,58 @@
+{include file="public/header" /}
+<body class="bg-re">
+    <header class="mui-bar mui-bar-nav index_header" id="header">
+        <a class="back-page mui-icon mui-icon-left-nav mui-pull-left" href="javascript:;"></a>
+        <a id="menu" class="mui-action-menu mui-icon mui-icon-bars mui-pull-right" href="javascript:void(0);"></a>
+        <h1 class="mui-title">Message Center</h1>
+            </header>
+            <div class="mui-content" style="padding-bottom:0!important;">
+                <div class="over">
+                    <ul class="mui-table-view m-t message-ul icon-list text-16">
+                        <li class="mui-table-view-cell">
+                            <div>
+                           <img src="__IMG__/wuliu.png" class="icon05" alt="" >
+                            </div>
+                            <a href="/wap/user/message_detail.html" class="mui-navigate-right islogin">
+                                <p>Logistics</p>
+                                <p>No news yet</p>
+                            </a>
+                        </li>
+                        <li class="mui-table-view-cell">
+                            <div>
+                            <img src="__IMG__/tongzhi.png" class="icon05" alt="">
+                            </div>
+                            <a href="/wap/user/message_detail.html" class="mui-navigate-right islogin">
+                                <p>Notifications</p>
+                                <p>No news yet</p>
+                            </a>
+                        </li>
+                        <li class="mui-table-view-cell">
+                            <div>
+                            <img src="__IMG__/huodong.png" class="icon05" alt=""></div>
+                            <a href="/wap/user/message_detail.html" class="mui-navigate-right islogin">
+                                <p>Event</p>
+                                <p>No news yet</p>
+                    </a>
+                </li>   
+            </ul>
+        </div>  
+    </div>
+    {include file="public/head_nav"/}
+</body>
+{include file="public/footer" /}
+
+<script type="text/javascript">
+     /* Header navigation bar */
+     $('#menu').click(function(e){
+        $('.login_pop').toggle(); 
+        e.stopPropagation();                     
+    })       
+    $('body').click(function(){
+        $('.login_pop').hide();          
+    }) 
+    $('.i_eye').on('tap', function () {
+        event.stopPropagation();
+    })
+</script>
+
+</html>

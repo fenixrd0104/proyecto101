@@ -1,0 +1,450 @@
+{include file="public/header"/}
+<style>
+#mescroll{
+    position: fixed;
+    top: 1rem;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+}
+</style>
+</head>    
+<body>
+<header class="mui-bar mui-bar-nav index_header search_head" id="header">
+    <a class="back-page mui-icon mui-icon-left-nav mui-pull-left" href="javascript:;"></a>
+    <a id="menu" class="mui-action-menu mui-icon mui-icon-bars mui-pull-right" href="javascript:void(0);"></a>
+    <div class="in_search fl">
+        <input type="search" name="searchgoods" placeholder="Search more goods" id="search_input">
+        <img class="small_search" src="__IMG__/search_btn.png">
+    </div>
+</header>
+<div class="street_nav search_listup">
+    <ul class="mui-clearfix">
+        <li class="search_li on" data-list="colligate">
+            <a href="javascript:void(0);">
+                <span>Comprehensive</span>
+            </a>
+        </li>
+        <li class="search_li s_li" data-list="sales_num">
+            <a href="javascript:void(0);">
+                <span>Sales</span>
+            </a>
+        </li>
+        <li class="search_li s_li li_price" data-list="shop_price">
+            <a href="javascript:void(0);">
+                <span>Price</span>
+                <img class="arrow" src="__IMG__/jiantou_1.png" alt="">
+                <img class="arrow_asc" src="__IMG__/jiantou_2.png" alt="">
+                <img class="arrow_desc" src="__IMG__/jiantou_3.png" alt="">
+            </a>
+        </li>
+        <li class="li_screen" data-list="screen">
+            <a href="javascript:void(0);">
+                <span>filter</span>
+                <i class="iconfont icon-shaixuan"></i>
+            </a>
+        </li>
+        <li>
+            <a href="javascript:void(0);">
+                <i class="iconfont icon-list1 i_list"></i>
+            </a>
+        </li>
+    </ul>
+</div>
+<div class="mui-content search_content">     
+    <div class="search_listlow search_small">
+        <div id="mescroll" class="mescroll">
+        <ul id="dataList">            
+            <!-- <li><a href="javascript:void(0);">
+                <div class="searimg"><img src="__IMG__/touxiang.png" alt=""></div>
+                <div class="seartxt">
+                    <p class="name mui-ellipsis">女装</p>
+                    <p class="red">KRC 20.00元</p>
+                    <span>0条评价</span>
+                </div>
+            </a></li> -->
+        </ul>  
+        </div>
+    </div>
+    <div class="search_none" style="display:none;">
+        <img src="__IMG__/none4.png" alt="">
+        <p>Sorry, there are no relevant results at the moment, try another filter condition</p>
+    </div>
+</div>
+<!-- filter -->
+<div class="search_screen">
+    <div class="screen_body">
+        <div class="screen_header">
+            <p>Filter</p>
+        </div>
+        <div class="screen_content">
+            <!-- <ul class="screen_up">
+                <li><i class="iconfont icon-duihao"></i><span>Show all</span></li>
+                <li><i class="iconfont icon-duihao"></i><span>Free shipping only</span></li>
+                <li><i class="iconfont icon-duihao"></i><span>Available only</span></li>
+                <li><i class="iconfont icon-duihao"></i><span>Promotional items</span></li>
+            </ul> -->
+            <div class="sc_filter" id="filter">
+                <div class="screen_list">
+                    <p class="screen_tit">Categories
+                        <i class="iconfont icon-arrow-down"></i>
+                    </p>
+                    <ul id="classify" class="screen_listul classify">
+                       <li data-key='top_cate' data-value='0'><span>all</span><i class="iconfont icon-duihao"></i></li>
+                        <li data-key='top_cate' data-value='1'><span>VIP</span><i class="iconfont icon-duihao"></i></li>
+                        <li data-key='top_cate' data-value='2'><span>Preferred</span><i class="iconfont icon-duihao"></i></li>
+                        <li data-key='top_cate' data-value='3'><span>special</span><i class="iconfont icon-duihao"></i></li>
+                        <li data-key='top_cate' data-value='4'><span>Direct purchase</span><i class="iconfont icon-duihao"></i></li>
+                        <li data-key='top_cate' data-value='5'><span>High-end</span><i class="iconfont icon-duihao"></i></li>
+                    </ul>
+                </div>
+            </div>
+            
+        </div>
+        <div class="screen_footer mui-clearfix">
+            <button class="reset">Reset</button>
+            <button class="confirm">OK</button>
+        </div>        
+    </div>
+    
+</div>
+<div class="search_screenbg"></div>
+
+{include file="public/head_nav"/}
+{include file="public/footer"/}    
+<script type="text/html" id="list">
+<li><a href="/wap/index/goods_info.html?id={{id}}">
+    <div class="searimg"><img src="{{original_img}}" alt=""></div>
+    <div class="seartxt">
+        <p class="name mui-ellipsis-2">{{goods_name}}
+            {{ if top_cate==4 && give_integral}}
+           <span class="little_span">Gift coupon {{give_integral}}</span>
+            {{ else if top_cate==1 }}
+                {{ if caidan_id==1}}
+                <span class="little_span">Promoting Ambassadors</span>
+                {{ else if caidan_id==2}}
+                <span class="little_span">Partner</span>
+                {{ /if }}
+            {{ else if top_cate==2 }}
+            <span class="little_span">Pay for items</span>
+            {{ else if top_cate==3 && exchange_integral_money }}
+            <span class="little_span">Coupon credit {{exchange_integral_money}}</span>
+            {{ /if }}
+        </p>
+        <p class="red">{{shop_price}}KRC</p>
+        <span class="elalu">{{comment_count}} reviews</span>&nbsp;
+        <span class="payment">{{sales_num}} people pay</span>
+    </div>
+</a></li>
+</script>
+<script>
+/* ---default data--- */
+var type='';
+var searchname =  "{:input('searchname')}";
+$('input[name = searchgoods]').val(searchname);
+if(searchname){
+    type=searchname;
+} else{
+    type=getQueryString('type');
+}
+
+// search
+$('.small_search').on('tap',function () {
+    var sear_inp=$("input[name = searchgoods]").val();
+    if(sear_inp == ""){
+        mui.toast("Please enter the search content");
+    }else{
+        window.location.href='/wap/index/goods_list/searchname/'+ sear_inp;
+    }
+});
+$("#search_input").on('keypress', function(e) {
+    var keycode = e.keyCode;
+    //Get the value of the search box
+    var searchContent = $(this).val();
+    if (keycode == '13') {
+        e.preventDefault();
+        //Request search interface
+        if (searchContent == '') {
+            mui.toast('Please enter the search content');
+        } else {
+            console.log('click to search')
+            window.location.href='/wap/index/goods_list/searchname/'+ searchContent;
+        }
+    }
+});
+
+var tid=getQueryString('tid')?getQueryString('tid'):0;
+var t_cate=getQueryString('top_cate')?getQueryString('top_cate'):0;
+if(t_cate){
+    $('#classify>li').eq(t_cate).addClass('active');
+}
+var this_url='';
+var par={ }
+// if(tid){ 
+//     this_url='/api/goods/type_goods';
+//     par={
+//         tid:tid,
+//         type:type,
+//         order_by:'colligate',
+//         order:'',
+//         page:'',
+//         num:8,
+//         screen:''
+//     }; 
+// } else{
+    this_url='/api/goods/special_goods';
+    par={
+        top_cate:t_cate,
+        tid:tid,
+        type:type,
+        order_by:'colligate',
+        order:'',
+        page:'',
+        num:8,
+        screen:''
+    };
+// }
+//Create a MeScroll object, the internal pull-down refresh is enabled by default, up.callback is automatically executed, and the list data is refreshed;
+var mescroll = new MeScroll("mescroll", {
+    up: {
+        callback: getListData, //Pull-up callback, which can be abbreviated here; equivalent to callback: function (page) { getListData(page); }
+        isBounce: false, //The ios bounce and parsing are prohibited here (be sure to read carefully, especially the last point): http://www.mescroll.com/qa.html#q10
+        noMoreSize: 5, //If the list has no data, you can set the total number of lists to be greater than half a page before displaying no more data; avoid too little list data (for example, only one piece of data), it will not look good to display no more data; Default 5
+        empty: {
+            icon: "/static/wap/images/none4.png", //icon, default null
+            tip: "No data at the moment~~~", //Tips
+
+        },
+        clearEmptyId: "dataList", //equivalent to setting clearId and empty.warpId at the same time; simplified writing; default null; note that this cannot be configured in vue
+        toTop: { //Configure back to top button
+            src: "/static/wap/images/top.png", //default scroll to 1000px display, configurable offset modification
+            offset: 1000
+        },
+        lazyLoad: {
+            use: true // Whether to enable lazy loading, default false
+        },
+        htmlNodata: '<p class="upwarp-nodata">-- END --</p>',
+        page: {
+            num: 0,
+            size: 8,
+            time: null
+        },
+        offset: 150,
+        loadFull: {
+            use: true,
+            delay: 500
+        }
+    }
+});
+
+function getListData(page) {
+   // load data online
+       getListDataFromNet(page.num, page.size, function(curPageData) {
+           //mescroll will automatically judge the list according to the passed parameters, if there is no data, it will prompt empty; if there is no next page of data in the list, it will prompt no more data;
+           mescroll.endSuccess(curPageData.length);
+           //set list data
+           setListData(curPageData);
+       }, function() {
+           //Callback for networking failure, hide the status of pull-down refresh and pull-up loading;
+        mescroll.endErr();
+    });
+}
+
+function setListData(curPageData) {
+    // console.log(curPageData);
+    var list = '';
+    for (var i in curPageData) {
+        list += template('list', curPageData[i]);
+    }
+    $('#dataList').append(list);
+}
+
+function getListDataFromNet(pageNum, pageSize, successCallback, errorCallback) {
+    setTimeout(function() {
+    par.page=pageNum;
+    $get(this_url, par, function(data) {
+        if (data.status == 1) {            
+           //--- Product list ---
+            var curPageData = '';
+            if(data.data.goods_list){
+                curPageData = data.data.goods_list;
+            } else{
+                curPageData = data.data;
+            }
+            var listData = [];
+            //All products (simulate pagination data)
+            for (var i in curPageData) {
+                if (i == curPageData.length) break;
+                listData.push(curPageData[i]);
+            }
+            successCallback(listData);
+        } else {
+            mescroll.endErr();
+        }
+    });
+    }, 1000);
+}
+
+get_data(this_url, par);
+function get_data($this_url, $par) {  
+    par.page=1;
+    $get($this_url, $par, function(data) {
+    if (data.status == 1) {
+        //--- filter list ---
+        if(data.data.filter[0]){            
+            var screen_div = "";
+            var obj_1 = data.data.filter;  
+            for( i = 0;i < obj_1.length;i++){                       
+                for( k in obj_1[i][0] ){ 
+                    var screen_ul = ""; 
+                    if(obj_1[i][0][k].length != 0){
+                        for( j in obj_1[i][0][k]){   
+                            screen_ul+= '<li><span data-key="'+obj_1[i][0][k][j].key+'" data-value="'+obj_1[i][0][k][j].value+'">'+obj_1[i][0][k][j].name+'</span><i class="iconfont icon-duihao"></i></li>';
+                        }
+                        screen_div+='<div class="screen_list"><p class="screen_tit">'+k+'<i class="iconfont icon-arrow-down"></i></p><ul class="screen_listul">'+screen_ul+'</ul></div> ';
+                    }                            
+                }
+            }
+            $('#filter').append(screen_div);
+        }
+    } else {
+        
+    }
+    });
+}
+
+
+
+//The selected style of 'Comprehensive' 'Sales'...
+$('.street_nav .search_li').on('tap',function(){
+    var order_by=$(this).attr('data-list');
+    $(this).addClass('on');
+    $(this).siblings().removeClass('on');
+    if($('.li_price').hasClass('on')){
+        $('.li_price').addClass('li_price_desc');
+    } else{
+        $('.li_price').attr('class','search_li s_li li_price');
+    }
+    var order='';
+    if($(this).hasClass('li_price_asc')){ //price in descending order
+        $(this).addClass('li_price_desc').removeClass('li_price_asc');
+        order='asc';
+    }else{ //price in ascending order
+        $(this).addClass('li_price_asc').removeClass('li_price_desc');
+        order='desc';
+    }
+    par.order_by=order_by;
+    par.order=order;
+    // reset the list data
+    mescroll.resetUpScroll();
+    // hide back to top button
+    mescroll.hideTopBtn();
+});
+// filter reset
+$('.screen_footer .reset').on('tap',function(){
+    $('.screen_content').find('li').removeClass('active');
+    par.top_cate=0;
+})
+//Change the graphic list style
+$('.i_list').on('tap',function(){
+    if($(this).hasClass('icon-list1')){
+        $(this).addClass('icon-list2').removeClass('icon-list1');
+        $('.search_listlow').addClass('search_big').removeClass('search_small');
+    }else{
+        $(this).addClass('icon-list1').removeClass('icon-list2');
+        $('.search_listlow').addClass('search_small').removeClass('search_big');
+    }
+})
+//Filtering---The selection of price, brand...
+var screen='';  
+$('.search_screen').on('tap','.screen_listul>li',function(){                       
+    $(this).toggleClass('active');
+    $(this).siblings().removeClass('active'); 
+    
+    if($(this).parent().hasClass('classify')){
+        
+        par.tid=0;
+    }        
+    // if($(this).hasClass('active')){
+    //         brand = $(this).find('span').attr('data-key');
+    //         price = $(this).find('span').attr('data-value');
+
+    //         screen +='@'+brand+'-'+price;
+    //         console.log(screen);
+            
+    //     $('.screen_listul').find('.active').each(function(){
+    //         screen +='@'+brand+'-'+price;
+    //     });
+    // }        
+});
+$('.search_screen').on('tap','.screen_tit',function(){            
+    $(this).siblings('.screen_listul').slideToggle();
+    if($(this).find('i').hasClass('icon-arrow-down')){
+        $(this).find('i').addClass('icon-arrow-up').removeClass('icon-arrow-down');
+    }else{
+        $(this).find('i').addClass('icon-arrow-down').removeClass('icon-arrow-up');
+    }
+});   
+//filter---  
+$('.li_screen').on('tap',function(){
+    $('.search_screen').css('transform','translateX(0)');
+    $('.search_screenbg').show();
+    $('.search_screenbg').css('opacity','1');
+})
+$('.search_screen,.screen_footer .confirm').on('tap',function(event){
+    if(event.target==this){
+        $('.search_screen').css('transform','translateX(100%)');
+        $('.search_screenbg').hide();
+        $('.search_screenbg').css('opacity','0');
+    };  
+});
+$('.confirm').on('tap',function(event){
+    var brand_str="";
+    var filter_str="";
+    $('.screen_list').each(function(){
+        brand = $(this).find("li.active span").attr("data-key");
+        if(brand != undefined){       
+            filter_str += brand;
+            $(this).find("li").each(function(index,value){
+                if($(this).hasClass("active")){
+                    filter_str += "-"
+                    filter_str += $(this).find('span').attr("data-value");
+                }
+            })
+            filter_str += "@"
+        }        
+    });
+    filter_str = filter_str.substring(0,filter_str.length-1);
+    // console.log(filter_str);
+    // return
+    
+    par.screen=filter_str;
+    if($('#classify li.active').length>0){
+        par.top_cate=$('#classify li.active').attr('data-value');
+    }
+    par.tid=0;
+    // reset the list data
+        mescroll.resetUpScroll();
+        // hide back to top button
+        mescroll.hideTopBtn();
+    });
+    
+    
+    //Filtering---show all, free shipping...selected
+    $('.screen_up>li').on('tap',function(){
+        $(this).addClass('active');
+        $(this).siblings().removeClass('active');
+    })
+    // get the address bar
+function getQueryString(name) {
+    var reg = new RegExp('(^|&)' + name + '=([^&]*)(&|$)', 'i');
+    
+    var r = window.location.search.substr(1).match(reg);
+    if (r != null) {
+        return unescape(r[2]);
+    }
+    return null;
+}            
+</script>
+</body>
+</html>

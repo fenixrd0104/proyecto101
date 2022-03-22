@@ -1,0 +1,130 @@
+<title>操作信息</title>
+
+<div class="layui-card layadmin-header">
+    <div class="layui-breadcrumb" lay-filter="breadcrumb">
+        <a>分店管理</a>
+        <a><cite>操作信息</cite></a>
+    </div>
+</div>
+
+<script type="text/html" template>
+    <link rel="stylesheet" href="{{ layui.setter.base }}style/supplier.css?v={{ layui.admin.v }}-1" media="all">
+</script>
+<style>
+    @media screen and (max-width: 450px){
+        .layui-form-item .layui-input-inline {
+            display: block;
+            float: none;
+            left: -3px;
+            width: auto;
+            margin: 0;
+        }
+    }
+</style>
+
+<div class="layui-fluid">
+        <div class="layui-row">
+            <div class="layui-col-md12">
+                <div class="layui-card">
+                   
+                    <div class="layui-card-body">
+                      <div class="layui-row layui-col-space10">
+                            
+                            <div class="layui-col-md12">
+                                <div class="layui-form  layuiadmin-card-header-auto goods_list_search" lay-filter="app-content-list">
+                                    <div class="layui-form-item">
+                                      <div class="layui-inline">
+                                        <div class="layui-input-inline">
+                                            <input type="text" class="layui-input" id="test-laydate-type-datetime-start" placeholder="开始时间">
+                                        </div>
+                                      </div>
+                                      <div class="layui-inline">
+                                        <div class="layui-input-inline">
+                                            <input type="text" class="layui-input" id="test-laydate-type-datetime-end" placeholder="结束时间">
+                                        </div>
+                                      </div>
+                                      
+                                      <div class="layui-inline">
+                                        <div class="layui-input-inline">
+                                          <input type="text" name="title" placeholder="单号/供应商/收货人/收货电话" autocomplete="off" class="layui-input">
+                                        </div>
+                                      </div>
+                                      <div class="layui-inline">
+                                        <button class="layui-btn layuiadmin-btn-list" lay-submit lay-filter="LAY-app-contlist-search">
+                                          <i class="layui-icon layui-icon-search layuiadmin-button-btn"></i>
+                                        </button>
+                                      </div>
+                                    </div>
+                                  </div>
+                            </div>
+                      </div>
+                  </div>
+            </div>
+        </div>
+        
+        <div class="layui-row">
+            <div class="layui-col-md12">
+              <div class="layui-card">
+                <div class="layui-card-body">
+                 <table class="layui-hide" id="test-table-storelog"></table>
+                
+                  <script type="text/html" id="test-table-toolbar-storelog2">
+                    <a class="layui-btn layui-btn-xs layui-btn-normal" lay-event="edit">详情</a>
+                    <a class="layui-btn layui-btn-xs" lay-event="edit">打印</a>
+                  </script>
+                </div>
+              </div>
+            </div>
+          </div>
+    
+    </div>
+    
+    
+    
+    </div>
+
+<script>
+  layui.use(['admin','table','form','laydate','layer'], function(){
+      var $ = layui.$
+      ,admin = layui.admin
+      ,view = layui.view
+      ,layer = layui.layer
+      ,table = layui.table
+      ,layer = layui.layer
+      ,setter = layui.setter
+      ,laydate = layui.laydate
+      ,form = layui.form;
+      
+      form.render(null, 'app-content-list');
+      //日期时间选择器
+        laydate.render({
+            elem: '#test-laydate-type-datetime-start'
+            ,type: 'datetime'
+        });
+        laydate.render({
+            elem: '#test-laydate-type-datetime-end'
+            ,type: 'datetime'
+        });
+
+
+      table.render({
+      elem: '#test-table-storelog'
+      ,url: layui.setter.baseUrl+'json/table/user.js'
+      ,toolbar: '#test-table-toolbar-storelog'
+      ,cols: [[
+        {field:'id', width:80, title: 'ID',align:'center'}
+        ,{field:'username', title: '操作人',align:'center'}
+        ,{field:'username', title: '模块名称',align:'center'}
+        ,{field:'username', title: '操作类型',align:'center'}
+        ,{field:'sign', title: '修改时间',align:'center'} 
+        ,{field:'score', title: '备注',align:'center'}
+      ]],
+      page:true
+    });
+ 
+   
+   
+  
+    });
+    </script>
+  

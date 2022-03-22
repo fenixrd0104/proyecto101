@@ -1,0 +1,203 @@
+{include file="public/header" /}
+<style>
+    .mui-col-xs-3 {
+        width: 24%;
+    }
+</style>
+</head>
+
+<body>
+    <header class="mui-bar mui-bar-nav flex bg_red_head" id="header" style="background-color:#232323!important;">
+        <a class="back-page mui-icon mui-icon-left-nav mui-pull-left" href="javascript:;"></a>
+        <div class="class-search flex_between" style="background:#161616;">
+            <input type="search" class="search-input" name="searchgoods" id="search_input" placeholder="Search all products">
+            <img class="small_search" src="__IMG__/search_btn.png">
+        </div>
+        <a id="menu" class="mui-action-menu mui-icon mui-icon-bars mui-pull-right" href="javascript:void(0);"></a>
+    </header>
+    <div class="mui-content">
+        <div class="goods_nav_box">
+            <div class="goods_nav cont flexs">
+                <div class="on"><button>VIP</button></div>
+                <div><button>Preferential</button></div>
+                <div><button>Specials</button></div>
+                <div><button>Direct Mail</button></div>
+                <div><button>High-end</button></div>
+            </div>
+        </div>
+        <div class="goods_cont_box">
+            <div class="goods_cont_left">
+                <div>
+                    <!-- <div class="on">Special Offer</div>
+                    <div>Home life</div>
+                    <div>Appliances</div>
+                    <div>Costume Jewelry</div>
+                    <div>Beauty Care</div> -->
+                </div>
+            </div>
+            <div class="goods_cont_right">
+                <div>
+                    <!-- <div>
+                        <p><img src="/static/wap/images/temp/img_015.png" alt=""></p>
+                        <p>Notebook</p>
+                    </div>
+                    <div>
+                        <p><img src="/static/wap/images/temp/img_016.png" alt=""></p>
+                        <p>Computer</p>
+                    </div>
+                    <div>
+                        <p><img src="/static/wap/images/temp/img_017.png" alt=""></p>
+                        <p>Camera</p>
+                    </div>
+                    <div>
+                        <p><img src="/static/wap/images/temp/img_018.png" alt=""></p>
+                        <p>Air conditioner</p>
+                    </div>
+                    <div>
+                        <p><img src="/static/wap/images/temp/img_019.png" alt=""></p>
+                        <p>Men's clothing</p>
+                    </div>
+                    <div>
+                        <p><img src="/static/wap/images/temp/img_020.png" alt=""></p>
+                        <p>Tablet</p>
+                    </div>
+                    <div>
+                        <p><img src="/static/wap/images/temp/img_021.png" alt=""></p>
+                        <p>Jewelry</p>
+                    </div>
+                    <div>
+                        <p><img src="/static/wap/images/temp/img_022.png" alt=""></p>
+                        <p>Mobile</p>
+                    </div>
+                    <div>
+                        <p><img src="/static/wap/images/temp/img_023.png" alt=""></p>
+                        <p>Watch</p>
+                    </div>
+                    <div>
+                        <p><img src="/static/wap/images/temp/img_024.png" alt=""></p>
+                        <p>Handbag</p>
+                    </div>
+                    <div>
+                        <p><img src="/static/wap/images/temp/img_025.png" alt=""></p>
+                        <p>Crate</p>
+                    </div>
+                    <div>
+                        <p><img src="/static/wap/images/temp/img_026.png" alt=""></p>
+                        <p>Graphics card</p>
+                    </div> -->
+
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    {include file="public/head_nav"/}
+    {include file="public/nav"/}
+    {include file="public/footer" /}
+    <script type="text/template" id="child">
+        <div data-id='{{id}}' class="go_goods">
+            <p><img src="{{image}}" alt=""></p>
+            <p>{{name}}</p>
+        </div>
+    </script>
+    <!--empty prompt -->
+    <script type="text/template" id="null">
+        <div class="mescroll-empty"><img class="empty-icon" src="/static/wap/images/none4.png"><p class="empty-tip">No category yet</p ></div>
+    </script>
+    <!-- Loading -->
+    <script type="text/template" id="load">
+        <div class="mescroll-upwarp" style="visibility: visible;
+        display: block;padding: 5px 0;">
+            <p class="upwarp-progress mescroll-rotate" style="transform: rotate(439.2deg);"></p>
+            <p class="upwarp-tip">Loading..</p>
+        </div>
+    </script>
+    <script type="text/javascript">
+        var top_cate = 1;
+        mui('.goods_cont_right').scroll();
+        mui('.goods_cont_left').scroll();
+        $('#segmentedControls').attr('data-aa');
+        get_data({ top_cate: top_cate });
+        function get_data(obj) {
+            $('.goods_cont_right').html(template('load'));
+            $get('/api/goods/get_con_category', obj, function (data) {
+                var l = data.data.list, c = data.data.child;
+                var str_left = '', str_right = '';
+                if (data.status == 1) {
+                    if (l.length > 0) {
+                        for (const i in c) {
+                            str_right += template('child', c[i]);
+                        }
+                        if (!obj.id && obj.top_cate) {
+                            for (const i in l) {
+                                if (i == 0) {
+                                    str_left = '<div class="on" data-id="' + l[i].id + '">' + l[i].name + '</div>';
+                                } else {
+                                    str_left += '<div data-id="' + l[i].id + '">' + l[i].name + '</div>';
+                                }
+                            }
+                            $('.goods_cont_left>div').html(str_left);
+                        }
+                        if(c.length==0){
+                            str_right = template('null');
+                        }
+                    } else {
+                        str_right = template('null');
+                        $('.goods_cont_left>div').html('');
+                    }
+                    $('.goods_cont_right>div').html(str_right);
+                } else {
+                    $('.goods_cont_right>div').html(template('null'));
+                }
+            });
+        }
+
+        // 搜索
+        $('.small_search').on('tap', function () {
+            var sear_inp = $("input[name = searchgoods]").val();
+            if (sear_inp == "") {
+                mui.toast("请输入搜索内容");
+            } else {
+                window.location.href = '/wap/index/goods_list/searchname/' + sear_inp;
+            }
+        });
+        $("#search_input").on('keypress', function (e) {
+            var keycode = e.keyCode;
+            //Get the value of the search box
+            var searchContent = $(this).val();
+            if (keycode == '13') {
+                e.preventDefault();
+                //Request search interface
+                if (searchContent == '') {
+                    mui.toast('Please enter the search content');
+                } else {
+                    console.log('click to search')
+                    window.location.href = '/wap/index/goods_list/searchname/' + searchContent;
+                }
+            }
+        });
+
+        // Tab
+        $('body').on('click', '.goods_nav>div', function () {
+            $(this).addClass('on').siblings().removeClass('on');
+            top_cate = $(this).index() + 1;
+            get_data({ top_cate: top_cate });
+        });
+        $('body').on('click', '.goods_cont_left>div>div', function () {
+            $(this).addClass('on').siblings().removeClass('on');
+            var id = $(this).attr('data-id');
+            get_data({ top_cate: top_cate, id: id });
+        });
+        // Category jump
+        $('body').on('click', '.go_goods', function () {
+            var id=$(this).attr('data-id');
+            window.location.href = '/wap/index/goods_list?tid='+id+'&top_cate='+top_cate;
+        });
+
+
+
+    </script>
+</body>
+
+</html>

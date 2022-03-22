@@ -1,0 +1,588 @@
+<title>拍卖管理</title>
+
+<div class="layui-card layadmin-header">
+    <div class="layui-breadcrumb" lay-filter="breadcrumb">
+        <a>拍卖管理</a>
+        <a><cite>拍卖列表</cite></a>
+    </div>
+</div>
+<div class="layui-fluid">
+    <div class="layui-row layui-col-space15">
+        <div class="layui-col-md12">
+            <div class="layui-card">
+                <div class="layui-card-header">拍卖列表</div>
+                <div class="layui-card-body">
+                    <form class="layui-form layuiadmin-card-header-auto">
+                        <div class="test-table-reload-btn" style="margin-bottom: 10px;">
+                            <button type="button" class="layui-btn layuiadmin-btn-admin" style="margin-right: 30px;" data-type="add">
+                                <i class="layui-icon layui-icon-add-1 layuiadmin-button-btn"></i>添加竞拍
+                            </button>
+                            <div class="layui-inline">
+                                <input class="layui-input" name="keywords" placeholder="输入需查询的拍卖名称或ID" style="width: 220px" id="test-table-demoReload" autocomplete="off">
+                            </div>
+                            <div class="layui-inline">
+                                <input class="layui-input" name="bidders" placeholder="竞拍者UID" style="width: 100px" id="test-table-demoReloads" autocomplete="off">
+                            </div>
+                            <div class="layui-inline">
+                                <div class="layui-input-inline">
+                                    <select name="auction_num" lay-filter="auction_num" id="auction_num">
+                                    <option value="">全部拍卖类型</option>
+                                    <option value="1">首次拍卖</option>
+                                    <option value="2">二次拍卖</option>
+                                </select>
+                                </div>
+                            </div>
+                            <div class="layui-inline">
+                                <div class="layui-input-inline">
+                                    <select name="status" lay-filter="status" id="status">
+                                    <option value="">全部状态</option>
+                                    <option value="0">待审核</option>
+                                    <option value="1">拍卖结束</option>
+                                    <option value="2">已拒绝</option>
+                                    <option value="3">已通过</option>
+                                    <option value="4">进行中</option>
+                                    <option value="5">二次拍卖申请</option>
+                                    <option value="6">提货申请</option>
+                                    <option value="7">已完成</option>
+                                </select>
+                                </div>
+                            </div>
+                            <div class="layui-inline">
+                                <div class="layui-input-inline">
+                                    <select name="pay_status" lay-filter="pay_status" id="pay_status">
+                                    <option value="">支付类型</option>
+                                    <option value="1">已支付</option>
+                                    <option value="0">待支付</option>
+                                </select>
+                                </div>
+                            </div>
+                            <div class="layui-inline">
+                                <div class="layui-input-inline">
+                                    <select name="is_remit" lay-filter="is_remit" id="is_remit">
+                                    <option value="">打款类型</option>
+                                    <option value="1">已打款</option>
+                                    <option value="0">待打款</option>
+                                </select>
+                                </div>
+                            </div>
+                            <button type="button" class="layui-btn" data-type="reload"><i class="layui-icon">&#xe615;</i>搜索</button>
+                        </div>
+                    </form>
+                    <table class="layui-hide" id="list_data" lay-filter="list_data"></table>
+                    <script type="text/html" id="tool_list_data">
+                        {{# if(d.status == 0){ }}
+                        <!-- <a class="layui-btn layui-btn-xs" lay-event="shenhe"><i class="layui-icon layui-icon-edit"></i>审核</a> -->
+                        <a class="layui-btn layui-btn-normal layui-btn-xs" lay-event="edit"><i class="layui-icon layui-icon-edit"></i>审核</a> {{# }else if(d.status == 1 && d.is_re_auction==1){ }}
+                        <a class="layui-btn layui-btn-xs" lay-event="re_auction"></i>重新拍卖</a>
+                        {{# }else if(d.status == 6){ }}
+                        <a class="layui-btn layui-btn-xs" lay-event="take_goods"></i>提货申请</a>
+                        {{# }else { }}
+                        <a class="layui-btn layui-btn-normal layui-btn-xs" lay-event="edit"><i class="layui-icon layui-icon-edit"></i>修改</a> {{# } }} {{# if(d.pay_status==1 && d.is_remit==0){ }}
+                        <a class="layui-btn layui-btn-xs" lay-event="remit_auction"></i>打款</a>
+                        {{# } }}
+                        <a class="layui-btn layui-btn-xs" lay-event="visit"></i>查看</a>
+                        <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del"><i class="layui-icon layui-icon-delete"></i>删除</a>
+                    </script>
+                    <script type="text/html" id="test-table-tui">
+                        <input type="checkbox" name="is_push" value="{{d.id}}" title="推荐" class="layui-input" {{ d.is_push===1 ? 'checked' : '' }} lay-filter="tui_status">
+                    </script>
+                    <script type="text/html" id="test-ar-images">
+                        <img src="{{d.goods_img.split( ',')[0] || '/static/admin/src/style/res/no_img.jpg'}}" height="100%" alt="">
+                    </script>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    layui.use(['admin', 'table', 'view', 'form', 'util', 'layedit', 'setter', 'layer', 'ourJs'], function() {
+        var $ = layui.$,
+            admin = layui.admin,
+            setter = layui.setter,
+            element = layui.element,
+            form = layui.form,
+            view = layui.view,
+            layer = layui.layer,
+            util = layui.util,
+            layedit = layui.layedit,
+            table = layui.table,
+            ourJs = layui.ourJs,
+            router = layui.router();
+
+        form.render();
+        table.render({
+            elem: '#list_data',
+            url: layui.setter.baseUrl + 'admin/auction/auction_goods',
+            parseData: function(res) { //res 即为原始返回的数据
+                return {
+                    "code": res.code, //解析接口状态
+                    "msg": res.msg, //解析提示文本
+                    "count": res.data.count, //解析数据长度
+                    "data": res.data.lists //解析数据列表
+                };
+            },
+            cols: [
+                [{
+                        field: 'id',
+                        width: 70,
+                        title: 'ID',
+                        sort: true,
+                        align: 'center'
+                    }, {
+                        field: 'uid',
+                        width: 90,
+                        title: '拍卖者ID',
+                        align: 'center'
+                    }, {
+                        field: 'bidders',
+                        width: 90,
+                        title: '竟拍者ID',
+                        align: 'center'
+                     }, {
+                        field: 'goods_name',
+                        width: 130,
+                        title: '商品名',
+                        align: 'center'
+                    }, {
+                        field: 'goods_img',
+                        width: 110,
+                        title: '商品图',
+                        templet: '#test-ar-images',
+                        align: 'center'
+                    }, {
+                        field: 'price',
+                        width: 120,
+                        title: '竞拍价格',
+                        align: 'center'
+                    }, {
+                        field: 'auction_num',
+                        width: 95,
+                        title: '拍卖类型',
+                        align: 'center',
+                        templet: function(d) {
+                            if (d.auction_num == 1) {
+                                return "首次拍卖";
+                            } else {
+                                return "二次拍卖";
+                            }
+                        }
+                    }, {
+                        field: 'is_private',
+                        width: 95,
+                        title: '公开',
+                        align: 'center',
+                        templet: function(d) {
+                            if (d.is_private == 1) {
+                                return "否";
+                            } else {
+                                return "是";
+                            }
+                        }
+                    }, {
+                        field: 'start_time',
+                        width: 160,
+                        title: '开始时间',
+                        align: 'center'
+                    }, {
+                        field: 'end_time',
+                        width: 160,
+                        title: '结束时间',
+                        align: 'center'
+                    }
+                    // ,{field:'is_push', width:110, title: '是否推荐', align:'center', templet: '#test-table-tui'}
+                    , {
+                        field: 'pay_status',
+                        width: 95,
+                        title: '支付状态',
+                        align: 'center',
+                        templet: function(d) {
+                            if (d.pay_status == 1) {
+                                return "已支付";
+                            } else {
+                                return "待支付";
+                            }
+                        }
+                    }, {
+                        field: 'is_remit',
+                        width: 95,
+                        title: '打款状态',
+                        align: 'center',
+                        templet: function(d) {
+                            if (d.pay_status == 1) {
+                                return "已打款";
+                            } else {
+                                return "待打款";
+                            }
+                        }
+                    }, {
+                        field: 'goods_status',
+                        width: 95,
+                        title: '商品状态',
+                        align: 'center',
+                        templet: function(d) {
+                            if (d.goods_status == 1) {
+                                return "已提货";
+                            } else if (d.goods_status == 2) {
+                                return "已收货";
+                            } else {
+                                return "--";
+                            }
+                        }
+                    }
+                    // ,{field:'service_fee', title: '服务费', align:'center'}
+                    , {
+                        field: 'status',
+                        width: 110,
+                        title: '状态',
+                        align: 'center',
+                        templet: function(d) {
+                            if (d.status == 0) {
+                                return '待审核';
+                            } else if (d.status == 1) {
+                                return '拍卖结束'
+                            } else if (d.status == 2) {
+                                return '已拒绝'
+                            } else if (d.status == 3) {
+                                return '已通过'
+                            } else if (d.status == 4) {
+                                return '进行中'
+                            } else if (d.status == 5) {
+                                return '二次拍卖申请'
+                            } else if (d.status == 6) {
+                                return '提货申请'
+                            } else if (d.status == 7) {
+                                return '已完成'
+                            }
+                        }
+                    }
+                    //,{field:'update_time', title: '更新时间', align:'center'}
+                    // ,{field:'bidders', title: '参与人员', align:'center'}
+                    , {
+                        fixed: 'right',
+                        title: '操作',
+                        align: 'center',
+                        toolbar: '#tool_list_data',
+                        width: 230
+                    }
+                ]
+            ],
+            limits: [10, 20, 50, 100, 500, 1000, 5000, 10000, 100000],
+            page: true
+        });
+
+        var $ = layui.$,
+            active = {
+                // 添加会员组
+                add: function() {
+                        admin.popup({
+                            title: "添加数据",
+                            area: admin.screen() < 2 ? ['95%', '90%'] : ["800px", "700px"],
+                            id: "LAY-popup-add_ar",
+                            success: function(layero, index) {
+                                view(this.id).render('/auction/add_auction_goods').done(function() {
+                                    form.render(null, 'form_add'); // 弹窗的lay-filter值
+                                    //form.render('select');  
+                                    //监听提交
+                                    form.on('submit(add_btn)', function(data) {
+                                        console.log(data.field);
+                                        admin.req({
+                                            url: layui.setter.baseUrl + 'admin/auction/add_auction_goods',
+                                            data: data.field,
+                                            type: 'post',
+                                            success: function(res) {
+                                                if (res.code == 1) {
+                                                    layer.msg(res.msg, {
+                                                        icon: 1,
+                                                        shade: 0.5,
+                                                        time: 1000
+                                                    }, function() {
+                                                        layer.close(index); //执行关闭 
+                                                        layui.table.reload('list_data'); //重载表格
+
+                                                    });
+                                                } else {
+                                                    layer.msg(res.msg, {
+                                                        icon: 5,
+                                                        anim: 6,
+                                                        shade: 0.5,
+                                                        time: 1000
+                                                    });
+                                                }
+                                            }
+                                        });
+                                    });
+
+                                });
+                            }
+                        });
+                    }
+                    // 搜索
+                    ,
+                reload: function() {
+                    //执行重载
+                    table.reload('list_data', {
+                        page: {
+                            curr: 1 //重新从第 1 页开始
+                        },
+                        where: {
+                            keywords: $('#test-table-demoReload').val(),
+                            bidders: $('#test-table-demoReloads').val(),
+                            auction_num: $('#auction_num').val(),
+                            status: $("#status").val(),
+                            pay_status: $("#pay_status").val(),
+                            is_remit: $("#is_remit").val()
+                        }
+                    });
+                }
+            };
+
+        $('.test-table-reload-btn .layui-btn').on('click', function() {
+            var type = $(this).data('type');
+            active[type] ? active[type].call(this) : '';
+        });
+
+        //监听工具条
+        table.on('tool(list_data)', function(obj) {
+            var data = obj.data;
+            if (obj.event === 'del') {
+                layer.confirm('确认删除此数据吗?', {
+                    icon: 3,
+                    title: '提示'
+                }, function(index) {
+                    admin.req({
+                        url: layui.setter.baseUrl + 'admin/auction/del_auction_goods',
+                        data: {
+                            id: data.id
+                        },
+                        type: 'get',
+                        success: function(res) {
+                            if (res.code == 1) {
+                                // console.log(res.msg)
+                                obj.del();
+                                layer.close(index);
+                            } else {
+                                layer.msg(res.msg);
+                            }
+                        }
+                    });
+                });
+            } else if (obj.event === 'edit') {
+                // 编辑
+                // console.log(data);        
+                admin.popup({
+                    title: "编辑数据",
+                    area: admin.screen() < 2 ? ['95%', '90%'] : ["800px", "700px"],
+                    id: "LAY-popup-edit_ar",
+                    success: function(layero, index) {
+                        view(this.id).render('/auction/add_auction_goods', data).done(function() {
+                            form.render(null, 'form_add'); // 弹窗的lay-filter值
+
+                            //监听提交
+                            form.on('submit(add_btn)', function(datas) {
+                                // console.log(data);
+                                datas.field.id = obj.data.id;
+                                delete datas.field.file;
+                                delete datas.field.editorValue;
+                                delete datas.field.upfile;
+
+                                admin.req({
+                                    url: layui.setter.baseUrl + 'admin/auction/edit_auction_goods',
+                                    data: datas.field,
+                                    type: 'post',
+                                    success: function(res) {
+                                        if (res.code == 1) {
+                                            layer.msg(res.msg, {
+                                                icon: 1,
+                                                time: 1000
+                                            }, function() {
+                                                layer.close(index); //执行关闭 
+                                                layui.table.reload('list_data'); //重载表格
+                                            });
+                                        } else {
+                                            layer.msg(res.msg, {
+                                                icon: 5,
+                                                anim: 6,
+                                                shade: 0.5,
+                                                time: 1000
+                                            });
+                                        }
+                                    }
+                                });
+                            });
+
+                        });
+                    }
+                });
+            } else if (obj.event === 'shenhe') {
+                // 编辑
+                // console.log(data);        
+                admin.popup({
+                    title: "审核",
+                    area: admin.screen() < 2 ? ['95%', '90%'] : ["800px", "700px"],
+                    id: "LAY-popup-edit_ar",
+                    success: function(layero, index) {
+                        view(this.id).render('/auction/shenhe_auction', data).done(function() {
+                            form.render(null, 'form_add'); // 弹窗的lay-filter值
+                        });
+                    }
+                });
+            } else if (obj.event === 'take_goods') {
+                // 编辑
+                // console.log(data);        
+                admin.popup({
+                    title: "审核",
+                    area: admin.screen() < 2 ? ['95%', '90%'] : ["800px", "700px"],
+                    id: "LAY-popup-edit_ar",
+                    success: function(layero, index) {
+                        view(this.id).render('/auction/take_auction', data).done(function() {
+                            form.render(null, 'form_add'); // 弹窗的lay-filter值
+                            form.on('submit(take_yes)', function(e) {
+                                admin.req({
+                                    url: layui.setter.baseUrl + 'admin/auction/take_auction' //实际使用请改成服务端真实接口
+                                        ,
+                                    data: {
+                                        id: obj.data.id,
+                                        shipping_name: e.field.shipping_name,
+                                        invoice_no: e.field.invoice_no
+                                    },
+                                    type: 'post',
+                                    success: function(res) {
+                                        if (res.code == 1) {
+                                            layer.msg(res.msg, {
+                                                icon: 1,
+                                                time: 1000
+                                            }, function() {
+                                                layer.close(index); //执行关闭 
+                                                layui.table.reload('list_data'); //重载表格
+                                            });
+                                        } else {
+                                            layer.msg(res.msg);
+                                        }
+                                    }
+                                });
+                            })
+                        });
+                    }
+                });
+            } else if (obj.event === 're_auction') {
+                // 编辑
+                // console.log(data);        
+                admin.popup({
+                    title: "重新拍卖",
+                    area: admin.screen() < 2 ? ['95%', '90%'] : ["800px", "700px"],
+                    id: "LAY-popup-edit_ar",
+                    success: function(layero, index) {
+                        view(this.id).render('/auction/re_auction', data).done(function() {
+                            form.render(null, 'form_add'); // 弹窗的lay-filter值
+
+                            //监听提交
+                            form.on('submit(re_btn)', function(datas) {
+                                // console.log(data);
+                                datas.field.id = obj.data.id;
+                                delete datas.field.file;
+                                delete datas.field.editorValue;
+                                delete datas.field.upfile;
+
+                                admin.req({
+                                    url: layui.setter.baseUrl + 'admin/auction/re_auction',
+                                    data: datas.field,
+                                    type: 'post',
+                                    success: function(res) {
+                                        if (res.code == 1) {
+                                            layer.msg(res.msg, {
+                                                icon: 1,
+                                                time: 1000
+                                            }, function() {
+                                                layer.close(index); //执行关闭 
+                                                layui.table.reload('list_data'); //重载表格
+                                            });
+                                        } else {
+                                            layer.msg(res.msg, {
+                                                icon: 5,
+                                                anim: 6,
+                                                shade: 0.5,
+                                                time: 1000
+                                            });
+                                        }
+                                    }
+                                });
+                            });
+                        });
+                    }
+                });
+            } else if (obj.event === 'visit') {
+                // 查看
+                // console.log(data);        
+                admin.popup({
+                    title: "拍卖详情",
+                    area: admin.screen() < 2 ? ['95%', '90%'] : ["800px", "700px"],
+                    id: "LAY-popup-visit_detail",
+                    success: function(layero, index) {
+                        view(this.id).render('/auction/visit_detail', data).done(function() {
+
+                        });
+                    }
+                });
+            } else if (obj.event === 'remit_auction') {
+                // 打款
+                layer.confirm('确认打款吗?', {
+                    icon: 6,
+                    title: '提示'
+                }, function(index) {
+                    admin.req({
+                        url: layui.setter.baseUrl + 'admin/auction/remit_auction',
+                        data: {
+                            id: data.id
+                        },
+                        type: 'post',
+                        success: function(res) {
+                            if (res.code == 1) {
+                                layer.msg(res.msg, {
+                                    icon: 1,
+                                    time: 1000
+                                }, function() {
+                                    layui.table.reload('list_data'); //重载表格
+                                });
+                            } else {
+                                layer.msg(res.msg, {
+                                    icon: 5,
+                                    anim: 6,
+                                    shade: 0.5,
+                                    time: 1000
+                                });
+                            }
+                        }
+                    });
+                })
+            }
+        });
+
+        // 推荐
+        form.on('checkbox(tui_status)', function(e) {
+            admin.req({
+                url: layui.setter.baseUrl + 'admin/auction/tui_auction',
+                data: {
+                    id: e.value
+                },
+                type: 'post',
+                success: function(res) {
+                    if (res.code == 1) {
+
+                    } else {
+                        layer.msg(res.msg, {
+                            icon: 5,
+                            anim: 6,
+                            shade: 0.5,
+                            time: 1000
+                        }, function() {
+                            layui.table.reload('list_data'); //重载表格
+                        });
+                    }
+                }
+            });
+
+        });
+
+    });
+</script>

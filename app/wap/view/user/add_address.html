@@ -1,0 +1,173 @@
+{include file="public/header" /}
+</head>
+
+<body>
+    <header class="mui-bar mui-bar-nav" id="header">
+        <a class="mui-action-back mui-icon mui-icon-left-nav mui-pull-left" href="javascript:;"></a>
+        <a id="menu" class="mui-action-menu mui-icon mui-icon-bars mui-pull-right" href="javascript:void(0);"></a>
+        <h1 class="mui-title"></h1>
+    </header>
+    <div class="mui-content">
+        <div class="mb10"></div>
+        <form class="mui-input-group xx_form">
+            <div class="mui-input-row">
+                <label>Name</label>
+                <input type="text" id="consignee" placeholder="Please enter consignee name">
+            </div>
+            <div class="mui-input-row">
+                <label>Mobile number</label>
+                <input type="tel" id="mobile" placeholder="Please enter mobile number">
+            </div>
+            <div class="mui-input-row">
+                <label>Consignee address</label>
+                <input type="text" placeholder="Please select an address" id="showCityPicker" readonly>
+            </div>
+            <div class="mui-input-row">
+                <label>Address details</label>
+                <input type="text" id="address" placeholder="Please enter detailed address">
+            </div>
+            <div class="mui-input-row">
+                <label>Default address</label>
+                <div class="mui-switch mui-switch-blue mui-switch-mini" id="is_default">
+                    <div class="mui-switch-handle"></div>
+                </div>
+            </div>
+            <div class="mb30"></div>
+            <div class="mui-button-row">
+                <button type="button" id="submit_btn" class="submit_btn bg-gold" onclick="return false;">confirm</button>
+            </div>
+        </form>
+    </div>
+    {include file="public/head_nav"/} {include file="public/footer" /}
+    <script type="text/javascript">
+        //Handling edit addresses
+        var id = getQueryString("id");
+        var from = getQueryString("from");
+        var province = ''; // province ID
+        var city = ''; // city ID
+        var district = '';
+        var is_default = '';
+
+        if (id) {
+            $('header h1').html('Edit delivery address');
+            var address_id = id;
+            get_address(id);
+        } else {
+            $('header h1').html('Add delivery address');
+            var address_id = "";
+        }
+
+        function get_address($id) {
+            $get('/api/address/get_address', {
+                id: $id
+            }, function(data) {
+                if (data.status == 1) {
+                    var data = data.data;
+                    $('#consignee').val(data.consignee);
+                    $('#mobile').val(data.mobile);
+                    $('#showCityPicker').val(data.pcd);
+                    $('#address').val(data.address);
+                    province = data.province;
+                    city = data.city;
+                    district = data.district;
+                    is_default = data.is_default;
+                    data.is_default == 1 ? $('#is_default').addClass('mui-active') : $('#is_default').removeClass('mui-active');
+
+                } else {
+                    // mui.toast(data.msg);
+                }
+            });
+        }
+
+        // start slider
+                mui('.mui-content .mui-switch').each(function() { //loop through all toggles
+                    this.addEventListener('toggle', function(event) {
+                        // console.log(event.detail.isActive);
+                        is_default = event.detail.isActive ? '1' : '0';
+                    });
+                });
+                // submit address
+                $('#submit_btn').click(function() {
+                    $('#submit_btn').attr("disabled", "true"); //Set the grayed out button
+                    setTimeout("$('#submit_btn').removeAttr('disabled')", 3000); //Submit button display after setting three seconds 
+
+            var consignee = $('#consignee').val();
+            var mobile = $('#mobile').val();
+            var address = $('#address').val();
+
+            var par = {
+                consignee: consignee,
+                mobile: mobile,
+                province: province,
+                city: city,
+                district: district,
+                is_default: is_default,
+                address: address,
+                address_id: address_id
+            }
+            if (consignee == "") {
+               mui.toast('Please enter the consignee's name');
+            } else if (mobile == "") {
+                mui.toast('Please enter the phone number');
+            } else if (mobile.search(/^\d{11}$/) == -1) {
+                mui.toast('Mobile phone number format is incorrect');
+            } else if (province == '') {
+                mui.toast('Please select the address');
+            } else if (address == '') {
+                mui.toast('Please enter detailed address');
+            } else {
+                $get('/api/address/edit_address', par, function(data) {
+                    if (data.status == 1) {
+                        mui.toast(data.msg);
+                        setTimeout(function(event) {
+                            mui.back();
+                            localStorage.setItem('load_list','true');
+                        }, 1000);
+                    } else {
+                        mui.toast(data.msg);
+                    }
+                });
+            }
+        });
+        // Get the third-level list of cities
+        (function($, doc) {
+            $.init();
+            $.ready(function() {
+                //Three-level linkage
+                var cityPicker3 = new $.PopPicker({
+                    layer: 3
+                });
+                $get('/api/address/get_region_tree', {}, function(data) {
+                    // console.log(data);
+                    if (data.status) {
+                        cityPicker3.setData(data.data);
+                    }
+                })
+                var showCityPickerButton = doc.getElementById('showCityPicker');
+                showCityPickerButton.addEventListener('click', function(event) {
+                    cityPicker3.show(function(items) {
+
+                        var provinces = (items[0] || {});
+                        var citys = (items[1] || {});
+                        var districts = (items[2] || {});
+                        showCityPickerButton.value = provinces.text + " " + citys.text + " " + districts.text;
+                        province = provinces.value;
+                        city = citys.value;
+                        district = districts.value;
+                    });
+                }, false);
+            });
+        })(mui, document);
+        // Get address bar information
+        function getQueryString(name) {
+            var reg = new RegExp('(^|&)' + name + '=([^&]*)(&|$)', 'i');
+            var r = window.location.search.substr(1).match(reg);
+            if (r != null) {
+                return unescape(r[2]);
+            }
+            return null;
+        };
+    </script>
+</body>
+
+</html>

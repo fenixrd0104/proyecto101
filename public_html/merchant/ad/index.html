@@ -1,0 +1,256 @@
+
+<title>广告管理</title>
+
+<div class="layui-card layadmin-header">
+  <div class="layui-breadcrumb" lay-filter="breadcrumb">
+    <a>广告管理</a>
+    <a><cite>广告列表</cite></a>
+  </div>
+</div>
+
+<div class="layui-fluid">
+  <div class="layui-row layui-col-space15">
+    <div class="layui-col-md12">
+      <div class="layui-card">
+        <div class="layui-card-header">广告列表</div>
+        <div class="layui-card-body"> 
+            <div class="test-table-reload-btn" style="margin-bottom: 10px;">
+              <button type="button" class="layui-btn layuiadmin-btn-admin" style="margin-right: 30px;" data-type="add"><i class="layui-icon layui-icon-add-1 layuiadmin-button-btn"></i>添加广告</button> 
+              <div class="layui-inline">
+                <input class="layui-input" name="key" placeholder="输入需查询广告标题" style="width: 220px" id="test-table-demoReload" autocomplete="off">
+              </div>
+              <button type="button" class="layui-btn" data-type="reload"><i class="layui-icon">&#xe615;</i>搜索</button>
+            </div>   
+            <table class="layui-hide" id="test-ad_lists" lay-filter="test-ad_lists"></table>    
+            <script type="text/html" id="test-table-ad_list">
+              <a class="layui-btn layui-btn-normal layui-btn-xs" lay-event="edit"><i class="layui-icon layui-icon-edit"></i>编辑</a>
+              <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del"><i class="layui-icon layui-icon-delete"></i>删除</a>
+            </script>           
+            <script type="text/html" id="test-table-state">
+              <input type="checkbox" name="status" lay-skin="switch" lay-text="开启|禁用" lay-filter="ad_status" value="{{d.id}}" {{ d.status === 1 ? 'checked' : '' }}>
+            </script>    
+            <script type="text/html" id="test-table-images">
+              <img src="{{d.images||'/static/merchant/src/style/res/no_img.jpg'}}" height="100%" alt="">
+            </script>      
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+layui.use(['admin','table', 'view', 'form','setter','layer','ourJs'], function(){
+  var $ = layui.$
+  ,admin = layui.admin
+  ,element = layui.element
+  ,setter = layui.setter
+  ,form = layui.form
+  ,layer = layui.layer
+  ,view = layui.view
+  ,table = layui.table
+  ,ourJs = layui.ourJs
+  ,router = layui.router();
+
+  table.render({
+      elem: '#test-ad_lists'
+      ,url: layui.setter.baseUrl+'merchant/ad/index'
+      ,parseData: function(res){ //res 即为原始返回的数据
+        return {
+        "code": res.code, //解析接口状态
+        "msg": res.msg, //解析提示文本
+        "count": res.data.count, //解析数据长度
+        "data": res.data.lists //解析数据列表
+        };
+      }
+      ,cols: [[
+        {field:'id', width:115, title: 'ID', sort: true, align:'center'}
+        ,{field:'title', title: '标题', align:'center'}
+        ,{field:'link_url', title: '链接地址', align:'center'}
+        ,{field:'name', title: '广告位', align:'center'}
+        ,{field:'width', title: '尺寸', align:'center',
+          templet:function(d){
+            return d.width+'*'+d.height
+          }}
+        ,{field:'images', title: '广告图', templet: '#test-table-images', align:'center'}
+        ,{field:'start_date', title: '开始时间', align:'center'}
+        ,{field:'end_date', title: '结束时间', align:'center'}
+        ,{field:'status', title: '状态', templet: '#test-table-state', align:'center'}
+        ,{fixed: 'right', title: '操作', align:'center',  toolbar: '#test-table-ad_list',width:200}
+      ]]
+      ,page:true
+    });
+
+    
+    var list="";
+    var res_url;
+    var curr_index_id="";
+    admin.req({
+      url: layui.setter.baseUrl+'merchant/ad/indexPosition'
+      ,data: {},
+      type:'get',
+      success: function(res){
+          if(res.code==1){
+            res_url =res.data.list;
+              
+              list="<option value=''>--全部--</option>";              
+              for( var i in res.data.list){
+                  list += "<option value='"+res.data.list[i].id+"' >"+res.data.list[i].name+"</option> ";                  
+              }              
+              form.render('select');
+          }else{
+              layer.msg(res.msg);
+          }       
+      } 
+    }); 
+    
+    
+    var $ = layui.$, active = {
+      // 添加
+      add:function(){
+        admin.popup({
+          title: "添加广告",
+          area: admin.screen() < 2 ? ['95%', '90%'] :["650px", "540px"],
+          id: "LAY-popup-add_ad",
+          success: function(layero, index){
+            view(this.id).render('/ad/add_ad').done(function() {
+              form.render(null, 'add_ad'); // 弹窗的lay-filter值
+
+              $('#ad_position_id').html(list);
+              form.render('select');
+               //监听提交
+               form.on('submit(ad_submit)', function(datas){
+                  admin.req({
+                      url: layui.setter.baseUrl+'merchant/Ad/addAd'
+                      ,data: datas.field
+                      ,type:'post'
+                      ,success: function(res){
+                        if(res.code==1){
+                            layer.msg(res.msg , {icon: 1,time: 1000} , function(){
+                              setTimeout(function(){
+                                layer.close(index); //执行关闭 
+                                layui.table.reload('test-ad_lists'); //重载表格
+                              },900);
+                              
+                            });
+                        }else{
+                          layer.msg(res.msg, {icon: 5,anim: 6,shade:0.5,time: 1000});
+                        }
+                      }
+                  }); 
+
+                });
+              
+            });
+          }
+        });
+      }
+      // 搜索
+      ,reload: function(){
+        var demoReload = $('#test-table-demoReload');        
+        //执行重载
+        table.reload('test-ad_lists', {
+          page: {
+            curr: 1 //重新从第 1 页开始
+          }
+          ,where: {
+            key: demoReload.val()
+          }
+        });
+      }
+    };
+    
+    $('.test-table-reload-btn .layui-btn').on('click', function(){
+      var type = $(this).data('type');
+      active[type] ? active[type].call(this) : '';
+    });
+    
+    //监听工具条
+    table.on('tool(test-ad_lists)', function(obj){
+      console.log(obj);
+      var data = obj.data;
+      var id = obj.data.id;
+      if(obj.event === 'del'){
+        layer.confirm('确认删除该条广告?', {icon: 3, title:'提示'}, function(index){
+          admin.req({
+              url: layui.setter.baseUrl+'merchant/Ad/delAd' //实际使用请改成服务端真实接口
+              ,data: {id:id},
+              type:'get',
+              success: function(res){
+                if(res.code==1){                  
+                    obj.del();                   
+                    layer.close(index);                                    
+                }else{
+                  layer.msg(res.msg, {icon: 5,anim: 6,shade:0.5,time: 1000});
+                }
+              }
+            }); 
+        });
+      } else if(obj.event === 'edit'){
+        // 编辑
+        admin.popup({
+          title: "编辑广告",
+          area: admin.screen() < 2 ? ['95%', '90%'] :["650px", "540px"],
+          id: "LAY-popup-edit_ad",
+          success: function(layero, index){
+            view(this.id).render('/ad/add_ad',data).done(function() {
+              form.render(null, 'add_ad'); // 弹窗的lay-filter值
+              for( var i in res_url){
+                if(res_url[i].name==data.name){
+                  curr_index_id=res_url[i].id;
+                }
+              }
+              
+              $('#ad_position_id').html(list);
+              $('#ad_position_id').val(curr_index_id);
+              form.render('select');
+              
+              
+               //监听提交
+               form.on('submit(ad_submit)', function(datas){
+                 datas.field.id=id;
+                  admin.req({
+                      url: layui.setter.baseUrl+'merchant/Ad/editAd' //实际使用请改成服务端真实接口
+                      ,data: datas.field,
+                      type:'post',
+                      success: function(res){
+                        if(res.code==1){
+                            layer.msg(res.msg , {icon: 1,time: 1000} , function(){
+                              setTimeout(function(){
+                                layer.close(index); //执行关闭 
+                                layui.table.reload('test-ad_lists'); //重载表格
+                              },1000);
+                              
+                            });
+                        }else{
+                          layer.msg(res.msg, {icon: 5,anim: 6,shade:0.5,time: 1000});
+                        }
+                      }
+                  }); 
+
+                });
+            });
+          }
+        });
+      } 
+    });
+    //编辑状态
+    form.on('switch(ad_status)', function(e){
+      var _this=this,status=e.elem.checked;
+      var id=e.value;
+      admin.req({
+          url: layui.setter.baseUrl+'merchant/ad/adState' //实际使用请改成服务端真实接口
+          ,data: {id:id}
+          ,type:'post'
+          ,success: function(res){
+            if(res.code==1){
+              ourJs.status_tong(table,_this,status);
+            }else{
+              layer.msg(res.msg, {icon: 5,anim: 6,shade:0.5,time: 1000});
+            }
+          }
+      }); 
+
+    });
+  
+});
+</script>

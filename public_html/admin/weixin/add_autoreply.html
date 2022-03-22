@@ -1,0 +1,84 @@
+<div class="layui-form" action="" lay-filter="add_autoreply" style="padding: 20px 30px 0 0;">
+<div class="layui-form-item">
+    <label class="layui-form-label">规则名称</label>
+    <div class="layui-input-block">
+    <!-- <input type="text" name="fullname" lay-verify="required" autocomplete="off" class="layui-input"> -->
+        <script type="text/html" template>                        
+            <input type="text" name="rule_name" lay-verify="required" autocomplete="off" class="layui-input" value="{{ d.params.rule_name|| '' }}" >
+        </script>
+    </div>
+    <div class="layui-form-mid layui-input-block layui-word-aux">规则的描述信息</div>
+</div>
+<div class="layui-form-item">
+    <label class="layui-form-label">关键词</label>
+    <div class="layui-input-block"> 
+        <script type="text/html" template>
+            <input type="text" name="key_word" lay-verify="required" autocomplete="off" class="layui-input" value="{{ d.params.key_word || '' }}" >
+        </script>                  
+            
+    </div>
+    <div class="layui-form-mid layui-input-block layui-word-aux">要触发的关键词，多个（|）号隔开</div>
+</div>
+<div class="layui-form-item">
+    <label class="layui-form-label">回复内容</label>
+    <div class="layui-input-block">
+        <script type="text/html" template>
+            <textarea name="content" placeholder="" class="layui-textarea" value="">{{ d.params.content || '' }}</textarea>
+        </script>                   
+        
+    </div>
+    <div class="layui-form-mid layui-input-block layui-word-aux">要自动回复对应关键词的内容</div>
+</div>
+<div class="layui-form-item">
+    <label class="layui-form-label">状态</label>
+    <div class="layui-input-block">
+        <script type="text/html" template>
+            {{# if(d.params.status>-1){ }}
+                <input type="radio" name="status" value="1" title="开启" {{ d.params.status=== 1 ? 'checked': '' }} >
+                <input type="radio" name="status" value="0" title="关闭" {{ d.params.status=== 0 ? 'checked': '' }}>
+               
+            {{# }else{ }}
+                <input type="radio" name="status" value="1" title="开启" checked>
+                <input type="radio" name="status" value="0" title="关闭" >
+            {{# } }}
+
+            
+        </script>        
+    </div>
+</div>
+<div class="layui-form-item">
+    <div class="layui-input-block">
+    <button type="button" class="layui-btn" lay-submit="" lay-filter="component-form-element"><i class="layui-icon">&#xe654;</i>保存</button>
+    <button type="button" class="layui-btn layui-btn-danger" data-type="close"><i class="layui-icon">&#x1006;</i>返回</button>
+    </div>
+</div>
+</div>
+        
+<script>
+    layui.use(['admin','form','upload','layedit','setter','layer'], function(){
+        var $ = layui.$
+      ,admin = layui.admin
+      ,setter = layui.setter
+      ,element = layui.element
+      ,form = layui.form
+      ,layer = layui.layer
+      ,upload = layui.upload
+      ,layer = layui.layer
+      ,router = layui.router();
+
+        element.render();
+        form.render(null, 'add_autoreply');
+        
+      var $ = layui.$, active = {
+            // 返回
+            close:function(index){ 
+                layer.closeAll('page');
+            }
+        };   
+        $('.layui-input-block .layui-btn').on('click', function(){
+            var type = $(this).data('type');
+            active[type] ? active[type].call(this) : '';
+        });
+
+    });
+</script>

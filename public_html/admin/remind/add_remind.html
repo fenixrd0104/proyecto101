@@ -1,0 +1,122 @@
+<form class="layui-form" action="" lay-filter="add_remind" style="padding: 20px 30px 0 0;">
+<div class="layui-form-item">
+    <label class="layui-form-label">标识</label>
+    <div class="layui-input-block">
+        <script type="text/html" template>                        
+        <input type="text" name="name" lay-verify="required" autocomplete="off" class="layui-input" value="{{ d.params.name || '' }}" >
+        </script>
+    </div>
+    <div class="layui-form-mid layui-input-block layui-word-aux">即发送消息的场景</div>
+</div>
+<div class="layui-form-item">
+    <label class="layui-form-label">参数</label>
+    <div class="layui-input-block">                   
+        <textarea name="param" lay-verify="required" autocomplete="off" placeholder="" class="layui-textarea" id="params_val"></textarea>
+    </div>
+    <div class="layui-form-mid layui-input-block layui-word-aux">例：#name# = 用户名称 (多个参数使用英文,分隔)</div>
+</div>
+<div class="layui-form-item">
+    <label class="layui-form-label">默认状态</label>
+    <div class="layui-input-block remind_box"> 
+        <script type="text/html" template>
+        {{# if(d.params.id){ }}
+        <input type="checkbox" name="auth[]" value="1" id="1" title="短信" lay-skin="primary" >
+        <input type="checkbox" name="auth[]" value="2" id="2" title="邮件" lay-skin="primary" >
+        <input type="checkbox" name="auth[]" value="4" id="4" title="站内信" lay-skin="primary" >
+        <input type="checkbox" name="auth[]" value="8" id="8" title="微信" lay-skin="primary" >
+        <input type="checkbox" name="auth[]" value="16" id="16" title="推送" lay-skin="primary">
+        {{# }else{ }}
+        <input type="checkbox" name="auth[]" value="1"  title="短信" lay-skin="primary" checked>
+        <input type="checkbox" name="auth[]" value="2" title="邮件" lay-skin="primary" >
+        <input type="checkbox" name="auth[]" value="4" title="站内信" lay-skin="primary" >
+        <input type="checkbox" name="auth[]" value="8" title="微信" lay-skin="primary" >
+        <input type="checkbox" name="auth[]" value="16" title="推送" lay-skin="primary" >
+        {{# } }}
+        </script>
+    </div>
+</div>
+<div class="layui-form-item">
+    <div class="layui-input-block">
+    <button type="button" class="layui-btn" lay-submit lay-filter="add_remind_submit"><i class="layui-icon">&#xe654;</i>保存</button>
+    <button type="button" class="layui-btn layui-btn-danger" data-type="close"><i class="layui-icon">&#x1006;</i>返回</button>
+    </div>
+</div>
+</form>
+<script type="text/html" template lay-done="layui.data.sendParams(d.params)"></script>       
+<script>
+layui.data.sendParams = function(params){
+    // console.log(params);
+    
+    layui.use(['admin','form','layer'], function(){
+        var $ = layui.$
+        ,admin = layui.admin
+        ,element = layui.element
+        ,layer = layui.layer
+        ,form = layui.form
+        ,layer = layui.layer
+        ,router = layui.router();
+
+        element.render();
+        form.render(null, 'add_remind');
+        
+        var $ = layui.$, active = {
+            // 返回
+            close:function(index){ 
+                layer.closeAll('page');
+            }
+        };
+        
+        $('.layui-input-block .layui-btn').on('click', function(){
+            var type = $(this).data('type');
+            active[type] ? active[type].call(this) : '';
+        });
+
+
+        if(params.id){
+            var reg = /\"(.*?)\"/g;
+            var str=params.param;
+            str=str.match(reg);
+            str=str[0].slice(1,-1);
+            $('#params_val').val(str);
+
+            admin.req({
+                url: layui.setter.baseUrl+'admin/remind/edit' //实际使用请改成服务端真实接口
+                ,data:{id:params.id},
+                type:'get',
+                success: function(res){
+                    if(res.code==1){
+                    // table.renderData();
+                    var list=res.data.auth_arr;
+                    if( list ){
+                        
+                    } else {
+                        list=[];
+                    }
+                    $('.remind_box input[type="checkbox"]').prop('checked',false);
+                    for(var i of list){    
+                        console.log(i);
+                                          
+                        $('#'+i).prop('checked',true);
+                        form.render();
+                    }
+                    
+                   
+                    }
+                }
+            }); 
+
+        }
+
+
+
+
+
+
+
+
+
+    });
+  
+  
+}
+</script>

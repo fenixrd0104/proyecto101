@@ -1,0 +1,38 @@
+/*
+ * @Author: 王世文1198627433@qq.com 
+ * @Date: 2019-06-19 15:08:56 
+ * @Last Modified by: 王世文1198627433@qq.com
+ * @Last Modified time: 2019-06-19 16:03:12
+ */
+ #worker_top p{
+    margin-top: 15px;
+ }
+ #worker_top span{
+    float:left;
+    display: block;
+    width:100px;
+    line-height: 36px;
+ }
+ #worker_top input{
+    float:left;
+    width:auto;
+ }
+ #worker_bottom p{
+    margin-top: 15px;
+ }
+ #worker_bottom>div>p>span{
+    float:left;
+    display: block;
+    width:100px;
+    line-height: 36px;
+ }
+ #worker_bottom input{
+    float:left;
+    width:auto;
+ }
+ #worker_detail_save{
+     margin-top:20px;
+     padding-top:20px;
+     border-top:1px solid #f2f2f2;
+     text-align: right;
+ }

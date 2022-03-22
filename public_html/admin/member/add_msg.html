@@ -1,0 +1,88 @@
+<div class="layui-form" action="" lay-filter="add_msg" style="padding: 20px 30px 0 0;">
+    <div class="layui-form-item">
+        <label class="layui-form-label">推送标题</label>
+        <div class="layui-input-block">
+            <input type="text" name="title" id="LAY-title" lay-verify="required" autocomplete="off" class="layui-input" >
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">推送方式</label>
+        <div class="layui-input-block" lay-filter="selFilter">
+            <select name="pid" id="LAY-select">
+                <option value="0">个人</option>
+                <option value="1">群体</option>
+            </select>
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">推送对象</label>
+        <div class="layui-input-block">
+            <div class="layui-col-md8">
+                <input type="text" name="search" id="LAY-title" lay-verify="required" autocomplete="off" class="layui-input" >
+            </div>
+            <button type="button" style="margin-left:20px;" class="layui-btn" data-type="search">搜索</button>
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">推送内容</label>
+        <div class="layui-input-block">
+            <textarea name="other" placeholder="" class="layui-textarea"></textarea>
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <div class="layui-input-block">
+        <button type="button" class="layui-btn" lay-submit lay-filter="component-form-element"><i class="layui-icon">&#xe654;</i>保存</button>
+        <button type="button" class="layui-btn layui-btn-danger" data-type="close"><i class="layui-icon">&#x1006;</i>返回</button>
+        </div>
+    </div>
+</div>
+
+<script>        
+layui.use(['admin', 'form','layer','element'], function(){
+    var $ = layui.$
+    ,admin = layui.admin
+    ,layer = layui.layer
+    ,element = layui.element
+    ,layer = layui.layer
+    ,form = layui.form;
+
+    // element.render();
+    form.render(null, 'add_msg');
+    
+    // 搜索
+    var active = {
+        search: function(){
+            var keywords = $("input[name='search']").val();
+            if(keywords == ''){
+                layer.msg('请输入关键词', {icon: 5,time:1500,shade: 0.1}, function(index){
+                    layer.close(index);
+                });
+                return false;
+            }
+
+            layer.open({
+                title:'选择接收人',
+                skin: 'layui-layer-rim', //加上边框
+                area: ['420px', '300px'], //宽高
+                content: '<label><input type="radio" name="search_id" data-name="123"/>123</label><br/>\
+                <label><input type="radio" name="search_id" data-name="666"/>666</label>',
+                yes:function(index,layero){
+                    $("input[name='search']").val($("input[name='search_id']:checked").attr('data-name'));
+                    layer.close(index);
+                }
+
+            });
+        }
+        // 返回--按钮
+        ,close:function(index){ 
+            layer.closeAll('page');
+        }
+    };
+    $('.layui-form-item .layui-btn').on('click', function(){
+        var type = $(this).data('type');
+        active[type] ? active[type].call(this) : '';
+    });
+    
+
+});
+</script>

@@ -1,0 +1,178 @@
+{include file="public/header"/}
+<style>
+    #submit_btn2 {
+        margin-left: 0.1rem;
+        width: 0.8rem;
+        border-right: 1px solid rgba(192, 192, 192, 0.8);
+        display: none;
+    }
+
+    .buy_content {
+        padding-bottom: 0 !important;
+    }
+
+    html,
+    body {
+        height: 100%;
+        min-height: 100%;
+        position: relative;
+    }
+</style>
+</head>
+
+<body style="background: #f2f2f2;">
+    <header class="mui-bar mui-bar-nav index_header shop_head bg_white" id="header">
+        <a class="mui-action-back mui-icon mui-icon-left-nav mui-pull-left" href="javascript:;"></a>
+        <a id="menu" class="mui-action-menu mui-icon mui-icon-bars mui-pull-right" href="javascript:void(0);"></a>
+        <h1 class="mui-title">Auction Pickup</h1>
+    </header>
+    <div class="mui-content buy_content">
+        <!-- Default address information -->
+        <div class="buy_address">
+            <a class="buyadd_txt_a" href="javascript:;">
+                <div class="buyadd_txt">
+                    <span class="name"></span>
+                    <span class="phone"></span>
+                    <p class="address mui-ellipsis"><i class="iconfont icon-dizhi"></i>&nbsp;&nbsp;</p>
+                </div>
+                <i class="iconfont icon-rightArrow"></i>
+            </a>
+            <div class="buyadd_none">
+                <p>Click to select delivery address</p>
+            </div>
+            <div class="bg"><img src="__IMG__/tt.png" alt=""></div>
+        </div>
+        <!-- Product Information -->
+        <div class="buy_cont" id="buy_cont">
+            <div class="buy_store mui-clearfix">
+                <div class="buyst_pic fl"><img src="__IMG__/upload_1.png" alt=""></div>
+                <div class="buyst_content fr">
+                    <h1 class="mui-ellipsis-2"></h1>
+                    <p class="hui"></p>
+                    <p class="red"></p>
+                    <span class="num fr"></span>
+                </div>
+            </div>
+        </div>
+        <!-- Points, Balance -->
+        <ul class="buy_maler">
+            <li>
+                <p class="m_hei fl">Auction Type</p>
+                <p class="m_hei fr" id="type"></p>
+            </li>
+            <li>
+                <p class="m_hei fl">Start time</p>
+                <p class="m_hei fr" id="start_time"></p>
+            </li>
+            <li>
+                <p class="m_hei fl">End time</p>
+                <p class="m_hei fr" id="end_time"></p>
+            </li>
+            <li>
+                <p class="m_hei fl">Number of participants</p>
+                <p class="m_hei fr" id="join_num"></p>
+            </li>
+        </ul>
+    </div>
+    <div class="buy_sumbit mui-clearfix">
+        <button class="sub fr" href="javascript:;" id="submit_btn" onclick="btnorders();">Pick up</button>
+    </div>
+    <div class="goods_choosebg"></div>
+    {include file="public/head_nav"/}
+    {include file="public/footer"/}
+    <script type="text/template" id="address">
+    <span class="name">{{consignee}}</span>
+    <span class="phone">{{mobile}}</span>
+    <p class="address mui-ellipsis"><i class="iconfont icon-dizhi"></i>&nbsp;&nbsp;{{address_detail}}</p>
+</script>
+    <script type="text/html" id="goods_list">
+    <div class="buy_store mui-clearfix">
+        <div class="buyst_pic fl"><img src="{{goods_img}}" alt=""></div>
+        <div class="buyst_content fr">
+            <h1 class="mui-ellipsis-2">{{goods_name}}</h1>
+            <p class="red">Price {{price}}KRC</p>
+            <span class="num fr">×1</span>
+        </div>
+    </div>
+</script>
+    <script>
+        // Get the selected address
+        var address_id = getQueryString('address_id');
+        var id = getQueryString('id');
+        $('.buyadd_txt_a').hide();
+        $('.buyadd_none').show();
+        if (address_id) {
+            $get('/api/address/get_address', { id: address_id }, function (data) {
+                if (data.status == 1) {
+                    var str = '';
+                    str += template('address', data.data);
+                    $('.buyadd_txt').html(str);
+                    $('.buyadd_txt_a').show();
+                    $('.buyadd_none').hide();
+                } else {
+
+                }
+            });
+        }
+        // get default address
+        var url;
+        addresss('/api/auction/get_now_auction', { id: id });
+        function addresss($url, $ppar) {
+            $get($url, $ppar, function (d) {
+                if (d.status == 1) {
+                    var goods_list = template("goods_list", d.data);
+                    $('#buy_cont').html(goods_list);
+                    $('#start_time').html(d.data.start_time);
+                    $('#end_time').html(d.data.end_time);
+                    $('#join_num').html(d.data.join_num);
+                    $('#type').html(d.data.is_private == 1 ?'private auction' : 'public auction');
+                } else {
+                    $('.buyadd_txt_a').hide();
+                    $('.buyadd_none').show();
+                }
+            });
+        }
+
+        // fill in the address
+        $('.buyadd_none').on('tap', function () {
+            window.location.href = "/wap/user/address_select.html?id=" + id;
+        });
+        // pick up
+        function btnorders() {
+            $('#submit_btn2').attr("disabled", "true"); //Set the grayed out button 
+           $('#submit_btn2').html("Submitting...");
+            $get('/api/auction/auction_take_goods', { id: id, address_id: address_id}, function (d) {
+                $('#submit_btn2').removeAttr('disabled');
+                $('#submit_btn2').html('Pick up');
+                if (d.status == 1) {
+                    $$toast(d.msg);
+                    setTimeout(function () {
+                        location.href = '/wap/user/my_auction.html?type=2';
+                    }, 1500);
+                } else {
+                    $$toast(d.msg);
+                }
+            });
+        };
+
+        function $$toast(param) {
+            layer.open({
+                type: 1,
+                skin: 'store_demo', //style class name
+                closeBtn: 0, // do not display the close button
+                anim: 2,
+                title: false, //do not display the title
+                shadeClose: true, //Turn on the mask to close
+                content: param
+            });
+        };
+        // get the parameters  
+        function getQueryString(name) {
+            var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)");
+            var r = window.location.search.substr(1).match(reg);
+            if (r != null) return unescape(r[2]); return null;
+        }
+    </script>
+</body>
+
+</html>

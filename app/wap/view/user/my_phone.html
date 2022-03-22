@@ -1,0 +1,163 @@
+{include file="public/header" /}
+</head>
+<body>
+<header class="mui-bar mui-bar-nav" id="header">
+    <a class="back-page mui-icon mui-icon-left-nav mui-pull-left" href="javascript:;"></a>
+    <a id="menu" class="mui-action-menu mui-icon mui-icon-bars mui-pull-right" href="javascript:;"></a>
+   <h1 class="mui-title">Modify phone number or email</h1>
+</header>
+<div class="mui-content register-content">
+    <div class="mui_type hide">
+        <span data-type="mobile" class="active">Modify phone number</span>
+        <span data-type="email">Modify Email</span>
+    </div>
+    <div class="mb10"></div>
+    <form class="mui-input-group xx_form">
+        <div class="mui-input-row mui_phone">
+            <label>Old phone number</label>
+            <input type="tel" id="old_mobile" placeholder="Please enter the old mobile number" readonly>
+        </div>
+        <div class="mui-input-row mui_email hide">
+            <label>Old mailbox</label>
+            <input type="tel" id="old_email" placeholder="Please enter the old email address" readonly>
+        </div>
+        <div class="mui-input-row mui_phone">
+            <!-- <label>New phone number</label> -->
+            <div class="m_row flex_between">
+                <select id="country_code">
+                    <!-- <option value="">+86China</option> -->
+                </select>
+                <input type="tel" id="phone" placeholder="Confirm new phone number">
+            </div>
+        </div>
+        <div class="mui-input-row mui_email hide">
+            <label>New Email</label>
+            <input type="text" id="email" placeholder="Confirm new email"">
+        </div>
+        <div class="mui-input-row">
+           <label>Captcha</label>
+            <input type="text" id="verify" placeholder="Please enter the verification code" style="width: 46%;float: left;">
+            <button class="btn_code fr" id="btn_code" type="button" style="margin-right: 0.05rem;">Get verification code</button>
+        </div>
+        <div class="mb30"></div>
+        <div class="mui-button-row">
+            <button type="button" id="submit_btn" class="submit_btn" onclick="return false;">Confirm modification</button>
+        </div>
+    </form>
+</div>
+
+{include file="public/head_nav"/}
+{include file="public/footer"/}
+<script type="text/javascript">
+var type=getQueryString('type');
+if(type=="mobile"){
+    $('.mui_phone').show();        
+    $('.mui_email').hide();        
+} else{    
+    $('.mui_email').show();  
+    $('.mui_phone').hide();    
+}
+// Get country code
+get_select();
+function get_select(){
+    $get("/api/user/get_country_code", { }, function (d) {     
+        if (d.code == 1) {
+            var list="";
+            for( var i in d.data){
+                list+='<option value="'+d.data[i].id+'">+'+d.data[i].id+d.data[i].name+'</option>';
+            }
+            $('#country_code').html(list);
+        } else{
+            mui.toast(d.msg);
+        }         
+    });
+}; 
+// Email or mobile number
+$('.mui_type>span').click(function(){
+    $(this).addClass('active').siblings().removeClass('active');
+    var type=$(this).attr('data-type');
+    if(type=="mobile"){
+        $('.mui_phone').show();        
+        $('.mui_email').hide();        
+    } else{    
+        $('.mui_email').show();  
+        $('.mui_phone').hide();    
+    }
+}); 
+// Modify phone number or email
+$('#submit_btn').on('tap', function () {
+    var phone = '';
+    var verify = $('#verify').val();
+    // var check_type = $('.mui_type .active').attr('data-type');
+    var check_type = type;
+
+    if(check_type=="email"){
+        phone = $('#email').val();
+    } else{
+        phone = $('#phone').val();
+    }
+
+    if (phone=="") {
+        mui.toast('Please enter your phone number or email');
+    } else if (verify=="") {
+        mui.toast('Please enter the verification code');
+    } else {
+    $get("/api/user/editmobile", { check_type:check_type,phone:phone,verify:verify }, function (d) {
+        mui.toast(d.msg);
+        if (d.code == 1) {
+            setTimeout(function () {
+                mui.back();
+                localStorage.setItem('load_list','true');
+            }, 1500);
+        }
+    });
+    }
+});
+// get default information
+$get('/api/user/getuserinfo',{},function(data){
+    if(data.code==1){
+        $('#old_mobile').val(data.data.mobile);
+        $('#old_email').val(data.data.email);
+    }else{
+        // mui.toast(data.msg);
+    }
+});
+// get verification code
+$('#btn_code').click(function(){
+    var country_code='';
+    var phone='';
+    // var check_type = $('.mui_type .active').attr('data-type');
+    var check_type = type;
+    var obj = $('#btn_code');
+    if(check_type==""){
+        return;
+    }
+    if(check_type=="email"){
+        country_code="86";
+        phone = $('#email').val();
+    } else{
+        country_code = $('#country_code').val();
+        phone = $('#phone').val();
+    }
+    if(phone==''){
+        mui.toast('Please enter your phone number or email');
+    } else{
+    $get("/api/user/send_login_verify", { country_code:country_code,phone:phone,check_type:check_type }, function (d) {
+        mui.toast(d.msg);       
+        if (d.code == 1) {
+            settime(obj);
+        } else{            
+        }         
+    });
+    }
+});
+
+// address bar information    
+function getQueryString(name){
+    var reg = new RegExp("(^|&)"+ name +"=([^&]*)(&|$)");
+    var r = window.location.search.substr(1).match(reg);
+    if(r!=null)return  unescape(r[2]); return null;
+}
+</script>
+</body>
+</html>

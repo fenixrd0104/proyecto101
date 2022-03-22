@@ -1,0 +1,335 @@
+<form class="layui-form" action="" lay-filter="add_member" style="padding: 20px 30px 0 0;">
+<script type="text/html" template> 
+  <div class="layui-form-item">
+    <label class="layui-form-label">账号</label>
+    <div class="layui-input-block">                       
+        <input type="text" name="account" lay-verify="required"  placeholder="请输入账号" autocomplete="off" class="layui-input" value="{{ d.params.account || '' }}" >
+    </div>
+  </div>
+  <div class="layui-form-item">
+    <label class="layui-form-label">昵称</label>
+    <div class="layui-input-block">                      
+      <input type="text" name="nickname" lay-verify="required"   placeholder="请输入昵称" autocomplete="off" class="layui-input" value="{{ d.params.nickname || '' }}" >
+    </div>
+  </div>
+  <div class="layui-form-item">
+    <label class="layui-form-label">会员等级</label>
+    <div class="layui-input-block">
+      <select name="dl_level" id="dl_level">
+        <option value="0">S0</option>
+        <option value="1">SS</option>
+        <option value="2">SSS</option>
+        <option value="3">SSSS</option>
+      </select>      
+    </div>
+  </div>
+  <div class="layui-form-item">
+    <label class="layui-form-label">会员类型</label>
+    <div class="layui-input-block">
+      <select name="is_set_type" id="is_set_type">
+        <option value="">==请选择==</option>
+        <option value="2">用户会员</option>
+        <option value="1">客服会员</option>
+      </select>      
+    </div>
+  </div>
+  <div class="layui-form-item">
+    <label class="layui-form-label">密码</label>
+    <div class="layui-input-block"> 
+      <input type="password" name="password"  placeholder="请输入密码" autocomplete="off" class="layui-input"  value="" >                     
+    </div>
+  </div> 
+  <div class="layui-form-item">
+    <label class="layui-form-label">交易密码</label>
+    <div class="layui-input-block"> 
+      <input type="password" name="pay_password"  placeholder="请输入交易密码" autocomplete="off" class="layui-input"  value="" >                     
+    </div>
+  </div>
+  <div class="layui-form-item">
+    <label class="layui-form-label">头像</label>
+    <div class="layui-input-inline">
+      <input name="head_img" id="goods_img" placeholder="图片地址" value="{{ d.params.head_img || '' }}" class="layui-input" style="width:200px;margin-right:20px;">
+    </div>
+    <div class="layui-input-inline layui-btn-container" style="width: auto;margin-left:20px;">
+        <button type="button" class="layui-btn" id="LAY_avatarUpload"><i class="layui-icon">&#xe67c;</i>上传图片</button>
+        <a class="layui-btn layui-btn-primary" onclick="see_img();">查看图片</a>
+    </div> 
+  </div>
+  <div class="layui-form-item">
+    <label class="layui-form-label">国家代码</label>
+    <div class="layui-input-block">
+      <input type="text" name="country_code"  placeholder="请输入国家代码" autocomplete="off" class="layui-input" value="{{ d.params.country_code || '' }}" >
+    </div>
+  </div>
+  <div class="layui-form-item">
+    <label class="layui-form-label">手机号</label>
+    <div class="layui-input-block">                     
+      <input type="text" name="mobile"  placeholder="请输入手机号" autocomplete="off" class="layui-input" value="{{ d.params.mobile || '' }}" >    
+    </div>
+  </div>
+  <div class="layui-form-item">
+    <label class="layui-form-label">邮箱</label>
+    <div class="layui-input-block">                       
+      <input type="text" name="email"  placeholder="请输入邮箱" autocomplete="off" class="layui-input" value="{{ d.params.email || '' }}" >    
+    </div>
+  </div>
+  <div class="layui-form-item">
+    <label class="layui-form-label">伞下动态奖励</label>
+    <div class="layui-input-block">                       
+      <input type="text" name="jldong"  placeholder="城市节点伞下动态奖励（非节点默认为0）" autocomplete="off" class="layui-input" value="{{ d.params.jldong || '' }}" >
+    </div>
+  </div>
+  <div class="layui-form-item">
+    <label class="layui-form-label">伞下动态币奖励</label>
+    <div class="layui-input-block">                       
+      <input type="text" name="jldongb"  placeholder="城市节点伞下动态币奖励（非节点默认为0）" autocomplete="off" class="layui-input" value="{{ d.params.jldongb || '' }}" >
+    </div>
+  </div>
+  <div class="layui-form-item">
+    <label class="layui-form-label">伞下升级奖励</label>
+    <div class="layui-input-block">
+      <input type="text" name="jlzhitui"  placeholder="城市节点伞下升级奖励（非节点默认为0）" autocomplete="off" class="layui-input" value="{{ d.params.jlzhitui || '' }}" >
+    </div>
+  </div>
+  <div class="layui-form-item">
+    <label class="layui-form-label">节点包裹奖励</label>
+    <div class="layui-input-block">
+      <input type="text" name="jlbaoguo"  placeholder="城市节点包裹奖励（非节点默认为0）" autocomplete="off" class="layui-input" value="{{ d.params.jlbaoguo || '' }}" >
+    </div>
+  </div>
+  <div class="layui-tab-item layui-show">
+    <div class="layui-form-item" style="margin-bottom: 0;">
+        <label class="layui-form-label">选择地区</label>
+        <div class="layui-input-inline">
+          <select id="province" lay-filter="province">
+              <option value="">请选择省</option>
+          </select>
+        </div>
+        <div class="layui-input-inline">
+          <select name="city" id="city" lay-filter="city">
+              <option value="">请选择市</option>
+          </select>
+        </div>
+    </div>
+  </div>
+  <div class="layui-form-item">
+    <div class="layui-input-block">
+      <button type="button" class="layui-btn" lay-submit lay-filter="vip_submit"><i class="layui-icon layui-icon-link"></i>保存</button>
+    </div>
+  </div>
+</script>    
+</form>
+  
+        
+<script type="text/html" template lay-done="layui.data.sendParams(d.params)"></script>    
+<script>
+layui.data.sendParams = function(params){
+     var  id=params.id;
+ 
+     layui.use(['admin','form','upload','layedit','view','setter','layer'], function(){
+      var $ = layui.$
+      ,admin = layui.admin
+      ,setter = layui.setter
+      ,layedit = layui.layedit
+      ,layer = layui.layer
+      ,element = layui.element
+      ,form = layui.form
+      ,layer = layui.layer
+      ,view = layui.view
+      ,upload = layui.upload
+      ,router = layui.router();
+
+    element.render();
+    form.render(null, 'add_member');
+    
+    window.see_img=function(){
+        var i = $('#goods_img').val();
+
+        layer.photos({
+            photos: {
+                title: "查看头像",
+                data: [{
+                    src: i
+                }]
+            },
+            shade: 0.5,
+            closeBtn: 1,
+            anim: 5
+        });
+      };
+      //多图片上传
+      upload.render({
+        elem: '#LAY_avatarUpload'
+        ,url: layui.setter.baseUrl+'admin/upload/upload'
+        ,multiple: true
+        ,before: function(obj){
+            //预读本地文件示例，不支持ie8
+            obj.preview(function(index, file, result){
+                $('#upload_goods_images_box').append('<img src="'+ result +'" alt="'+ file.name +'" class="layui-upload-img" style="width:120px;height:120px;margin:0 15px 15px 0px;">')
+            });
+        }
+        ,done: function(res){
+            //上传完毕
+            $('#goods_img').val(res.data);
+        }
+      });
+    var $ = layui.$, active = {
+      // 返回--按钮
+      close:function(index){ 
+       layer.closeAll('page');
+      }
+    };
+    
+    $('.layui-input-block .layui-btn').on('click', function(){
+      var type = $(this).data('type');
+      active[type] ? active[type].call(this) : '';
+    });
+
+    // // 获取数据
+    // if(params.id){
+    //   if(dl_level == 3){
+    //     $('#province').val(params.province);
+    //   }
+    //   $('#dl_level').val(params.dl_level);
+    // }else{
+    //   //添加
+    //   admin.req({
+    //         url: layui.setter.baseUrl+'admin/member/add_member' 
+    //         ,data:{},
+    //         type:'get',
+    //         success: function(res){
+    //         if(res.code==1){
+    //             var list='<option value="">==请选择会员组==</option>';
+    //             for(var i in res.data.group){
+    //               list+='<option value="'+res.data.group[i].id+'">'+res.data.group[i].group_name+'</option>'
+    //             }
+    //             $('#group').html(list);
+    //             form.render();
+    //             }else{
+    //                 layer.msg(res.msg, {icon: 5,anim: 6,shade:0.5,time: 1500});
+    //             }
+    //         }
+    //     });
+
+    // }
+
+    // 三级联动
+    var str='';
+    var cur_data='';
+    admin.req({
+        url: layui.setter.baseUrl+'admin/login/getRegionTree' //实际使用请改成服务端真实接口
+        ,data: {},
+        type:'get',
+        success: function(res){
+            if(res.code==1){
+                str=res.data;
+                var list="<option value=''>请选择省</option>";
+                for( var i in res.data){
+                    list += "<option value='"+res.data[i].value+"'>"+res.data[i].text+"</option> ";
+                }  
+                if(params.province){
+                    $("#province").html(list);
+                    $('#province').val(params.province);
+                    for(var i in str){
+                        if(str[i].value===params.province){
+                            var city="";
+                            var city_data=str[i].children;
+                            for(var j in city_data){
+                                city += "<option value='"+city_data[j].value+"'>"+city_data[j].text+"</option> ";
+                                if(city_data[j].value===params.city){
+                                    
+                                    var area="";
+                                    var area_data=city_data[j].children;
+                                    
+                                    if(area_data){
+                                        for(var k in area_data){
+                                            area+="<option value='"+area_data[k].value+"'>"+area_data[k].text+"</option> ";
+                                        }
+                                        $("#area").html(area);
+                                        $("#area").val(params.area);
+                                    }else{
+                                        area_data=city_data;
+                                        for(var k in area_data){
+                                            area+="<option value='"+area_data[k].value+"'>"+area_data[k].text+"</option> ";
+                                        }
+                                        $("#area").html(area);
+                                        $("#area").val(params.area);
+                                    }
+                                }
+                            }
+                            $("#city").html(city);
+                            $("#city").val(params.city);
+                        }
+                    }
+                }else{
+                    $("#province").html(list);
+                }
+                if(params.id){
+                  form.val('add_member',{
+                    dl_level:params.dl_level,
+                    is_set_type:params.is_set_type
+                  });
+                }   
+
+                form.render('select');  
+            }else{
+                layer.msg(res.msg);
+            }            
+        } 
+    }); 
+  
+    form.on('select(province)',function(e){
+        get_tree(e.value,0,0);
+        $("#area").html('');
+        form.render();
+    });
+    // 选择市
+    form.on('select(city)',function(e){
+        get_tree($('#province').val(),e.value,0);
+    });
+    // 选择区县
+    form.on('select(area)',function(e){ });
+    // p 省  c 市  a 区   
+    function get_tree(p,c,a){
+        for(var i in str){
+            if(str[i].value==p){
+                var city="<option value=''>请选择市</option>";
+                var city_data=str[i].children;
+                for(var j in city_data){
+                    city += "<option value='"+city_data[j].value+"'>"+city_data[j].text+"</option> ";
+                    if(city_data[j].value==c){
+                        var area="<option value=''>请选择区/县</option>";
+                        var area_data=city_data[j].children;
+                        
+                        if(area_data){
+                            for(var k in area_data){
+                                area+="<option value='"+area_data[k].value+"'>"+area_data[k].text+"</option> ";
+                            }
+                            $("#area").html(area);
+                            form.render();
+                        }else{
+                            area_data=city_data;
+                            for(var k in area_data){
+                                area+="<option value='"+area_data[k].value+"'>"+area_data[k].text+"</option> ";
+                            }
+                            $("#area").html(area);
+                            
+                            form.render();
+                        }
+                        
+                        
+                    }
+                }
+                $("#city").html(city);
+                if(c!=0){
+                    $("#city").val(c);
+                }
+                
+                form.render();
+            }
+        }
+    }
+    
+  });
+}
+</script>

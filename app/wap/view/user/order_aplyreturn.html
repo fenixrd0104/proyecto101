@@ -1,0 +1,199 @@
+{include file="public/header" /}
+</head>
+<body style="background: #f8f8f8;">
+<header class="mui-bar mui-bar-nav bg_white" id="header">
+    <a class="mui-action-back mui-icon mui-icon-left-nav mui-pull-left" href="javascript:;"></a>
+    <a id="menu" class="mui-action-menu mui-icon mui-icon-bars mui-pull-right" href="javascript:;"></a>
+    <h1 class="mui-title">Request a refund</h1>
+</header>
+<div class="mui-content">
+    <div class="mb10"></div>
+    <ul class="aply_ul">
+        <li>
+            <img src="__IMG__/touxiang.png" alt="">
+            <div class="aply_txt">
+                <h3></h3>
+                <p></p>
+            </div>
+        </li>
+    </ul>
+    <div class="mb10"></div>
+    <form class="mui-input-group apply_form">
+        <div class="mui-input-row mui_change">
+            <label>Refund Type</label>
+            <input type="text" id="refund_type" placeholder="Please select" disabled>
+        </div>
+        <div class="mb10"></div>
+        <div class="mui-input-row">
+            <label>Reason for refund</label>
+            <input type="text" id="reason" placeholder="Please select" readonly>
+        </div>
+        <div class="mui-input-row">
+            <label>Refund Instructions</label>
+            <input type="text" id="describe" placeholder="optional">
+        </div>
+        <div class="mb10"></div>
+        <div class="mui-input-row">
+            <label>Upload Credentials</label>
+            <div class="mb"></div>
+            <div class="groupImg" id="apply_groupImg">
+                <input type="file" class="choose" accept="image/*" multiple>
+                <ul class="img-list">
+                    <div class="upload img_add"><i class="iconfont icon-jia"></i><p class="text-mini">Add image</p></div>
+                </ul>
+                <div class="mui-clearfix"></div>
+            </div>
+        </div>
+        <div class="mui-button-row bottom_btn">
+            <button type="button" id="submit_btn" class="submit_btn" onclick="return false;">Confirm refund</button>
+        </div>
+    </form>
+</div>
+
+{include file="public/head_nav"/}
+{include file="public/footer"/}
+<script type="text/html" id="list">
+<li>
+    <img src="{{img}}" alt="">
+    <div class="aply_txt">
+        <h3>{{goods_name}}</h3>
+        <p>{{spec_key_name}}</p>
+    </div>
+</li>
+</script>
+<script type="text/javascript">
+var order_id=getQueryString('order_id');
+var par={
+    order_id:order_id,
+    refund_type:'',
+    reason:'',
+    describe:'',
+    imgs:''
+};
+// upload picture
+imgFileupload(4,'.choose','/api/user/upload');
+
+var now_status='';
+get_data();
+function get_data(){
+    $get('/api/order/order_detail',{order_id:order_id}, function(data) {
+        if (data.status == 1) {
+            shipping_status=data.data.shipping_status;
+            if(shipping_status==0){
+               $('#refund_type').val('I want a refund (no return required)');
+                par.refund_type='0';
+                $('.mui_courier').hide();
+            } else{
+                $('#refund_type').val('I want to return a refund');  
+                par.refund_type='1';  
+                $('.mui_courier').show();
+            }
+            var list='';
+            for( var i in data.data.goods_list){
+                list += template('list', data.data.goods_list[i]);
+            }
+            $('.aply_ul').html(list);
+        } else {
+            
+        }
+    });
+};
+
+mui.init();
+// refund type
+mui.ready(function() {
+    var userPicker = new mui.PopPicker();
+    userPicker.setData([{
+        value: 0,
+        text: 'I want a refund (no return required)'
+    },
+    {
+        value: 1,
+        text: 'I want to return a refund'
+    }
+    ]);
+    var showUserPickerButton = document.getElementById('refund_type');
+    showUserPickerButton.addEventListener('tap', function(event) {
+        userPicker.show(function(items) {
+            $('#refund_type').val( (items[0] || {}).text );  
+            par.refund_type=(items[0] || {}).value;  
+        });
+    }, false);
+});
+// reason for return
+mui.ready(function() {
+    var userPicker = new mui.PopPicker();
+    userPicker.setData([{
+        value: 0,
+        text: 'Multiple shots/wrong shots/don't want'
+    }, {
+        value: 1,
+        text: 'The courier has not been delivered'
+    },{
+        value: 2,
+        text: 'Express no tracking record'
+    },{
+        value: 3,
+        text: 'Empty Package/Short Item'
+    },{
+        value: 4,
+        text: 'Quality problem'
+    },{
+        value: 5,
+        text: 'The color/style/pattern does not match the description'
+    },{
+        value: 6,
+        text: 'other'
+    }]);
+    var showUserPickerButton = document.getElementById('reason');
+    showUserPickerButton.addEventListener('tap', function(event) {
+        userPicker.show(function(items) {
+            $('#reason').val( (items[0] || {}).text );            
+            par.reason= (items[0] || {}).text;            
+        });
+    }, false);
+});
+
+
+// submit
+$('#submit_btn').click(function(){
+    $('#submit_btn').attr("disabled","true"); //Set the grayed out button
+    setTimeout("$('#submit_btn').removeAttr('disabled')",3000); //Submit button display after setting three seconds
+    
+    var imgs='';
+    var describe=$('#describe').val();
+    var refund_kddh=$('#refund_kddh').val();
+    $('.img-list li').each(function() {
+        var src=$(this).attr('data-src');
+        imgs+=src+'@';
+    });
+    imgs = imgs.substr(0,imgs.length-1);
+    par.imgs=imgs;
+    par.describe=describe;
+
+    if(par.refund_type===""){
+        mui.toast('Please select a refund type');
+    } else if(par.reason==""){
+        mui.toast('Please select the reason for refund');
+    } else{   
+    $get('/api/order/return_goods',par, function(data) {
+        if (data.status == 1) {
+            mui.toast(data.msg);   
+            setTimeout(function(){
+                mui.back();
+            },1000);  
+        } else {
+            mui.toast(data.msg);            
+        }
+    });         
+    } 
+});
+// address bar information    
+function getQueryString(name){
+    var reg = new RegExp("(^|&)"+ name +"=([^&]*)(&|$)");
+    var r = window.location.search.substr(1).match(reg);
+    if(r!=null)return  unescape(r[2]); return null;
+}
+</script>
+</body>
+</html>

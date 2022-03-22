@@ -1,0 +1,75 @@
+ <div class="layui-form" lay-filter="add_cate" style="padding: 20px 30px 0 0;">
+  <div class="layui-form-item">
+    <label class="layui-form-label">模块分类</label>
+    <div class="layui-input-block">
+      <script  type="text/html" template>
+      <select name="top_cate" lay-filter="top_cate">
+        <!-- <option value="1" {{ d.params.top_cate=== 1 ? 'selected': '' }}>VIP商品</option> -->
+        <option value="2" {{ d.params.top_cate=== 2 ? 'selected': '' }}>优享商品</option>
+        <option value="3" {{ d.params.top_cate=== 3 ? 'selected': '' }}>特惠商品</option>
+        <option value="4" {{ d.params.top_cate=== 4 ? 'selected': '' }}>直购</option>
+        <option value="5" {{ d.params.top_cate=== 5 ? 'selected': '' }}>高端</option>
+      </select>
+      </script>
+    </div>
+  </div>
+  <div class="layui-form-item">
+    <label class="layui-form-label">分类名称</label>
+    <div class="layui-input-block">
+      <!-- <input type="text" name="fullname" lay-verify="required" autocomplete="off" class="layui-input"> -->
+      <script type="text/html" template>                        
+        <input type="text" name="name" lay-verify="required" autocomplete="off" class="layui-input" value="{{ d.params.name || '' }}" placeholder="请输入分类名称">
+      </script>
+    </div>
+  </div>
+  <div class="layui-form-item">
+    <label class="layui-form-label">状态</label>
+    <div class="layui-input-block">
+        <script  type="text/html" template>
+          {{# if(d.params.id){ }}
+              <input type="radio" name="status" value="0" title="开启" {{ d.params.status=== 0 ? 'checked': '' }} >
+              <input type="radio" name="status" value="1" title="关闭" {{ d.params.status=== 1 ? 'checked': '' }}>
+          
+          {{# }else{ }}
+              <input type="radio" name="status" value="0" title="开启" checked>
+              <input type="radio" name="status" value="1" title="关闭" >
+          {{# } }}
+        </script>
+      
+    </div>
+  </div>
+  <div class="layui-form-item">
+    <div class="layui-input-block">
+      <button type="button" class="layui-btn" lay-submit lay-filter="submit_index_cate"><i class="layui-icon">&#xe654;</i>保存</button>
+      <button type="button" class="layui-btn layui-btn-danger" data-type="close"><i class="layui-icon">&#x1006;</i>返回</button>
+    </div>
+  </div>
+</div>
+    
+    <script>
+    layui.use(['admin','form','setter','layer'], function(){
+      var $ = layui.$
+      ,admin = layui.admin
+      ,setter = layui.setter
+      ,element = layui.element
+      ,form = layui.form
+      ,layer = layui.layer
+      ,router = layui.router();
+  
+      element.render();     
+      form.render(null, 'add_cate');
+      
+      var $ = layui.$, active = {
+        // 返回
+        close:function(index){ 
+         layer.closeAll('page');
+        }
+      };
+      
+      $('.layui-input-block .layui-btn').on('click', function(){
+        var type = $(this).data('type');
+        active[type] ? active[type].call(this) : '';
+      });
+  
+    });
+    </script>

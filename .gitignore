@@ -1,0 +1,6 @@
+/.idea
+/.vscode
+runtime
+*.log
+public_html/.user.ini
+/public_html/*.ini

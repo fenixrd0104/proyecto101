@@ -1,0 +1,55 @@
+<style>
+.generate .layui-form-item{ margin-bottom: 25px;}
+.generate .layui-form-label{ width: 88px;}
+.generate .layui-input-block{ margin-left: 118px;}
+</style>
+
+<div class="layui-form generate" lay-filter="choose_time" style="padding: 20px 30px 0 0;">
+    <div class="layui-form-item">
+        <label class="layui-form-label">对账开始日期</label>
+        <div class="layui-input-block">
+            <input name="start_time" type="text" class="layui-input" id="datetime_start" placeholder="对账开始日期" lay-verify="required" autocomplete="off">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">对账结束日期</label>
+        <div class="layui-input-block">
+            <input name="end_time" type="text" class="layui-input" id="datetime_end" placeholder="对账结束日期" lay-verify="required" autocomplete="off">
+        </div>
+    </div>    
+    <div class="layui-form-item">
+        <div class="layui-input-block">
+            <button type="button" class="layui-btn" lay-submit lay-filter="component-form-element"><i class="layui-icon">&#xe654;</i>保存</button>
+        </div>
+    </div>
+</div>
+    
+<script>
+layui.use(['admin','form','layer',"laydate"], function(){
+    var $ = layui.$
+    ,admin = layui.admin
+    ,element = layui.element
+    ,form = layui.form
+    ,layer = layui.layer
+    ,laydate = layui.laydate
+    ,router = layui.router();
+
+    element.render();
+    form.render(null, 'choose_time');
+
+    //日期时间选择器
+    laydate.render({
+        elem: '#datetime_start'
+        ,type: 'datetime'
+        ,trigger: 'click'
+    });
+    laydate.render({
+        elem: '#datetime_end'
+        ,type: 'datetime'
+        ,trigger: 'click'
+    });
+    
+    
+
+});
+</script>

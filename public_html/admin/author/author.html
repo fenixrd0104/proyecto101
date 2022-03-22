@@ -1,0 +1,153 @@
+<title>员工权限</title>
+<script type="text/html" template>
+    <link rel="stylesheet" href="{{ layui.setter.base }}style/store.css?v={{ layui.admin.v }}-1" media="all">
+</script>
+<div class="layui-fluid" id="component-tabs">
+        <div class="layui-row">
+          <div class="layui-col-md12">
+            <div class="layui-card">
+              <div class="layui-card-header">员工权限</div>
+              <div class="layui-card-body">
+                <div class="layui-tab">
+                  <ul class="layui-tab-title">
+                    <li class="layui-this">后台权限</li>
+                    <li>收银权限</li>
+                  </ul>
+                  <div class="layui-tab-content">
+                      <!-- 后台权限 -->
+                    <div class="layui-tab-item layui-show">
+                        <form class="layui-form" lay-filter="author_form">
+                            <div class="layui-form-item">
+                                <label class="layui-form-label">模块</label>
+                                <div class="layui-input-inline">
+                                    <select name="province" id="province" lay-filter="province">
+                                        <option value="">选择模块</option>
+                                        <option value="0">管理中心</option>
+                                        <option value="1" selected>客户中心</option>
+                                        <option value="2">业务中心</option>
+                                        <option value="3">监管中心</option>
+                                        <option value="4">客服中心</option>
+                                        <option value="5">商品管理</option>
+                                    </select>
+                                </div>
+                                <!-- <div class="layui-form-mid" style="color:#3399ea;cursor:pointer;">显示全部</div> -->
+                            </div>
+                            <div class="layui-form-item">
+                                <label class="layui-form-label">是否全选</label>
+                                <div class="layui-input-block">
+                                    <input type="checkbox" name="all_check" lay-skin="switch" lay-text="是|否" lay-filter="all_check">
+                                </div>
+                            </div>
+                            <div class="layui-form-item">
+                                <label class="layui-form-label">权限</label>
+                                <div class="layui-input-block" id="curr_quanxian">
+                                    <input type="checkbox" name="" title="发呆438" lay-skin="primary"> 
+                                    <input type="checkbox" name="" title="388" lay-skin="primary" checked>
+                                    <input type="checkbox" name="" title="发呆86" lay-skin="primary"> 
+                                    <input type="checkbox" name="" title="写作合格" lay-skin="primary" checked>
+                                    <input type="checkbox" name="" title="发呆单位" lay-skin="primary"> 
+                                    <br>
+                                    <input type="checkbox" name="" title="写作让" lay-skin="primary" checked>
+                                    <input type="checkbox" name="" title="发呆偶" lay-skin="primary"> 
+                                    <input type="checkbox" name="" title="写作我认为" lay-skin="primary" checked>
+                                    <input type="checkbox" name="" title="发呆" lay-skin="primary"> 
+                                    <input type="checkbox" name="" title="写作" lay-skin="primary" checked>
+                                    <input type="checkbox" name="" title="发呆" lay-skin="primary"> 
+                                </div>
+                            </div>
+                            <div class="layui-form-item" style="margin-top: 30px;padding-top:20px;border-top:1px solid #f2f2f2;">
+                                <div class="layui-input-block">
+                                    <a class="layui-btn">保存</a>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                    <div class="layui-tab-item">
+                        <div class="layui-form">
+                            <div class="layui-form-item">
+                                <label class="layui-form-label" style="width:100px;">收银销售功能</label>
+                                <div class="layui-input-block">
+                                    <input type="checkbox" name="" title="发呆438" lay-skin="primary"> 
+                                    <input type="checkbox" name="" title="388" lay-skin="primary" checked>
+                                    <input type="checkbox" name="" title="发呆86" lay-skin="primary"> 
+                                    <input type="checkbox" name="" title="写作合格" lay-skin="primary" checked>
+                                    <input type="checkbox" name="" title="发呆单位" lay-skin="primary"> 
+                                    <input type="checkbox" name="" title="写作让" lay-skin="primary" checked>
+                                    <br>
+                                    <input type="checkbox" name="" title="发呆偶" lay-skin="primary"> 
+                                    <input type="checkbox" name="" title="写作我认为" lay-skin="primary" checked>
+                                    <input type="checkbox" name="" title="发呆" lay-skin="primary"> 
+                                    <input type="checkbox" name="" title="写作" lay-skin="primary" checked>
+                                    <input type="checkbox" name="" title="发呆" lay-skin="primary"> 
+                                </div>
+                            </div>
+                            <div class="layui-form-item">
+                                <label class="layui-form-label" style="width:100px;">收银结算功能</label>
+                                <div class="layui-input-block">
+                                    <input type="checkbox" name="" title="发呆438" lay-skin="primary"> 
+                                    <input type="checkbox" name="" title="388" lay-skin="primary" checked>
+                                    <input type="checkbox" name="" title="发呆86" lay-skin="primary"> 
+                                    <input type="checkbox" name="" title="写作合格" lay-skin="primary" checked>
+                                    <input type="checkbox" name="" title="发呆单位" lay-skin="primary"> 
+                                    <input type="checkbox" name="" title="写作让" lay-skin="primary" checked>
+                                    <br>
+                                    <input type="checkbox" name="" title="发呆偶" lay-skin="primary"> 
+                                    <input type="checkbox" name="" title="写作我认为" lay-skin="primary" checked>
+                                    <input type="checkbox" name="" title="发呆" lay-skin="primary"> 
+                                    <input type="checkbox" name="" title="写作" lay-skin="primary" checked>
+                                    <input type="checkbox" name="" title="发呆" lay-skin="primary"> 
+                                </div>
+                            </div>
+                        </div>
+                        <div class="layui-form-item" style="margin-top: 30px;padding-top:20px;border-top:1px solid #f2f2f2;">
+                            <div class="layui-input-block">
+                                <a class="layui-btn">保存</a>
+                            </div>
+                        </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+           
+          
+         </div>
+ </div>
+      
+</div>
+
+<script>
+    layui.use(['admin','form','setter','layer'], function(){
+      var $ = layui.$
+      ,admin = layui.admin
+      ,setter = layui.setter
+      ,view = layui.view
+      ,table = layui.table
+      ,layer = layui.layer
+      ,form = layui.form;
+        
+
+      form.render('checkbox');
+      form.render(null, 'author_form');
+
+
+    // 全选按钮监听
+      form.on('switch(all_check)', function(obj){
+        // console.log(obj.elem.checked);
+        var sta=obj.elem.checked;
+        // layer.msg('当前状态：'+sta);
+        if(sta==true){
+            $('#curr_quanxian input').prop('checked',true);
+            
+        }else{
+            $('#curr_quanxian input').prop('checked',false);
+        }
+        form.render();
+      });
+    
+
+    
+
+    });
+    
+</script>

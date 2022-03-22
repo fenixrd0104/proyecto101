@@ -1,0 +1,159 @@
+{include file="public/header" /}
+</head>
+
+<body style="background: #f0f0f0;">
+    <header class="mui-bar mui-bar-nav bg_white" id="header">
+        <a class="mui-action-back mui-icon mui-icon-left-nav mui-pull-left" href="javascript:;"></a>
+        <a id="menu" class="mui-action-menu mui-icon mui-icon-bars mui-pull-right" href="javascript:;"></a>
+        <h1 class="mui-title">Transaction</h1>
+            </header>
+            <div class="mui-content">
+                <div>
+                    <ul class="flex dh_box">
+                        <li>
+                            <div class="bod-left">
+                                <div class="flex">
+                                    <img class="spend_img" src="__IMG__/temp/bidui.png" alt="">
+                                    <span class="text-gold spend_bi">KRC</span>
+                                </div>
+                                <div>
+                                    <p>Cost</p>
+                                    <input id="spend_num" type="number" value="100">
+                                </div>
+                            </div>
+                        </li>
+                        <li><img src="__IMG__/dh.png" alt="" class="change" onclick="change()"></li>
+                        <li>
+                            <div class="bod-right">
+                                <div class="flex">
+                                    <img class="get_img" src="__IMG__/temp/USDT.png" alt="">
+                                    <span class="text-gold get_bi">USDT</span class="text-gold">
+                                </div>
+                                <div>
+                                    <p>Get</p>
+                            <input id="get_num" type="text" readonly onfocus="this.blur();">
+                        </div>
+                    </div>
+                </li>
+            </ul>
+        </div>
+        <div class="p-10">
+           <p>Balance: <span id="rest_num">0.00</span> <span class="text-gold spend_bi">KRC</span></p>
+                       <div class="mb5"></div>
+                       <!-- <span>Fees: <span>1</span> <span class="text-gold spend_bi">KRC</span></p> -->
+                   </div>
+                   <div class="mb10"></div>
+                   <div class="cont">
+                       <button class="submit_btn" title="" id="btn_code" onclick="go();">Redeem</button>
+                   </div>
+               </div>
+           
+               {include file="public/head_nav"/} {include file="public/footer"/}
+               <script type="text/javascript">
+                   var init_bi = 2, deg = 360, type = 2, usdt_num = 0.00, cbnk_num = 0.00;//represents coin initial rotation 360
+        function getQueryString(name) {
+            var result = window.location.search.match(new RegExp("[\?\&]" + name + "=([^\&]+)", "i"));
+            if (result == null || result.length < 1) {
+                return "";
+            }
+            return result[1];
+        }
+        var id = getQueryString("id");
+        //1 USDT=>KRC  2 KRC=>USDT
+        if (id) {
+            type = id;
+            init_bi = id == 1 ? 2 : 1;
+        }
+        change();
+        function change() {
+            $(".change").css({
+                "transform": "rotate(" + deg + "deg)",
+                "webkitTransform": "rotate(" + deg + "deg)",
+                "mozTransform": "rotate(" + deg + "deg)",
+                "msTransform": "rotate(" + deg + "deg)",
+            })
+            deg += 360;
+            if (init_bi == 2) {
+                $('.get_img').attr('src', '__IMG__/temp/bidui.png');
+                $('.spend_img').attr('src', '__IMG__/temp/USDT.png');
+                $('.spend_bi').html('USDT');
+                $('.get_bi').html('KRC');
+                init_bi = 1;
+                type = 1;
+                $('#rest_num').html(usdt_num);
+            } else if (init_bi == 1) {
+                $('.get_img').attr('src', '__IMG__/temp/USDT.png');
+                $('.spend_img').attr('src', '__IMG__/temp/bidui.png');
+                $('.spend_bi').html('KRC');
+                $('.get_bi').html('USDT');
+                init_bi = 2;
+                type = 2;
+                $('#rest_num').html(cbnk_num);
+            }
+            scale($('#spend_num').val(), type);
+        }
+        get_data();
+        function get_data() {
+            $get('/api/money/withdraw', { c_id: 2 }, function (res) {
+                if (res.status == 1) {
+                    cbnk_num = res.data.arr.money;
+                    if (id == 2) {
+                        $('#rest_num').html(res.data.arr.money);
+                    } else {
+                        $('#rest_num').html(res.data.arr.pool_hatch);
+                    }
+
+                    usdt_num = res.data.arr.pool_hatch;
+                }
+            });
+        }
+        $('#spend_num').on('input', function () {
+            var reg = /^\d+(\.{0,1}\d+){0,1}$/;
+            var v = $(this).val();
+            if (!reg.test(v)) {
+                mui.toast('Amount cannot be negative');
+                $(this).val('');
+                $('#get_num').val('');
+                return
+            } else {
+                scale(v, type);
+            }
+        });
+        function go() {
+            btn_disabled($('#btn_code'),'Submitting...');
+            var num = $('#spend_num').val();
+            $post('/api/user/money_exchange', { num: num, type: type }, (data) => {
+                mui.toast(data.msg);
+                btn_abled($('#btn_code'),'exchange');
+                if (data.code == 1) {
+                    setTimeout(() => {
+                        if (type == 1) {
+                            window.location.href = "/wap/user/wallet.html";
+                        } else {
+                            window.location.href = "/wap/user/wallet1.html";
+                        }
+                    }, 1500);
+                }
+            },function(){
+                btn_abled($('#btn_code'),'exchange');
+            })
+        }
+        function scale(num, type) {
+            $('#get_num').css('font-size', 12);
+            $('#get_num').val('calculating...');
+            setTimeout(() => {
+                $get('/api/user/exchange_bl', { num: num, type: type }, (data) => {
+                    if (data.status == 1) {
+                        $('#get_num').css('font-size', 17);
+                        $('#get_num').val(data.data.num);
+                    } else {
+                        mui.toast(data.msg);
+                        $('#get_num').val('');
+                    }
+                });
+            }, 1000);
+        }
+    </script>
+</body>
+
+</html>

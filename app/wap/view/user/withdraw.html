@@ -1,0 +1,184 @@
+{include file="public/header" /}
+
+</head>
+<style>
+
+</style>
+
+<body class="bg-re withdraw-body">
+    <header class="mui-bar mui-bar-nav index_header" id="header">
+        <a class="back-page mui-icon mui-icon-left-nav mui-pull-left" href="javascript:;"></a>
+        <a id="menu" class="mui-action-menu mui-icon mui-icon-bars mui-pull-right" href="javascript:void(0);"></a>
+       <h1 class="mui-title">Apply for withdrawal</h1>
+    </header>
+    <div class="mui-content register-content">
+        <div class="register-block cont">
+            <div class="inp-div">
+                <P class="text_hei">Account Type</P>
+                <div class="mb10"></div>
+                <!-- <div class="flex account-type-list">
+                    <div class="mui-input-row mui-radio flex">
+                        <label>Alipay</label>
+                        <input name="account_type" value="Alipay" type="radio">
+                    </div>
+                    <div class="mui-input-row mui-radio flex">
+                        <label>WeChat</label>
+                        <input name="account_type" value="WeChat" type="radio">
+                    </div>
+                    <div class="mui-input-row mui-radio">
+                        <label>Bank Card</label>
+                        <input name="account_type" value="Bank card" type="radio">
+                    </div>
+                </div> -->
+               <input type="text" id="account_type" class="input-register mobile-num" readonly placeholder="Please select an account type">
+            </div>
+            <div class="inp-div">
+                <P class="text_hei">Account number</P>
+                <div class="mb10"></div>
+                <input type="text" id="account_text" class="input-register mobile-num" placeholder="Please enter the receiving account number">
+            </div>
+            <div class="inp-div">
+                <P class="text_hei">Cardholder Name</P>
+                <div class="mb10"></div>
+                <input type="text" id="name_text" placeholder="Please enter cardholder name" class="input-register">
+            </div>
+            <div class="inp-div">
+                <P class="text_hei">Bank Name</P>
+                <div class="mb10"></div>
+                <input type="text" id="bank_text" placeholder="For example: ICBC, Alipay, WeChat" class="input-register">
+            </div>
+            <div class="inp-div">
+                <P class="text_hei">Withdrawal amount</P>
+                <div class="mb10"></div>
+                <input type="number" id="withdraw_num" class="input-register">
+            </div>
+            <div class="inp-div">
+                <P class="text_hei">Payment password</P>
+                <div class="mb10"></div>
+                <input type="password" id="password" placeholder="Please enter payment password" class="input-register">
+            </div>
+            <div class="login_row">
+                <P class="text_hei">Verification code</P>
+                <div class="mb10"></div>
+                <input type="text" class="verify_code" id="code" placeholder="Please enter the verification code">
+                <img class="login_verify" src="__IMG__/verify.png" />
+            </div>
+            <div class="foot-btn">
+                <button id="register" type="button" class="red-btn">Submit application</button>
+            </div>
+        </div>
+    </div>
+    {include file="public/head_nav"/}
+</body>
+{include file="public/footer" /}
+
+<script type="text/javascript">
+user();
+    function user(){
+        $get('/api/user/userinfo',{},function(d){
+            // console.log(d);
+            if(d.code==1){
+                $('#withdraw_num').attr('placeholder','withdrawable amount is'+d.data.money);
+            }else{
+                mui.toast(d.msg);
+            }                
+        })
+    }
+    // select account type
+    $('#account_type').click(function (e) {
+        mui.confirm('<div class="withdraw-pop alert_text pay-pop gender-pop sub_paytype"><div id="vchat" class="mui-input-row mui-radio flex"><i class="iconfont icon-weixin1 icon_pic"></i><label>WeChat</label><input name="pay-type" value="WeChat" type="radio"></div><div class="mui-input -row mui-radio flex"><i class="iconfont icon-zhifubao1 icon_pic"></i> <label>Alipay</label> <input name="pay-type" value="Alipay" type="radio "> </div><div class="mui-input-row mui-radio flex"><i class="iconfonts icon-yinlian icon_pic"></i><label>Bank card</label> <input name ="pay-type" value="Bank card" type="radio"> </div></div>', 'Please select an account type', ['Cancel', 'OK'], function (e) {
+            if (e.index == 1) {
+                var pay_type = $('.pay-type-show');
+                var choose = $("input[name='pay-type']:checked").val();
+                var vchat=0;
+                if (choose == undefined) {
+                    mui.toast('The selection cannot be empty');
+                    return false;
+                }
+                if(choose!='Bank card'){
+                    if(choose=='WeChat'){
+                        if(!vchat){
+                            mui.toast('Please bind WeChat first');
+                            return false;
+                        }
+                    }else if(choose=='WeChat'&&vchat||choose=='Alipay'){
+                        $('#account_type').val(choose);
+                        $('#bank_text').val(choose);
+                        $('#bank_text').attr('readonly',true);
+                    }
+                }else{
+                    $('#account_type').val(choose);
+                    $('#bank_text').val('');
+                    $('#bank_text').attr('readonly',false);
+                }
+            } else {
+
+            }
+        }, 'div');
+    })
+    // registration submission
+    $('#register').on('tap', function () {
+        var account_type = $("input[name='account_type']:checked").val();
+        var account_text = $('#account_text').val();
+        var name_text = $('#name_text').val();
+        var bank_text = $('#bank_text').val();
+        var withdraw_num = $('#withdraw_num').val();
+        var password = $('#password').val;
+        var code = $('#code').val;
+        if (!account_type) {
+            mui.toast('Account type cannot be empty');
+            return false;
+        } else if (!account_text) {
+            mui.toast('The receiving account cannot be empty');
+            return false;
+        }else if (!name_text) {
+            mui.toast('cardholder name cannot be empty');
+            return false;
+        } else if (!bank_text) {
+            mui.toast('Bank name cannot be empty');
+            return false;
+        }else if (!withdraw_num) {
+            mui.toast('The withdrawal amount cannot be empty');
+            return false;
+        }else if (!password) {
+            mui.toast('Payment password cannot be empty');
+            return false;
+        } else if (!code) {
+            mui.toast('Verification code cannot be empty');
+            return false;
+        } 
+        $get("/api/user/getback_password", { account: phone, verify: code, password: password }, function (d) {
+            mui.toast(d.msg);
+            if (d.code == 1) {
+                setTimeout(function () {
+                    location.href = '/wap/index/login.html';
+                }, 1000);
+            }
+        });
+    });
+    
+    // Send the verification code
+    function get_code() {
+        var phone = $('#input_val').val();
+        if (phone == '') {
+            mui.toast('Mobile phone number cannot be empty')
+        } else {
+            $get('/api/user/send_verify', { id: 3, param: phone }, function (data) {
+                mui.toast(data.msg);
+                if (data.code == 1) {
+                    settime($('.get_code'));
+                }
+            });
+        }
+    }
+    /* header navigation bar */
+    $('#menu').click(function (e) {
+        $('.login_pop').toggle();
+        e.stopPropagation();
+    })
+    $('body').click(function () {
+        $('.login_pop').hide();
+    }) 
+</script>
+
+</html>

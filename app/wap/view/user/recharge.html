@@ -1,0 +1,192 @@
+{include file="public/header" /}
+<style>
+</style>
+</head>
+
+<body class="bg-re recharge" style="overflow-y:scroll;">
+    <header class="mui-bar mui-bar-nav index_header" id="header">
+        <a class="back-page mui-icon mui-icon-left-nav mui-pull-left" href="javascript:;"></a>
+        <a id="menu" class="mui-action-menu mui-icon mui-icon-bars mui-pull-right" href="javascript:void(0);"></a>
+        <h1 class="mui-title">Top-up</h1>
+    </header>
+    <div class="mui-content pos-abso ucenter">
+        <div class="user-top flex" style="height:1rem;">
+            <div class="recharge-money">
+                <p>Current balance</p>
+                <p id="my_money">0.00</p>
+            </div>
+        </div>
+        <div class="recharge-num">
+            <p>Recharge amount</p>
+            <div class="flex padding01">
+                <span style="font-size:0.2rem;">KRC </span>
+                <input type="number" id="recharge-num" class="rechargeNum" autofocus>
+            </div>
+            <div class="recharge_value">
+                <ul class="flex">
+                    <li>KRC <span>50</span></li>
+                    <li>KRC <span>100</span></li>
+                    <li>KRC <span>500</span></li>
+                </ul>
+            </div>
+        </div>
+        <div class="mb20"></div>
+        <div class="cont">
+            <button type="submit" id="next" class="red-btn quit-btn">Next step</button>
+        </div>
+    </div>
+    <div class="next-detail" style="display:none">
+        <div class="next-detail-body">
+            <header class="mui-bar mui-bar-nav index_header" id="header">
+                <a class="close-pop mui-icon mui-icon mui-icon-closeempty mui-pull-right" href="javascript:;"></a>
+                <h1 class="mui-title">Confirm deposit</h1>
+            </header>
+            <div class="next-confirm">
+                <div class="flex padding01 my-num"><span></span></div>
+                <div class="mui-table-view-cell flex list-li pay-type">
+                    <span style="width:25%;">Payment method</span>
+                    <a href="javascript:;" class="info-tab pay-type-show">WeChat Pay</a>
+                    <i class="mui-navigate-right fr"></i>
+                </div>
+                <div class="mui-table-view-cell flex list-li">
+                    <span>Payment password</span>
+                    <div class="val-box" id="val-box">
+                        <input id="val-code-input" type="tel" maxlength="6" onkeyup="checkForNum(this)"
+                            onkeydown="TestKeyDown(event);" onselectstart="return false;" onblur="checkForNum(this)" />
+                        <div class="fr">
+                            <input type="password" name="val-item">
+                            <input type="password" name="val-item">
+                            <input type="password" name="val-item">
+                            <input type="password" name="val-item">
+                            <input type="password" name="val-item">
+                            <input type="password" name="val-item">
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="mb10"></div>
+            <div class="cont">
+                <button type="submit" id="recharge-go" class="red-btn quit-btn">Confirm recharge</button>
+            </div>
+        </div>
+    </div>
+
+</body>
+{include file="public/head_nav"/}
+{include file="public/footer" /}
+<script type="text/javascript">
+    //Payment method popup
+        /* ---member information--- */
+        user();
+        function user() {
+            $get('/api/user/userinfo', {}, function (d) {
+                // console.log(d);
+                if (d.code == 1) {
+                    $('#my_money').html(d.data.money);
+                } else {
+                    mui.toast(d.msg);
+                }
+            })
+        }
+        //Payment method popup
+    $('.pay-type').on('tap', function () {
+       mui.confirm('<div class="alert_text pay-pop gender-pop sub_paytype"><div class="mui-input-row mui-radio flex"><i class="iconfont icon-weixin1 icon_pic"></i i><label>WeChat</label> <input name="pay-type" class="icon_radio" value="WeChat Pay" type="radio" checked></div><div class="mui-input- row mui-radio flex"><i class="iconfont icon-zhifubao1 icon_pic"></i><label>Alipay</label> <input class="icon_radio"name="pay-type" value="Alipay payment " type="radio"> </div></div>', 'Please select a payment method', ['Cancel', 'Confirm'], function (e) {
+                   if (e.index == 1) {
+                var pay_type = $('.pay-type-show');
+                var choose = $("input[name='pay-type']:checked").val();
+                if (choose == undefined) {
+                    mui.toast('selection cannot be empty');
+                    return false;
+                }
+                $('#val-box').click();
+                if (choose != pay_type.html()) {
+                    valCodeInput.val('');
+                    valCodeItems.val('');
+                    pay_type.html($("input[name='pay-type']:checked").val());
+                }
+            } else {
+
+            }
+        }, 'div');
+    });
+    // enter recharge
+    $('#next').on('tap', function () {
+        var rechargeNum = $('#recharge-num').val();
+        if (rechargeNum == '') {
+            mui.toast('The deposit amount cannot be empty!');
+        }
+        else {
+            var num = rechargeNum;
+            next.show();
+            $('.my-num span').html('US ' + num);
+            setTimeout(() => {
+                $('#val-box').click();
+            }, 300);
+
+        }
+    });
+    //Six digit input box
+    var valCodeInput = $('#val-code-input');
+    var valCodeItems = $("input[name='val-item']");
+    var regex = /^[\d]+$/;
+    var valCodeLength = 0;
+    $('#val-box').on('click', () => {
+        valCodeInput.focus();
+    })
+    valCodeInput.on('input propertychange change', (e) => {
+        valCodeLength = valCodeInput.val().length;
+        if (valCodeInput.val() && regex.test(valCodeInput.val())) {
+            $(valCodeItems[valCodeLength - 1]).addClass('available');
+            $(valCodeItems[valCodeLength - 1]).val(valCodeInput.val().substring(valCodeLength - 1, valCodeLength));
+        }
+    })
+    $(this).on('keyup', (e) => {
+        if (e.keyCode === 8) {
+            $(valCodeItems[valCodeLength]).removeClass('available');
+            $(valCodeItems[valCodeLength]).val("");
+        }
+    });
+    function checkForNum(obj) {
+        obj.value = obj.value.replace(/[\D]/g, '');
+    }
+    var lastkeyCode = -1;
+    function TestKeyDown(event) {
+
+        if (event.keyCode == lastkeyCode) {
+            $(valCodeItems[valCodeLength]).removeClass('available');
+            $(valCodeItems[valCodeLength]).val("");
+        }
+
+        lastkeyCode = event.keyCode;
+
+    }
+    //Quick recharge amount
+    $('.recharge_value>ul>li').click(function () {
+        var value = $(this).find('span').html();
+        $('#recharge-num').val(value);
+    });
+    var next = $('.next-detail');
+    $('#recharge-go').on('tap', function () {
+        // console.log(valCodeInput.val());
+        if (valCodeInput.val() == '') {
+            mui.toast('Payment password cannot be empty!');
+        }
+        else {
+            next.fadeOut();
+        }
+    });
+    //close button
+    $('.close-pop').on('tap', function () {
+        next.fadeOut();
+    });
+    // header navigation bar
+    $('#menu').click(function (e) {
+        $('.login_pop').toggle();
+        e.stopPropagation();
+    })
+    $('body').click(function () {
+        $('.login_pop').hide();
+    }) 
+</script>
+
+</html>

@@ -1,0 +1,87 @@
+<link href="/static/admin/umedit/themes/default/css/umeditor.css" type="text/css" rel="stylesheet">
+<style>
+    .edui-tab-item{
+        line-height: 11px;
+    }
+</style>
+<form class="layui-form" action="" lay-filter="form_edit" style="padding: 20px 30px 0 0;">
+    <div class="layui-form-item">
+        <label class="layui-form-label">快递名称</label>
+        <div class="layui-input-block">
+        	<input type="hidden" name="id">
+                <input id="shipping_name" type="text" class="layui-input" name="shipping_name" value="" lay-verify="required" placeholder="请输入快递名称">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">描述</label>
+        <div class="layui-input-block">
+                <input id="shipping_desc" type="text" class="layui-input" name="shipping_desc" value="" lay-verify="required" placeholder="请输入价格">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">状态</label>
+        <div class="layui-input-block">
+                <select type="text" name="status" id="status" lay-verify="required" autocomplete="off" class="layui-input">
+                	<option value="1" selected>开启</option>
+                	<option value="0">关闭</option>
+                </select>
+        </div>
+    </div>
+
+    <div class="layui-form-item">
+        <div class="layui-input-block">
+            <button type="button" class="layui-btn" lay-submit="form_save" lay-filter="form_save">+保存</button>
+        </div>
+    </div>
+    <script type="text/html" template lay-done="layui.data.sendParams(d.params)">
+
+    </script>
+</form>
+<script src="/static/admin/layui/lay/modules/jquery.3.1.1.js"></script>
+<script src="/static/admin/umedit/umeditor.config.js"></script>
+<script src="/static/admin/umedit/umeditor.min.js"></script>
+<script src="/static/admin/umedit/lang/zh-cn/zh-cn.js"></script>
+
+<script>
+    layui.data.sendParams = function(params){
+
+        layui.use(['admin','form','upload','layedit','view','setter','layer'], function(){
+            var $ = layui.$
+                ,admin = layui.admin
+                ,setter = layui.setter
+                ,layedit = layui.layedit
+                ,element = layui.element
+                ,form = layui.form
+                ,view = layui.view
+                ,layer = layui.layer
+                ,upload = layui.upload
+                ,router = layui.router();
+
+            element.render();
+            form.render(null, 'form_edit');
+
+            if(params.id){
+                // admin/Article/editArticle
+                admin.req({
+                    url: layui.setter.baseUrl+'admin/order/edit_shopping' //实际使用请改成服务端真实接口
+                    ,data: {id:params.id},
+                    type:'get',
+                    success: function(res){
+                        if(res.code==1){
+                            //um.setContent(res.data.info.content);
+                            form.val('form_edit',{
+                            	'id':res.data.id,
+                                'shipping_name':res.data.shipping_name,
+                                'shipping_desc':res.data.shipping_desc,
+                            });
+                        }else{
+                            layer.msg(res.msg);
+                        }
+                    }
+                });
+            }
+
+        });
+
+    }
+</script>

@@ -1,0 +1,198 @@
+<title>资产日志</title>
+
+<div class="layui-card layadmin-header">
+    <div class="layui-breadcrumb" lay-filter="breadcrumb">
+        <a>财务管理</a>
+        <a><cite>资产日志</cite></a>
+    </div>
+</div>
+
+<div class="layui-fluid">
+<div class="layui-row layui-col-space15">
+<div class="layui-col-md12">
+<div class="layui-card">
+    <div class="layui-card-header">资产日志</div>
+    <div class="layui-card-body">
+        <form class="layui-form" style="margin-bottom: 20px;">
+            <div class="layui-inline" >
+                <input type="text" class="layui-input" id="test-laydate-type-datetime-start" name="starttime" placeholder="开始时间">
+            </div>
+            <div class="layui-inline" >
+                <input type="text" class="layui-input" name="endtime" id="test-laydate-type-datetime-end" placeholder="结束时间">
+            </div>
+            <div class="layui-inline" style="width:162px;">
+                <select name="type" id="log_type"> </select>
+            </div>
+            <div class="layui-inline">
+                <input class="layui-input" name="mobile" placeholder="搜索会员手机号" id="test-table-demoReload" autocomplete="off">
+            </div>
+            <div class="layui-inline">
+                <input class="layui-input" name="account" placeholder="搜索会员账号" id="test-table-demoReload" autocomplete="off">
+            </div>
+            <div class="layui-inline">
+                <button class="layui-btn" type="button" lay-submit lay-filter="usdt_log_search"><i class="layui-icon">&#xe615;</i>搜索</button>
+            </div>
+        </form>
+
+        <table class="layui-hide" id="usdt_log" lay-filter="usdt_log"></table>
+
+    </div>
+</div>
+</div>
+</div>
+</div>
+
+<script>
+layui.use(['admin', 'table', 'view', 'form', 'layer', 'laydate'], function () {
+    var $ = layui.$
+        , admin = layui.admin
+        , element = layui.element
+        , form = layui.form
+        , view = layui.view
+        , laydate = layui.laydate
+        , layer = layui.layer
+        , table = layui.table;
+
+    //日期时间选择器
+    laydate.render({
+        elem: '#test-laydate-type-datetime-start'
+        ,type: 'datetime'
+    });
+    laydate.render({
+        elem: '#test-laydate-type-datetime-end'
+        ,type: 'datetime'
+    });
+
+    form.on('submit(usdt_log_search)', function (datas) {
+        get_data(datas.field);
+    });
+    // 下拉框 
+    var keywords = "";
+    var act = "";
+    var type_obj={
+      1:'充值KRC',
+      2:'KRC提现申请',
+      3:'转化USDT',
+      4:'USDT转化KRC',
+      5:'KRC提现拒绝',
+      6:'KRC提现通过',
+      7:'代理商动态奖励',
+      8:'代理商奖励',
+      9:'节点代付动态奖励',
+      10:'直推VIP商品奖励',
+      11:'伞下VIP商品节点奖励',
+      12:'代付奖励',
+      13:'代付动态奖励',
+      14:'节点包裹奖励',
+      15:'购买代付券',
+      16:'订单支付',
+      17:'订单收货',
+      18:'代付订单',
+      19:'返还代付',
+      21:'充值USDT',
+      22:'USDT提现申请',
+      23:'转化为KRC',
+      24:'KRC转化usdt',
+      25:'USDT提现拒绝',
+      26:'USDT提现通过',
+      27:'转账减少KRC',
+      28:'转账增加KRC',
+      41:'充值赠送币',
+      42:'赠送币提现申请',
+      43:'赠送币提现拒绝',
+      44:'赠送币提现通过',
+      
+      51:'代付奖励',
+      52:'代付动态币奖励',
+      53:'节点代付动态币奖励',
+      61:'购买代付券',
+      62:'代付使用代付券',
+      63:'购买VIP商品赠送代付券',
+      81:'订单支付优惠券',
+      82:'订单购买送优惠券',
+
+      101:' 购买VIP商品赠送原始股',
+      102:'原始股减少',
+      130:'拍卖成功',
+      131:'拍卖扣保证金',
+      132:'拍卖返保证金',
+      133:'拍卖补交费用',
+      134:'拍卖奖励',
+      135:'拍卖团队奖励',
+      136:'拍卖红包奖励',
+      137:'直购红包奖励',
+      138:'代付红包奖励',
+      139:'推荐红包奖励',
+      200:'捐款',
+      201:'挑战任务奖励',
+      202:'开通体验会员',
+      203:'直推体验会员奖励',
+      204:'体验团队奖励',
+      205:'体验团队平级奖励',
+      206:'体验代付奖励',
+      207:'体验代付币奖励',
+      208:'体验代付动态奖励',
+      209:'体验代付动态币奖励',
+        1000:'免费赠送代付',
+
+    };
+    var type_option='<option value="">操作类型</option>';
+    for (const i in type_obj) {
+      type_option+='<option value="'+i+'">'+type_obj[i]+'</option>';
+    }
+    $('#log_type').html(type_option);
+    form.render();
+
+    
+    var n = 1;
+    get_data({ keywords: '' });
+    function get_data(param) {
+    table.render({
+        elem: '#usdt_log'
+        , url: layui.setter.baseUrl + 'admin/Member_Wallet_Log/index'
+        , toolbar: '#tool_usdt_log'
+        , parseData: function (res) { //res 即为原始返回的数据
+            return {
+            "code": res.code, //解析接口状态
+            "msg": res.msg, //解析提示文本
+            "count": res.data.count, //解析数据长度
+            "data": res.data.lists //解析数据列表
+            };
+        }
+        , cols: [[
+            { field: 'id', width: 85, title: 'ID', sort: true, align: 'center' }
+            , { field: 'account', title: '会员账号', align: 'center' }
+            , { field: 'mobile', title: '手机账号', align: 'center' }
+            , {field: 'type', title: '操作类型', align: 'center',
+              templet: function (d) {
+                for(var i in type_obj){
+                    if(d.type == i){
+                        return type_obj[i];
+                    }  
+                }
+              }
+            }
+            , { field: 'number', title: '数量', align: 'center',sort:true,templet:function (d) {
+                    return d.number;
+                }}
+            , { field: 'ymoney', title: '原余额', align: 'center',sort:true,templet:function (d) {
+                    return d.ymoney;
+                }}
+            , { field: 'nmoney', title: '最新余额', align: 'center',sort:true,templet:function (d) {
+                    return d.nmoney;
+                }}
+
+            , {field: 'act', title: '对应操作id', align: 'center', sort: true}
+            , { field: 'z_remarks', title: '备注', align: 'center' }
+            , { field: 'create_time', title: '时间', align: 'center', sort: true }
+        ]],
+        page: true,
+        limits:[10,20,50,100,500,1000,5000,10000,100000],
+        where: param
+    });
+    }
+
+
+
+});
+</script>

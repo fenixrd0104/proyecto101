@@ -1,0 +1,319 @@
+{include file="public/header" /}
+<style>
+    .user-top-info {
+        width: 100%;
+    }
+    
+    .user-info {
+        display: inline-block;
+        width: auto !important;
+        vertical-align: middle;
+        margin-right: 0.02rem;
+    }
+    
+    .vip-img {
+        text-align: center;
+    }
+    
+    .vip-img,
+    .account {
+        display: inline-block;
+        margin: 0 -2px;
+        vertical-align: middle;
+    }
+    .huiy{
+        border: 1px solid;
+    border-radius: 3px;
+    padding: 0px 5px;
+    }
+    /* .money_nav ul{
+    display: flex;
+    align-content: space-around!important;
+    align-items: center!important;
+    flex-wrap: inherit;
+    justify-content: inherit;
+} */
+.p_img{
+    width: 0.18rem;
+    vertical-align: sub;
+    margin-right: 0.1rem;
+}
+</style>
+
+<body style="background: #f2f2f2;">
+    <div class="mui-content">
+        <div class="user_box cont">
+            <div class="user_box_info flexs">
+                <div>
+                    <!-- <img src="/static/wap/images/heads.png" alt="" id="head_img"> -->
+                    <img id="head_img" src="/static/wap/images/heads.png" alt="">
+                </div>
+                <div>
+                    <p class="no_login" style="display: none;" onclick="to_login();">Click to login/register</p>
+                    <p id="nickname"></p>
+                    <div class="mb10"></div>
+                    <p><span class="huiy text-gold font-12"></span></p>
+                    <p><span class="huiy text-gold font-12 dlsh"></span></p>
+                </div>
+            </div>
+            <div class="user_info_tab flexs">
+                <div onclick="window.location.href='wallet.html'">Wallet</div>
+                <div onclick="window.location.href='exchange.html'">Exchange</div>
+                <div onclick="window.location.href='my_agent.html'">Coupon purchase</div>
+            </div>
+            <img src="/static/wap/images/setting.png" alt="" id="to_setting">
+        </div>
+        <div class="mb10"></div>
+        <div class="nav_radius order_nav">
+            <a href="/wap/user/my_auction.html" class="block">
+                <div class="order_nav_up flex_between">
+                    <p><img class="p_img" src="/static/wap/images/nav/nav4.2.png" alt="">My Auction</p>
+                    <i class="iconfont icon-jiantou"></i>
+                </div>
+            </a>
+        </div>
+        <div class="mb10"></div>
+        <div class="nav_radius order_nav">
+            <div class="order_nav_up flex_between">
+                <p>My order</p>
+                <!-- <a href="/wap/user/order_list.html">All<i class="iconfont icon-jiantou"></i></a> -->
+            </div>
+            <ul class="list-row text-15 color-666" id="order_tabs">
+                <li class="mui-col-xs-4">
+                    <a href="/wap/user/order_list.html?id=1" class="shop-info">
+                        <p><img src="/static/wap/images/temp/img_012.png" alt=""></p>
+                        <div class="info-tab">VIP order</div>
+                    </a>
+                </li>
+                <li class="mui-col-xs-4">
+                    <a href="/wap/user/order_list.html?id=2" id="signbtn" class="shop-info">
+                        <p><img src="/static/wap/images/temp/img_010.png" alt=""></p>
+                        <div class="info-tab">Preferred Orders</div>
+                    </a>
+                </li>
+                <li class="mui-col-xs-4">
+                    <a href="/wap/user/order_list.html?id=6" class="shop-info">
+                        <p><img src="/static/wap/images/temp/img_011.png" alt=""></p>
+                        <div class="info-tab">Pay on behalf of orders</div>
+                    </a>
+                </li>
+                <li class="mui-col-xs-4">
+                    <a href="/wap/user/order_list.html?id=3" class="shop-info">
+                        <p><img src="/static/wap/images/temp/img_009.png" alt=""></p>
+                        <div class="info-tab">Special order</div>
+                    </a>
+                </li>
+                <li class="mui-col-xs-4">
+                    <a href="/wap/user/order_list.html?id=4" class="shop-info">
+                        <p><img src="/static/wap/images/temp/img_013.png" alt=""></p>
+                        <div class="info-tab">Direct Order</div>
+                    </a>
+                </li>
+                <li class="mui-col-xs-4">
+                    <a href="/wap/user/order_list.html?id=5" class="shop-info">
+                        <p><img src="/static/wap/images/temp/img_014.png" alt=""></p>
+                        <div class="info-tab">High-end order</div>
+                    </a>
+                </li>
+            </ul>
+        </div>
+
+        <div class="mb10"></div>
+        <div class="nav_radius money_nav">
+            <div class="order_nav_up flex_between">
+                <p>Funding Account</p>
+            </div>
+            <ul>
+                <li>
+                    <a href="/wap/user/wallet1.html">
+                        <img src="__IMG__/temp/USDT.png" alt="">
+                        <p>USDT</p>
+                    </a>
+                </li>
+                <li>
+                    <a href="/wap/user/wallet.html">
+                        <img src="__IMG__/temp/img_029.png" alt="">
+                        <p>KRC</p>
+                    </a>
+                </li>
+                <li>
+                    <a href="/wap/user/wallet2.html">
+                        <img src="__IMG__/temp/bidui.png" alt="">
+                        <p>XXX</p>
+                    </a>
+                </li>
+                <li>
+                    <a href="/wap/user/wallet3.html">
+                        <img src="__IMG__/temp/img_006.png" alt="">
+                        <p>Voucher</p>
+                    </a>
+                </li>
+                <li>
+                    <a href="/wap/user/wallet4.html">
+                        <img src="__IMG__/temp/img_028.png" alt="">
+                        <p>Coupon</p>
+                    </a>
+                </li>
+                <li>
+                    <a href="/wap/user/wallet5.html">
+                        <img src="__IMG__/temp/stock.png" alt="">
+                        <p>Original shares</p>
+                    </a>
+                </li>
+
+            </ul>
+        </div>
+        <div class="mb10"></div>
+        <div class="nav_radius money_nav">
+            <div class="order_nav_up flex_between">
+                <p>My Services</p>
+            </div>
+            <ul>
+                <li>
+                    <a href="/wap/user/my_friend.html">
+                        <img src="__IMG__/temp/img_005.png" alt="">
+                        <p>My friends</p>
+                    </a>
+                </li>
+                <li>
+                    <a href="/wap/user/address.html?type=address">
+                        <img src="__IMG__/temp/img_007.png" alt="">
+                        <p>My address</p>
+                    </a>
+                </li>
+                <li>
+                    <a href="/wap/user/my_invite.html">
+                        <img src="__IMG__/temp/img_008.png" alt="">
+                        <p>Invite friends</p>
+                    </a>
+                </li>
+
+            </ul>
+        </div>
+        <div class="mb30"></div>
+    </div>
+    {include file="public/nav"/} {include file="public/footer" /}
+    <script type="text/template" id="order_tab">
+        <li class="mui-col-xs-3">
+            <a href="/wap/user/order_list.html?id=1" class="shop-info">
+                {{ if p_0>0 }}
+                <span class="order_num0">{{p_0}}</span>
+                {{ /if end }}
+                <i class="iconfont icon-dfk"></i>
+                <div class="info-tab">Pending payment</div>
+            </a>
+        </li>
+        <li class="mui-col-xs-3">
+            <a href="/wap/user/order_list.html?id=2" id="signbtn" class="shop-info">
+                {{ if p_1>0 }}
+                <span class="order_num0">{{p_1}}</span>
+                {{ /if end }}
+                <i class="iconfont icon-dfh"></i>
+                <div class="info-tab">To be shipped</div>
+            </a>
+        </li>
+        <li class="mui-col-xs-3">
+            <a href="/wap/user/order_list.html?id=3" class="shop-info">
+                {{ if p_2>0 }}
+                <span class="order_num0">{{p_2}}</span>
+                {{ /if end }}
+                <i class="iconfont icon-dsh"></i>
+                <div class="info-tab">Pending delivery</div>
+            </a>
+        </li>
+        <li class="mui-col-xs-3">
+            <a href="/wap/user/order_list.html?id=4" class="shop-info">
+                {{ if p_3>0 }}
+                <span class="order_num0">{{p_3}}</span>
+                {{ /if end }}
+                <i class="iconfont icon-dpj"></i>
+                <div class="info-tab">To be evaluated</div>
+            </a>
+        </li>
+        <li class="mui-col-xs-3">
+            <a href="/wap/user/order_return.html" class="shop-info">
+                {{ if p_4>0 }}
+                <span class="order_num0">{{p_4}}</span>
+                {{ /if end }}
+                <i class="iconfont icon-tk"></i>
+                <div class="info-tab">Refund/After Sales</div>
+            </a>
+        </li>
+    </script>
+
+    <script type="text/javascript">
+        /* ---member information--- */
+        user();
+
+        function user() {
+            $get('/api/user/getuserinfo', {}, function(data) {
+                if (data.code == 1) {
+                    var data = data.data;
+                    $('#nickname').html(data.nickname);
+                    $('.huiy').html(data.grade.name);
+                    $('.dlsh').html('V' + data.dls_level)
+                    $('#money').html(data.money);
+                    $('#integral').html(data.integral);
+                    $('#encourage').html(data.encourage);
+                    $('#pool_hatch').html(data.pool_hatch);
+                    $('#pool_sale').html(data.pool_sale);
+                    $('#pool_consumption').html(data.pool_consumption);
+                    if (data.head_img) {
+                        $('#head_img').attr('src', data.head_img);
+                    }
+                    $('#this_status').attr('data-status', data.shop_id);
+                } else {
+                    mui.toast(data.msg);
+                    $('.no_login').show();
+                }
+            });
+            $get('/api/order/order_num', {}, function(data) {
+
+                var this_data = {};
+                this_data.p_0 = data[0];
+                this_data.p_1 = data[1];
+                this_data.p_2 = data[2];
+                this_data.p_3 = data[3];
+                this_data.p_4 = data[4];
+                // $('#order_tabs').html(template('order_tab',this_data));
+            });
+        }
+
+        function to_login(){
+            window.location.href = "/wap/index/login.html";
+        }
+
+        // Merchant management
+        function to_guanli(a) {
+            var $that = $(a);
+            var this_st = $that.attr('data-status');
+
+            if (this_st != "") {
+                if (this_st != 0) {
+                    // alert(1);
+                    window.location.href = "/wap/store/store.html";
+                } else {
+                    window.location.href = "/wap/store/open_sell.html";
+                }
+            }
+        }
+        $('body').on('click', '#to_setting', function() {
+            window.location.href = "/wap/user/my_setting.html"
+        });
+
+        //sign out
+        $('#quit').on('tap', function() {
+            $get('/api/user/logout', {}, function(data) {
+                if (data.status == 1) {
+                    setTimeout(function() {
+                        location.href = '/wap/index/index.html';
+                    }, 1000);
+                } else {
+                    mui.toast(data.info);
+                }
+            });
+        })
+    </script>
+</body>
+
+</html>

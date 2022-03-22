@@ -1,0 +1,246 @@
+{include file="public/header" /}
+<style>
+    body, html, .mui-content {
+        background: #fff!important;
+    }
+    #country_code {
+        background: transparent;
+        color: #bd132d;
+    }
+    #header,#header .mui-title{
+        background: #fff!important;
+        color:#333!important;
+    }
+    .login_form{
+        width:80%!important;
+    }
+    .login_form .mui-input-row{
+        background:#fff;
+        border-bottom:1px solid #f1f1f1!important;
+        border-radius:0!important;
+        font-size: 0.14rem!important;
+        padding:0;
+    }
+    .login_form .mui-input-row input{
+        width:100%;
+        font-size: 0.14rem;
+        color:#333!important;
+    }
+    .text-gold{
+        color:#bd132d!important;
+    }
+    .bg-gold{
+        background:#bd132d!important;
+    }
+</style>
+</head>
+
+<body>
+    <header class="mui-bar mui-bar-nav" id="header">
+        <!-- <a class="back-page mui-icon mui-icon-left-nav mui-pull-left" href="javascript:;"></a> -->
+        <div class="mui-title">Registration</div>
+        <h1 class="mui-title"></h1>
+    </header>
+    <div class="mui-content" style="padding-bottom: 0 !important;">
+        <div class="mb10"></div>
+        <div class="goods_fenlei_tab">
+            <!-- <div data-type="mobile">Mobile registration</div> -->
+            <!-- <div data-type="email">Email registration</div> -->
+        </div>
+        <div class="mb10"></div>
+        <div class="mb10"></div>
+        <form class="mui-input-group mui_form login_form">
+            <div class="mui-input-row">
+                <input type="text" id="account" placeholder="Please enter a nickname">
+            </div>
+            <div class="mui-input-row mui_phone" style="padding-left: 0.0rem;">
+                <select id="country_code" style="width: 30%;">
+                    <!-- <option value="">+86China</option> -->
+                </select>
+                <input type="text" id="phone" placeholder="Please enter the phone number" maxlength="11" style="width: 60%;">
+            </div>
+            <div class="mui-input-row mui_email" style="display: none;">
+                <input type="email" id="email" placeholder="Please enter your email"">
+            </div>
+            <div class="mui-input-row">
+                <input type="text" id="verify" placeholder="Please enter the verification code" style="width: 80%;">
+                <button type="button" id="verify_btn" class="btn btn_code bg-gold" style="width: 40%;">Get verification code</button>
+            </div>
+            <div class="mui-input-row">
+                <input type="password" id="password" maxlength="16" placeholder="Please set the login password">
+            </div>
+            <div class="mui-input-row">
+                <input type="password" id="con_password" maxlength="16" placeholder="Confirm login password">
+            </div>
+            <div class="mui-input-row">
+                <input type="password" id="jy_password" maxlength="16" placeholder="Please set transaction password">
+            </div>
+            <div class="mui-input-row">
+                <input type="text" id="tma" disabled placeholder="Please enter the invitation code">
+            </div>
+            <div class="mb20"></div>
+            <view class="color-theme mg-t-20 font-24" style="color:#bd132d;font-size:0.13rem">
+                Note: Password 8-20 characters (combination of letters, numbers and underscores)
+            </view>
+            <div class="mb20"></div>
+            <div class="mui-button-row">
+                <button type="button" id="submit_btn" class="submit_btn bg-gold">Sign up</button>
+            </div>
+            <p class="t-c text-gray" style="padding:0.15rem 0.15rem 0 0.15rem;">Have an account?
+                <a href="" class=" t-c text-gold font-14" id="down">download app</a></p>
+        </form>
+        <!-- <div class="bot_btn">
+            <p class="t-c text-gray">Existing account? </p>
+            <button type="button" id="" class="submit_btn" onclick="window.location.href='/wap/index/login.html'">login</button>
+        </div> -->
+    </div>
+    {include file="public/head_nav"/} {include file="public/footer" /}
+    <script type="text/javascript">
+        var tma = getQueryString('tma');
+        $('#tma').val(tma);
+
+        get_select();
+
+        function get_select() {
+            $get("/api/user/get_country_code", {}, function(d) {
+                if (d.code == 1) {
+                    var list = "";
+                    for (var i in d.data) {
+                        list += '<option value="' + d.data[i].id + '">+' + d.data[i].id + d.data[i].name + '</option>';
+                    }
+                    $('#country_code').html(list);
+                } else {
+                    mui.toast(d.msg);
+                }
+            });
+        };
+        var  down='';
+        get_d();
+        function get_d(){
+            $get("/api/user/banben", {}, function(res) {
+                if(res.code==1){
+                    down=res.fx_appurl;
+                    $('#down').attr('href',down);
+                }
+            });
+        }
+        // Tab
+        $('body').on('click', '.goods_fenlei_tab>div', function() {
+            $(this).addClass('on').siblings().removeClass('on');
+            var type = $(this).attr('data-type');
+            if (type == "mobile") {
+                $('.mui_phone').show();
+                $('.mui_email').hide();
+            } else {
+                $('.mui_email').show();
+                $('.mui_phone').hide();
+            }
+        });
+        // get verification code
+        $('#verify_btn').on('click', function() {
+            var obj = $('#verify_btn');
+            var country_code;
+            var phone;
+            var check_type = $('.check_type').attr('data-type');
+
+            if (check_type == "email") {
+                country_code = "86";
+                phone = $('#email').val();
+            } else {
+                country_code = $('#country_code').val();
+                phone = $('#phone').val();
+            }
+
+            if (phone == '') {
+                mui.toast('Please enter your phone number or email');
+            } else {
+                obj.attr('disabled',true);
+                $post("/api/user/send_reg_verify", {
+                    country_code: country_code,
+                    phone: phone,
+                    check_type: check_type
+                }, function(d) {
+                    obj.attr('disabled',false);
+                    mui.toast(d.msg);
+                    if (d.code == 1) {
+                        settime(obj);
+                    } else {}
+                });
+            }
+        });
+        // register
+        $('#submit_btn').on('click', function() {
+            var account = $('#account').val();
+            var phone = '';
+            var password = $('#password').val();
+            var repassword = $('#con_password').val();
+            var jy_password = $('#jy_password').val();
+            var verify = $('#verify').val();
+            var tma = $('#tma').val();
+            var check_type = $('.check_type').attr('data-type');
+
+            if (check_type == "email") {
+                phone = $('#email').val();
+            } else {
+                phone = $('#phone').val();
+            }
+
+            if (account == '') {
+              mui.toast('Please enter a nickname');
+            }else if(account.length>10){
+                mui.toast('nickname cannot be more than 10 characters');return;
+            } else if (phone == '') {
+                mui.toast('Please enter your phone number or email');
+            } else if (password == '') {
+                mui.toast('Please set the login password');
+            }else if(/^(?=.*\d)(?=.*[a-zA-Z]).{8,20}$/.test(password)==false){
+                mui.toast('The password format is incorrect');return;
+            } else if (password != repassword) {
+                mui.toast('The two passwords are inconsistent');
+            } else if (verify == '') {
+                mui.toast('Verification code cannot be empty');
+            } else if (jy_password == '') {
+                mui.toast('Transaction password cannot be empty');
+            } else if (tma == '') {
+                mui.toast('Please enter the invitation code');
+            } else {
+                btn_disabled($(this),'Committing...');
+                $get("/api/user/register", {
+                    check_type: check_type,
+                    account: account,
+                    phone: phone,
+                    password: password,
+                    jy_password: jy_password,
+                    verify: verify,
+                    tma: tma
+                }, function(d) {
+                    mui.toast(d.msg);
+                    if (d.code == 1) {
+                        setTimeout(function() {
+                            location.href = down;
+                        }, 1000);
+                    } else {
+                        mui.toast(d.msg);
+                    }
+                    btn_abled($(this),'register');
+                },function(){
+                    btn_abled($(this),'register');
+                });
+            }
+        });
+
+        function getQueryString(name) {
+            var reg = new RegExp('(^|&)' + name + '=([^&]*)(&|$)', 'i');
+
+            var r = window.location.search.substr(1).match(reg);
+            if (r != null) {
+                return unescape(r[2]);
+            }
+            return null;
+        }
+        var code=getQueryString('code');
+        $('#tma').val(code)
+    </script>
+</body>
+
+</html>

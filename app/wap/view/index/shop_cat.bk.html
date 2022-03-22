@@ -1,0 +1,573 @@
+{include file="public/header"/}
+</head>
+<body style="background: #f0f0f0;">
+<header class="mui-bar mui-bar-nav index_header shop_head bg_red_head" id="header">
+    <a class="mui-action-back mui-icon mui-icon-left-nav mui-pull-left" href="javascript:;"></a>
+    <a id="menu" class="mui-action-menu mui-icon mui-icon-bars mui-pull-right" href="javascript:void(0);"></a>
+    <h1 class="mui-title">Shopping Cart</h1>
+</header>
+<div class="mui-content cat_content">
+    <!-- When not logged in -->
+    <div class="no_login hide">
+        <div class="nocat_up bg_white">
+            <i class="iconfont icon-gouwucheno"></i>
+            <p>The items in the mobile shopping cart can be synchronized after logging in</p>
+            <a href="/wap/index/login.html">Login</a>
+        </div>
+    </div>
+    <!-- Signed in, no products -->
+    <div class="ok_login no_goods bg_white hide">
+        <div class="nocat_up">
+            <i class="iconfont icon-gouwucheno"></i>
+            <p>The shopping cart is empty, let's go shopping~</p>
+        </div>
+        <div class="cat_good mui-clearfix">
+            <a href="/wap/index/exchange.html">
+                <div class="cat_goodimg fl">
+                    <img src="__IMG__/img_15.png" alt="">
+                </div>
+                <div class="cat_goodtxt fr">
+                    <p>Environmental vibration area</p>
+                    <span>Limited delivery, go grab it</span>
+                </div>
+            </a>
+            <a href="/wap/user/my_focus.html">
+                <div class="cat_goodimg fl">
+                    <img src="__IMG__/img_16.png" alt="">
+                </div>
+                <div class="cat_goodtxt fr">
+                    <p>My Favorites</p>
+                    <span>Your favorites are here</span>
+                </div>
+            </a>
+        </div>
+    </div>
+    <!-- Recommended for you -->
+    <div class="is_remm hide">
+        <h1 class="recommend"><img src="__IMG__/img_4.png">recommended for you</h1>
+        <ul class="goods_ul">
+            
+        </ul>
+    </div>
+    <!-- Cart selected item -->
+    <div class="gwc_item ok_login hide">
+        <div class="shopcat_div" id="shopcat_div">
+       
+        </div>
+        <!-- total price -->
+        <div class="shopcat_down">
+            <p class="radio_all">
+                <input type="checkbox" class="sp_cbox sp_allinp">
+                <label for="" class="iconfont icon-yuan sp_label"></label>
+                select all
+            </p>
+            <div class="shopdown_txt">
+                <p class="total_text">Total: US <span>0.00</span></p>
+                <!-- <span>Save: US <span id="cut_fee">0.00</span></p> -->
+            </div>
+            <div class="shopdown_btn"><p>Go to settlement(<span class="piece_num">0</span>)</p></div>
+        </div>
+        <div class="goods_choosebg"></div>    
+    </div>
+    
+</div>
+
+{include file="public/head_nav"/}
+{include file="public/footer"/}
+<script type="text/html" id="list">
+{{each cartList as value index }} 
+<ul>
+    <li>
+    <div class="shopcat_hd" data-shopid="{{cartList[index][0].shop_id}}">
+        <div class="shopcat_hdleft">
+            <input type="checkbox" class="sp_cbox sp_storeinp"> 
+            <label for="" class="iconfont icon-yuan sp_label"></label>  
+            <i class="iconfont icon-shop"></i>
+            <a class="s_name" href="javascript:void(0);">{{index}}</a>
+            <i class="iconfont icon-rightArrow"></i>
+        </div>
+    </div>
+    <div class="shopcat_bd">
+    <ul>
+        {{each cartList[index] as avalue aindex }} 
+        <li data-id="{{avalue.id}}">
+            <div class="shopcat_list">
+                {{ if avalue.selected==1 }}
+                <input type="checkbox" class="sp_cbox sp_goodsinp" checked> 
+                <label for="" class="iconfont icon-duihao1 sp_label"></label>  
+                {{ else }}
+                <input type="checkbox" class="sp_cbox sp_goodsinp"> 
+                <label for="" class="iconfont icon-yuan sp_label"></label>  
+                {{ /if end }}
+                <div class="shoplist_midd">
+                    <a href="/wap/index/goods_info.html?id={{avalue.goods_id}}"><img src="{{avalue.goods_img}}" /></a>
+                </div>
+                <div class="shoplist_right mui-clearfix">
+                    <a class="mui-ellipsis-2 shop_title" href="/wap/index/goods_info.html?id={{avalue.goods_id}}">{{avalue.goods_name}}</a>
+                    <span class="size">{{avalue.spec_key_name}}</span>
+                    <p class="price fl">KRC <span class="s_price">{{avalue.goods_price}}</span></p>
+                    <div class="shop_num fr mui-clearfix">
+                        <button class="jian" onclick="jian({{avalue.id}},this);">-</button>
+                        <input type="num" class="num_inp" onblur="num_inp({{avalue.id}},this);" data-specnum="{{avalue.spec_num}}" value="{{avalue.goods_num}}" onkeyup="this.value=this.value.replace(/[^\d]/g,'')" />
+                        <button class="plus" onclick="plus_add({{avalue.id}},this);">+</button>
+                    </div>
+                </div>
+            </div>
+            <div class="shopcat_low mui-clearfix fr">
+                {{ if avalue.is_collection==1 }}
+               <span onclick="addCollection({{avalue.goods_id}},this);">Uncollect</span>
+                {{ else }}
+                <span onclick="addCollection({{avalue.goods_id}},this);">Add Collection</span>
+                {{ /if end }}
+                <span class="shop_del" onclick="shopDelete({{avalue.id}},this);">Delete</span>
+            </div>
+        </li>
+        {{/each}}        
+    </ul>
+    </div>
+    </li>                
+</ul>
+{{/each}}
+</script>
+<script type="text/html" id="recomm_list">
+    <li><a href="/wap/index/goods_info.html?id={{id}}">
+        <img src="{{original_img}}" width="100%">
+        <div class="goods_li_txt">
+            <h1 class="mui-ellipsis-2">{{goods_name}}</h1>
+            <p><span>KRC </span>{{shop_price}}</p>
+            <span> {{sales_num}} units sold</span>
+        </div>
+    </a></li>
+</script>
+<script>
+/*---User Info---*/
+userInfo();
+function userInfo(){
+    $get('/api/user/getuserinfo',{},function(data){
+        if(data.code==1){
+            // $('.ok_login').show();
+        } else{
+            $('.no_login').show();
+            $('.is_remm').show();
+        }                
+    });
+    $get('/api/goods/get_cart_list',{},function(data){
+        if(data.status==1){
+            if(data.data==''){
+                $('.no_goods').show();
+                $('.is_remm').show();
+                $('.gwc_item').hide();
+            } else{
+                $('.gwc_item').show();
+                $('.is_remm').hide();
+
+                $('.total_text span').html(data.data.total_price.total_fee.toFixed(2));
+                $('#cut_fee').html(data.data.total_price.cut_fee);
+                $('.piece_num').html(data.data.total_price.num);
+
+                var list =template("list",data.data);                
+                $('#shopcat_div').html(list);
+
+                check_status();
+                // totalMoney();
+                // $('input[type="checkbox"]').prop("checked", true); 
+                // isChecked();   
+                    
+            }
+        } else{
+            
+        }                
+    }); 
+   
+    var par={
+        type: 'is_recommend',
+        order_by: 'colligate',
+        order: 'asc',
+        page: 1,
+        num: 4,
+        screen: ''
+    }
+    $get('/api/goods/special_goods',par,function(data){
+        var recomm_list = "";
+        for(var i in data.data.goods_list){
+            recomm_list+=template("recomm_list",data.data.goods_list[i]);
+        }
+        $('.goods_ul').html(recomm_list);
+    });
+    
+}
+
+
+    // style modification
+    var $allCheckbox = $('input[type="checkbox"]'),
+        $spstoreinp = $('.sp_storeinp'), //The input class name of the store
+        $spgoodsinp = $('.sp_goodsinp'), //input class name of goods
+        $spallinp = $('.sp_allinp'), //Select all input class names
+        $shopcatli = $('.shopcat_div>ul>li'); //The li class name of the product
+    
+    
+    //Check box --label's selected event
+    $('.gwc_item').on('click','input[type="checkbox"]',function(){
+        if ($(this).is(':checked')) {
+            $(this).siblings('label').addClass('icon-duihao1').removeClass('icon-yuan');
+        } else {
+            $(this).siblings('label').addClass('icon-yuan').removeClass('icon-duihao1');
+        }
+    });
+    //select all click event
+    // $('.sp_allinp').click();      
+    $('.sp_allinp').on('click',function(){ 
+        var $spallcbox = $('.shopcat_div>ul>li').find('input[type="checkbox"]');
+        var cart={};
+          
+        if ($(this).is(':checked')) {
+            $spallcbox.prop("checked", true);
+            $spallcbox.siblings('label').addClass('icon-duihao1').removeClass('icon-yuan');
+            cart={
+                selected:1,
+                shop_id:""
+            }
+        } else {
+            $spallcbox.prop("checked", false);
+            $spallcbox.siblings('label').addClass('icon-yuan').removeClass('icon-duihao1');
+            cart={
+                selected:0,
+                shop_id:""
+            }
+        }
+        totalMoney();
+        $get('/api/goods/change_cart_selected_all',cart,function(data){
+            // mui.toast(data.msg);
+        });
+    }); 
+    $('.radio_all').click(function(){
+        $('.sp_allinp').click();
+    });    
+    //shop monitoring
+    $('.gwc_item').on('click','.sp_storeinp',function() {
+        var $spallinp = $('.sp_allinp'),
+            $spstoreinp = $('.sp_storeinp');
+        var shop_id=$(this).parents('.shopcat_hd').attr('data-shopid');
+        var cart={};
+
+        if ($(this).siblings('label').hasClass('icon-duihao1')) {               
+            checked($spstoreinp,$spallinp);
+            $(this).parents('.shopcat_div>ul>li').find('.sp_goodsinp').prop("checked", true);
+            $(this).parents('.shopcat_div>ul>li').find('.sp_goodsinp').siblings('label').addClass('icon-duihao1').removeClass('icon-yuan');            
+            cart={
+                selected:1,
+                shop_id:shop_id
+            }
+        } else {
+            $spallinp.siblings('label').addClass('icon-yuan').removeClass('icon-duihao1');
+            $(this).parents('.shopcat_div>ul>li').find('.sp_goodsinp').prop("checked", false);
+            spaddclass($spallinp,$(this).parents('.shopcat_div>ul>li').find('.sp_goodsinp'));         
+            cart={
+                selected:0,
+                shop_id:shop_id
+            }
+        } 
+        // interface
+        totalMoney();  
+        get_list();
+        $get('/api/goods/change_cart_selected_all',cart,function(data){
+            // mui.toast(data.msg);
+        });
+                           
+    });     
+    //The li class name of the product Monitor &&&& monitor the product
+    $('.gwc_item').on('click','.sp_goodsinp',function() {
+        var $spgoodsinp = $('.sp_goodsinp'),	
+            $spallinp = $('.sp_allinp'); 
+        
+        var all_length=$(this).parents(".shopcat_bd").find("input[type='checkbox']").length; //Total
+        var na_length=$(this).parents(".shopcat_bd").find("input[type='checkbox']:checked").length; //Number of selected items
+
+        if ( all_length==na_length ) {     
+            checked($spgoodsinp,$spallinp);                   
+            checked($(this),$(this).parents('.shopcat_div>ul>li').find('.sp_storeinp'));
+        } else {
+            spaddclass($spallinp,$spallinp);
+            spaddclass($(this).parents('.shopcat_div>ul>li').find('.sp_storeinp'),$(this).parents('.shopcat_div>ul>li').find('.sp_storeinp'));
+        }
+        // interface
+        
+        var id=$(this).parents('li').attr('data-id');
+        $get('/api/goods/change_cart_selected',{id:id},function(data){
+            // mui.toast(data.msg);
+        get_list();
+        });  
+        totalMoney();
+    });
+    // default
+    function isChecked(){
+        if ($('.sp_cbox').is(':checked')) {        
+            $('.sp_cbox').siblings('label').addClass('icon-duihao1').removeClass('icon-yuan');
+        } else {
+            $('.sp_cbox').siblings('label').addClass('icon-yuan').removeClass('icon-duihao1');
+        }
+        var cart={
+            selected:1,
+            shop_id:""
+        }
+        $get('/api/goods/change_cart_selected_all',cart,function(data){
+            // mui.toast(data.msg);
+        })  
+    }
+    function checked(inp,allinp){
+        var len = inp.length;
+        var num = 0;
+        inp.each(function() {
+            if ($(this).is(':checked')) {
+                num++;
+            }
+        });
+        if (num == len) {
+            allinp.prop("checked", true);
+            allinp.siblings('label').addClass('icon-duihao1').removeClass('icon-yuan');
+        }
+    }
+    function spaddclass(aclass,bclass){
+        aclass.prop("checked", false);
+        bclass.siblings('label').addClass('icon-yuan').removeClass('icon-duihao1');
+    }
+
+    var cartNum={};
+    //add quantity
+    function plus_add($id,$this){
+        cartNum={
+            id:$id,
+            mode:'+',
+            num:1
+        };
+        $get('/api/goods/change_cart_num',cartNum,function(d){
+            if(d.status==1){
+                mui.toast(d.msg);
+                var arr = $($this).siblings('.num_inp').val();
+                if (arr < 200) {
+                    arr++;
+                    $('.jian').removeAttr('disabled');
+                    $($this).siblings('.num_inp').val(arr);
+                } else {
+                    $($this).attr('disabled', 'true');
+                    mui.toast("The number of items cannot be greater than 200");
+                }
+                totalMoney();
+                get_list();
+            }else{
+                mui.toast(d.msg);
+                $($this).attr('disabled',true);
+            }                
+        });  
+    }
+    //reduce quantity      
+    function jian($id,$this){
+        var arr = $($this).siblings('.num_inp').val();
+        if (arr > 1) {
+            arr--;
+            $('.plus').removeAttr('disabled');
+            $($this).siblings('.num_inp').val(arr);
+        } else {
+            $($this).attr('disabled', 'true');
+        }
+        totalMoney();
+        cartNum={
+            id:$id,
+            mode:'-',
+            num:1
+        };
+        change_cart_num($this);
+    }
+    //quantity input
+    function num_inp($id,$this){
+        var inp_val = $($this).val();
+        var data_specnum=$($this).attr('data-specnum');
+        cartNum={
+            id:$id,
+            mode:'',
+            num:inp_val
+        };
+        $get('/api/goods/change_cart_num',cartNum,function(d){
+            if(d.status==1){
+                if (inp_val > 200) {
+                    layer.open({
+                        content: 'The number of items cannot be greater than 200',
+                        btn: 'OK'
+                    });
+                    $($this).val('200')
+                }
+                totalMoney();
+                get_list();
+            }else{
+                mui.toast(d.msg);
+                $($this).val(data_specnum);
+                get_list();
+            }                
+        });  
+    }
+    
+    
+   //Add to Favorites
+    function addCollection($id,$this) {
+        $get('/api/goods/collection',{id:$id},function(d){
+        if(d.status==1){
+            mui.toast(d.msg);
+            if(d.msg=='collection successful'){
+                $($this).html('Unfavorite');
+            }else if(d.msg == "Cancel the collection successfully"){
+                $($this).html('Add Favorites');
+            }
+            get_list();
+        }else{
+            layer.open({
+                type: 1,
+                skin: 'store_demo', //style class name
+                closeBtn: 0, // do not display the close button
+                anim: 2,
+                time: 4000,
+                title: false, //do not display the title
+                shadeClose: true, //Turn on the mask to close
+                content: d.msg
+            });
+        }                
+    });        
+    }
+    //delete
+    function shopDelete($id,$this) {
+        var $order_lists = $($this).parents('.shopcat_bd>ul>li');
+        var $order_content = $order_lists.parents('.shopcat_bd>ul');
+        var del = layer.confirm('Are you sure you want to delete this item?', {
+            title: false,
+            closeBtn: 0,
+            skin: 'addcat_demo',
+            shadeClose: true, //Turn on the mask to close
+            btn: ['Cancel', 'OK'] //Button
+        }, function () {
+            $('.layui-layer-btn a').attr('href', 'javascript:;');
+            layer.close(del);
+        }, function () {
+            $get('/api/goods/remove_cart',{id:$id},function(d){
+            if(d.status==1){
+                mui.toast(d.msg);
+                $('.layui-layer-btn a').attr('href', 'javascript:;');
+                $order_lists.remove();
+                if ($order_content.html().trim() == null || $order_content.html().trim().length == 0) {
+                    $order_content.parents('.shopcat_div>ul>li').remove();
+                }
+                $spgoodsinp = $('.sp_goodsinp');
+    
+                // if($('#shopcat_div ul>li').length==0){
+                //     $('.gwc_item').hide();
+                //     $('.is_remm').show();
+                //     $('.no_goods').show();
+                // } 
+                
+                get_list();
+                // totalMoney();
+            }else{
+                mui.toast(d.msg);               
+            }       
+            });         
+        });
+    }
+    // get list
+    function get_list(){
+        $get('/api/goods/get_cart_list',{},function(data){
+            if(data.status==1){
+                if(data.data==''){
+                    $('.no_goods').show();
+                    $('.is_remm').show();
+                    $('.gwc_item').hide();
+                } else{
+                    $('.gwc_item').show();
+                    $('.is_remm').hide();
+
+                    $('.total_text span').html(data.data.total_price.total_fee.toFixed(2));
+                    $('.piece_num').html(data.data.total_price.num);
+
+                    var list =template("list",data.data);
+                    $('#shopcat_div').html(list);
+  
+                    check_status();  
+                    totalMoney();           
+                }
+            } else{
+                
+            }                
+        });    
+    }
+    //price calculation
+    function totalMoney() {
+        var total_money = 0;
+        var total_count = 0;
+        var $spgoodsinp = $('.sp_goodsinp');
+        $spgoodsinp.each(function() {
+            if ($(this).is(':checked')) {
+                var numvalue=$(this).parents('.shopcat_bd>ul>li').find('.num_inp').val();  
+                var goods = parseFloat($(this).parents('.shopcat_bd>ul>li').find('.s_price').html()*numvalue);
+                var num = $('.shopcat_bd').find('.icon-duihao1');
+                total_money += goods;
+                total_count += parseInt(numvalue);
+                
+            }
+        });
+        $('.total_text span').html(total_money.toFixed(2));
+        $('.piece_num').html(total_count);
+    }
+    // increasing number
+    function change_cart_num($this){
+    $get('/api/goods/change_cart_num',cartNum,function(d){
+        if(d.status==1){
+            mui.toast(d.msg);
+            get_list();
+        }else{
+            mui.toast(d.msg);
+            $($this).attr('disabled',true);
+        }                
+    });  
+    };
+    // Check status
+    function check_status(){
+        $('#shopcat_div>ul').each(function(){
+            // console.log($(this).find('.shopcat_bd .icon-duihao1').length);
+            if($(this).find('.shopcat_bd li').length==$(this).find('.shopcat_bd li .icon-duihao1').length){
+                $(this).find('.shopcat_hd input').attr('checked',true);
+                $(this).find('.shopcat_hd label').addClass('icon-duihao1').removeClass('icon-yuan');
+            }else{
+                $(this).find('.shopcat_hd input').attr('checked',false);
+                $(this).find('.shopcat_hd label').removeClass('icon-duihao1').addClass('icon-yuan');
+            }
+        });
+        if( $('#shopcat_div>ul .shopcat_hd .icon-duihao1').length==$('#shopcat_div>ul').length){
+            $('.radio_all input').attr('checked',true);
+            $('.radio_all label').addClass('icon-duihao1').removeClass('icon-yuan');
+        }else{
+            $('.radio_all input').attr('checked',false);
+            $('.radio_all label').removeClass('icon-duihao1').addClass('icon-yuan');
+        }
+        
+    }
+    //settlement
+    $('.shopdown_btn p').click(function(){
+        var pricenum = $('.piece_num').html();
+        // console.log(pricenum);
+        if(pricenum==0){
+            layer.open({
+                type: 1,
+                skin: 'store_demo', //style class name
+                closeBtn: 0, // do not display the close button
+                anim: 2,
+                time: 4000,
+                title: false, //do not display the title
+                shadeClose: true, //Turn on the mask to close
+                content: 'Please select the item to be settled! '
+            });
+        }else{
+            window.location.href='/wap/user/buy_now.html';
+        }
+        
+    })
+
+</script>
+</body>
+</html>

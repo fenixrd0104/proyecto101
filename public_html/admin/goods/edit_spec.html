@@ -1,0 +1,199 @@
+<style>
+#line_inp input,
+#addline_html input{
+    width: 50%;
+    height: 24px;
+    margin-bottom: 5px;
+}
+#addline_html input{
+    display: inline-block;
+}
+#ed_lay_ff .layui-form-label{
+    width: 85px;
+}
+#ed_lay_ff .layui-input-block{
+    margin-left: 115px;
+}
+#ed_sel_type .layui-input-inline{
+    width: 202px;
+}
+</style>
+<div class="layui-form" id="ed_lay_ff" lay-filter="add_spec" style="padding: 20px 30px 0 0;">    
+    <div class="layui-form-item">
+        <label class="layui-form-label">类型名称</label>
+        <div class="layui-input-block">
+        <script type="text/html" template>
+            <input type="text" name="name" lay-verify="required" placeholder="输入类型名称" autocomplete="off" class="layui-input" value="{{d.params.name||''}}">
+        </script>
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">所属商品类型</label>
+        <div class="layui-input-block" id="ed_sel_type">
+            <div class="layui-input-inline">
+                <select name="" id="top_cates" lay-filter="choose_top_cate" disabled lay-verify="required">
+                    <option value="" >选择模块</option>
+                    <option value="1">VIP商品</option>
+                    <option value="2">优享商品</option>
+                    <option value="3">特惠商品</option>
+                    <option value="4">直购</option>
+                    <option value="5">高端</option>
+                </select>
+            </div>
+            <div class="layui-input-inline">                
+                <select name="select_id" id="type_caidan" lay-verify="required" lay-filter="type_caidan" disabled> </select>
+            </div>
+            <div class="layui-input-inline"> 
+                <select name="type_id" id="type_spec" lay-verify="required" disabled> </select>
+            </div>           
+        </div>
+    </div>
+    <div class="layui-form-item layui-form-text item_line">
+        <label class="layui-form-label">规格项</label>
+        <div class="layui-input-block" id="line_inp">
+            <!-- <textarea name="items" placeholder="请输入规格项" class="layui-textarea" lay-verify="required" id="spec_textarea"></textarea> -->
+        </div>
+        <div class="layui-input-block" id="addline_html" style="min-height: auto;">
+            <!-- <div>
+                <input type="text" name="items" lay-verify="required" placeholder="请输入规格项" autocomplete="off" class="layui-input">
+                <button type="button" class="layui-btn layui-btn-xs laybtn_line" style="margin-bottom: 2px;" data-type="del_line">删除</button>
+            </div> -->
+        </div>
+        <button type="button" class="layui-btn layui-btn-xs laybtn_line add_line" data-type="add_line" style="margin-left: 110px;">+</button>
+    </div>
+    <div class="layui-form-item layui-form-text">
+        <label class="layui-form-label">备注</label>
+        <div class="layui-input-block">
+            <div class="layui-word-aux" style="line-height: 36px;">每个规格项单独一行</div>
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <div class="layui-input-block">
+        <button type="button" class="layui-btn" lay-submit lay-filter="spec_submit"><i class="layui-icon">&#xe654;</i>保存</button>
+        </div>
+    </div>
+</div>
+    
+<script type="text/html" template lay-done="layui.data.sendParams(d.params)"></script>
+<script>
+layui.data.sendParams = function(params){
+console.log(params);
+layui.use(['admin', 'form','table','view','setter','layer'], function(){
+    var $ = layui.$
+    ,admin = layui.admin
+    ,setter = layui.setter
+    ,upload = layui.upload
+    ,layer = layui.layer
+    ,element = layui.element
+    ,view = layui.view
+    ,layer = layui.layer
+    ,form = layui.form;
+
+    // 获取传值参数---得到type
+    var router = layui.router();
+    // console.log(router.search);
+    admin.req({
+        url: layui.setter.baseUrl+'admin/goods/editGoodsSpec' //实际使用请改成服务端真实接口
+        ,data: { id:params.id }
+        ,type:'get'
+        ,success: function(res){
+            if(res.code==1){
+                var data=res.data.info;
+                var list_s='<input type="text" class="layui-input layui-hide">';
+                for( var i in data.goodsSpecItem){
+                    list_s +='<input type="text" name="items[]['+data.goodsSpecItem[i].id+']" lay-verify="required" placeholder="请输入规格项" autocomplete="off" class="layui-input" value="'+data.goodsSpecItem[i].item+'">'
+                }
+                $('#line_inp').html(list_s);
+                $('#top_cates').val(data.top_cate);
+                $('#type_caidan').val(data.caidan_id);
+                get_sptype(data.caidan_id,data.type_id);
+                form.render();            
+            }else{
+                layer.msg(res.msg, {icon: 5,anim: 6,shade:0.5,time: 1000});
+            }
+        }
+    }); 
+
+ 
+    if( router.search.type ){
+        var chec_id = router.search.type;
+    } else{
+        var chec_id=params.type_id;
+    }        
+    // var chec_id=params.type_id;
+    var list='';
+    if(params.values){
+        for(var i in params.values){
+            list+=params.values[i].item+'\r\n';
+        }
+        $('#spec_textarea').val(list);
+    }
+
+    // 菜单类型
+    admin.req({
+        url: layui.setter.baseUrl+'admin/goods/catetype' 
+        ,data: {}
+        ,type:'get'
+        ,success: function(res){
+            if(res.code==1){
+                var list="<option value=''>--全部菜单类型--</option>";
+                for( var i in res.data){
+                    list += "<option value='"+res.data[i].id+"' >"+res.data[i].name+"</option> ";
+                }             
+                $('#type_caidan').html(list);
+                form.render();
+            }else{
+                layer.msg(res.msg);
+            }       
+        } 
+    }); 
+    form.on('select(type_caidan)',function(e){
+        get_sptype(e.value);
+    });
+    function get_sptype(params,val) {
+    // 商品类型
+    admin.req({
+        url: layui.setter.baseUrl+'admin/goods/getTypeList' 
+        ,data: {select_id:params},
+        type:'get',
+        success: function(res){
+            if(res.code==1){
+                var list="<option value=''>--全部商品类型--</option>";
+                for( var i in res.data){
+                    list += "<option value='"+res.data[i].id+"' >"+res.data[i].name+"</option> ";
+                }     
+                $('#type_spec').html(list);   
+                $('#type_spec').val(val);                 
+                form.render();
+            }else{
+                layer.msg(res.msg);
+            }       
+        } 
+    }); 
+    }
+
+    var num=0;  
+    var $ = layui.$, active = {
+    // 添加会员组
+    add_line:function(data){ 
+        var inp='<div id="moreline_inp'+num+'"> <input type="text" name="items[][]" lay-verify="required" placeholder="请输入规格项" autocomplete="off" class="layui-input"> <button type="button" class="layui-btn layui-btn-xs laybtn_line del_line" data-num="'+num+'" style="margin-bottom: 2px;" data-type="del_line">删除</button></div>';
+        $('#addline_html').append(inp);
+        num++;
+    }
+    };
+    $('.item_line .laybtn_line').on('click', function(){
+        var type = $(this).data('type');
+        active[type] ? active[type].call(this) : '';
+    });
+    $(document).on('click','.del_line',function(data){
+        var data_num=$(this).attr('data-num');
+        $('#moreline_inp'+data_num).remove();
+    })
+    
+    
+    
+  
+
+}) 
+}
+</script>

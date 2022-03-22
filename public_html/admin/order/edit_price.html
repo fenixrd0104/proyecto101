@@ -1,0 +1,121 @@
+<form class="layui-form" id="edit_price" lay-filter="edit_price" style="padding: 20px 30px 0 0;">
+    <div class="layui-form-item">
+        <label class="layui-form-label" style="padding-top: 2px;">订单总额</label>
+        <div class="layui-input-block" id="top_info">
+            
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">物流费用</label>
+        <div class="layui-input-block">
+            <input type="text" name="shipping_price" value="" autocomplete="off" placeholder="" lay-verify="required" class="layui-input" id="wuliu">     
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">订单价格</label>
+        <div class="layui-input-block">
+            <input type="text" name="order_amount" value=""  autocomplete="off" placeholder="" lay-verify="required" class="layui-input" id="jiage">  
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">余额抵扣</label>
+        <div class="layui-input-block">
+            <input type="text" name="user_money" value=""  autocomplete="off" placeholder="" lay-verify="required" class="layui-input layui-disabled" disabled>  
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">积分抵扣</label>
+        <div class="layui-input-block">
+            <input type="text" name="integral_money" value=""  autocomplete="off" placeholder="" lay-verify="required" class="layui-input layui-disabled" disabled>  
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">应付金额</label>
+        <div class="layui-input-block">
+            <input type="text" name="total_amount" value=""  autocomplete="off" placeholder="" lay-verify="required" id="order_p" class="layui-input layui-disabled" disabled>  
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <div class="layui-input-block">
+            <button type="button" class="layui-btn" lay-submit lay-filter="edit_price_submit"><i class="layui-icon">&#xe654;</i>保存</button>
+            <button type="button" class="layui-btn layui-btn-danger" data-type="close"><i class="layui-icon">&#x1006;</i>返回</button>
+        </div>
+    </div>
+</form>  
+
+<script type="text/html" template lay-done="layui.data.sendParams(d.params)"></script> 
+<script> 
+layui.data.sendParams = function(params){
+    console.log(params);
+    layui.use(['admin', 'form', 'view','layer'], function(){
+        var $ = layui.$
+        ,admin = layui.admin
+        ,form = layui.form
+        ,layer = layui.layer
+        ,view = layui.view
+        ,layer = layui.layer
+        ,router = layui.router();
+
+        // element.render();
+        form.render(null, 'edit_price');
+
+        var $ = layui.$, active = {
+            // 返回--按钮
+            close:function(index){ 
+                layer.closeAll('page');
+            }
+        };
+        
+        $('.layui-input-block .layui-btn').on('click', function(){
+            var type = $(this).data('type');
+            active[type] ? active[type].call(this) : '';
+        });
+
+        var curr_price="";
+        admin.req({
+            url: layui.setter.baseUrl+'admin/order/editprice'
+            ,data: {id:params},
+            type:'get',
+            success: function(res){
+                if(res.code==1){
+                    var data=res.data;
+                    $('#top_info').html('<p><b>'+data.total_amount+'</b>（商品总价：'+data.order_amount+' 运费：'+data.shipping_price+'）</p><p>订单总额 = 商品总价 + 运费</p>');
+                    form.val('edit_price',{
+                        'shipping_price':data.shipping_price,
+                        'order_amount':data.order_amount,
+                        'user_money':data.user_money,
+                        'integral_money':data.integral_money,
+                        'total_amount':data.total_amount
+                    });
+                    curr_price=data.total_amount;
+                    form.render();
+
+                }else{
+                    layer.msg(res.msg, {icon: 5,anim: 6,shade:0.5,time: 1500});
+                }
+            }
+        });
+
+        $('#edit_price input').on('blur',function(){
+            // 物流价格
+            var w_p=$('#wuliu').val();
+            // 订单价格
+            var j_p=$('#jiage').val();
+            
+            // 计算总价
+            var z_p=((w_p*100+j_p*100)/100).toFixed(2);
+
+            $('#top_info').html('<p><b>'+z_p+'</b>（商品总价：'+j_p+' 运费：'+w_p+'）</p><p>订单总额 = 商品总价 + 运费</p>');
+            form.val('edit_price',{
+                'total_amount':z_p
+            });
+            form.render();
+        });
+
+
+
+
+
+    });
+}
+</script>

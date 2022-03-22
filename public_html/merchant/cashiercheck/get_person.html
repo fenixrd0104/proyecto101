@@ -1,0 +1,64 @@
+<title>选择会员</title>
+
+<div class="layui-row">
+    <div class="layui-form" lay-filter="get_person" style="padding: 20px 30px 0 0;">
+        <div class="layui-inline"  style="width:250px;">
+            <input type="text" name="keyWords" placeholder="账号/真实姓名" autocomplete="off" class="layui-input" >
+        </div>
+        <div class="layui-inline">
+            <button class="layui-btn layuiadmin-btn-list" type="button" lay-submit lay-filter="p_search"><i class="layui-icon layui-icon-search layuiadmin-button-btn"></i></button>
+        </div>
+    </div>
+    <div class="layui-col-md12">          
+        <table class="layui-hide" id="test-table-add_store" lay-filter="test-table-add_store"></table>
+        <script type="text/html" id="test-table-toolbar-purchase-list">
+        <button type="button" class="layui-btn layui-btn-xs layui-btn-normal" lay-event="edit">选择</button>
+        </script>
+    </div>
+</div>
+
+<script>
+layui.use(['admin','table','form','laydate','layer'], function(){
+    var $ = layui.$
+    ,admin = layui.admin
+    ,setter = layui.setter
+    ,view = layui.view
+    ,layer = layui.layer
+    ,table = layui.table
+    ,laydate = layui.laydate
+    ,form = layui.form;
+    
+    form.render(null, 'get_person');
+    
+    table.render({
+        elem: '#test-table-add_store'
+        ,url: layui.setter.baseUrl+'merchant/ShopStatement/getCashierLists'
+        ,parseData: function(res){ 
+            return {
+            "code": res.code, //解析接口状态
+            "msg": res.msg, //解析提示文本
+            "count": res.data.count, //解析数据长度
+            "data": res.data.lists //解析数据列表
+            };
+        }
+        ,cols: [[
+        {field:'id', width:85, title: 'ID', sort: true,align:"center"}
+        ,{field:'shop_id', width:85, title: '单号', align:"center"}
+        ,{field:'username', title: '账号',align:"center"}
+        ,{field:'real_name', title: '真实姓名',align:"center"}
+        ,{field:'shop_name', title: '商店',align:"center"}
+        ,{fixed: '', title:'操作',  toolbar: '#test-table-toolbar-purchase-list', width:80,align:"center"}
+        ]]
+        ,page: true
+    });
+
+    // 搜索
+    form.on('submit(p_search)',function(data){
+        // console.log(data.field);
+        table.reload('test-table-add_store', {
+            where: data.field
+        });
+    });
+     
+});
+</script>

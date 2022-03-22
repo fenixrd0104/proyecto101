@@ -1,0 +1,114 @@
+
+<style>
+#order_qr_row .layui-form-item{ margin-bottom: 30px; }
+</style>
+
+<div class="layui-row" id="order_qr_row">
+<div class="layui-col-md12">
+<form  class="layui-form" lay-filter="app-content-list">
+<div class="layui-form-item" style="margin-bottom: 0;">
+    <div class="layui-inline">
+        <div class="layui-input-inline">
+            <select name="shopTypeTree" id="spec_type_id"> </select>
+        </div>
+    </div>
+    <div class="layui-inline">
+        <div class="layui-input-inline">
+            <input type="text" name="keyWords" placeholder="请输入店铺名称" autocomplete="off" class="layui-input">
+        </div>
+    </div>
+    <div class="layui-inline">
+        <button class="layui-btn layuiadmin-btn-list" lay-submit lay-filter="storelist_search" type="button"><i class="layui-icon layui-icon-search layuiadmin-button-btn"></i></button>
+    </div>
+
+    <table class="layui-table layuiadmin-page-table" id="dianpu_list" lay-filter="dianpu_list"></table>
+    <script type="text/html" id="tool_dianpu_list">
+        <a class="layui-btn layui-btn-normal layui-btn-xs" lay-event="edit"><i class="layui-icon layui-icon-edit"></i>选择</a>
+    </script>
+</div>
+</form>
+</div>
+</div>
+<script> 
+layui.use(['admin', 'form', 'table', 'view','layer'], function(){
+    var $ = layui.$
+    ,admin = layui.admin
+    ,form = layui.form
+    ,layer = layui.layer
+    ,view = layui.view
+    ,layer = layui.layer
+    ,table = layui.table
+    ,router = layui.router();
+
+    // element.render();
+    form.render();
+    var active = {
+        // 返回按钮
+        close:function(index){ 
+            layer.closeAll('page');
+        }
+    };
+    $('.layui-form-item .layui-btn').on('click', function(){
+        var type = $(this).data('type');
+        active[type] ? active[type].call(this) : '';
+    });
+    var cate_list="";
+
+    var is_loading=true;
+    get_data(0);
+    function get_data(d){
+        if(d==0){
+            var type='';
+        }else{
+            var type="&shopTypeTree="+d.shopTypeTree+'&keyWords='+d.keyWords;
+        }
+        table.render({
+            elem: '#dianpu_list'
+            ,url: layui.setter.baseUrl+'admin/shop/index?'+type
+            ,parseData: function(res){ 
+                if(is_loading==true){
+                    var list="<option value=''>--全部类型--</option>";
+                    for( var i in res.data.shopTpye){
+                        list += "<option value='"+i+"' >"+res.data.shopTpye[i]+"</option> ";
+                    }    
+                    $('#spec_type_id').html(list);
+                    cate_list=res.data.shopTpye;
+                    form.render();
+                    is_loading=false;
+                }
+                return {
+                "code": res.code, //解析接口状态
+                "msg": res.msg, //解析提示文本
+                "count": res.data.count, //解析数据长度
+                "data": res.data.lists //解析数据列表
+                };
+            }
+            ,cellMinWidth: 80 
+            ,cols: [[
+                {field:'id', width:80, title: 'ID', sort: true,align:'center'}
+                ,{field:'name', title: '店铺',align:'center'}
+                ,{field:'type', width:180, title: '店铺类型/分类',templet:function(d){
+                    for(var i in  cate_list){
+                        if(i==d.type){
+                            var this_cate=cate_list[i];
+                        }
+                    }
+                    return this_cate;
+                },align:'center'}
+                ,{field:'create_time', title: '营业时间',align:'cenetr',align:'center'} 
+                ,{fixed: 'right', title:'操作',width: 100, toolbar: '#tool_dianpu_list',align:'center'}
+            ]],
+            page:true
+        });
+    }
+    //监听搜索
+    form.on('submit(storelist_search)', function(data){
+        var field = data.field;
+        // console.log(data);   
+        table.reload('dianpu_list', {
+            where: field
+        });
+    });
+    
+});
+</script>

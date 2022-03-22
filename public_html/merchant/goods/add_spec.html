@@ -1,0 +1,135 @@
+<style>
+#line_inp input{
+    margin-bottom: 5px;
+}
+</style>
+<div class="layui-form" lay-filter="add_spec" style="padding: 20px 30px 0 0;">    
+    <div class="layui-form-item">
+        <label class="layui-form-label">类型名称</label>
+        <div class="layui-input-block">
+        <script type="text/html" template>
+            <input type="text" name="name" lay-verify="required" placeholder="输入类型名称" autocomplete="off" class="layui-input" value="{{d.params.name||''}}">
+        </script>
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">所属类型</label>
+        <div class="layui-input-block">
+            <select name="type_id" id="type_spec"  lay-verify="required"> </select>
+        </div>
+    </div>
+    <div class="layui-form-item layui-form-text">
+        <label class="layui-form-label">规格项</label>
+        <div class="layui-input-block" id="line_inp">
+            <textarea name="items" placeholder="请输入规格项" class="layui-textarea" lay-verify="required" id="spec_textarea"></textarea>
+            <!-- <input type="text" name="items" lay-verify="required" placeholder="请输入规格项" autocomplete="off" class="layui-input"> -->
+        </div>
+        <!-- <button type="button" class="layui-btn layui-btn-sm add_line" style="margin-left: 110px;" data-type="add_line">添加一行</button> -->
+    </div>
+    <div class="layui-form-item layui-form-text">
+        <label class="layui-form-label">备注</label>
+        <div class="layui-input-block">
+            <div class="layui-word-aux" style="line-height: 36px;">每个规格项单独一行</div>
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <div class="layui-input-block">
+        <button type="button" class="layui-btn" lay-submit lay-filter="spec_submit"><i class="layui-icon">&#xe654;</i>保存</button>
+        </div>
+    </div>
+</div>
+    
+<script type="text/html" template lay-done="layui.data.sendParams(d.params)"></script>
+<script>
+layui.data.sendParams = function(params){
+console.log(params);
+layui.use(['admin', 'form','table','view','setter','layer'], function(){
+    var $ = layui.$
+    ,admin = layui.admin
+    ,setter = layui.setter
+    ,upload = layui.upload
+    ,layer = layui.layer
+    ,element = layui.element
+    ,view = layui.view
+    ,layer = layui.layer
+    ,form = layui.form;
+
+    // 获取传值参数---得到type
+    var router = layui.router();
+    // console.log(router.search);
+
+    admin.req({
+        url: layui.setter.baseUrl+'merchant/goods/addGoodsSpec' //实际使用请改成服务端真实接口
+        ,data: { id:params.id }
+        ,type:'get'
+        ,success: function(res){
+        if(res.code==1){
+            
+            
+        }else{
+            layer.msg(res.msg, {icon: 5,anim: 6,shade:0.5,time: 1000});
+        }
+        }
+    }); 
+
+ 
+        if( router.search.type ){
+            var chec_id = router.search.type;
+        } else{
+            var chec_id=params.type_id;
+        }        
+        // var chec_id=params.type_id;
+        var list='';
+        if(params.values){
+            for(var i in params.values){
+                list+=params.values[i].item+'\r\n';
+            }
+            $('#spec_textarea').val(list);
+        }
+
+        admin.req({
+            url: layui.setter.baseUrl+'merchant/goods/goodsType' 
+            ,data: {},
+            type:'get',
+            success: function(res){
+                if(res.code==1){
+                    var list="<option value='0'>--全部类型--</option>";
+                    for( var i in res.data.lists){
+                        list += "<option value='"+res.data.lists[i].id+"' >"+res.data.lists[i].name+"</option> ";
+                    }
+                    if(chec_id){                        
+                        $('#type_spec').html(list);
+                        $('#type_spec').val(chec_id);
+                    }else{
+                        $('#type_spec').html(list);
+                    }    
+                    
+                    form.render();
+                }else{
+                    layer.msg(res.msg);
+                }       
+            } 
+        }); 
+
+
+        var $ = layui.$, active = {
+        // 添加会员组
+        add_line:function(){
+            var inp=' <input type="text" name="items" lay-verify="required" placeholder="请输入规格项" autocomplete="off" class="layui-input">';
+            $('#line_inp').append(inp);
+
+        }
+        };
+        $('.add_line').on('click', function(){
+            var type = $(this).data('type');
+            active[type] ? active[type].call(this) : '';
+        });
+
+    
+    
+    
+  
+
+}) 
+}
+</script>

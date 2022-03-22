@@ -1,0 +1,94 @@
+<div class="layui-form" action="" lay-filter="menu_eadit" style="padding: 20px 30px 0 0;">
+    <div class="layui-form-item">
+        <label class="layui-form-label">所属父级</label>
+        <div class="layui-input-block" lay-filter="selFilter">
+            <select name="id" id="LAY-select">
+                <!-- <option value="1">--默认顶级--</option> -->
+            </select>
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">菜单名称</label>
+        <div class="layui-input-block">
+        <input type="text" name="title" id="LAY-title" lay-verify="required" placeholder="输入菜单名称" autocomplete="off" class="layui-input" >
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">节点</label>
+        <div class="layui-input-block">
+        <input type="text" name="name" lay-verify="required" placeholder="模块/控制器/方法" autocomplete="off" id="LAY-name" class="layui-input" >
+        </div>
+        <div class="layui-form-mid layui-word-aux" style="margin-left: 110px">如：admin/user/adduser (一级节点添加“#”即可)</div>  
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">附加</label>
+        <div class="layui-input-block">
+        <input type="text" name="condition" placeholder="" id="LAY-name" class="layui-input" >
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">CSS样式</label>
+        <div class="layui-input-block">
+        <input type="text" name="css" id="LAY-css" placeholder="输入菜单名称前显示的CSS样式" class="layui-input">
+        </div>
+        <div class="layui-form-mid layui-word-aux" style="margin-left: 110px"><a href="http://fontawesome.dashgame.com/" target="_black" style="color: #337ab7">选择图标</a> 如fa fa-user</div>  
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">排序</label>
+        <div class="layui-input-block">
+        <input type="text" name="sort" id="LAY-sort" lay-verify="required" placeholder="输入排序" value="255" autocomplete="off" class="layui-input" >
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">是否显示</label>
+        <div class="layui-input-block">
+        <input type="radio" name="is_show" value="1" title="是" checked>
+        <input type="radio" name="is_show" value="0" title="否">
+        </div>                    
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">管理节点</label>
+        <div class="layui-input-block">
+        <input type="radio" name="tag" value="1" title="是">
+        <input type="radio" name="tag" value="0" title="否" checked>
+        </div>                    
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">站点状态</label>
+        <div class="layui-input-block">
+        <input type="radio" name="status" value="1" title="开启" checked="">
+        <input type="radio" name="status" value="0" title="关闭">
+        </div>                    
+    </div>
+    <div class="layui-form-item">
+        <div class="layui-input-block">
+        <button type="button" class="layui-btn" lay-submit lay-filter="component-form-element"><i class="layui-icon">&#xe654;</i>保存</button>
+        <button type="button" class="layui-btn layui-btn-danger" data-type="close" id="btnclose"><i class="layui-icon">&#x1006;</i>关闭</button>
+        </div>
+    </div>
+</div>
+<script>        
+layui.use(['admin', 'table', 'form','layer'], function(){
+    var $ = layui.$
+    ,admin = layui.admin
+    ,element = layui.element
+    ,form = layui.form
+    ,layer = layui.layer
+    ,table = layui.table;
+
+    // element.render();
+    form.render(null, 'menu_eadit');
+    
+    //取消按钮
+    var active = {
+        close: function(){     
+            layer.closeAll('page'); //关闭所有页面层
+        }
+    }  
+    $('.layui-input-block .layui-btn').on('click', function(){
+    var type = $(this).data('type');
+    active[type] ? active[type].call(this) : '';
+    });
+
+});
+</script>

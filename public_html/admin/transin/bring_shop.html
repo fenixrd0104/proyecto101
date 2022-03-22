@@ -1,0 +1,58 @@
+<title>调出店铺</title>
+
+<div class="layui-row">
+    <div class="layui-form" lay-filter="app-content-list" style="padding: 20px 30px 0 0;">
+        <div class="layui-inline"  style="width:250px;">
+            <input type="text" name="keyWords" placeholder="商店ID/商店名称/电话/地址" autocomplete="off" class="layui-input" >
+        </div>
+        <div class="layui-inline">
+            <button class="layui-btn layuiadmin-btn-list" type="button" lay-submit lay-filter="p_search"><i class="layui-icon layui-icon-search layuiadmin-button-btn"></i></button>
+        </div>
+    </div>
+    <div class="layui-col-md12">          
+        <table class="layui-hide" id="test-table-bring-shop" lay-filter="test-table-bring-shop"></table>
+        <script type="text/html" id="test-table-toolbar-purchase-list">
+        <button type="button" class="layui-btn layui-btn-xs layui-btn-normal" lay-event="edit">选择</button>
+        </script>
+    </div>
+</div>
+
+<script>
+layui.use(['admin','table','form','laydate','layer'], function(){
+    var $ = layui.$
+    ,admin = layui.admin
+    ,setter = layui.setter
+    ,view = layui.view
+    ,layer = layui.layer
+    ,table = layui.table
+    ,laydate = layui.laydate
+    ,form = layui.form;
+    
+    form.render(null, 'app-content-list');
+    
+    table.render({
+        elem: '#test-table-bring-shop'
+        ,url: layui.setter.baseUrl+'admin/StockApply/getShopLists'
+        ,cols: [[
+        {field:'id', width:70, title: 'ID', sort: true,align:"center"}
+        ,{field:'name', title: '店铺名称',align:"center"}
+        ,{field:'phone', title: '联系电话',align:"center"}
+        ,{field:'address', title: '地址',align:"center"}
+        ,{fixed: '', title:'操作',  toolbar: '#test-table-toolbar-purchase-list', width:80,align:"center"}
+        ]]
+    });
+
+    // 搜索
+    form.on('submit(p_search)',function(data){
+        // console.log(data.field);
+        table.reload('test-table-bring-shop', {
+            where: data.field
+        });
+    });
+     
+
+  
+
+
+});
+</script>

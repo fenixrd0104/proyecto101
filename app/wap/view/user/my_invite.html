@@ -1,0 +1,74 @@
+{include file="public/header" /}
+<style>
+
+</style>
+</head>
+
+<body class="">
+    <header class="mui-bar mui-bar-nav" id="header">
+        <a class="back-page mui-icon mui-icon-left-nav mui-pull-left" href="javascript:;"></a>
+        <a id="menu" class="mui-action-menu mui-icon mui-icon-bars mui-pull-right" href="javascript:void(0);"></a>
+        <h1 class="mui-title">Invite friends</h1>
+    </header>
+    <div class="mui-content">
+        <div class="invite_div">
+            <div class="invite_invite">
+                <p>Your invitation code</p>
+                <h1 id="code_num" class="text-gold"></h1>
+                <button type="button" class="btn_code bg-gold" title="" id="btn_invite">Copy invitation code</button>
+            </div>
+            <div class="mb50"></div>
+            <div class="invite_code">
+                <div id="qrcode"></div>
+                <p id="url" class="text-gray"></p>
+                <button title="" type="button" id="btn_code">click to copy</button>
+            </div>
+        </div>
+    </div>
+    {include file="public/head_nav"/} {include file="public/footer" /}
+    <script>
+        // User Info
+        get_data();
+
+        function get_data() {
+            $get('/api/user/getuserinfo', {}, function(data) {
+                // console.log(data);
+                if (data.code == 1) {
+                    var data = data.data;
+                    // Invitation code
+                    $("#code_num").html(data.tma);
+                    $("#btn_invite").attr('title', data.tma);
+                    // generate QR code
+                    jQuery('#qrcode').qrcode({
+                        render: "canvas",
+                        width: 150,
+                        height: 150,
+                        text: baseurl + 'wap/index/register.html?tma=' + data.tma
+                    });
+                    // link address
+                    var get_url = baseurl + 'wap/index/register.html?tma=' + data.tma;
+                    $("#url").html(get_url);
+                    $("#btn_code").attr('title', get_url);
+                } else {
+                    mui.toast(data.msg);
+                }
+            });
+        }
+        // copy the invitation code
+        $('#btn_invite').on('tap', function() {
+            mui.toast("Copied");
+            var val = $(this).attr('title');
+            $(this).attr('data-clipboard-text', val);
+            var clipboard = new ClipboardJS('#btn_invite');
+        });
+        // copy the address
+        $('#btn_code').on('tap', function() {
+            mui.toast("Copied");
+            var val = $(this).attr('title');
+            $(this).attr('data-clipboard-text', val);
+            var clipboard = new ClipboardJS('#btn_code');
+        });
+    </script>
+</body>
+
+</html>

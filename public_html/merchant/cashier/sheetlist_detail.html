@@ -1,0 +1,645 @@
+<title>在线收银</title>
+<style>
+    .choose_purchase .layui-input-block{ margin-left: 80px; }
+    .choose_purchase .layui-form-label{padding: 9px 0;}
+    .choose_purchase .layui-row .layui-col-lg4{ margin-bottom: 10px !important;}
+</style>
+<script type="text/html" template>
+    <link rel="stylesheet" href="{{ layui.setter.base }}style/purchase.css?v={{ layui.admin.v }}-1" media="all">
+</script>
+<div class="layui-card layadmin-header">
+    <div class="layui-breadcrumb" lay-filter="breadcrumb">
+        <a>收银管理</a>
+        <a lay-href="/cashier/sheetlist">收银单</a>
+        <a><cite>收银单详情</cite></a>
+    </div>
+</div>
+
+<form class="layui-form layui-fluid" lay-filter="sheetlist_detail">
+    <div class="layui-row">
+    <div class="layui-card">
+    <div class="layui-card-header">收银单详情</div> 
+    <div class="layui-card-body choose_purchase">  
+        <div class="layui-btn-group">        
+            <button type="button" class="layui-btn layui-hide" id="again_submit" lay-submit lay-filter="again_submit">重新收银</button>
+            <button type="button" class="layui-btn layui-hide" id="sales_return" lay-submit lay-filter="sales_return">整单退货</button>
+            <button type="button" class="layui-btn layui-hide" id="quxiao_submit" lay-submit lay-filter="quxiao_submit">取消</button>
+            <button type="button" class="layui-btn" lay-submit lay-filter="print">单据打印</button>
+            <button type="button" class="layui-btn" lay-submit lay-filter="receipts_print">小票打印</button>
+        </div> 
+        <hr>
+
+        <!-- 第二步：建立视图。 -->
+        <div class="layui-row" id="view_detail"> </div>
+        <!--  第一步：编写模版。 -->
+        <script id="demo_detail" type="text/html">             
+        <div class="layui-col-lg4 layui-col-md6">
+            <label class="layui-form-label">店铺名称：</label>
+            <div class="layui-input-block">
+                <div class="layui-form-mid layui-word-aux">{{ d.shop_name}}</div>
+            </div>
+        </div>
+        <div class="layui-col-lg4 layui-col-md6">
+            <label class="layui-form-label">订 单 号：</label>
+            <div class="layui-input-block">
+                <div class="layui-form-mid layui-word-aux">{{ d.order_id}}</div>
+            </div>
+        </div>
+        <div class="layui-col-lg4 layui-col-md6">
+            <label class="layui-form-label">订单状态：</label>
+            <div class="layui-input-block">
+                <div class="layui-form-mid layui-word-aux">{{ d.order_status}}</div>
+            </div>
+        </div>        
+        <div class="layui-col-lg4 layui-col-md6">
+            <label class="layui-form-label">收 银 员：</label>
+            <div class="layui-input-block">
+                <div class="layui-form-mid layui-word-aux">{{ d.cashier_account}}</div>
+            </div>
+        </div>
+        <div class="layui-col-lg4 layui-col-md6">
+            <label class="layui-form-label">售 货 员：</label>
+            <div class="layui-input-block">
+                <div class="layui-form-mid layui-word-aux" id="sale_account"></div>
+            </div>
+        </div>
+        <div class="layui-col-lg4 layui-col-md6">
+            <label class="layui-form-label">会员：</label>
+            <div class="layui-input-block">
+                <div class="layui-form-mid layui-word-aux">{{ d.user_account}}</div>
+            </div>
+        </div>
+        <div class="layui-col-lg4 layui-col-md6">
+            <label class="layui-form-label">销售数量：</label>
+            <div class="layui-input-block">
+                <div class="layui-form-mid layui-word-aux">{{ d.num}}</div>
+            </div>
+        </div>
+        <div class="layui-col-lg4 layui-col-md6">
+            <label class="layui-form-label">使用积分：</label>
+            <div class="layui-input-block">
+                <div class="layui-form-mid layui-word-aux">{{ d.integral_money}}</div>
+            </div>
+        </div>
+        <div class="layui-col-lg4 layui-col-md6">
+            <label class="layui-form-label">使用余额：</label>
+            <div class="layui-input-block">
+                <div class="layui-form-mid layui-word-aux">{{ d.user_money}}</div>
+            </div>
+        </div>
+        <div class="layui-col-lg4 layui-col-md6">
+            <label class="layui-form-label">总 金 额：</label>
+            <div class="layui-input-block">
+                <div class="layui-form-mid layui-word-aux">{{ d.total_amount}}</div>
+            </div>
+        </div>
+        <div class="layui-col-lg4 layui-col-md6">
+            <label class="layui-form-label">优惠金额：</label>
+            <div class="layui-input-block">
+                <div class="layui-form-mid layui-word-aux">{{ d.discount}}</div>
+            </div>
+        </div>
+        <div class="layui-col-lg4 layui-col-md6">
+            <label class="layui-form-label">实际金额：</label>
+            <div class="layui-input-block">
+                <div class="layui-form-mid layui-word-aux">{{ d.order_amount}}</div>
+            </div>
+        </div>
+        <div class="layui-col-lg4 layui-col-md6">
+            <label class="layui-form-label">本单积分：</label>
+            <div class="layui-input-block">
+                <div class="layui-form-mid layui-word-aux">{{ d.integral}}</div>
+            </div>
+        </div>
+        <div class="layui-col-lg4 layui-col-md6">
+            <label class="layui-form-label">支付方式：</label>
+            <div class="layui-input-block">
+                <div class="layui-form-mid layui-word-aux">{{ d.pay_name}}</div>
+            </div>
+        </div>
+        <div class="layui-col-lg4 layui-col-md6">
+            <label class="layui-form-label">下单时间：</label>
+            <div class="layui-input-block">
+                <div class="layui-form-mid layui-word-aux">{{ d.create_time}}</div>
+            </div>
+        </div>
+        <div class="layui-col-lg4 layui-col-md6">
+            <label class="layui-form-label">退款现金：</label>
+            <div class="layui-input-block">
+                <div class="layui-form-mid layui-word-aux">{{ d.returns_price}}</div>
+            </div>
+        </div>
+        <div class="layui-col-lg4 layui-col-md6">
+            <label class="layui-form-label">退款积分：</label>
+            <div class="layui-input-block">
+                <div class="layui-form-mid layui-word-aux">{{ d.refunds_integral}}</div>
+            </div>
+        </div>
+        <div class="layui-col-lg4 layui-col-md6">
+            <label class="layui-form-label">退款余额：</label>
+            <div class="layui-input-block">
+                <div class="layui-form-mid layui-word-aux">{{ d.refunds_money}}</div>
+            </div>
+        </div>
+        <div class="layui-col-lg12 layui-col-md12">
+            <label class="layui-form-label">备注：</label>
+            <div class="layui-input-block">
+                <div class="layui-form-mid layui-word-aux">{{ d.admin_note}}</div>
+            </div>
+        </div>
+        </script>
+        
+
+        <input type="hidden" name="order_id" id="order_id">
+        <input type="hidden" name="pay_id" id="pay_id">
+        <div class="layui-row">
+            <table id="table_cost_detail" lay-filter="table_cost_detail"></table> 
+            <script type="text/html" id="test-table_status">
+            {{# if(d.order_status_html || d.pay_status_html ){ }}
+                <button type="button" class="layui-btn layui-btn-xs layui-btn-normal" id="return_goods" lay-event="return">退货</button>    
+            {{# }else{ }}      
+                <button type="button" class="layui-btn layui-btn-xs layui-btn-normal layui-btn-disabled" id="return_goods" lay-event="return" disabled="disabled" >退货</button>  
+            {{# } }}
+            </script>
+        </div>
+
+        <div class="layui-hide">
+        <!--startprint-->
+        <div class="bd_canvas" id="bd_canvas">  </div>
+        <!--endprint-->
+        </div>
+        <!-- 第一步：编写模版 -->
+        <script id="demo_s" type="text/html">
+        {{#  layui.each(d, function(index, item){ }}
+            {{# if( item.type == "text" ) { }}
+                <span class='subobj span_{{index}}'>{{item.value}}</span>
+            {{# } else if( item.type == "img" ) { }}
+                <span class='subobj span_{{index}}'><img id='img_{{index}}' width="100%" height="100%" ></span>
+            {{# } else if( item.type == "lists" ) { }}
+                <span class='subobj span_{{index}}'>
+                    <p style="text-align:center;">商品列表</p>
+                    {{#  layui.each(item.value, function(index, item1){ }}
+                    <p>{{item1}}</p>
+                    {{#  }); }}
+                </span>
+            {{# } }}  
+        {{#  }); }}
+        </script> 
+    </div>
+    </div>
+    </div>
+    
+    
+</form>
+<script>
+layui.use('JsBarcode.code128.min', layui.factory('JsBarcode.code128.min'))
+.use('JsBarcode.all.min', layui.factory('JsBarcode.all.min'))
+.use(['admin','table','form','laydate','view','myprint','layer','laytpl'], function(){
+    var $ = layui.$
+    ,admin = layui.admin
+    ,view = layui.view
+    ,setter = layui.setter
+    ,table = layui.table
+    ,layer = layui.layer
+    ,laytpl = layui.laytpl
+    ,laydate = layui.laydate
+    ,myprint = layui.myprint
+    ,form = layui.form;
+
+    // $('.layadmin-tabspage-none').addClass('layadmin-side-shrink');
+    form.render(null, 'sheetlist_detail');
+    // 获取传值参数---得到id
+    var router = layui.router();
+    // console.log(router.search);
+    var id = router.search.order_id;
+    
+    get_data();
+    var table_xls;
+    var data_xls;
+    function get_data(){
+        // console.log(json_data)
+        
+        table_xls = table.render({
+            elem: '#table_cost_detail'
+            ,title: "收银详情"
+            ,data: json_data
+            ,cellMinWidth: 80 //全局定义常规单元格的最小宽度，layui 2.2.1 新增
+            ,toolbar: '#test-table-toolbar'
+            ,cols: [[
+            {type:'checkbox'}
+            ,{field:'id', width:80, title: 'ID',align:"center", sort: true,}
+            ,{field:'goods_sku', title: '商品SKU',align:"center"}
+            ,{field:'goods_name', title: '商品名称',align:"center"}
+            ,{field:'spec_key_name', title: '规格',align:"center"}
+            ,{field:'shop_price', title: '原价',align:"center",width: 90}
+            ,{field:'member_goods_price', title: '实际售价',align:"center",templet:'#market_price',width: 90}
+            ,{field:'goods_num', title: '数量',align:"center",templet:'#cost_price',width: 90}
+            ,{field:'total_money', title: '金额',align:"center",width: 90,
+            templet: function (d) {                         
+                return (d.member_goods_price*d.goods_num).toFixed(2)
+            }}
+            ,{field: 'remarks', title:'调价备注',width:160,align:"center"}      
+            ,{field: '', title:'操作',width:100,toolbar: '#test-table_status',align:"center"}      
+            ]]
+            ,limit: 10000
+            ,done: function (res, page, count){
+                data_xls = res.data;  
+                           
+            }
+
+        });
+    }
+
+    var myobj=[];//打印头部    
+    var json_data;
+    // 获取信息 “form” ---请求登入接口
+    admin.req({
+        url: layui.setter.baseUrl+'merchant/Cashier/lists'
+        ,data: { order_id:id }
+        ,type:'get'
+        ,success: function(res){
+            if(res.code==1){
+                // console.log(res.data);
+                
+                $('#order_id').val(res.data.info.order_id);
+                $('#pay_id').val(res.data.info.pay_id);
+                
+
+                //第三步：渲染模版
+                var data = res.data.info;
+                var getTpl = demo_detail.innerHTML
+                    ,view_detail = document.getElementById('view_detail');
+                laytpl(getTpl).render(data, function(html){
+                    view_detail.innerHTML = html;
+                });
+                
+                // 判断是否可以---整单退货
+                if( data.order_status ==="已撤销" ){
+                       
+                } else if( data.pay_status ==="未付款"){
+                    $('#quxiao_submit').removeClass('layui-hide');
+                    $('#again_submit').removeClass('layui-hide');
+                } else if(data.pay_status ==="已付款"){
+                    $('#sales_return').removeClass('layui-hide');
+                }
+                if(data.pay_status ==="已付款" && data.order_status ==="已提交" ){
+                    for( var i in res.data.lists){                        
+                        res.data.lists[i].order_status_html="已提交";                    
+                        res.data.lists[i].pay_status_html="已付款";   
+                    }     
+                }
+                // if( data.order_status ==="已撤销" ){
+                //     $('#sales_return').removeClass('layui-hide');  
+                //     for( var i in res.data.lists){                        
+                //         res.data.lists[i].order_status_html="已提交";                    
+                //         res.data.lists[i].pay_status_html="已付款";   
+                //     }                  
+                // } else if( data.pay_status ==="未付款"){
+                //     $('#again_submit').removeClass('layui-hide');
+                //     $('#sales_return').removeClass('layui-hide');
+                // } 
+                admin.req({
+                    url: layui.setter.baseUrl + 'merchant/Cashier/getWorkerById'
+                    ,data: { uid:res.data.info.sale_uid  }
+                    ,type: 'get'
+                    ,success: function (res) {
+                        if (res.code == 1) {
+                            // 确认--时的默认设置  
+                            $('#sale_account').html( res.data.username ); 
+                        } else {           
+                            $('#sale_account').html(""); 
+                        }
+                    }
+                }); 
+
+                // 打印
+                myobj['店铺名称']=res.data.info.shop_name;           
+                myobj['订 单 号']=res.data.info.order_id;              
+                myobj['订单状态']=res.data.info.order_status; 
+                myobj['收 银 员']=res.data.info.cashier_account;                         
+                myobj['售 货 员']=res.data.info.sale_account; 
+                myobj['会员']=res.data.info.user_account;        
+                myobj['销售数量']=res.data.info.num;       
+                myobj['使用积分']=res.data.info.integral_money;       
+                myobj['使用余额']=res.data.info.user_money;       
+                myobj['总 金 额']=res.data.info.total_amount;       
+                myobj['优惠金额']=res.data.info.discount;       
+                myobj['实际金额']=res.data.info.order_amount;       
+                myobj['本单积分']=res.data.info.integral;       
+                myobj['支付方式']=res.data.info.pay_name;       
+                myobj['下单时间']=res.data.info.create_time;       
+                myobj['备注']=res.data.info.admin_note;       
+                myobj['退款现金']=res.data.info.returns_price;       
+                myobj['退款积分']=res.data.info.refunds_integral;       
+                myobj['退款余额']=res.data.info.refunds_money;       
+                // 自定义json
+                json_data = res.data.lists;
+                // console.log(JSON.stringify(json_data));   
+                get_data();
+                form.render();
+            }else{
+                layer.msg(res.msg);
+            }
+        }
+    }); 
+
+    // 取消订单
+    form.on('submit(quxiao_submit)',function(e){
+        admin.req({
+            url: layui.setter.baseUrl+'merchant/Cashier/cancel'
+            ,data: {order_id: e.field.order_id}
+            ,type:'get'
+            ,success: function(res){
+                if(res.code==1){
+                    layer.msg(res.msg, {icon: 1,time: 1000});
+                }else{
+                    layer.msg(res.msg, {icon: 5,anim: 6,shade:0.5,time: 1000});
+                }       
+            } 
+        });
+      
+    });
+    // 重新收银
+    form.on('submit(again_submit)',function(e){
+        console.log(e.field);
+        var field = e.field;
+        admin.popup({
+            title: "零售单支付",
+            area: admin.screen() < 2 ? ['95%', '90%'] : ["600px", "520px"],
+            id: "LAY-popup-add",
+            success: function (layero, index) {
+            view(this.id).render('/cashier/payment',e.field).done(function () {
+            // 线上支付
+            form.on("submit(lay_online)", function(online){ 
+            var lay_id=$(this).attr('lay-id');
+            if( lay_id == 1 ){
+                admin.req({
+                url: layui.setter.baseUrl+'merchant/Cashier/getPayConfig'
+                ,data:  { order_id:field.order_id, pay_id:lay_id}
+                ,type: 'post'
+                ,success: function(res){
+                    if(res.code==1){
+                        // console.log(res.data);
+                        layer.msg(res.msg, {icon: 1,time: 1000},function(){
+                            location.href="#/cashier/sheetlist_detail/order_id="+field.order_id;
+                        });
+                    }else{
+                        layer.msg(res.msg, {icon: 5,anim: 6,shade:0.5,time: 1500});
+                    }       
+                } 
+                });
+            } else{
+            admin.popup({
+            title: "请扫码",
+            area: ["500px",'170px'],            
+            id: "LAY-popup-sao_purchase",
+            success: function(e, i) {
+                view(this.id).render('/cashier/sweep_code').done(function() {
+                $('#code_inp').focus();
+                form.on("submit(code_btn)", function(code){ 
+                // console.log(code.field);
+                admin.req({
+                url: layui.setter.baseUrl+'merchant/Cashier/getPayConfig'
+                ,data:  { order_id:field.order_id, pay_id:lay_id,auth_code:code.field.auth_code}
+                ,type: 'post'
+                ,success: function(res){
+                    if( res.code == 1 ){
+                        // console.log(res.data);  
+                        layer.msg(res.msg, {icon: 1,time: 1000},function(){
+                            location.href="#/cashier/sheetlist_detail/order_id="+field.order_id;
+                        });
+                    } else if( res.code == 2 ){
+                        var a_code = $('#code_inp').val();
+                        var myMsg = layer.msg(res.msg, {
+                                icon: 16,
+                                time:false //取消自动关闭
+                        });
+                        
+                        // layer.msg(res.msg, { icon: 16});
+                        
+                        let aa = setInterval(function(){
+                        admin.req({
+                            url: layui.setter.baseUrl+'merchant/Cashier/getPayStatus'
+                            ,data:  { order_id:field.order_id}
+                            ,type: 'get'
+                            ,success: function(res){
+                                if( res.code == 1 ){
+                                    clearInterval(aa); 
+                                    layer.close(myMsg);//手动关闭 
+                                    layer.msg(res.msg, {icon: 1,time: 1000},function(){
+                                        location.href="#/cashier/sheetlist_detail/order_id="+field.order_id
+                                    });
+                                } else if( res.code == 2 ){
+                                    layer.msg(res.msg, { icon: 16 });                                         
+                                } else if( res.code == 0 ){
+                                    clearInterval(aa);
+                                    layer.close(myMsg);//手动关闭 
+                                    layer.msg(res.msg, {icon: 5,anim: 6,shade:0.5,time: 1500});
+                                }
+                            } 
+                        }); 
+                        
+                        },3000);
+                        
+                    
+                    // 288097395358345959
+                        
+                        
+                        
+                    } else if( res.code == 0 ){
+                        layer.msg(res.msg, {icon: 5,anim: 6,shade:0.5,time: 1500});
+                    }       
+                } 
+                });
+                    
+                });
+                });
+            }   
+            });    
+            }
+            
+                
+            });  
+            
+            // 线下支付
+            form.on("submit(lay_offline)", function(e){ 
+                var lay_id=$(this).attr('lay-id');
+                console.log( lay_id );
+                admin.req({
+                    url: layui.setter.baseUrl+'merchant/Cashier/getPayConfig'
+                    ,data:  { order_id:field.order_id, pay_id:lay_id}
+                    ,type: 'post'
+                    ,success: function(res){
+                        if(res.code==1){
+                            // console.log(res.data);
+                            layer.msg(res.msg, {icon: 1,time: 1000},function(){
+                                location.href="#/cashier/sheetlist_detail/order_id="+field.order_id
+                            });
+                        }else{
+                            layer.msg(res.msg, {icon: 5,anim: 6,shade:0.5,time: 1500});
+                        }       
+                    } 
+                });
+            });
+           
+            
+            });
+            }
+        });
+    });
+
+    // 整单退货
+    form.on('submit(sales_return)',function(e){
+        // console.log(e.field);
+    admin.popup({
+        title: "整单退货",
+        area: ["562px",'415px'],            
+        id: "LAY-popup-sao_purchase",
+        success: function(e, i) {
+        view(this.id).render('/cashier/sales_return').done(function() {
+        form.on("submit(sales_return)", function(code){ 
+        // console.log(code.field);
+        var field =code.field;
+        admin.req({
+            url: layui.setter.baseUrl+'merchant/Cashier/refunds' //实际使用请改成服务端真实接口
+            ,data: { order_id: id, refunds_price: field.propose_returns_price,
+                refunds_integral: field.propose_refunds_integral, refunds_money: field.propose_refunds_money,}
+            ,type:'post'
+            ,success: function(res){
+                if(res.code==1){
+                    layer.msg(res.msg, {icon: 1,time: 1000});
+                    layer.close(i); 
+                }else{
+                    layer.msg(res.msg, {icon: 5,anim: 6,shade:0.5,time: 1000});
+                }
+            }
+        });
+            
+        });
+        });
+        }   
+    });    
+        
+    });
+
+    // 单据打印
+    form.on('submit(print)',function(e){
+        // console.log(e.field);
+        myprint.myprint(myobj,'table_cost_detail');
+    });
+    // 小票打印
+    form.on('submit(receipts_print)',function(e){
+    // console.log(e.field);
+    admin.req({
+        url: layui.setter.baseUrl+'merchant/Barcode/cashierOrder'
+        ,data: { order_id: id}
+        ,type:'get'
+        ,success: function(res){
+            if(res.code==1){
+                $('#bd_canvas').width(res.data.width);
+                // $('#bd_canvas').height(res.data.height);
+                $('.bd_canvas').css({
+                    'position':"relative",
+                    'background':'#fff'
+                });
+
+                //第三步：渲染模版    
+                var getTpl = demo_s.innerHTML
+                ,view = document.getElementById('bd_canvas');
+                laytpl(getTpl).render(res.data.sub, function(html){
+                    view.innerHTML = html;
+                });
+
+                for( var index in res.data.sub ){
+                    $('.span_'+index).css({
+                        'display':"inline-block",
+                        'position':"absolute",
+                        'width': res.data.sub[index].width+'px',
+                        'height': res.data.sub[index].height+'px',
+                        'top': res.data.sub[index].top+'px',
+                        'left': res.data.sub[index].left+'px',
+                        'font-size': res.data.sub[index].size+'px'
+                    });
+                    if( res.data.sub[index].type=="img" ){
+                        $("#img_"+index).JsBarcode( res.data.sub[index].value );
+                    }
+                }  
+                receipts_myprint();    
+            }else{
+                layer.msg(res.msg, {icon: 5,anim: 6,shade:0.5,time: 1000});
+            }
+        }
+    });
+    });
+
+    // 打印
+    function receipts_myprint(){ 
+        window.location.replace("#/cashier/sheetlist_choose");
+        var $iframe = $("<iframe  />");
+        $iframe.css({
+            position: "absolute",
+            width: "0px",
+            height: "0px",
+            left: "-600px",
+            top: "-600px"
+        });
+        $iframe.appendTo("body");
+        var doc = $iframe[0].contentWindow.document;
+        
+        var head = "<html><head><title></title></head><body><OBJECT classid='CLSID:8856F961-340A-11D0-A96B-00C04FD705A2' height='0' id='WebBrowser3' width='0' VIEWASTEXT></OBJECT><style>@page {size: auto;margin: 0mm;}html,body{padding: 5px;}</style>";//先生成头部
+        var foot = "</body></html>";//生成尾部
+        // var newWin=window.open("_url","_blank","");
+        bdhtml=window.document.body.innerHTML;
+        sprnstr="<!--startprint-->"; //打印区域开始的标记
+        eprnstr="<!--endprint-->";   //打印区域结束的标记  
+        prnhtml=bdhtml.substr(bdhtml.indexOf(sprnstr)+17);      
+        prnhtml=prnhtml.substring(0,prnhtml.indexOf(eprnstr)); 
+        var titleHTML=head+prnhtml+foot;   
+        doc.write(titleHTML);  
+        $iframe[0].contentWindow.print();
+    }
+
+    // 单件退货------表格
+    table.on('tool(table_cost_detail)',function(obj){
+    // console.log(obj);
+    var order_lists_id= obj.data.id;
+    if(obj.event==='return'){
+    admin.popup({
+        title: "单件退货",
+        area: ["500px",'375px'],            
+        id: "LAY-popup-sao_purchase",
+        success: function(e, i) {
+        view(this.id).render('/cashier/return_goods').done(function() {
+        form.on("submit(return_goods)", function(dd){ 
+        console.log(dd.field);
+        var field=dd.field;
+        admin.req({
+            url: layui.setter.baseUrl+'merchant/cashier/dantui' //实际使用请改成服务端真实接口
+            ,data: { order_id:id, order_lists_id:order_lists_id,
+                refunds_num:field.refunds_num, refunds_price:field.refunds_price,
+                refunds_integral:field.refunds_integral, refunds_money:field.refunds_money }
+            ,type:'post'
+            ,success: function(res){
+                if(res.code==1){
+                    layer.msg(res.msg, {icon: 1,time: 1000});
+                    layer.close(i); 
+                }else{
+                    layer.msg(res.msg, {icon: 5,anim: 6,shade:0.5,time: 1000});
+                }
+            }
+        }); 
+            
+        });
+        });
+        }   
+    });    
+    }else if(obj.event==='LAYTABLE_PRINT'){
+        console.log(4565);
+        
+    }
+    });
+
+
+    
+});
+</script>

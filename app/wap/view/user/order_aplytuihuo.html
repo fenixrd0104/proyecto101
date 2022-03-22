@@ -1,0 +1,133 @@
+{include file="public/header" /}
+</head>
+<body style="background: #f8f8f8;">
+<header class="mui-bar mui-bar-nav bg_white" id="header">
+    <a class="mui-action-back mui-icon mui-icon-left-nav mui-pull-left" href="javascript:;"></a>
+    <a id="menu" class="mui-action-menu mui-icon mui-icon-bars mui-pull-right" href="javascript:;"></a>
+    <h1 class="mui-title">Request a refund</h1>
+</header>
+<div class="mui-content">
+    <div class="mb10"></div>
+    <ul class="aply_ul">
+        <li>
+            <img src="__IMG__/touxiang.png" alt="">
+            <div class="aply_txt">
+                <h3></h3>
+                <p></p>
+            </div>
+        </li>
+    </ul>
+    <div class="mb10"></div>
+    <form class="mui-input-group apply_form">
+        <div class="mui-input-row mui_change">
+            <label>Refund Type</label>
+            <input type="text" id="refund_type" placeholder="Please select" disabled>
+        </div>
+        <div class="mb10"></div>
+        <div class="mui-input-row">
+           <label>Express Type</label>
+            <input type="text" id="refund_kdlx" placeholder="Please select" readonly>
+        </div>
+        <div class="mui-input-row">
+            <label>Express tracking number</label>
+            <input type="text" id='refund_kddh' placeholder="Please enter the tracking number">
+        </div>
+        <div class="mui-button-row bottom_btn">
+            <button type="button" id="submit_btn" class="submit_btn" onclick="return false;">Continue return</button>
+        </div>
+    </form>
+</div>
+
+{include file="public/head_nav"/}
+{include file="public/footer"/}
+<script type="text/html" id="list">
+<li>
+    <img src="{{img}}" alt="">
+    <div class="aply_txt">
+        <h3>{{goods_name}}</h3>
+        <p>{{spec_key_name}}</p>
+    </div>
+</li>
+</script>
+<script type="text/javascript">
+var order_id=getQueryString('order_id');
+
+var now_status='';
+get_data();
+function get_data(){
+    $get('/api/order/order_detail',{order_id:order_id}, function(data) {
+        if (data.status == 1) {
+            now_status=data.data.now_status;
+            par.id=data.data.return_id;
+            $('#refund_type').val('I want to return a refund');   
+            get_kdlx();
+            var list='';
+            for( var i in data.data.goods_list){
+                list += template('list', data.data.goods_list[i]);
+            }
+            $('.aply_ul').html(list);
+        } else {
+            
+        }
+    });
+};
+var par={
+    id:'',
+    refund_kdlx:'',
+    refund_kddh:''
+};
+
+mui.init();
+// Express Type
+function get_kdlx() {
+mui.ready(function() {
+    var userPicker_kdlx = new mui.PopPicker();
+    $get('/api/shop/shipping', {}, function (data) {
+        if (data.status) {
+            for( var i in data.data){
+                data.data[i].text=data.data[i].shipping_name;
+            }
+            userPicker_kdlx.setData(data.data);
+        } 
+    });
+    var showPicker_kdlx = document.getElementById('refund_kdlx');
+    showPicker_kdlx.addEventListener('tap', function(event) {
+        userPicker_kdlx.show(function(items) {
+            $('#refund_kdlx').val( (items[0] || {}).text );  
+            par.refund_kdlx=(items[0] || {}).text;  
+        });
+    }, false);
+});   
+};
+
+// submit
+$('#submit_btn').click(function(){
+    var refund_kddh=$('#refund_kddh').val();
+    par.refund_kddh=refund_kddh;
+
+    if(par.refund_kdlx==''){
+        mui.toast('Please select the express type');
+    } else if(par.refund_kddh==''){
+        mui.toast('Please enter the courier number');
+    } else{       
+    $get('/api/order/return_confirm',par, function(data) {
+        if (data.status == 1) {
+            mui.toast(data.msg);   
+            setTimeout(function(){
+                mui.back();
+            },1000);  
+        } else {
+            mui.toast(data.msg);            
+        }
+    });    
+    }
+});
+// address bar information    
+function getQueryString(name){
+    var reg = new RegExp("(^|&)"+ name +"=([^&]*)(&|$)");
+    var r = window.location.search.substr(1).match(reg);
+    if(r!=null)return  unescape(r[2]); return null;
+}
+</script>
+</body>
+</html>

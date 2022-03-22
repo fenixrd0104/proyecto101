@@ -1,0 +1,388 @@
+
+<title>统计</title>
+<style>
+.layui-table-view{ margin: 10px 0 !important;}
+.layui-table-view .layui-table td,
+.layui-table-view .layui-table th{
+    border-left: none;
+    border-right: none;
+}
+.layui-table-body .layui-table-cell{
+    height: auto;
+    line-height: 20px;
+    overflow: initial;
+    text-overflow: initial;
+    white-space: initial;
+}
+.goods li{ margin: 0 !important; }
+</style>
+<div class="layui-card layadmin-header">
+    <div class="layui-breadcrumb" lay-filter="breadcrumb">
+        <a>店铺管理</a>
+        <a><cite>统计</cite></a>
+    </div>
+</div>
+<script type="text/html" template>
+    <link rel="stylesheet" href="{{ layui.setter.base }}style/statistics.css?v={{ layui.admin.v }}-1" media="all">
+</script>
+
+<div class="layui-fluid" id="component-tabs">
+<div class="layui-row">      
+<div class="layui-card">
+<div class="layui-card-header">统计</div>
+<div class="layui-card-body">
+    <div class="layui-form layui-row layui-col-space10 laydata_div" style="margin: 10px 0 20px;">
+        <div class="layui-col-md6">
+            <label class="layui-form-label">筛选日期：</label>
+            <div class="layui-inline">
+                <input type="text" name="start" class="layui-input" id="laydate_datetime_start" placeholder="">
+            </div>
+            <label>至</label>
+            <div class="layui-inline">
+                <input type="text" name="end" class="layui-input" id="laydate_datetime_end" placeholder="">
+            </div>
+            <div class="layui-inline">
+                <button class="layui-btn layuiadmin-btn-list" lay-submit lay-filter="xl_search">查询</button>
+            </div>  
+        </div>               
+        <div class="layui-col-md6 order_num" id="xl_data">
+            <button class="layui-btn layui-btn-primary order_active" lay-type="d">日</button>
+            <button class="layui-btn layui-btn-primary" lay-type="w">周</button>
+            <button class="layui-btn layui-btn-primary" lay-type="m">月</button>
+        </div>
+    </div> 
+    <blockquote class="layui-elem-quote">销量</blockquote>
+    <div class="layui-carousel layadmin-carousel layadmin-dataview" data-anim="fade" lay-filter="LAY-index-heapline">
+        <div carousel-item id="LAY_index_xl">
+            <div><i class="layui-icon layui-icon-loading1 layadmin-loading"></i></div>
+        </div>
+    </div> 
+    <blockquote class="layui-elem-quote">商品销量TOP10</blockquote>
+    <div class="layui-carousel layadmin-carousel layadmin-dataview" data-anim="fade" lay-filter="LAY-index-heapline">
+        <div carousel-item id="LAY_index_spxl">
+            <div><i class="layui-icon layui-icon-loading1 layadmin-loading"></i></div>
+        </div>
+    </div> 
+    <blockquote class="layui-elem-quote">商品金额top10 </blockquote>
+    <div class="layui-carousel layadmin-carousel layadmin-dataview" data-anim="fade" lay-filter="LAY-index-heapline">
+        <div carousel-item id="LAY_index_spje">
+            <div><i class="layui-icon layui-icon-loading1 layadmin-loading"></i></div>
+        </div>
+    </div> 
+
+</div>
+</div>  
+</div>
+</div>
+
+<script>
+layui.use(['admin', 'carousel'], function(){
+    var $ = layui.$
+    ,admin = layui.admin
+    ,carousel = layui.carousel
+    ,element = layui.element
+    ,device = layui.device();
+
+    //轮播切换
+    $('.layadmin-carousel').each(function(){
+    var othis = $(this);
+    carousel.render({
+        elem: this
+        ,width: '100%'
+        ,arrow: 'none'
+        ,interval: othis.data('interval')
+        ,autoplay: othis.data('autoplay') === true
+        ,trigger: (device.ios || device.android) ? 'click' : 'hover'
+        ,anim: othis.data('anim')
+    });
+    });
+
+});
+layui.use(['admin','laydate','table','form','element','laytpl','echarts'], function(){
+    var $ = layui.$
+    ,admin = layui.admin
+    ,laydate = layui.laydate
+    ,table = layui.table
+    ,form = layui.form
+    ,laytpl = layui.laytpl
+    ,echarts = layui.echarts
+    ,element = layui.element
+    ,router = layui.router(); 
+
+    laydate.render({
+        elem: '#laydate_datetime_start'
+    });
+    laydate.render({
+        elem: '#laydate_datetime_end'
+    });
+
+    // 日-周-月
+    $('.order_num').find('.layui-btn').click(function(){
+        $(this).addClass("order_active").siblings().removeClass("order_active");
+    });
+    
+    // 销量
+    var xl_line_js;
+    var xl_line_dds;
+    var xl_line_je;
+    var xl_line_category;
+    // 商品销量
+    var spxl_bar_category;
+    var spxl_bar_value;
+    // 商品销量
+    var spje_bar_category;
+    var spje_bar_value;
+    xl_ajax(); 
+    //监听搜索 
+    form.on('submit(xl_search)', function(data){
+        // console.log(data.field);
+        xl_ajax(data.field);
+    });
+    // 日-周-月-季-年
+    $('#xl_data').find('.layui-btn').click(function(){
+        var lay_type= $(this).attr('lay-type');
+        // console.log(lay_type);
+        xl_ajax( {type:lay_type} );
+    })
+    function xl_ajax(data_s){
+    admin.req({
+        url: layui.setter.baseUrl + 'merchant/shop/statistics'
+        ,data: data_s
+        ,type: 'get'
+        ,success: function (res) {
+            if (res.code == 1) {
+                var data=res.data;
+                xl_line_category=data.xiaoliang.category;
+                xl_line_js=data.xiaoliang.xiaoliang;
+                xl_line_dds=data.xiaoliang.dingdan;
+                xl_line_je=data.xiaoliang.jine;
+                xl_line();
+                spxl_bar_category=data.shangpin_top10.category;
+                spxl_bar_value=data.shangpin_top10.value;
+                spxl_bar();
+                spje_bar_category=data.jine_top10.category;
+                spje_bar_value=data.jine_top10.value;
+                spje_bar();
+            } else {
+                layer.msg(res.msg);
+            }
+        }
+    });
+    }
+
+    function xl_line(){
+    var echheapline = [], heapline = [{
+        tooltip : {
+            trigger: 'axis',
+            axisPointer : {            // 坐标轴指示器，坐标轴触发有效
+                type : 'line'        // 默认为直线，可选为：'line' | 'shadow'
+            }
+        }, 
+        color: ["#3aa1ff"],
+        toolbox: {
+            show: true,
+            orient: 'vertical',
+            top: 'center',
+            feature: {
+                mark: {
+                    show: true
+                },
+                dataView: {
+                    show: true,
+                    readOnly: true
+                },
+                magicType: {
+                    show: true,
+                    type: ['line', 'bar']
+                },
+                restore: {
+                    show: true
+                },
+                saveAsImage: {
+                    show: true
+                }
+            }
+        },
+        color: ["#009688","#1e9fff","#ff38b1"],
+        legend: {
+            data:['件数','订单数','金额'],
+            x:"left"
+        },
+        xAxis:[{
+            type: 'category',
+            data: xl_line_category,
+            splitLine: {
+                show: false // x轴的网格隐藏
+            },
+            axisPointer: {
+                type: 'shadow'
+            }
+        }],
+        yAxis: [
+        {
+            type: 'value',
+        }],
+        series: [
+        {
+            name: '件数',
+            type: 'line',
+            data: xl_line_js
+        },{
+            name: '订单数',
+            type: 'line',
+            data: xl_line_dds
+        },{
+            name: '金额',
+            type: 'line',
+            data: xl_line_je
+        }]
+    }]
+    ,elemheapline = $('#LAY_index_xl').children('div')
+    ,renderheapline = function(index){
+        echheapline[index] = echarts.init(elemheapline[index], layui.echartsTheme);
+        echheapline[index].setOption(heapline[index]);
+        window.onresize = echheapline[index].resize;
+    };
+    if(!elemheapline[0]) return;
+    renderheapline(0);
+    }
+    function spxl_bar(){
+    var echheapline = [], heapline = [{
+        tooltip : {
+            trigger: 'axis',
+            axisPointer : {            // 坐标轴指示器，坐标轴触发有效
+                type : 'shadow'        // 默认为直线，可选为：'line' | 'shadow'
+            }
+        }, 
+        color: ["#ff9e00"],
+        toolbox: {
+            show: true,
+            orient: 'vertical',
+            top: 'center',
+            feature: {
+                mark: {
+                    show: true
+                },
+                dataView: {
+                    show: true,
+                    readOnly: true
+                },
+                magicType: {
+                    show: true,
+                    type: ['line', 'bar']
+                },
+                restore: {
+                    show: true
+                },
+                saveAsImage: {
+                    show: true
+                }
+            }
+        },
+        legend: {
+            data:['件数'],
+            x:"left"
+        },
+        xAxis:[{
+            type: 'category',
+            data: spxl_bar_category,
+            splitLine: {
+                show: false // x轴的网格隐藏
+            },
+            axisPointer: {
+                type: 'shadow'
+            }
+        }],
+        yAxis: [
+        {
+            type: 'value',
+        }],
+        series: [
+        {
+            name: '件数',
+            type: 'bar',
+            data: spxl_bar_value
+        }]
+    }]
+    ,elemheapline = $('#LAY_index_spxl').children('div')
+    ,renderheapline = function(index){
+        echheapline[index] = echarts.init(elemheapline[index], layui.echartsTheme);
+        echheapline[index].setOption(heapline[index]);
+        window.onresize = echheapline[index].resize;
+    };
+    if(!elemheapline[0]) return;
+    renderheapline(0);
+    }
+    function spje_bar(){
+    var echheapline = [], heapline = [{
+        tooltip : {
+            trigger: 'axis',
+            axisPointer : {            // 坐标轴指示器，坐标轴触发有效
+                type : 'shadow'        // 默认为直线，可选为：'line' | 'shadow'
+            }
+        }, 
+        color: ["#f2637b"],
+        toolbox: {
+            show: true,
+            orient: 'vertical',
+            top: 'center',
+            feature: {
+                mark: {
+                    show: true
+                },
+                dataView: {
+                    show: true,
+                    readOnly: true
+                },
+                magicType: {
+                    show: true,
+                    type: ['line', 'bar']
+                },
+                restore: {
+                    show: true
+                },
+                saveAsImage: {
+                    show: true
+                }
+            }
+        },
+        legend: {
+            data:['件数'],
+            x:"left"
+        },
+        xAxis:[{
+            type: 'category',
+            data: spje_bar_category,
+            splitLine: {
+                show: false // x轴的网格隐藏
+            },
+            axisPointer: {
+                type: 'shadow'
+            }
+        }],
+        yAxis: [
+        {
+            type: 'value',
+        }],
+        series: [
+        {
+            name: '件数',
+            type: 'bar',
+            data: spje_bar_value
+        }]
+    }]
+    ,elemheapline = $('#LAY_index_spje').children('div')
+    ,renderheapline = function(index){
+        echheapline[index] = echarts.init(elemheapline[index], layui.echartsTheme);
+        echheapline[index].setOption(heapline[index]);
+        window.onresize = echheapline[index].resize;
+    };
+    if(!elemheapline[0]) return;
+    renderheapline(0);
+    }
+ 
+
+
+    
+});
+</script>

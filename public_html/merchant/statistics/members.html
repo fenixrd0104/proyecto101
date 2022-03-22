@@ -1,0 +1,1081 @@
+
+<title>会员数据</title>
+<style>
+.layui-table-view{ 
+    margin: 10px 0 !important;
+    border: none;
+}
+.layui-table-view .layui-table td,
+.layui-table-view .layui-table th{
+    border-left: none;
+    border-right: none;
+}
+.layui-table-view .layui-table{ width: 100%; }
+.table_list_ul li{ margin: 0 !important; }
+</style>
+<div class="layui-card layadmin-header">
+    <div class="layui-breadcrumb" lay-filter="breadcrumb">
+        <a>数据统计</a>
+        <a><cite>会员数据</cite></a>
+    </div>
+</div>
+<script type="text/html" template>
+    <link rel="stylesheet" href="{{ layui.setter.base }}style/statistics.css?v={{ layui.admin.v }}-1" media="all">
+</script>
+
+<div class="layui-fluid" id="component-tabs">
+<div class="layui-row">      
+<div class="layui-card">
+<div class="layui-card-header">会员数据</div>
+<div class="layui-card-body">
+<div class="layui-tab layui-tab-brief" lay-filter="component-tabs-brief">
+    <ul class="layui-tab-title">
+        <li class="layui-this">会员概况</li>
+        <li>会员分析</li>
+    </ul>
+    <div class="layui-tab-content">
+        <div class="layui-tab-item layui-show">
+            <blockquote class="layui-elem-quote">客户概况及趋势</blockquote>
+            <blockquote class="layui-elem-quote layui-quote-nm">
+                累计粉丝数：通过微信注册，且关注时间小于筛选时间的结束时间的会员数<br>成交客户数：在筛选时间内，有付款成功订单的会员数（单天去重）
+            </blockquote>
+            <div class="layui-row layui-col-space10" style="margin: 10px 0 10px;">
+            <div class="layui-col-md6">
+                <label class="layui-form-label">筛选日期：</label>
+                <div class="layui-inline">
+                    <input type="text" name="startTime" class="layui-input" id="test-laydate-type-datetime-month-start-cust_profile" placeholder="">
+                </div>
+                <label>至</label>
+                <div class="layui-inline">
+                    <input type="text" name="endTime" class="layui-input" id="test-laydate-type-datetime-month-end-cust_profile" placeholder="">
+                </div>
+                <div class="layui-inline">
+                    <button class="layui-btn layuiadmin-btn-list" lay-submit lay-filter="LAY-user-back-search">查询</button>
+                </div>  
+            </div>  
+            </div> 
+            <div class="layui-row" id="real_time">
+                <div class="layui-col-md3">
+                <div class="layui-card data_text">
+                    <p>累积粉丝数</p>
+                    <h3>337</h3>
+                    <p class="p_hui"><span>环比增幅</span>
+                    <span class="p_red">1.81% <i class="iconfont icon-up"></i></span></p>
+                </div>                
+                </div>
+                <div class="layui-col-md3">
+                <div class="layui-card data_text">
+                    <p>成交客户数</p>
+                    <h3>13</h3>
+                    <p class="p_hui"><span>环比增幅</span>
+                    <span class="p_green">0% <i class="iconfont icon-down"></i></span></p>
+                </div>                
+                </div>
+                <div class="layui-col-md3"></div>
+                <div class="layui-col-md3"></div>
+            </div>  
+            <div class="layui-carousel layadmin-carousel layadmin-dataview" data-anim="fade" lay-filter="LAY-index-heapline">
+            <div carousel-item id="LAY-index-cust_profile">
+                <div><i class="layui-icon layui-icon-loading1 layadmin-loading"></i></div>
+            </div>
+            </div>
+            <blockquote class="layui-elem-quote">微信粉丝统计</blockquote>
+            <blockquote class="layui-elem-quote layui-quote-nm">
+                累计粉丝数：通过微信注册，且关注时间小于筛选时间的结束时间的会员数<br>跑路粉丝数：通过微信注册，且取消关注时间在搜索时间段内的会员数（单天去重）<br>净增粉丝数：通过微信注册，且关注时间在搜索时间段内的会员数（单天去重）
+            </blockquote>
+            <div class="layui-row layui-col-space10" style="margin: 10px 0 10px;">
+                <div class="layui-col-md6">
+                    <label class="layui-form-label">筛选日期：</label>
+                    <div class="layui-inline">
+                        <input type="text" name="startTime" class="layui-input" id="test-laydate-type-datetime-month-start-wx_fans" placeholder="">
+                    </div>
+                    <label>至</label>
+                    <div class="layui-inline">
+                        <input type="text" name="endTime" class="layui-input" id="test-laydate-type-datetime-month-end-wx_fans" placeholder="">
+                    </div>
+                    <div class="layui-inline">
+                        <button class="layui-btn layuiadmin-btn-list" lay-submit lay-filter="LAY-user-back-search">查询</button>
+                    </div>  
+                </div>  
+            </div> 
+            <div class="layui-row" id="real_time">
+                <div class="layui-col-md4">
+                <div class="layui-card data_text">
+                    <p>累积粉丝数</p>
+                    <h3>337</h3>
+                    <p class="p_hui"><span>环比增幅</span>
+                    <span class="p_green">0% <i class="iconfont icon-down"></i></span></p>
+                </div>                
+                </div>
+                <div class="layui-col-md4">
+                <div class="layui-card data_text">
+                    <p>跑路粉丝数</p>
+                    <h3>0</h3>
+                    <p class="p_hui"><span>环比增幅</span>
+                    <span class="p_green">0% <i class="iconfont icon-down"></i></span></p>
+                </div>                
+                </div>
+                <div class="layui-col-md4">
+                <div class="layui-card data_text">
+                    <p>净增粉丝数</p>
+                    <h3>0</h3>
+                    <p class="p_hui"><span>环比增幅</span>
+                    <span class="p_green">0% <i class="iconfont icon-down"></i></span></p>
+                </div>                
+                </div>
+            </div>  
+            <blockquote class="layui-elem-quote">粉丝活跃</blockquote>            
+            <blockquote class="layui-elem-quote layui-quote-nm">
+                访问粉丝数：通过微信注册，且最后活跃时间在指定搜索时间段内的会员数（去重）<br>访问粉丝数占比：指定搜索时间段内，访问粉丝数 / 累积粉丝数
+                领券粉丝数：通过微信注册，且在指定搜索时间段内有优惠券领券记录的会员数（去重）<br>领券粉丝数占比：指定搜索时间段内，领券粉丝数 / 访问粉丝数
+                加购粉丝数：通过微信注册，且在指定搜索时间段内购物车中有添加记录的会员数（去重）<br>加购粉丝数占比：指定搜索时间段内，加购粉丝数 / 访问粉丝数
+                成交粉丝数：通过微信注册，且在指定搜索时间段内有付款成功订单的会员数（去重）<br>成交粉丝数占比：指定搜索时间段内，成交粉丝数 / 访问粉丝数
+            </blockquote>
+            <div class="layui-row layui-col-space10" style="margin: 10px 0 10px;">
+                <div class="layui-col-md6">
+                    <label class="layui-form-label">筛选日期：</label>
+                    <div class="layui-inline">
+                        <input type="text" name="startTime" class="layui-input" id="test-laydate-type-datetime-month-start-fans" placeholder="">
+                    </div>
+                    <label>至</label>
+                    <div class="layui-inline">
+                        <input type="text" name="endTime" class="layui-input" id="test-laydate-type-datetime-month-end-fans" placeholder="">
+                    </div>
+                    <div class="layui-inline">
+                        <button class="layui-btn layuiadmin-btn-list" lay-submit lay-filter="LAY-user-back-search">查询</button>
+                    </div>  
+                </div>  
+            </div> 
+            <div class="layui-row" id="real_time">
+                <div class="layui-col-md3">
+                <div class="layui-card data_text">
+                    <p>访问粉丝数</p>
+                    <h3>337</h3>
+                    <p class="p_hui">占比0.89%</p>
+                </div>                
+                </div>
+                <div class="layui-col-md3">
+                <div class="layui-card data_text">
+                    <p>领券粉丝数</p>
+                    <h3>0</h3>
+                    <p class="p_hui">占比0.89%</p>
+                </div>                
+                </div>
+                <div class="layui-col-md3">
+                <div class="layui-card data_text">
+                    <p>加购粉丝数 </p>
+                    <h3>0</h3>
+                    <p class="p_hui">占比0.89%</p>
+                </div>                
+                </div>
+                <div class="layui-col-md3">
+                <div class="layui-card data_text">
+                    <p>成交粉丝数 </p>
+                    <h3>0</h3>
+                    <p class="p_hui">占比0.89%</p>
+                </div>                
+                </div>
+            </div>  
+            <div class="layui-row" style="margin: 10px 0 10px;">
+                <div class="layui-col-md4">
+                    <div class="layui-carousel layadmin-carousel layadmin-dataview" data-anim="fade" lay-filter="LAY-index-heapline">
+                    <div carousel-item id="LAY-index-fans1">
+                        <div><i class="layui-icon layui-icon-loading1 layadmin-loading"></i></div>
+                    </div>
+                    </div>
+                </div>  
+                <div class="layui-col-md8">
+                    <div class="layui-carousel layadmin-carousel layadmin-dataview" data-anim="fade" lay-filter="LAY-index-heapline">
+                    <div carousel-item id="LAY-index-fans2">
+                        <div><i class="layui-icon layui-icon-loading1 layadmin-loading"></i></div>
+                    </div>
+                    </div>
+                </div>  
+            </div> 
+            <blockquote class="layui-elem-quote">会员活跃</blockquote>                        
+            <blockquote class="layui-elem-quote layui-quote-nm">
+                访问会员数：最后活跃时间在指定搜索时间段内的会员数（去重）<br>访问会员数占比：指定搜索时间段内，访问会员数 / 累积会员数
+                领券会员数：在指定搜索时间段内有优惠券领券记录的会员数（去重）<br>领券会员数占比：指定搜索时间段内，领券会员数 / 访问会员数
+                加购会员数：在指定搜索时间段内购物车中有添加记录的会员数（去重）<br>加购会员数占比：指定搜索时间段内，加购会员数 / 访问会员数
+                成交会员数：在指定搜索时间段内有付款成功订单的会员数（去重）<br>成交会员数占比：指定搜索时间段内，成交会员数 / 访问会员数
+            </blockquote>
+            <div class="layui-row layui-col-space10" style="margin: 10px 0 10px;">
+                <div class="layui-col-md6">
+                    <label class="layui-form-label">筛选日期：</label>
+                    <div class="layui-inline">
+                        <input type="text" name="startTime" class="layui-input" id="test-laydate-type-datetime-month-start-member_go" placeholder="">
+                    </div>
+                    <label>至</label>
+                    <div class="layui-inline">
+                        <input type="text" name="endTime" class="layui-input" id="test-laydate-type-datetime-month-end-member_go" placeholder="">
+                    </div>
+                    <div class="layui-inline">
+                        <button class="layui-btn layuiadmin-btn-list" lay-submit lay-filter="LAY-user-back-search">查询</button>
+                    </div>  
+                </div>  
+            </div> 
+            <div class="layui-row" id="real_time">
+                <div class="layui-col-md3">
+                <div class="layui-card data_text">
+                    <p>访问会员数</p>
+                    <h3>7</h3>
+                    <p class="p_hui">占比0.89%</p>
+                </div>                
+                </div>
+                <div class="layui-col-md3">
+                <div class="layui-card data_text">
+                    <p>领券会员数</p>
+                    <h3>0</h3>
+                    <p class="p_hui">占比0.89%</p>
+                </div>                
+                </div>
+                <div class="layui-col-md3">
+                <div class="layui-card data_text">
+                    <p>加购会员数 </p>
+                    <h3>0</h3>
+                    <p class="p_hui">占比0.89%</p>
+                </div>                
+                </div>
+                <div class="layui-col-md3">
+                <div class="layui-card data_text">
+                    <p>成交会员数 </p>
+                    <h3>0</h3>
+                    <p class="p_hui">占比0.89%</p>
+                </div>                
+                </div>
+            </div>  
+            <div class="layui-row" style="margin: 10px 0 10px;">
+                <div class="layui-col-md4">
+                    <div class="layui-carousel layadmin-carousel layadmin-dataview" data-anim="fade" lay-filter="LAY-index-heapline">
+                    <div carousel-item id="LAY-index-member_go1">
+                        <div><i class="layui-icon layui-icon-loading1 layadmin-loading"></i></div>
+                    </div>
+                    </div>
+                </div>  
+                <div class="layui-col-md8">
+                    <div class="layui-carousel layadmin-carousel layadmin-dataview" data-anim="fade" lay-filter="LAY-index-heapline">
+                    <div carousel-item id="LAY-index-member_go2">
+                        <div><i class="layui-icon layui-icon-loading1 layadmin-loading"></i></div>
+                    </div>
+                    </div>
+                </div>  
+            </div> 
+            <blockquote class="layui-elem-quote">成交客户分析</blockquote>                               
+            <blockquote class="layui-elem-quote layui-quote-nm">
+                客户数 <br>
+                全部成交客户：在指定搜索时间内，有付款成功订单的会员数（单天去重）<br>新成交客户数：在指定搜索时间之前没有付款成功的订单(待发货、待确认、已完成、付款后退款成功)，在指定时间之内有付款成功订单<br>老成交客户数：在指定搜索时间之前有付款成功的订单(待发货、待确认、已完成、付款后退款成功)，在指定搜索时间内也有付款成功订单的会员数
+            </blockquote>
+            <blockquote class="layui-elem-quote layui-quote-nm">
+                客户数占比 <br>
+                全部成交客户占比：全部成交客户 / 累计会员数<br>新成交客户数占比：新成交客户数 / 全部成交客户数<br>老成交客户数占比：老成交客户数 / 全部成交客户数
+            </blockquote>
+            <blockquote class="layui-elem-quote layui-quote-nm">
+                客单价 <br>
+                在指定搜索时间内，对应的付款金额 / 对应的付款人数
+            </blockquote>
+            <blockquote class="layui-elem-quote layui-quote-nm">
+                访问-付款转化率 <br>
+                全部成交客户-访问-付款转化率：在指定搜索时间内，全部成交客户数 / 访问会员数<br>新成交客户-访问-付款转化率：在指定搜索时间内，新成交客户数 / 访问会员数<br>老成交客户-访问-付款转化率：在指定搜索时间内，老成交客户数 / 访问会员数
+            </blockquote>
+            <blockquote class="layui-elem-quote layui-quote-nm">
+                客户复购趋势 <br>
+                上个月4周付款的老客户数 / 统计周付款客户数
+            </blockquote>
+            <div class="layui-row layui-col-space10" style="margin: 10px 0 10px;">
+                <div class="layui-col-md6">
+                    <label class="layui-form-label">筛选日期：</label>
+                    <div class="layui-inline">
+                        <input type="text" name="startTime" class="layui-input" id="test-laydate-type-datetime-month-start-cust_deal" placeholder="">
+                    </div>
+                    <label>至</label>
+                    <div class="layui-inline">
+                        <input type="text" name="endTime" class="layui-input" id="test-laydate-type-datetime-month-end-cust_deal" placeholder="">
+                    </div>
+                    <div class="layui-inline">
+                        <button class="layui-btn layuiadmin-btn-list" lay-submit lay-filter="LAY-user-back-search">查询</button>
+                    </div>  
+                </div>  
+            </div> 
+            <table class="layui-hide" id="test-table-good"></table>
+            <script type="text/html" id="test-num">               
+                <p class="p_hei"><span>{{d.num}}</span>
+                <span class="p_green">-50% <i class="iconfont icon-down"></i></span></p>
+            </script> 
+            <script type="text/html" id="test-accounted">               
+                <p class="p_hei"><span>{{d.accounted}}%</span>
+                <span class="p_green">-50% <i class="iconfont icon-down"></i></span></p>
+            </script> 
+            <script type="text/html" id="test-price">               
+                <p class="p_hei"><span>{{d.price}}</span>
+                <span class="p_green">-50% <i class="iconfont icon-down"></i></span></p>
+            </script> 
+            <script type="text/html" id="test-amount">               
+                <p class="p_hei"><span>{{d.amount}}</span>
+                <span class="p_green">-50% <i class="iconfont icon-down"></i></span></p>
+            </script> 
+            <script type="text/html" id="test-rate">               
+                <p class="p_hei"><span>{{d.rate}}%</span>
+                <span class="p_green">-50% <i class="iconfont icon-down"></i></span></p>
+            </script> 
+            <div class="layui-form" id="deal_form">
+                <label class="layui-form-label">所属职称：</label>
+                <div class="layui-input-block">
+                    <input type="radio" name="role" value="" title="客户数">
+                    <input type="radio" name="role" value="" title="客单价" checked>
+                    <input type="radio" name="role" value="" title="付款金额">
+                    <input type="radio" name="role" value="" title="访问-付款转化率">
+                </div>
+            </div>
+            <div class="layui-carousel layadmin-carousel layadmin-dataview" data-anim="fade" lay-filter="LAY-index-heapline">
+            <div carousel-item id="LAY-index-cust_deal">
+                <div><i class="layui-icon layui-icon-loading1 layadmin-loading"></i></div>
+            </div>
+            </div>
+            <div class="layui-row" style="margin: 10px 0 10px;">
+                <div class="layui-col-md6">                    
+                    <blockquote class="layui-elem-quote" style="border-left: none;margin-right: 10px;">会员粉丝成交</blockquote>
+                    <div class="layui-carousel layadmin-carousel layadmin-dataview" data-anim="fade" lay-filter="LAY-index-heapline">
+                    <div carousel-item id="LAY-index-cust_deal1">
+                        <div><i class="layui-icon layui-icon-loading1 layadmin-loading"></i></div>
+                    </div>
+                    </div>
+                </div>  
+                <div class="layui-col-md6">                    
+                    <blockquote class="layui-elem-quote" style="border-left: none;margin-right: 10px;">客户复购趋势</blockquote>
+                    <div class="layui-carousel layadmin-carousel layadmin-dataview" data-anim="fade" lay-filter="LAY-index-heapline">
+                    <div carousel-item id="LAY-index-cust_deal2">
+                        <div><i class="layui-icon layui-icon-loading1 layadmin-loading"></i></div>
+                    </div>
+                    </div>
+                </div>  
+            </div> 
+            <blockquote class="layui-elem-quote">客户看板</blockquote>                
+            <blockquote class="layui-elem-quote layui-quote-nm">
+                累计粉丝数：通过微信注册，且关注时间截止至指定搜索时间结束的会员数<br>净增粉丝数：通过微信注册，且关注时间在指定搜索时间当天的会员数<br>访问粉丝数：通过微信注册，且最后活跃时间在指定搜索时间当天的会员数<br><br>累计会员数：注册时间截止至指定搜索时间结束的会员数<br>新增会员数：注册时间在指定搜索时间当天的会员数<br>成交会员数：在指定搜索时间当天，有付款成功订单的会员数（去重）
+            </blockquote>
+            <div class="layui-form-item">
+                <label class="layui-form-label">筛选日期：</label>
+                <div class="layui-inline">
+                    <input type="text" name="startTime" class="layui-input" id="test-laydate-type-datetime-screen" placeholder="">
+                </div>
+                <div class="layui-inline">
+                    <button class="layui-btn layuiadmin-btn-list" lay-submit lay-filter="LAY-user-back-search">查询</button>
+                </div>
+            </div>     
+            <div class="layui-row layui-col-space10 customer" style="margin-bottom: 10px;">
+            <div class="layui-col-md6">
+                <div class="layui-card" style="border: 1px solid #e8e8e8;">
+                <div class="layui-card-header" style="background: #f8f8f8;border-bottom:1px solid #e8e8e8;">微信粉丝</div>
+                <div class="layui-card-body layui-row">
+                    <div class="layui-carousel layadmin-carousel layadmin-dataview" data-anim="fade" lay-filter="LAY-index-heapline" style="width: 100%;height: 250px;">
+                    <div carousel-item id="LAY-index-wechat">
+                        <div><i class="layui-icon layui-icon-loading1 layadmin-loading"></i></div>
+                    </div>
+                    </div>
+                    <div class="layui-col-md4">
+                        <p class="p_title">累积粉丝数</p>
+                        <h3>337</h3>
+                        <p class="p_hui"><span>较前一日</span>
+                        <span class="p_red">0.3% <i class="iconfont icon-up"></i></span></p>
+                        <p class="p_hui"><span>较上一周</span>
+                        <span class="p_green">0% <i class="iconfont icon-down"></i></span></p>
+                    </div>
+                    <div class="layui-col-md4">
+                        <p class="p_title">净增粉丝数</p>
+                        <h3>1</h3>
+                        <p class="p_hui"><span>较前一日</span>
+                        <span class="p_red">100% <i class="iconfont icon-up"></i></span></p>
+                        <p class="p_hui"><span>较上一周</span>
+                        <span class="p_green">0% <i class="iconfont icon-down"></i></span></p>
+                    </div>
+                    <div class="layui-col-md4">
+                        <p class="p_title">访问粉丝数</p>
+                        <h3>2</h3>
+                        <p class="p_hui"><span>较前一日</span>
+                        <span class="p_red">200% <i class="iconfont icon-up"></i></span></p>
+                        <p class="p_hui"><span>较上一周</span>
+                        <span class="p_green">-66.67% <i class="iconfont icon-down"></i></span></p>
+                    </div>
+                </div>
+                </div>
+            </div>
+            <div class="layui-col-md6">
+                <div class="layui-card" style="border: 1px solid #e8e8e8;">
+                <div class="layui-card-header" style="background: #f8f8f8;border-bottom:1px solid #e8e8e8;">店铺会员</div>
+                <div class="layui-card-body layui-row">
+                    <div class="layui-carousel layadmin-carousel layadmin-dataview" data-anim="fade" lay-filter="LAY-index-heapline" style="width: 100%;height: 250px;">
+                    <div carousel-item id="LAY-index-goods">
+                        <div><i class="layui-icon layui-icon-loading1 layadmin-loading"></i></div>
+                    </div>
+                    </div>
+                    <div class="layui-col-md4">
+                        <p class="p_title">累积粉丝数</p>
+                        <h3>1336</h3>
+                        <p class="p_hui"><span>较前一日</span>
+                        <span class="p_red">0.23% <i class="iconfont icon-up"></i></span></p>
+                        <p class="p_hui"><span>较上一周</span>
+                        <span class="p_red">0.53% <i class="iconfont icon-up"></i></span></p>
+                    </div>
+                    <div class="layui-col-md4">
+                        <p class="p_title">净增粉丝数</p>
+                        <h3>3</h3>
+                        <p class="p_hui"><span>较前一日</span>
+                        <span class="p_red">300% <i class="iconfont icon-up"></i></span></p>
+                        <p class="p_hui"><span>较上一周</span>
+                        <span class="p_red">75% <i class="iconfont icon-up"></i></span></p>
+                    </div>
+                    <div class="layui-col-md4">
+                        <p class="p_title">访问粉丝数</p>
+                        <h3>3</h3>
+                        <p class="p_hui"><span>较前一日</span>
+                        <span class="p_red">300% <i class="iconfont icon-up"></i></span></p>
+                        <p class="p_hui"><span>较上一周</span>
+                        <span class="p_green">-50% <i class="iconfont icon-down"></i></span></p>
+                    </div>
+                </div>
+                </div>
+            </div>
+            </div>
+
+            
+        </div> 
+        <div class="layui-tab-item">
+            <div class="layui-tab layui-tab-card" lay-filter="component-tabs-brief">
+            <ul class="layui-tab-title" id="analysis">
+                <li class="layui-this">会员增长</li>
+                <li>会员业务</li>
+                <li>会员属性</li>
+            </ul>
+            <div class="layui-tab-content">
+                <div class="layui-tab-item layui-show">
+                    <blockquote class="layui-elem-quote">会员实时统计</blockquote>
+                    <div class="layui-row member_time" id="real_time">
+                        <div class="layui-col-md1">
+                        <div class="layui-card data_text">
+                            <p>会员总数（人）</p>
+                            <h3>1337</h3>
+                        </div>                
+                        </div>
+                        <div class="layui-col-md1">
+                        <div class="layui-card data_text">
+                            <p>粉丝总数（人）</p>
+                            <h3>337</h3>
+                        </div>                
+                        </div>
+                        <div class="layui-col-md1">
+                        <div class="layui-card data_text">
+                            <p>分销商总数（人）</p>
+                            <h3>809</h3>
+                        </div>                
+                        </div>
+                        <div class="layui-col-md1">
+                        <div class="layui-card data_text">
+                            <p>节点商总数（人）</p>
+                            <h3>57</h3>
+                        </div>                
+                        </div>
+                        <div class="layui-col-md1">
+                        <div class="layui-card data_text">
+                            <p>本月新增会员数（人）</p>
+                            <h3>36</h3>
+                        </div>                
+                        </div>
+                        <div class="layui-col-md1">
+                        <div class="layui-card data_text">
+                            <p>本月新增粉丝数（人）</p>
+                            <h3>12</h3>
+                        </div>                
+                        </div>
+                        <div class="layui-col-md1">
+                        <div class="layui-card data_text">
+                            <p>本月新增分销商数（人）</p>
+                            <h3>15</h3>
+                        </div>                
+                        </div>
+                    </div>  
+                    <blockquote class="layui-elem-quote">往期会员结构统计</blockquote>
+                    <div class="layui-row" id="real_time">
+                        <div class="layui-col-md3">
+                        <div class="layui-card data_text">
+                            <p>上月新增会员数（人）</p>
+                            <h3>49</h3>
+                            <p class="p_hui"><span>环比增幅</span>
+                            <span class="p_green">0% <i class="iconfont icon-down"></i></span></p>
+                        </div>                
+                        </div>
+                        <div class="layui-col-md3">
+                        <div class="layui-card data_text">
+                            <p>上月新增粉丝数（人）</p>
+                            <h3>7</h3>
+                            <p class="p_hui"><span>环比增幅</span>
+                            <span class="p_green">0% <i class="iconfont icon-down"></i></span></p>
+                        </div>                
+                        </div>
+                        <div class="layui-col-md3">
+                        <div class="layui-card data_text">
+                            <p>上月新增分销商数（人）</p>
+                            <h3>43</h3>
+                            <p class="p_hui"><span>环比增幅</span>
+                            <span class="p_green">0% <i class="iconfont icon-down"></i></span></p>
+                        </div>                
+                        </div>
+                        <div class="layui-col-md3">
+                        <div class="layui-card data_text">
+                            <p>上月新增供应商数（人）</p>
+                            <h3>13</h3>
+                            <p class="p_hui"><span>环比增幅</span>
+                            <span class="p_green">0% <i class="iconfont icon-down"></i></span></p>
+                        </div>                
+                        </div>
+                    </div>  
+                    <blockquote class="layui-elem-quote">新增会员/粉丝/分销商统计</blockquote>
+                    <div class="layui-row layui-col-space10" style="margin: 10px 0 20px;">
+                        <div class="layui-col-md6">
+                            <label class="layui-form-label">筛选日期：</label>
+                            <div class="layui-inline">
+                                <input type="text" name="startTime" class="layui-input" id="test-laydate-type-datetime-month-start-new_number" placeholder="">
+                            </div>
+                            <label>至</label>
+                            <div class="layui-inline">
+                                <input type="text" name="endTime" class="layui-input" id="test-laydate-type-datetime-month-end-new_number" placeholder="">
+                            </div>
+                            <div class="layui-inline">
+                                <button class="layui-btn layuiadmin-btn-list" lay-submit lay-filter="LAY-user-back-search">查询</button>
+                            </div>  
+                        </div>               
+                        <div class="layui-col-md6 order_num" id="refund_num">
+                            <button class="layui-btn layui-btn-primary order_active" lay-submit lay-filter="layui_day">日</button>
+                            <button class="layui-btn layui-btn-primary" lay-submit lay-filter="layui_weeks">周</button>
+                            <button class="layui-btn layui-btn-primary" lay-submit lay-filter="layui_month">月</button>
+                        </div>
+                    </div> 
+                    <div class="layui-carousel layadmin-carousel layadmin-dataview" data-anim="fade" lay-filter="LAY-index-heapline">
+                    <div carousel-item id="LAY-index-new_number">
+                        <div><i class="layui-icon layui-icon-loading1 layadmin-loading"></i></div>
+                    </div>
+                    </div>
+                    <blockquote class="layui-elem-quote">饼图统计</blockquote>
+                    <div class="layui-row" style="margin: 10px 0 10px;">
+                        <div class="layui-col-md6">
+                            <p class="pie_p">粉丝会员数量饼状图</p>
+                            <div class="layui-carousel layadmin-carousel layadmin-dataview" data-anim="fade" lay-filter="LAY-index-heapline">
+                            <div carousel-item id="LAY-index-pie_chart1">
+                                <div><i class="layui-icon layui-icon-loading1 layadmin-loading"></i></div>
+                            </div>
+                            </div>
+                        </div>  
+                        <div class="layui-col-md6">
+                            <p class="pie_p">分销商数量饼状图</p>
+                            <div class="layui-carousel layadmin-carousel layadmin-dataview" data-anim="fade" lay-filter="LAY-index-heapline">
+                            <div carousel-item id="LAY-index-pie_chart2">
+                                <div><i class="layui-icon layui-icon-loading1 layadmin-loading"></i></div>
+                            </div>
+                            </div>
+                        </div>  
+                    </div> 
+                    <div class="layui-row" style="margin: 10px 0 10px;">
+                        <div class="layui-col-md6">
+                            <p class="pie_p">多次购物会员数量饼状图</p>
+                            <div class="layui-carousel layadmin-carousel layadmin-dataview" data-anim="fade" lay-filter="LAY-index-heapline">
+                            <div carousel-item id="LAY-index-pie_chart3">
+                                <div><i class="layui-icon layui-icon-loading1 layadmin-loading"></i></div>
+                            </div>
+                            </div>
+                        </div>  
+                        <div class="layui-col-md6">
+                            <p class="pie_p">节点商数量饼状图</p>
+                            <div class="layui-carousel layadmin-carousel layadmin-dataview" data-anim="fade" lay-filter="LAY-index-heapline">
+                            <div carousel-item id="LAY-index-pie_chart4">
+                                <div><i class="layui-icon layui-icon-loading1 layadmin-loading"></i></div>
+                            </div>
+                            </div>
+                        </div>  
+                    </div> 
+                </div>
+                <div class="layui-tab-item">
+                    <blockquote class="layui-elem-quote">业务会员实时统计</blockquote>
+                    <div class="layui-row" id="real_time">
+                        <div class="layui-col-md6">
+                        <div class="layui-card data_text">
+                            <p>本月有业务的分销商数（人）</p>
+                            <h3>13</h3>
+                        </div>                
+                        </div>
+                        <div class="layui-col-md6">
+                        <div class="layui-card data_text">
+                            <p>本月已提现的分销商数（人）</p>
+                            <h3>0</h3>
+                        </div>                
+                        </div>
+                    </div> 
+                    <blockquote class="layui-elem-quote">往期业务会员统计</blockquote>
+                    <div class="layui-row" id="real_time">
+                        <div class="layui-col-md6">
+                        <div class="layui-card data_text">
+                            <p>上月有业务的分销商数（人）</p>
+                            <h3>12</h3>
+                            <p class="p_hui"><span>环比增幅</span>
+                            <span class="p_green">0% <i class="iconfont icon-down"></i></span></p>
+                        </div>                
+                        </div>
+                        <div class="layui-col-md6">
+                        <div class="layui-card data_text">
+                            <p>上月已提现的分销商数（人）</p>
+                            <h3>0</h3>
+                            <p class="p_hui"><span>环比增幅</span>
+                            <span class="p_red">0% <i class="iconfont icon-up"></i></span></p>
+                        </div>                
+                        </div>
+                    </div>  
+                    <blockquote class="layui-elem-quote">佣金实时统计</blockquote>
+                    <div class="layui-row member_time" id="real_time">
+                        <div class="layui-col-md2">
+                        <div class="layui-card data_text">
+                            <p>会员总余额（元）</p>
+                            <h3>19018496.54</h3>
+                        </div>                
+                        </div>
+                        <div class="layui-col-md2">
+                        <div class="layui-card data_text">
+                            <p>分销商总佣金（元）</p>
+                            <h3>515148.59</h3>
+                        </div>                
+                        </div>
+                        <div class="layui-col-md2">
+                        <div class="layui-card data_text">
+                            <p>分销商总佣金余额（元）</p>
+                            <h3>705260.81</h3>
+                        </div>                
+                        </div>
+                        <div class="layui-col-md2">
+                        <div class="layui-card data_text">
+                            <p>分销商总提现佣金（元）</p>
+                            <h3>0</h3>
+                        </div>                
+                        </div>
+                        <div class="layui-col-md2">
+                        <div class="layui-card data_text">
+                            <p>本月分销商业务佣金（元）</p>
+                            <h3>110.00</h3>
+                        </div>                
+                        </div>
+                        <div class="layui-col-md2">
+                        <div class="layui-card data_text">
+                            <p>本月分销商佣金提现金额（元）</p>
+                            <h3>0</h3>
+                        </div>                
+                        </div>
+                    </div> 
+                    <blockquote class="layui-elem-quote">往期佣金统计</blockquote>
+                    <div class="layui-row" id="real_time">
+                        <div class="layui-col-md6">
+                        <div class="layui-card data_text">
+                            <p>上月分销商业务佣金（元）</p>
+                            <h3>10.00</h3>
+                            <p class="p_hui"><span>环比增幅</span>
+                            <span class="p_green">99% <i class="iconfont icon-down"></i></span></p>
+                        </div>                
+                        </div>
+                        <div class="layui-col-md6">
+                        <div class="layui-card data_text">
+                            <p>上月分销商佣金提现金额（元）</p>
+                            <h3>0</h3>
+                            <p class="p_hui"><span>环比增幅</span>
+                            <span class="p_red">0% <i class="iconfont icon-up"></i></span></p>
+                        </div>                
+                        </div>
+                    </div>  
+                    <blockquote class="layui-elem-quote">购物会员统计</blockquote>
+                    <div class="layui-row layui-col-space10" style="margin: 10px 0 20px;">
+                        <div class="layui-col-md6">
+                            <label class="layui-form-label">筛选日期：</label>
+                            <div class="layui-inline">
+                                <input type="text" name="startTime" class="layui-input" id="test-laydate-type-datetime-month-start-shopping" placeholder="">
+                            </div>
+                            <label>至</label>
+                            <div class="layui-inline">
+                                <input type="text" name="endTime" class="layui-input" id="test-laydate-type-datetime-month-end-shopping" placeholder="">
+                            </div>
+                            <div class="layui-inline">
+                                <button class="layui-btn layuiadmin-btn-list" lay-submit lay-filter="LAY-user-back-search">查询</button>
+                            </div>  
+                        </div>               
+                        <div class="layui-col-md6 order_num" id="refund_num">
+                            <button class="layui-btn layui-btn-primary order_active" lay-submit lay-filter="layui_day">日</button>
+                            <button class="layui-btn layui-btn-primary" lay-submit lay-filter="layui_weeks">周</button>
+                            <button class="layui-btn layui-btn-primary" lay-submit lay-filter="layui_month">月</button>
+                        </div>
+                    </div> 
+                    <div class="layui-carousel layadmin-carousel layadmin-dataview" data-anim="fade" lay-filter="LAY-index-heapline">
+                    <div carousel-item id="LAY-index-shopping">
+                        <div><i class="layui-icon layui-icon-loading1 layadmin-loading"></i></div>
+                    </div>
+                    </div>
+                    <blockquote class="layui-elem-quote">分销商业务人数和提现人数统计</blockquote>
+                    <div class="layui-row layui-col-space10" style="margin: 10px 0 20px;">
+                        <div class="layui-col-md6">
+                            <label class="layui-form-label">筛选日期：</label>
+                            <div class="layui-inline">
+                                <input type="text" name="startTime" class="layui-input" id="test-laydate-type-datetime-month-start-distrib" placeholder="">
+                            </div>
+                            <label>至</label>
+                            <div class="layui-inline">
+                                <input type="text" name="endTime" class="layui-input" id="test-laydate-type-datetime-month-end-distrib" placeholder="">
+                            </div>
+                            <div class="layui-inline">
+                                <button class="layui-btn layuiadmin-btn-list" lay-submit lay-filter="LAY-user-back-search">查询</button>
+                            </div>  
+                        </div>               
+                        <div class="layui-col-md6 order_num" id="refund_num">
+                            <button class="layui-btn layui-btn-primary order_active" lay-submit lay-filter="layui_day">日</button>
+                            <button class="layui-btn layui-btn-primary" lay-submit lay-filter="layui_weeks">周</button>
+                            <button class="layui-btn layui-btn-primary" lay-submit lay-filter="layui_month">月</button>
+                        </div>
+                    </div> 
+                    <div class="layui-carousel layadmin-carousel layadmin-dataview" data-anim="fade" lay-filter="LAY-index-heapline">
+                    <div carousel-item id="LAY-index-distrib">
+                        <div><i class="layui-icon layui-icon-loading1 layadmin-loading"></i></div>
+                    </div>
+                    </div>
+                    <blockquote class="layui-elem-quote">分销商业务佣金和提现金额统计</blockquote>
+                    <div class="layui-row layui-col-space10" style="margin: 10px 0 20px;">
+                        <div class="layui-col-md6">
+                            <label class="layui-form-label">筛选日期：</label>
+                            <div class="layui-inline">
+                                <input type="text" name="startTime" class="layui-input" id="test-laydate-type-datetime-month-start-distrib_money" placeholder="">
+                            </div>
+                            <label>至</label>
+                            <div class="layui-inline">
+                                <input type="text" name="endTime" class="layui-input" id="test-laydate-type-datetime-month-end-distrib_money" placeholder="">
+                            </div>
+                            <div class="layui-inline">
+                                <button class="layui-btn layuiadmin-btn-list" lay-submit lay-filter="LAY-user-back-search">查询</button>
+                            </div>  
+                        </div>               
+                        <div class="layui-col-md6 order_num" id="refund_num">
+                            <button class="layui-btn layui-btn-primary order_active" lay-submit lay-filter="layui_day">日</button>
+                            <button class="layui-btn layui-btn-primary" lay-submit lay-filter="layui_weeks">周</button>
+                            <button class="layui-btn layui-btn-primary" lay-submit lay-filter="layui_month">月</button>
+                        </div>
+                    </div> 
+                    <div class="layui-carousel layadmin-carousel layadmin-dataview" data-anim="fade" lay-filter="LAY-index-heapline">
+                    <div carousel-item id="LAY-index-distrib_money">
+                        <div><i class="layui-icon layui-icon-loading1 layadmin-loading"></i></div>
+                    </div>
+                    </div>
+                    <blockquote class="layui-elem-quote">饼图统计</blockquote>
+                    <div class="layui-row" style="margin: 10px 0 10px;">
+                        <div class="layui-col-md6">
+                            <p class="pie_p">购物会员数量饼状图</p>
+                            <div class="layui-carousel layadmin-carousel layadmin-dataview" data-anim="fade" lay-filter="LAY-index-heapline">
+                            <div carousel-item id="LAY-index-pie_member1">
+                                <div><i class="layui-icon layui-icon-loading1 layadmin-loading"></i></div>
+                            </div>
+                            </div>
+                        </div>  
+                        <div class="layui-col-md6">
+                            <p class="pie_p">重复购物会员数量饼状图</p>
+                            <div class="layui-carousel layadmin-carousel layadmin-dataview" data-anim="fade" lay-filter="LAY-index-heapline">
+                            <div carousel-item id="LAY-index-pie_member2">
+                                <div><i class="layui-icon layui-icon-loading1 layadmin-loading"></i></div>
+                            </div>
+                            </div>
+                        </div>  
+                    </div> 
+                    <blockquote class="layui-elem-quote">会员排行榜</blockquote>
+                    <div class="layui-row table_list layui-col-space10">
+                        <div class="layui-col-md6">
+                            <ul class="layui-tab-title table_list_ul">
+                                <li class="layui-this" style="padding: 0 25px;">会员积分排行榜</li>
+                            </ul>
+                            <table class="layui-hide" id="test-table-mebintegral"></table>
+                        </div>
+                        <div class="layui-col-md6">
+                            <ul class="layui-tab-title table_list_ul">
+                                <li class="layui-this" style="padding: 0 25px;">会员余额排行榜</li>
+                            </ul>
+                            <table class="layui-hide" id="test-table-mebmoney"></table>
+                        </div>
+                    </div>
+                    <blockquote class="layui-elem-quote">分销商排行榜</blockquote>
+                    <div class="layui-row table_list layui-col-space10">
+                        <div class="layui-col-md6">
+                            <ul class="layui-tab-title table_list_ul">
+                                <li class="layui-this" style="padding: 0 25px;">分销商佣金总额排行榜</li>
+                            </ul>
+                            <table class="layui-hide" id="test-table-commission"></table>
+                        </div>
+                        <div class="layui-col-md6">
+                            <ul class="layui-tab-title table_list_ul">
+                                <li class="layui-this" style="padding: 0 25px;">分销商佣金余额排行榜</li>
+                            </ul>
+                            <table class="layui-hide" id="test-table-comoney"></table>
+                        </div>
+                    </div>
+                    <blockquote class="layui-elem-quote">购物信息排行榜</blockquote>
+                    <div class="layui-row table_list layui-col-space10">
+                        <div class="layui-col-md6">
+                            <ul class="layui-tab-title table_list_ul">
+                                <li class="layui-this" style="padding: 0 25px;">购物笔数排行榜</li>
+                            </ul>
+                            <table class="layui-hide" id="test-table-shop_num"></table>
+                        </div>
+                        <div class="layui-col-md6">
+                            <ul class="layui-tab-title table_list_ul">
+                                <li class="layui-this" style="padding: 0 25px;">购物金额排行榜</li>
+                            </ul>
+                            <table class="layui-hide" id="test-table-shop_money"></table>
+                        </div>
+                    </div>
+                    <blockquote class="layui-elem-quote">分销商佣金提现及上月消费排行榜</blockquote>
+                    <div class="layui-row table_list layui-col-space10">
+                        <div class="layui-col-md6">
+                            <ul class="layui-tab-title table_list_ul">
+                                <li class="layui-this" style="padding: 0 25px;">分销商佣金提现排行榜</li>
+                            </ul>
+                            <table class="layui-hide" id="test-table-consumption"></table>
+                        </div>
+                        <div class="layui-col-md6">
+                            <ul class="layui-tab-title table_list_ul">
+                                <li class="layui-this" style="padding: 0 25px;">上月消费排行榜</li>
+                            </ul>
+                            <table class="layui-hide" id="test-table-conmoney"></table>
+                        </div>
+                    </div>
+                </div>
+                <div class="layui-tab-item">
+                    <div class="layui-row" style="margin: 10px 0 10px;">
+                        <div class="layui-col-md6" style="padding-right: 20px;">
+                            <div class="layui-carousel layadmin-carousel layadmin-dataview" data-anim="fade" lay-filter="LAY-index-heapline">
+                            <div carousel-item id="LAY-index-map">
+                                <div><i class="layui-icon layui-icon-loading1 layadmin-loading"></i></div>
+                            </div>
+                            </div>  
+                        </div>  
+                        <div class="layui-col-md6">
+                            <table class="layui-hide" id="test-table-onrow" lay-filter="test-table-onrow"></table>
+                            <script type="text/html" id="test-member-num">
+                                
+                                <span style="display: inline-block;width: 30px;">{{d.value}}</span>
+                                <div class="layui-progress" style="display: inline-block;width: 55%;">
+                                    <div class="layui-progress-bar" style="width: {{d.value}}%;"></div>
+                                </div>
+                            </script> 
+                        </div>  
+                        <div class="table_provinces_bg">
+                            <div class="table_provinces layui-clearfix">
+                                <div class="pro_city">
+                                    <p class="pro_title">城市</p>
+                                    <ul>
+                                        <li>保定</li>
+                                    </ul>
+                                </div>
+                                <div class="pro_num">
+                                    <p class="pro_title">会员数</p>
+                                    <ul>
+                                        <li>5</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div> 
+                    <blockquote class="layui-elem-quote">性别分布比例</blockquote>           
+                    <div class="layui-carousel layadmin-carousel layadmin-dataview" data-anim="fade" lay-filter="LAY-index-heapline">
+                    <div carousel-item id="LAY-index-sex">
+                        <div><i class="layui-icon layui-icon-loading1 layadmin-loading"></i></div>
+                    </div>
+                    </div>         
+                </div>
+            </div>
+            </div>
+        </div>
+    </div>
+</div>
+</div>
+</div>  
+</div>
+</div>
+
+<script>
+layui.use('member_echarts', layui.factory('member_echarts')).
+     use('statistics_laydate', layui.factory('statistics_laydate')).
+     use(['admin','laydate','table','form','element'], function(){
+
+    var $ = layui.$
+    ,admin = layui.admin
+    ,laydate = layui.laydate
+    ,table = layui.table
+    ,form = layui.form
+    ,element = layui.element
+    ,router = layui.router();  
+
+    element.render('progress');
+  
+    var dataurl=[
+    { type:"全部成交客户", num:"24", accounted:1, amount:2, rate:4, price:2400.00 },  
+    { type:"新成交客户", num:"3", accounted:1, amount:2, rate:4, price:1197.00 },  
+    { type:"老成交客户", num:"2", accounted:1, amount:2, rate:4, price:120.00 }
+    ]
+    table.render({
+        elem: '#test-table-good'
+        ,data: dataurl
+        ,cols: [[
+            {field:'type', title: '客户类型',}
+            ,{field:'num', title: '客户数',templet: '#test-num',align:"center"}
+            ,{field:'accounted ', title: '客户数占比',templet: '#test-accounted'}
+            ,{field:'price', title: '客单价',templet: '#test-price'}
+            ,{field:'amount', title: '付款金额',templet: '#test-amount'}
+            ,{field:'rate', title: '访问-付款转化率',templet: '#test-rate'}
+        ]]
+    });
+
+    var membership=[
+    { id:'1', name:"EGEME全永存/1896*****54", integral:10001090, creat_time:'2019-07-27' },  
+    { id:'2', name:"林丽君/1586000064", integral:345645, creat_time:'2019-07-27' },  
+    { id:'3', name:"猫人优+宣传号/", integral:43333, creat_time:'2019-07-27' },  
+    { id:'4', name:"明明/139567890", integral:1125, creat_time:'2019-07-27' },  
+    { id:'5', name:"懵懵小梦梦/1526*****91", integral:5440, creat_time:'2019-07-27' },  
+    ];
+    			
+    table.render({
+        elem: '#test-table-mebintegral'
+        ,data: membership
+        ,cols: [[
+            {field:'id',title:'排名',width: 60, align:"center"}
+            ,{field:'name', title: '昵称/手机'}
+            ,{field:'integral', title: '会员积分', width: 100}
+            ,{field:'creat_time', title: '注册时间', width: 120}
+        ]]
+    });
+    table.render({
+        elem: '#test-table-mebmoney'
+        ,data: membership
+        ,cols: [[
+            {field:'id',title:'排名',width: 60, align:"center"}
+            ,{field:'name', title: '昵称/手机'}
+            ,{field:'integral', title: '会员余额', width: 100}
+            ,{field:'creat_time', title: '注册时间', width: 120}
+        ]]
+    });
+    table.render({
+        elem: '#test-table-commission'
+        ,data: membership
+        ,cols: [[
+            {field:'id',title:'排名',width: 60, align:"center"}
+            ,{field:'name', title: '昵称/手机'}
+            ,{field:'integral', title: '佣金', width: 100}
+            ,{field:'creat_time', title: '注册时间', width: 120}
+        ]]
+    });
+    table.render({
+        elem: '#test-table-comoney'
+        ,data: membership
+        ,cols: [[
+            {field:'id',title:'排名',width: 60, align:"center"}
+            ,{field:'name', title: '昵称/手机'}
+            ,{field:'integral', title: '佣金余额', width: 100}
+            ,{field:'creat_time', title: '注册时间', width: 120}
+        ]]
+    });
+    table.render({
+        elem: '#test-table-shop_num'
+        ,data: membership
+        ,cols: [[
+            {field:'id',title:'排名',width: 60, align:"center"}
+            ,{field:'name', title: '昵称/手机'}
+            ,{field:'integral', title: '购物次数', width: 100}
+            ,{field:'creat_time', title: '注册时间', width: 120}
+        ]]
+    });
+    table.render({
+        elem: '#test-table-shop_money'
+        ,data: membership
+        ,cols: [[
+            {field:'id',title:'排名',width: 60, align:"center"}
+            ,{field:'name', title: '昵称/手机'}
+            ,{field:'integral', title: '购物余额', width: 100}
+            ,{field:'creat_time', title: '注册时间', width: 120}
+        ]]
+    });
+    table.render({
+        elem: '#test-table-consumption'
+        ,data: membership
+        ,cols: [[
+            {field:'id',title:'排名',width: 60, align:"center"}
+            ,{field:'name', title: '昵称/手机'}
+            ,{field:'integral', title: '提现佣金', width: 100}
+            ,{field:'creat_time', title: '注册时间', width: 120}
+        ]]
+    });
+    table.render({
+        elem: '#test-table-conmoney'
+        ,data: membership
+        ,cols: [[
+            {field:'id',title:'排名',width: 60, align:"center"}
+            ,{field:'name', title: '昵称/手机'}
+            ,{field:'integral', title: '消费余额', width: 100}
+            ,{field:'creat_time', title: '注册时间', width: 120}
+        ]]
+    });
+
+
+    var tabledemo=[
+        { name:"北京", value:"37" },
+        { name:"天津", value:"4" },
+        { name:"上海", value:"34" },
+        { name:"河北", value:"19" },
+        { name:"河南", value:"36" },
+        { name:"云南", value:"35" },
+        { name:"辽宁", value:"19" },
+        { name:"黑龙江", value:"20" },
+        { name:"湖南", value:"14" },
+        { name:"安徽", value:"28" },
+        { name:"山东", value:"31" },
+        { name:"新疆", value:"22"},
+        { name:"江苏", value:"4" },
+        { name:"浙江", value:"60" },
+        { name:"江西", value:"237" },
+        { name:"湖北", value:"22" },
+        { name:"广西", value:"79" },
+        { name:"甘肃", value:"10" },
+        { name:"山西", value:"2" },
+        { name:"内蒙古", value:"22" },
+        { name:"陕西", value:"8" },
+        { name:"吉林", value:"20" },
+        { name:"福建", value:"46" },
+        { name:"贵州", value:"6" },
+        { name:"广东", value:"121" },
+        { name:"青海", value:"0" },
+        { name:"西藏", value:"0" },
+        { name:"四川", value:"54" },
+        { name:"宁夏", value:"2" },
+        { name:"海南", value:"13"},
+        { name:"台湾", value:"1" },
+        { name:"澳门", value:"2" },
+        { name:"南海诸岛", value:"0" },
+        { name:"未知", value:"328" }
+    ];
+    table.render({
+        elem: '#test-table-onrow'
+        ,data: tabledemo
+        ,cols: [[
+            {field:'name', title:'省份', width: 150}
+            ,{field:'value', title:'用户数',templet:"#test-member-num"}
+        ]]
+        ,page: true
+    });
+    
+    //监听行单击事件（单击事件为：rowDouble）
+    table.on('row(test-table-onrow)', function(obj){
+        var data = obj.data;
+        
+        layer.open({
+            type: 1,
+            area: ['420px', '240px'], //宽高
+            content: $('.table_provinces_bg').html()
+        }); 
+    });
+
+
+});
+</script>

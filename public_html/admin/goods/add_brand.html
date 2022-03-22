@@ -1,0 +1,209 @@
+<form class="layui-form" lay-filter="add_brand" style="padding: 20px 30px 0 0;">
+    <div class="layui-form-item">
+        <label class="layui-form-label">品牌名称</label>
+        <div class="layui-input-block">
+            <script type="text/html" template>
+                <input type="text" name="name" id="LAY-title" lay-verify="required" placeholder="输入品牌名称" autocomplete="off" class="layui-input" value="{{d.params.name||''}}">
+            </script>
+       
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">品牌网址</label>
+        <div class="layui-input-block">
+            <script template type="text/html">
+                <input type="text" name="url" id="LAY-title" lay-verify="required" placeholder="输入品牌网址" autocomplete="off" class="layui-input" value="{{d.params.url||''}}">
+            </script>
+        </div>
+    </div>
+    <!-- <div class="layui-form-item">
+        <label class="layui-form-label">顶级分类</label>
+        <div class="layui-input-block">
+            <select name="parent_cat_id" id="LAY-fenlei" lay-filter="LAY-fenlei">
+                
+            </select>
+        </div>
+        
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">二级分类</label>
+        <div class="layui-input-block">
+            <select name="cat_id" id="LAY-fl" lay-filter="LAY-fl">
+            </select>
+        </div>
+    </div> -->
+    <div class="layui-form-item">
+        <label class="layui-form-label">品牌LOGO</label>
+        <div class="layui-input-block">
+            <div class="layui-input-inline">
+                <input name="logo" lay-verify="required" id="goods_img" placeholder="图片地址" value="" class="layui-input">
+               
+                </div>
+                <div class="layui-input-inline layui-btn-container" style="width: auto;">
+                <button type="button" class="layui-btn" id="LAY_avatarUpload">
+                    <i class="layui-icon">&#xe67c;</i>上传图片
+                </button>
+                <a class="layui-btn layui-btn-primary" id="see_img">查看图片</a>
+            </div>
+        </div>
+    </div>
+    <div class="layui-form-item layui-form-text">
+        <label class="layui-form-label">品牌描述</label>
+        <div class="layui-input-block">
+            
+            <textarea name="desc" placeholder="请输入内容" class="layui-textarea" id="brand_textarea"></textarea>
+            
+            
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">是否推荐</label>
+        <div class="layui-input-block">
+            <script template type="text/html">
+             {{# if(d.params.id){ }}
+                    <input type="radio" name="is_recom" value="1" title="是" {{d.params.is_recom===1? 'checked':''}}>
+                    <input type="radio" name="is_recom" value="0" title="否" {{d.params.is_recom===0? 'checked':''}}>
+              {{# }else{ }}  
+                <input type="radio" name="is_recom" value="1" title="是">
+                <input type="radio" name="is_recom" value="0" title="否" checked>
+              {{# } }}  
+               
+            </script>
+        </div>                    
+    </div>
+    <div class="layui-form-item">
+            <label class="layui-form-label">排序</label>
+            <div class="layui-input-block">
+                <script template type="text/html">
+                    <input type="text" name="order" id="LAY-title" lay-verify="required" placeholder="输入排序" autocomplete="off" class="layui-input" value="{{d.params.order||'255'}}">
+                </script>
+            </div>
+        </div>
+    <div class="layui-form-item">
+        <div class="layui-input-block">
+        <button class="layui-btn"  type="button" lay-submit lay-filter="brand_submit"><i class="layui-icon">&#xe654;</i>保存</button>
+        </div>
+    </div>
+    <script type="text/html" template lay-done="layui.data.sendParams(d.params)"></script>  
+</form>
+ 
+<script>
+
+layui.data.sendParams = function(params){
+    console.log(params);
+    var chec_id=params.parent_cat_id;
+    var fl_id=params.cat_id;
+
+
+    layui.use(['admin', 'upload','form','table','view','setter','layer'], function(){
+    var $ = layui.$
+    ,admin = layui.admin
+    ,setter = layui.setter
+    ,element = layui.element
+    ,form = layui.form
+    ,layer = layui.layer
+    ,upload = layui.upload
+    ,view = layui.view
+    ,router = layui.router();
+    
+    if(params.desc){
+        $('#brand_textarea').val(params.desc);
+    }
+    if(params.logo){
+        $('#goods_img').val(params.logo);
+    }
+    form.render();
+    form.render(null, 'add_brand');
+
+    // admin.req({
+    //     url: layui.setter.baseUrl+'admin/goods/goodsCategory' 
+    //     ,data: {},
+    //     type:'get',
+    //     success: function(res){
+    //         if(res.code==1){
+    //             var list="<option value=''>--全部类型--</option>";
+    //             for( var i in res.data){
+    //                 list += "<option value='"+res.data[i].id+"' >"+res.data[i].name+"</option> ";
+    //             }
+    //             if(chec_id){
+    //                 $('#LAY-fenlei').html(list);
+    //                 $('#LAY-fenlei').val(chec_id);
+    //             }else{
+    //                 $('#LAY-fenlei').html(list);
+    //             }    
+                
+    //             form.render();
+    //         }else{
+    //             layer.msg(res.msg);
+    //         }       
+    //     } 
+    // }); 
+
+     form.on('select(LAY-fenlei)',function(e){
+        console.log(e);
+        admin.req({
+            url: layui.setter.baseUrl+'admin/goods/ajaxGetCategory' 
+            ,data: {pid:e.value},
+            type:'get',
+            success: function(res){
+                if(res.code==1){
+                    var list="<option value=''>--全部分类--</option>";
+                    for( var i in res.data){
+                        list += "<option value='"+res.data[i].id+"' >"+res.data[i].name+"</option> ";
+                    }
+                    if(chec_id){
+                        $('#LAY-fl').html(list);
+                        $('#LAY-fl').val(fl_id);
+                    }else{
+                        $('#LAY-fl').html(list);
+                    }    
+                    
+                    form.render();
+                }else if(res.code===0){
+                    var list="<option value=''>该分类下无子分类</option>";
+                    $('#LAY-fl').html(list);
+                }else if(res.data===""&&res.code===1){
+                    var list="<option value=''>该分类下无子分类</option>";
+                    $('#LAY-fl').html(list);
+                }else{
+                    layer.msg(res.msg);
+                }       
+            } 
+        });
+     });
+
+    // 查看图片
+    $('body').on('click','#see_img',function(){
+        var i = $('#goods_img').val();
+        layer.photos({
+            photos: {
+                title: "查看头像",
+                data: [{
+                    src: i
+                }]
+            },
+            shade: 0.5,
+            closeBtn: 1,
+            anim: 5
+        });
+    });    
+    //多图片上传
+    upload.render({
+        elem: '#LAY_avatarUpload'
+        ,url: layui.setter.baseUrl+'admin/upload/upload'
+        ,multiple: true
+        ,before: function(obj){
+        //预读本地文件示例，不支持ie8
+        obj.preview(function(index, file, result){
+            $('#upload_goods_images_box').append('<img src="'+ result +'" alt="'+ file.name +'" class="layui-upload-img" style="width:120px;height:120px;margin:0 15px 15px 0px;">')
+        });
+        }
+        ,done: function(res){
+            //上传完毕
+            $('#goods_img').val(res.data);
+        }
+    });
+
+})
+}
+</script>

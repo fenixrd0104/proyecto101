@@ -1,0 +1,134 @@
+{include file="public/header" /}
+</head>
+<body style="background: #f0f0f0;">
+<header class="mui-bar mui-bar-nav bg_white head_line" id="header">
+    <a class="mui-action-back mui-icon mui-icon-left-nav mui-pull-left" href="javascript:;"></a>
+    <a id="menu" class="mui-action-menu mui-icon mui-icon-bars mui-pull-right" href="javascript:void(0);"></a>
+    <h1 class="mui-title">Refund details</h1>
+</header>
+<div class="mui-content">
+    <div class="ret_up">
+        <p id="status"></p>
+        <p id="refund_time"></p>
+    </div>
+    <div class="ret_row bg_white flex_between">
+        <p>Total refund amount</p>
+        <h3>KRC <span id="refund_money">0.00</span></h3>
+    </div>
+    <div class="mb10"></div>
+    <div class="ret_div bg_white">
+        <h1>Refund Information</h1>
+        <ul class="after_ul after_ul_s">
+            <li>
+                <img src="__IMG__/touxiang.png" alt="">
+            </li>
+        </ul>
+        <div class="ret_txt">
+            <p>Reason for refund:</p>
+            <p>Refund amount:</p>
+            <p>Number of applications:</p>
+            <p>Application period:</p>
+            <p>Refund Number:</p>
+        </div>
+    </div>
+</div>
+
+{include file="public/head_nav"/}
+{include file="public/footer"/}
+<script type="text/html" id="list">
+<li>
+    <img src="{{img}}" alt="">
+    <div class="after_txt">
+        <h3>{{goods_name}}</h3>
+        <p>{{spec_key_name}}</p>
+    </div>
+    <span>x {{goods_num}}</span>
+</li>
+</script>
+<script type="text/html" id="list_p">
+    <p>Reason for refund: {{reason}}</p>
+    <p>Refund amount: {{re_money}}</p>
+    <p>Resonance hashrate for refund: {{refund_integral}}</p>
+    <p>Number of applications: {{goods_num}}</p>
+    <p>Application time: {{addtime}}</p>
+    <p>Refund number: {{order_sn}}</p>
+    {{ if refund_type==1 }}
+        {{ if shop_addr!='' }}
+        <p>Business address: {{shop_addr}}</p>
+        {{ /if end }}
+        {{ if shop_addr!='' }}
+        <p>Merchant Remarks: {{remark}}</p>
+        {{ /if end }}
+        {{ if refund_kdlx!='' }}
+        <p>Express Type: {{refund_kdlx}}</p>
+        <p>Express tracking number: {{refund_kddh}}</p>
+        {{ /if end }}
+    {{ /if end }}
+    {{ if status==0 }}
+    {{ else if status==1 }}
+    {{ else }}
+    <div class="mb10"></div>
+    <p class="text_red">Reason for failure：{{remark}}</p>
+    {{ /if end }}
+</script>
+<script type="text/javascript">
+var id=getQueryString('id');
+
+get_list();
+function get_list(){
+    $get('/api/order/return_detail',{id:id}, function(data) {
+        if (data.status == 1) {
+            var data=data.data;
+            data.refund_time=new Date(data.refund_time*1000).Format("MM month dd day of yyyy year hh:mm:ss");
+            data.addtime=new Date(data.addtime*1000).Format("yyyy-MM-dd hh:mm:ss");
+            if(data.refund_type==0){
+                if(data.status==1){
+                    $('#status').html('Refund successful');
+                    $('#refund_time').html(data.refund_time);
+                } else if(data.status==0){
+                    $('#status').html('Refund under review');
+                } else{
+                    $('#status').html('Refund failed');
+                    $('#refund_time').html(data.refund_time);
+                }
+            } else{
+                if(data.status==1){
+                    $('#status').html('Successful return and refund');
+                    $('#refund_time').html(data.refund_time);
+                } else if(data.status==0){
+                    $('#status').html('Return and refund under review');
+                } else{
+                    $('#status').html('Return refund failed');
+                    $('#refund_time').html(data.refund_time);
+                }
+            }
+            
+            var re_money=parseFloat(data.refund_deposit)+parseFloat(data.refund_money);
+            $('#refund_money').html(re_money.toFixed(2));
+            var list="";
+            for( var i in data.goods_list){
+                list += template('list', data.goods_list[i]);
+            }
+            $('.after_ul').html(list);
+            data.re_money=re_money.toFixed(2);
+            var list_p=template('list_p', data);
+            $('.ret_txt').html(list_p);
+        } else {
+            mui.toast(data.msg);
+        }
+
+    });
+};
+
+// Get address bar information
+function getQueryString(name) {
+    var reg = new RegExp('(^|&)' + name + '=([^&]*)(&|$)', 'i');
+    var r = window.location.search.substr(1).match(reg);
+    if (r != null) {
+        return unescape(r[2]);
+    }
+    return null;
+}
+</script>
+</body>
+</html>

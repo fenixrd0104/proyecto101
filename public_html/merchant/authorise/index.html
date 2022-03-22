@@ -1,0 +1,118 @@
+<title>扩展工具</title>
+
+<div class="layui-card layadmin-header">
+  <div class="layui-breadcrumb" lay-filter="breadcrumb">
+    <a>扩展工具</a>
+    <a><cite>第三方登录</cite></a>
+  </div>
+</div>
+
+<div class="layui-fluid">
+<div class="layui-row layui-col-space15">
+<div class="layui-col-md12">
+    <div class="layui-card">
+        <div class="layui-card-header">第三方登录</div>
+        <div class="layui-card-body">             
+            <table class="layui-hide" id="sf_login" lay-filter="sf_login"></table>    
+            <script type="text/html" id="tool_sf_login">
+              <a class="layui-btn layui-btn-xs" lay-event="config">配置</a>
+              {{# if(d.status==1){ }}
+              <a class="layui-btn layui-btn-xs this_status" lay-event="open" >启用</a>
+                {{# }else{ }}
+                <a class="layui-btn layui-btn-xs this_status layui-btn-danger" lay-event="open" >禁用</a>
+                {{# } }}
+             
+            </script>   
+            <script type="text/html" id="sf_login-images">
+              <img src="{{'/static/merchant/src/style/res/no_img.jpg'}}" height="100%" alt="">
+            </script>      
+        </div>
+    </div>
+</div>
+</div>
+</div>
+
+<script>
+layui.use(['admin','table', 'view', 'form','setter','layer'], function(){
+    var $ = layui.$
+    ,admin = layui.admin
+    ,setter = layui.setter
+    ,element = layui.element
+    ,form = layui.form
+    ,view = layui.view
+    ,table = layui.table
+    ,layer = layui.layer
+    ,router = layui.router();
+
+    table.render({
+        elem: '#sf_login'
+        ,url: layui.setter.baseUrl+'merchant/authorise/index'
+        ,cols: [[
+            {field:'name', title: '插件名称', align:'center'}
+            ,{field:'config_desc', title: '插件描述', align:'center'}
+            ,{field:'logo', title: '插件图片', templet: '#sf_login-images', align:'center'}
+            ,{fixed: 'right', title: '操作', align:'center',  toolbar: '#tool_sf_login',width:200}
+        ]]
+    });
+    
+    //监听工具条
+    table.on('tool(sf_login)', function(obj){
+        var data = obj.data;
+        var id = obj.data.id;
+        if(obj.event === 'config'){
+            // 配置
+            admin.popup({
+                title: data.name+"参数设置",
+                area: admin.screen() < 2 ? ['95%', '90%'] :["500px", "360px"],
+                id: "LAY-popup-add_a",
+                success: function(layero, index){
+                    view(this.id).render('/authorise/add_config',data).done(function() {
+                    form.render(null, 'add_config'); // 弹窗的lay-filter值
+                        form.on('submit(sf_login_submit)',function(datas){
+                            datas.field.id=id;
+                            admin.req({
+                                url: layui.setter.baseUrl+'merchant/authorise/config' //实际使用请改成服务端真实接口
+                                ,data: datas.field,
+                                type:'post',
+                                success: function(res){
+                                    if(res.code===1){
+                                        layer.msg(res.msg, {icon: 1,anim: 6,shade:0.5,time: 1000},function(){
+                                            layer.closeAll();
+                                        });
+                                    }else{
+                                        layer.msg(res.msg, {icon: 5,anim: 6,shade:0.5,time: 1000});
+                                    }          
+                                } 
+                            }); 
+                        });
+                    
+                    });
+                }
+            });
+        } else if(obj.event === 'open'){
+            console.log($(this).html());
+            $(this).toggleClass('layui-btn-danger');
+            if($(this).html()=='启用'){
+            $(this).html('禁用');
+            }else{
+            $(this).html('启用');
+            }
+            admin.req({
+                url: layui.setter.baseUrl+'merchant/authorise/status_config' //实际使用请改成服务端真实接口
+                ,data: {id:id},
+                type:'post',
+                success: function(res){
+                    if(res.code===1){
+                    }else{
+                        layer.msg(res.msg, {icon: 5,anim: 6,shade:0.5,time: 1000},function(){
+                            table.reload('sf_login');
+                        });
+                    }       
+                } 
+            }); 
+            
+        } 
+    });
+    
+});
+</script>

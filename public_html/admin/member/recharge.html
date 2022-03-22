@@ -1,0 +1,105 @@
+<style>
+.no_border{
+    border: none;
+}
+</style>
+
+<form class="layui-form" action="" lay-filter="recharge" style="padding: 10px 30px 0 0;">
+    <div class="layui-form-item">
+        <label class="layui-form-label">账号</label>
+        <div class="layui-input-block">
+        <script type="text/html" template>                        
+            <input type="text" name="account" placeholder="请输入账号" class="layui-input no_border" value="{{ d.params.account || '' }}" readonly>
+        </script>            
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">昵称</label>
+        <div class="layui-input-block"> 
+        <script type="text/html" template>                        
+            <input type="text" name="nickname" class="layui-input no_border" value="{{ d.params.nickname || '' }}" readonly>
+        </script>    
+        <input type="hidden" name="id" class="layui-input no_border" id="cz_id"> 
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">选择类型</label>
+        <div class="layui-input-block">
+            <select name="set_type" id="set_type" lay-verify="required">
+                <option value="">请选择类型</option>
+                <option value="money">KRC余额</option>
+                <option value="pool_water">SM币</option>
+                <option value="pool_hatch">USDT余额</option>
+                <option value="encourage">原始股</option>
+                <option value="integral">抵扣金</option>
+                <option value="pool_sale">代付券</option>
+                <option value="jifen">积分</option>
+            </select>
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">状态</label>
+        <div class="layui-input-block">
+            <input type="radio" name="type" value="up" title="加" checked>
+            <input type="radio" name="type" value="down" title="减">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">输入金额</label>
+        <div class="layui-input-block">                
+            <input type="text" name="money" class="layui-input" placeholder="请输入金额" lay-verify="required|number" id="cz_money" autocomplete="off">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">备注</label>
+        <div class="layui-input-block">
+            <textarea name="remarks" placeholder="选填，备注" class="layui-textarea"></textarea>  
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <div class="layui-input-block">
+            <button type="button" class="layui-btn" lay-submit lay-filter="cz_submit"><i class="layui-icon layui-icon-link"></i>保存</button>
+        </div>
+    </div>
+</form>
+        
+<script type="text/html" template lay-done="layui.data.sendParams(d.params)"></script>    
+<script>
+layui.data.sendParams = function(params){
+var  id=params.id;
+
+layui.use(['admin','form','upload','layedit','view','setter','layer'], function(){
+    var $ = layui.$
+    ,admin = layui.admin
+    ,setter = layui.setter
+    ,layedit = layui.layedit
+    ,layer = layui.layer
+    ,element = layui.element
+    ,form = layui.form
+    ,layer = layui.layer
+    ,view = layui.view
+    ,upload = layui.upload
+    ,router = layui.router();
+
+    element.render();
+    form.render(null, 'recharge');
+    
+    $('#cz_id').val(id);
+
+    $('#cz_money').on('blur',function () { 
+        var reg = /^[1-9]\d*$/;
+        var value=$(this).val();
+
+        if( !reg.test(value) ){
+            layer.msg('请输入正整数', { icon: 5, anim: 6, shade: 0.5, time: 1000 });
+            $(this).val('');
+        }
+    });
+
+
+
+  
+
+});
+}
+</script>

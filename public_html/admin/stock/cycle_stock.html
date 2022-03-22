@@ -1,0 +1,191 @@
+<title>周期库存</title>
+
+<div class="layui-card layadmin-header">
+    <div class="layui-breadcrumb" lay-filter="breadcrumb">
+        <a>库存管理</a>
+        <a><cite>周期库存</cite></a>
+    </div>
+</div>
+<style>
+#table_cycle_stock th,
+#table_cycle_stock td{
+    text-align: center;
+}
+#table_cycle_stock{
+    margin: 0;
+}
+</style>
+
+<div class="layui-fluid">
+<div class="layui-row">
+<div class="layui-col-md12">
+<div class="layui-card">
+    <div class="layui-card-header">周期库存</div>
+    <div class="layui-card-body layui-clear">
+        <form  class="layui-form" lay-filter="cycle_stock">
+            <div class="layui-form-item">
+                <div class="layui-inline">
+                    <select name="shop_id" id="shop_lists"> </select>
+                </div>
+                <div class="layui-inline">
+                    <input name="startTime" type="text" class="layui-input" id="laydate-datetime-start" placeholder="开始时间">
+                </div>
+                <div class="layui-inline">
+                    <input name="endTime" type="text" class="layui-input" id="laydate-datetime-end" placeholder="截止时间">
+                </div>  
+                <div class="layui-inline">
+                    <button class="layui-btn layuiadmin-btn-list" lay-submit lay-filter="cycle_search" type="button"><i class="layui-icon layui-icon-search layuiadmin-button-btn"></i></button>
+                </div>
+            </div>
+        </form>             
+        <div class="layui-col-xs12"> 
+            <!-- class="layui-table" -->
+            <table id="table_cycle_stock" lay-filter="table_cycle_stock">
+                <thead id="view_head"> </thead> 
+                <tbody id="view_body"> </tbody>
+            </table>
+            <script id="demo_head" type="text/html">
+                <tr>
+                    <th lay-data="{field:'a', fixed: 'left',align:'center',totalRowText: '合计',width:180}" rowspan="2">商品代码</th>
+                    {{#  layui.each(d, function(index, item){ }}
+                    <th lay-data="{field:'b',align:'center'}" colspan="2">{{item.type}}-{{item.remarks}}</th>
+                    {{#  }); }}
+                </tr>
+                <tr>
+                {{#  layui.each(d, function(index, item){ }}
+                    <th lay-data="{field:'c{{index}}',align:'center',width:75, totalRow: true}" rowspan="1">数量</th>
+                    <th lay-data="{field:'d{{index}}',align:'center',width:120, totalRow: true}" rowspan="1">金额</th>
+                {{#  }); }}
+                </tr>
+            </script>
+            <script id="demo_body" type="text/html">
+                {{#  layui.each(d, function(index, item){ }}
+                <tr>
+                    <td>{{item[0].spec_sku}}</td>
+                    {{#  layui.each(d[index], function(index, bitem){ }}
+                   
+                    <td>{{bitem.count}}</td>
+                    <td>{{bitem.price}}</td>
+                    {{#  }); }}
+                </tr>
+                {{#  }); }}
+            </script>
+        </div>
+ 
+    </div>
+</div>
+</div>  
+</div>
+</div>
+
+<script>
+layui.use(['admin','table','view','form','layer','laydate','laytpl'], function(){
+    var $ = layui.$
+    ,admin = layui.admin
+    ,view = layui.view
+    ,form = layui.form
+    ,layer = layui.layer
+    ,table = layui.table
+    ,laytpl = layui.laytpl
+    ,laydate = layui.laydate
+    ,form = layui.form;
+
+    form.render(null, 'cycle_stock');
+    //日期时间选择器
+    laydate.render({
+        elem: '#laydate-datetime-start'
+        // ,type: 'datetime'
+    });
+    laydate.render({
+        elem: '#laydate-datetime-end'
+        // ,type: 'datetime'
+    });    
+
+    admin.req({
+        url: layui.setter.baseUrl + 'admin/StockInventory/periodic' 
+        ,data: {}
+        ,type: 'get'
+        ,success: function (res) {
+        if (res.code == 1) {
+            // 下拉列表的值
+            var shop_lists=res.data.shop_lists;
+            var list="<option value=''>店铺列表</option>";
+            for( var i in shop_lists){
+                list+="<option value='"+i+"' >"+shop_lists[i]+"</option>";
+            }
+            $('#shop_lists').html(list);
+            form.render('select');           
+            // 表格 
+            var data=res.data.lists;
+            laytpl_html(data);            
+            table.init('table_cycle_stock', { 
+                toolbar: '#test-table-toolbar'
+                ,page:true
+                ,totalRow: true
+            }); 
+            
+        } else {
+            layer.msg(res.msg, {icon: 5,anim: 6,shade:0.5,time: 1000});
+        }
+
+        }
+    });
+
+    // 模板化加载
+    function laytpl_html(data){
+        //第三步：渲染模版
+        var data_first=first_attribute(data);
+        if( data_first== undefined){
+            data_first=[];
+        } 
+        var getTpl = demo_head.innerHTML
+        ,view = document.getElementById('view_head');
+        laytpl(getTpl).render(data_first, function(html,first){                
+            view.innerHTML = html; 
+        });
+        var getTpl = demo_body.innerHTML
+        ,view = document.getElementById('view_body');
+        laytpl(getTpl).render(data, function(html,first){                
+            view.innerHTML = html;
+        });
+    }
+
+    //监听搜索
+    form.on('submit(cycle_search)', function(data){
+        var field = data.field;
+        // console.log(field); 
+        admin.req({
+            url: layui.setter.baseUrl + 'admin/StockInventory/periodic' 
+            ,data: field
+            ,type: 'get'
+            ,success: function (res) {
+            if (res.code == 1) {     
+                // 表格 
+                //第三步：渲染模版
+                var data=res.data.lists;
+                laytpl_html(data);
+                table.init('table_cycle_stock', { 
+                    toolbar: '#test-table-toolbar'
+                    ,page:true
+                    ,totalRow: true
+                });              
+                
+            } else {
+                layer.msg(res.msg, {icon: 5,anim: 6,shade:0.5,time: 1000});
+            }
+
+            }
+        });
+    });
+
+    // 获得第一个属性
+    function first_attribute(data){
+        for (var key in data)
+        return data[key];
+    }
+   
+   
+
+});
+</script>
+    

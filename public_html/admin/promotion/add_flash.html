@@ -1,0 +1,132 @@
+<div class="layui-form" action="" lay-filter="menu_eadit" style="padding: 20px 30px 0 0;">
+    
+    <div class="layui-form-item">
+        <label class="layui-form-label">抢购标题</label>
+        <div class="layui-input-block">
+        <input type="text" name="title" id="LAY-title" lay-verify="required" placeholder="输入抢购标题" autocomplete="off" class="layui-input" >
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">选择商品</label>
+        <div class="layui-input-block">
+            <a  class="layui-btn layuiadmin-btn-useradmin" onclick="add_flash_goods();"><i class="layui-icon layui-icon-templeate-1"></i> 选择商品</a>
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">已选商品</label>
+        <div class="layui-input-block">
+            <table id="LAY-add_flash" lay-filter="LAY-add_flash"></table>
+
+            <script type="text/html" id="table-add_flash">
+                <a class="layui-btn layui-btn-normal layui-btn-xs" lay-event="edit">编辑</a>
+                <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del">删除</a>
+            </script>
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">抢购价格</label>
+        <div class="layui-input-block">
+        <input type="text" name="sort" id="LAY-sort" lay-verify="required" placeholder="输入抢购价格" value="" autocomplete="off" class="layui-input" >
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">抢购数量</label>
+        <div class="layui-input-block">
+        <input type="text" name="sort" id="LAY-sort" lay-verify="required" placeholder="输入抢购数量" value="" autocomplete="off" class="layui-input" >
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">限购数量</label>
+        <div class="layui-input-block">
+        <input type="text" name="sort" id="LAY-sort" lay-verify="required" placeholder="输入限购数量" value="" autocomplete="off" class="layui-input" >
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">开始时间</label>
+        <div class="layui-input-block">
+        <input type="text" name="sort" id="test-flash-start" lay-verify="required" placeholder="输入开始时间" value="" autocomplete="off" class="layui-input" >
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">结束时间</label>
+        <div class="layui-input-block">
+        <input type="text" name="sort" id="test-flash-end" lay-verify="required" placeholder="输入结束时间" value="" autocomplete="off" class="layui-input" >
+        </div>
+    </div>
+    <div class="layui-form-item layui-form-text">
+        <label class="layui-form-label">活动说明</label>
+        <div class="layui-input-block">
+            <textarea name="remarks" placeholder="请输入内容" class="layui-textarea"></textarea>
+        </div>
+        </div>
+    <!-- <div class="layui-form-item">
+        <label class="layui-form-label">站点状态</label>
+        <div class="layui-input-block">
+        <input type="radio" name="status" value="1" title="开启" checked=""><div class="layui-unselect layui-form-radio layui-form-radioed"><i class="layui-anim layui-icon"></i><div>开启</div></div>
+        <input type="radio" name="status" value="0" title="关闭"><div class="layui-unselect layui-form-radio"><i class="layui-anim layui-icon"></i><div>关闭</div></div>
+        </div>                    
+    </div> -->
+    <div class="layui-form-item">
+        <div class="layui-input-block">
+        <button class="layui-btn" lay-submit lay-filter="component-form-element"><i class="layui-icon">&#xe654;</i>保存</button>
+        
+        </div>
+    </div>
+</div>
+    
+    <script>
+      layui.use(['admin', 'table','form','laydate','layer','element'], function(){
+        var $ = layui.jquery
+        ,admin = layui.admin
+        ,upload = layui.upload
+        ,element = layui.element
+        ,laydate = layui.laydate
+        ,view = layui.view
+        ,layer = layui.layer
+        ,table = layui.table
+  ,setter = layui.setter
+        ,form = layui.form;
+
+        //日期时间选择器
+        laydate.render({
+            elem: '#test-flash-start'
+            ,type: 'datetime'
+        });
+        laydate.render({
+            elem: '#test-flash-end'
+            ,type: 'datetime'
+        });
+
+        table.render({
+            elem: '#LAY-add_flash'
+            ,url: layui.setter.baseUrl+'json/table/user.js'
+            ,cellMinWidth: 80 //全局定义常规单元格的最小宽度，layui 2.2.1 新增
+            ,cols: [[
+            {field:'username', title: '名称',align:'center', sort: true}
+            ,{field:'sign', title: '价格', width: 100,align:'center', sort: true} 
+            ,{field:'wealth',title: '库存',align:'center', sort: true}
+            ,{fixed: 'right', title:'操作', toolbar: '#table-add_flash',align:'center'}
+            ]]
+        });
+
+        function add_flash_goods(){
+        admin.popup({
+          title: "添加活动",
+          area: admin.screen() < 2 ? ['95%', '90%'] :["700px", "580px"],
+          id: "LAY-popup-add_flash_goods",
+          success: function(layero, index){
+            view(this.id).render('/promotion/add_flash_goods').done(function() {
+              form.render(null, 'add_flash_goods'); // 弹窗的lay-filter值
+             
+            });
+          }
+        });
+      }
+        // 添加活动
+      window.add_flash_goods=function(){
+        add_flash_goods();
+      };
+      
+    
+    })
+    </script>

@@ -1,0 +1,67 @@
+<div class="layui-row" id="order_fh_row">
+<form class="layui-form" action="" lay-filter="fahuo">                 
+    <div class="layui-form-item">
+        <label class="layui-form-label">配送方式</label>
+        <div class="layui-input-inline">
+            <select name="shipping_id" id="wuliu"></select> 
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">配送单号</label>
+        <div class="layui-input-block">
+            <input type="text" name="invoice_no" value=""  autocomplete="off" placeholder="请输入配送单号" class="layui-input">  
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">备注</label>
+        <div class="layui-input-block">
+            <textarea name="note" placeholder="请输入备注" class="layui-textarea"></textarea>   
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <div class="layui-input-block">
+            <button type="button" class="layui-btn" lay-submit lay-filter="fahuo_submit"><i class="layui-icon">&#xe654;</i>保存</button>
+            <a class="layui-btn layui-btn-danger" data-type="close"><i class="layui-icon">&#x1006;</i>返回</a>
+        </div>
+    </div>
+</form>
+</div>
+<script type="text/html" template lay-done="layui.data.sendParams(d.params)"></script> 
+<script> 
+layui.data.sendParams = function(params){
+    // console.log(params);
+layui.use(['admin', 'form', 'table', 'view','layer'], function(){
+    var $ = layui.$
+    ,admin = layui.admin
+    ,form = layui.form
+    ,layer = layui.layer
+    ,view = layui.view
+    ,layer = layui.layer
+    ,table = layui.table
+    ,router = layui.router();
+
+    // element.render();
+    form.render();
+
+    var active = {
+        // 返回--按钮
+        close:function(index){ 
+            layer.closeAll('page');
+        }
+    };
+    $('.layui-form-item .layui-btn').on('click', function(){
+        var type = $(this).data('type');
+        active[type] ? active[type].call(this) : '';
+    });
+    var wuliu_list='<option value="">--请选择--</option>';
+    for(var i in params){
+        wuliu_list+='<option value="'+params[i].id+'">'+params[i].shipping_name+'</option>';
+    }
+    $('#wuliu').html(wuliu_list);
+    form.render();
+
+        
+        
+    });
+}
+</script>

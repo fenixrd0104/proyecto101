@@ -1,0 +1,142 @@
+<title>奖池产币日志</title>
+<style>
+    form .layui-inline{
+        margin-bottom: 20px;
+    }
+</style>
+<div class="layui-card layadmin-header">
+  <div class="layui-breadcrumb" lay-filter="breadcrumb">
+      <a>财务管理</a>
+      <a><cite>奖池产币日志</cite></a>
+  </div>
+</div>
+<div class="layui-fluid">
+        <div class="layui-row layui-col-space15">
+          <div class="layui-col-md12">
+            <div class="layui-card">
+              <div class="layui-card-header">奖池产币日志</div>
+              <div class="layui-card-body"> 
+                  <div class="test-table-reload-btn" style="margin-bottom: 10px;">
+                    
+                    <div class="layui-input-inline">
+      
+                        <form class="layui-form">
+                            <div class="layui-inline">
+                                <div class="layui-input-inline">
+                                  <input type="text" class="layui-input" id="test-laydate-type-datetime-start" name="start_time" placeholder="开始时间">
+                                </div>
+                              </div>
+                              <div class="layui-inline">
+                                <div class="layui-input-inline">
+                                  <input type="text" class="layui-input"  name="end_time" id="test-laydate-type-datetime-end" placeholder="结束时间">
+                                </div>
+                              </div>
+                              <div class="layui-inline">
+                                <select name="type" id="jc_log_status">
+                                    <option value="">类型</option>
+                                    <option value="1">产币</option>
+                                    <option value="2">平台</option>
+                                    <option value="3">合伙人</option>
+                                    <option value="4">领导人</option>
+                                    <option value="5">沉淀</option>
+                                </select>
+                             </div>
+                            <!-- <div class="layui-inline">
+                                <input class="layui-input" name="uid" placeholder="搜索会员ID" id="test-table-demoReload" autocomplete="off">
+                              </div>
+                            <div class="layui-inline">
+                                <input class="layui-input" name="account" placeholder="搜索会员账号" id="test-table-demoReload" autocomplete="off">
+                              </div> -->
+                            <div class="layui-inline">
+                                <button class="layui-btn" type="button" lay-submit lay-filter="jc_log_search"><i class="layui-icon">&#xe615;</i>搜索</button>
+                              </div>
+                              
+                        </form>
+                       
+                    </div>
+                   
+                  </div>   
+
+                  <table class="layui-hide" id="jc_log" lay-filter="jc_log"></table>    
+                  <script id="tool_jc_log" type='text/html' templet>
+                    <!-- 总BTC数量：<span id="z_btc" style="font-weight:800;color:orangered;"></span> -->
+                  </script> 
+ 
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <script>
+      layui.use(['admin','table', 'view', 'form','layer','laydate'], function(){
+        var $ = layui.$
+        ,admin = layui.admin
+        ,element = layui.element
+        ,form = layui.form
+        ,view = layui.view
+        ,laydate = layui.laydate
+        ,layer = layui.layer
+        ,table = layui.table;
+          //日期时间选择器
+          laydate.render({
+            elem: '#test-laydate-type-datetime-start'
+            ,type: 'datetime'
+        });
+        laydate.render({
+            elem: '#test-laydate-type-datetime-end'
+            ,type: 'datetime'
+        });
+        form.render();
+
+
+        form.on('submit(jc_log_search)',function(datas){
+            get_data(datas.field);
+        });
+       
+      
+          var keywords="";
+          var type="";
+          var n=1;
+          get_data({keywords:''});
+          function get_data(param){
+            table.render({
+              elem: '#jc_log'
+              ,url: layui.setter.baseUrl+'admin/member/jchi_log'
+              ,toolbar: '#tool_jc_log'
+              ,parseData: function(res){ //res 即为原始返回的数据
+                  return {
+                  "code": res.code, //解析接口状态
+                  "msg": res.msg, //解析提示文本
+                  "count": res.data.count, //解析数据长度
+                  "data": res.data.lists //解析数据列表
+                  };
+              }
+              ,cols: [[
+                {field:'id', width:85, title: '序号', sort: true, align:'center'}
+                ,{field:'btc',title: 'BTC数量', align:'center',sort:true}
+                ,{field:'type',title: '操作类型', align:'center',templet:function(d){
+                    if(d.type==1){
+                        return '产币';
+                    }else if(d.type==2){
+                        return '平台';
+                    }else if(d.type==3){
+                        return '合伙人';
+                    }else if(d.type==4){
+                        return "领导人";
+                    }else{
+                        return "沉淀";
+                    }
+                }}
+                ,{field:'create_time', title: '时间', align:'center',templet: "<div>{{layui.util.toDateString(d.create_time*1000, 'yyyy-MM-dd HH:mm:ss')}}</div>",sort:true}
+                
+              ]],
+              page:true,
+              where:param
+            });
+          }
+         
+         
+      
+      });
+      </script>

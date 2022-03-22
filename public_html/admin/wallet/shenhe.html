@@ -1,0 +1,80 @@
+<form class="layui-form" action="" lay-filter="shenhe">
+  <div class="layui-form-item">
+    <label class="layui-form-label">审核状态</label>
+    <div class="layui-input-block">
+          <input type="radio" name="status" value="1" title="审核通过" checked>
+          <input type="radio" name="status" value="2" title="审核拒绝">
+    </div>
+  </div>
+  <div class="layui-form-item">
+      <label class="layui-form-label">备注</label>
+      <div class="layui-input-block">
+          <textarea name="z_msg" placeholder="" class="layui-textarea"></textarea>
+      </div>
+  </div>
+
+<div class="layui-form-item">
+  <div class="layui-input-block">
+    <button type="button" class="layui-btn" lay-submit lay-filter="shen_submit"><i class="layui-icon layui-icon-ok·"></i>保存</button>
+  </div>
+</div>
+</form>
+  
+        
+<script type="text/html" template lay-done="layui.data.sendParams(d.params)"></script>    
+<script>
+layui.data.sendParams = function(params){
+     var  id=params.id;
+ 
+     layui.use(['admin','form','upload','layedit','view','setter','layer'], function(){
+      var $ = layui.$
+      ,admin = layui.admin
+      ,setter = layui.setter
+      ,layedit = layui.layedit
+      ,layer = layui.layer
+      ,element = layui.element
+      ,form = layui.form
+      ,layer = layui.layer
+      ,view = layui.view
+      ,upload = layui.upload
+      ,router = layui.router();
+
+    element.render();
+    form.render(null, 'shenhe');
+
+    var $ = layui.$, active = {
+      // 返回--按钮
+      close:function(index){ 
+       layer.closeAll('page');
+      }
+    };
+    
+    $('.layui-input-block .layui-btn').on('click', function(){
+      var type = $(this).data('type');
+      active[type] ? active[type].call(this) : '';
+    });
+
+
+    
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    
+  });
+}
+</script>

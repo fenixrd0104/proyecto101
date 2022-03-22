@@ -1,0 +1,286 @@
+<link href="/static/admin/umedit/themes/default/css/umeditor.css" type="text/css" rel="stylesheet">
+<style>
+    .edui-tab-item{
+        line-height: 11px;
+    }
+</style>
+<form class="layui-form" action="" lay-filter="form_add" style="padding: 20px 30px 0 0;">
+    <div class="layui-form-item">
+        <label class="layui-form-label">商品名</label>
+        <div class="layui-input-block">   
+            <script type="text/html" template>                        
+            <input type="text" name="goods_name" lay-verify="required" placeholder="请输入商品名" autocomplete="off" class="layui-input" value="{{ d.params.goods_name || '' }}" >
+            </script>    
+        </div>
+    </div>    
+    
+    <div class="layui-form-item">
+        <label class="layui-form-label">拍卖者ID</label>
+        <div class="layui-input-block">   
+            <script type="text/html" template>                        
+            <input type="text" name="uid" lay-verify="required" readonly placeholder="请输入拍卖者ID" autocomplete="off" class="layui-input" value="{{ d.params.uid || '' }}" >
+            </script>    
+        </div>
+    </div>            
+    <div class="layui-form-item">
+        <label class="layui-form-label">商品图</label>
+        <div class="layui-input-block">
+            <div class="layui-input-inline">
+                <script type="text/html" template>        
+                    <input type="hidden" name="goods_img" id="goods_img" lay-verify="required" value="{{ d.params.goods_img || '' }}" placeholder="图片地址"  class="layui-input">
+                </script>
+            </div>
+            <div class="layui-input-inline layui-btn-container" style="width: auto;">
+                <!-- <button type="button" class="layui-btn" id="LAY_avatarUpload">
+                    <i class="layui-icon">&#xe67c;</i>上传图片
+                </button> -->
+                <a class="layui-btn layui-btn-primary" onclick="see_img();">查看图片</a>
+            </div>
+        </div>
+    </div>
+  
+    <div class="layui-form-item">
+        <label class="layui-form-label">是否公开</label>
+        <div class="layui-input-block" id="radios">
+            <script  type="text/html" template>
+                {{# if(d.params.id){ }}
+                    <input type="radio" name="is_private" lay-filter="is_private" value="0" title="是" {{ d.params.is_private=== 0 ? 'checked': '' }} >
+                    <input type="radio" name="is_private" lay-filter="is_private" value="1" title="否" {{ d.params.is_private=== 1 ? 'checked': '' }}>
+                
+                {{# }else{ }}
+                    <input type="radio" name="is_private" lay-filter="is_private" value="0" title="是" checked>
+                    <input type="radio" name="is_private" lay-filter="is_private" value="1" title="否">
+                {{# } }}
+            </script>
+        </div>
+    </div>
+
+    <div class="layui-form-item" id="is_show">
+        <label class="layui-form-label">私有密码</label>
+        <div class="layui-input-block">
+            <script  type="text/html" template>
+                 <input type="text" name="password" placeholder="私有则输入密码" autocomplete="off" class="layui-input" value="{{ d.params.password || '' }}" >
+            </script>
+        </div>
+    </div>  
+ 
+    <div class="layui-form-item">
+        <label class="layui-form-label">开始时间</label>
+        <div class="layui-input-block">
+            <input type="text" class="layui-input" lay-verify="required" id="laydate-type-datetime-start" name="start_time" placeholder="开始时间">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">拍卖时长</label>
+        <div class="layui-input-block">
+            <script  type="text/html" template>     
+                <input type="text" class="layui-input" lay-verify="required" value="{{ d.params.longtime || '0' }}"  name="longtime" placeholder="拍卖时长-按分钟">
+            </script>
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">联系方式</label>
+        <div class="layui-input-block">  
+            <script  type="text/html" template>                 
+            <input type="text" name="contact" placeholder="" autocomplete="off" class="layui-input" value="{{ d.params.contact || '' }}" >
+            </script>
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">估值</label>
+        <div class="layui-input-block">  
+            <script  type="text/html" template>                 
+            <input type="text" name="valuation" placeholder="" autocomplete="off" class="layui-input" value="{{ d.params.valuation || '0' }}" >
+            </script>
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">拍买价格</label>
+        <div class="layui-input-block">  
+            <script  type="text/html" template>                 
+            <input type="text" name="price" placeholder="" autocomplete="off" class="layui-input" value="{{ d.params.price || '0' }}" >
+            </script>
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">加价幅度</label>
+        <div class="layui-input-block">  
+            <script  type="text/html" template>                 
+            <input type="text" name="price_range" placeholder="" autocomplete="off" class="layui-input" value="{{ d.params.price_range || '0' }}" >
+            </script>
+        </div>
+    </div>
+
+    <div class="layui-form-item">
+        <label class="layui-form-label">内容</label>
+        <div class="layui-input-block">                   
+            <input type="hidden" name="goods_content" id="get_content">
+            <script id="editor" type="text/plain" style="width:100%;height:500px;"></script>
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">其它费用</label>
+        <div class="layui-input-block">
+            <script  type="text/html" template>         
+                <input type="text" name="other_fee" placeholder="" class="layui-input" value="{{ d.params.other_fee || '0' }}">
+            </script>
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">费用说明</label>
+        <div class="layui-input-block">  
+            <script  type="text/html" template>   
+                <textarea name="other_mark" id="other_mark" class="layui-input">{{ d.params.other_mark || ''}}</textarea>
+            </script>
+        </div>
+    </div>
+    
+    <div class="layui-form-item">
+        <div class="layui-input-block">
+            <button type="button" class="layui-btn" lay-submit="" lay-filter="re_btn">+保存</button>
+        </div>
+    </div>
+    <script type="text/html" template lay-done="layui.data.sendParams(d.params)">
+  
+    </script>
+</form>
+<script src="/static/admin/layui/lay/modules/jquery.3.1.1.js"></script>
+<script src="/static/admin/umedit/umeditor.config.js"></script>
+<script src="/static/admin/umedit/umeditor.min.js"></script>
+<script src="/static/admin/umedit/lang/zh-cn/zh-cn.js"></script>
+    
+<script>
+layui.data.sendParams = function(params){
+    var um = UM.getEditor('editor',{
+        initialFrameWidth:600,
+        initialFrameHeight:350,
+        // imageFieldName:"file" //上传图片的表单的name
+    });
+
+    UM.getEditor('editor').addListener('blur',function(editor){
+        $('#get_content').val(UM.getEditor('editor').getContent());
+    });
+    
+    layui.use(['admin','form','upload','laydate','layedit','view','setter','layer'], function(){
+      var $ = layui.$
+      ,admin = layui.admin
+      ,setter = layui.setter
+      ,layedit = layui.layedit
+      ,element = layui.element
+      ,form = layui.form
+      ,view = layui.view
+      ,layer = layui.layer
+      ,upload = layui.upload
+      ,router = layui.router()
+      ,laydate = layui.laydate;
+  
+      element.render();      
+      form.render(null, 'form_add');
+
+    laydate.render({
+        elem: '#laydate-type-datetime-start'
+        ,type: 'datetime'
+    });
+    // laydate.render({
+    //     elem: '#laydate-type-datetime-end'
+    //     ,type: 'datetime'
+    // });
+
+
+    form.on("radio(is_private)", function (data) {
+       var sex = data.value;
+        if (this.value == '0') { 
+            $('#is_show').hide();
+        } else if (this.value == '1') { 
+            $('#is_show').show();
+        } 
+    });
+
+    if(params.id){
+        if (params.is_private == '0') { 
+            $('#is_show').hide();
+        } else if (params.is_private == '1') { 
+            $('#is_show').show();
+        } 
+        
+        // admin/Article/editArticle
+        admin.req({
+            url: layui.setter.baseUrl+'admin/auction/edit_auction_goods' //实际使用请改成服务端真实接口
+            ,data: {id:params.id},
+            type:'get',
+            success: function(res){
+                if(res.code==1){
+                    um.setContent(res.data.info.goods_content);
+                    form.val('form_add',{
+                        'start_time':res.data.info.start_time,
+                        'end_time':res.data.info.end_time,
+                        'goods_content':res.data.info.goods_content
+                        
+                    });
+                }else{
+                    layer.msg(res.msg);
+                }       
+            } 
+        }); 
+    }
+
+ 
+      // 查看图片
+      window.see_img=function(){
+        var i = $('#goods_img').val();
+        var arr = i.split(",");
+        var brr = [];
+        for(s in arr){
+            brr.push({'src':arr[s]});
+        }
+        layer.photos({
+            photos: {
+                title: "查看头像",
+                data: brr
+            },
+            shade: 0.5,
+            closeBtn: 1,
+            anim: 5
+        });
+      };
+      //多图片上传
+      upload.render({
+        elem: '#LAY_avatarUpload'
+        ,url: layui.setter.baseUrl+'admin/upload/upload'
+        ,multiple: true
+        ,before: function(obj){
+            //预读本地文件示例，不支持ie8
+            obj.preview(function(index, file, result){
+                $('#upload_goods_images_box').append('<img src="'+ result +'" alt="'+ file.name +'" class="layui-upload-img" style="width:120px;height:120px;margin:0 15px 15px 0px;">')
+            });
+        }
+        ,done: function(res){            
+            //上传完毕
+            $('#goods_img').val(res.data);
+            layer.msg(res.msg);
+        }
+      });
+
+      //多图片上传
+      upload.render({
+        elem: '#LAY_avatarUpload2'
+        ,url: layui.setter.baseUrl+'admin/upload/upload'
+        ,multiple: true
+        ,before: function(obj){
+            //预读本地文件示例，不支持ie8
+            obj.preview(function(index, file, result){
+                $('#upload_goods_images_box').append('<img src="'+ result +'" alt="'+ file.name +'" class="layui-upload-img" style="width:120px;height:120px;margin:0 15px 15px 0px;">')
+            });
+        }
+        ,done: function(res){            
+            //上传完毕
+            $('#writer_img').val(res.data);
+            layer.msg(res.msg);
+        }
+      });
+     
+      
+    });
+
+} 
+</script>

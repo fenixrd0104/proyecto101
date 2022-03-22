@@ -1,0 +1,251 @@
+<title>店铺列表</title>
+
+<div class="layui-card layadmin-header">
+    <div class="layui-breadcrumb" lay-filter="breadcrumb">
+        <a>店铺管理</a>
+        <a><cite>店铺列表</cite></a>
+    </div>
+</div>
+
+<script type="text/html" template>
+    <link rel="stylesheet" href="{{ layui.setter.base }}style/goods.css?v={{ layui.admin.v }}-1" media="all">
+</script>
+<style>
+  .layui-table-cell { height: auto; }
+</style>
+
+<div class="layui-fluid">
+<div class="layui-row">
+    <div class="layui-col-md12">
+    <div class="layui-card">
+    <div class="layui-card-header">店铺列表</div>
+    <div class="layui-card-body">
+    <div class="layui-row layui-col-space10">
+    <div class="layui-col-md12">
+<!--        <form  class="layui-form" lay-filter="app-content-list">-->
+<!--            <div class="layui-form-item">-->
+<!--                <div class="layui-inline">-->
+<!--                <div class="layui-input-inline">-->
+<!--                    <select name="shopTypeTree" id="spec_type_id"> </select>-->
+<!--                </div>-->
+<!--                </div>-->
+<!--                <div class="layui-inline">-->
+<!--                <div class="layui-input-inline">-->
+<!--                    <input type="text" name="keyWords" placeholder="请输入店铺名称" autocomplete="off" class="layui-input">-->
+<!--                </div>-->
+<!--                </div>-->
+<!--                <div class="layui-inline">-->
+<!--                    <button class="layui-btn layuiadmin-btn-list" lay-submit lay-filter="storelist_search" type="button">-->
+<!--                        <i class="layui-icon layui-icon-search layuiadmin-button-btn"></i>-->
+<!--                    </button>-->
+<!--                </div>-->
+<!--            </div>-->
+<!--        </form>-->
+    </div>
+    </div>
+    </div>
+    </div>
+    </div>
+    <div class="layui-row">
+    <div class="layui-col-md12">
+    <div class="layui-card">
+    <div class="layui-card-body">
+        <table class="layui-hide" id="test-table-simple" lay-filter="test-table-operate"></table>
+
+        <script type="text/html" id="test-table-toolbar-toolbarDemo">
+            <div class="layui-btn-container">
+<!--                <a type="button" class="layui-btn" onclick="add_s();">新增分店</a>-->
+<!--                <a type="button" class="layui-btn" lay-href="/storelist/storecategory">店铺分类</a>-->
+<!--                <button type="button" class="layui-btn" lay-href="/industry/index" id="to_industry">店铺行业</button>-->
+            </div>
+        </script>
+        <script type="text/html" id="test-table-toolbar-barDemo">
+            <a class="layui-btn layui-btn-normal layui-btn-xs" lay-event="edit"><i class="layui-icon layui-icon-edit"></i>编辑</a>
+            <!-- <a class="layui-btn layui-btn-xs layui-btn-normal" lay-event="see">查看详情</a>
+            <a class="layui-btn layui-btn-xs" lay-event="edit">地址信息</a>
+            <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del">店铺介绍</a>
+            <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del">二维码</a> -->
+        </script>
+        <script type="text/html" id="test-table-state">
+            <input type="checkbox" name="sex" lay-skin="switch" lay-text="启用|禁用" lay-filter="table-status-store" value="{{ d.id}}" {{ d.status == 1 ? 'checked' : '' }}>
+        </script>    
+    </div>
+    </div>
+    </div>
+    </div>    
+</div>
+</div>
+
+<script>
+layui.use(['admin','table', 'view','form','layer','ourJs'], function(){
+    var $ = layui.$
+    ,admin = layui.admin
+    ,view = layui.view
+    ,form = layui.form
+    ,layer = layui.layer
+    ,table = layui.table
+    ,ourJs = layui.ourJs
+    ,form = layui.form;
+
+    form.render(null, 'app-content-list');
+    var cate_list="";
+
+    get_data(0);
+    function get_data(d){
+        if(d==0){
+            var type='';
+        }else{
+            var type="&shopTypeTree="+d.shopTypeTree+'&keyWords='+d.keyWords;
+        }
+        table.render({
+            elem: '#test-table-simple'
+            ,url: layui.setter.baseUrl+'merchant/shop/index?'+type
+            ,parseData: function(res){ //res 即为原始返回的数据
+                if(d===0){
+                    var list="<option value=''>--全部类型--</option>";
+                    for( var i in res.data.shopTpye){
+                        list += "<option value='"+i+"' >"+res.data.shopTpye[i]+"</option> ";
+                    }    
+                    $('#spec_type_id').html(list);
+                    cate_list=res.data.shopTpye;
+                    form.render();
+                }
+               
+                return {
+                "code": res.code, //解析接口状态
+                "msg": res.msg, //解析提示文本
+                "count": res.data.count, //解析数据长度
+                "data": res.data.lists //解析数据列表
+                };
+            }
+            ,toolbar: '#test-table-toolbar-toolbarDemo'
+            ,cellMinWidth: 80 //全局定义常规单元格的最小宽度，layui 2.2.1 新增
+            ,cols: [[
+                {field:'id', width:80, title: 'ID', sort: true,align:'center'}
+                ,{field:'name', title: '店铺名称',align:'center'}
+                ,{field:'uid',width:150, title: '用户名称',align:'center'}
+                ,{field:'type', width:80, title: '店铺类型/分类',templet:function(d){
+                        for(var i in  cate_list){
+                            if(i==d.type){
+                                var this_cate=cate_list[i];
+
+                            }
+                        }
+                        return this_cate;
+                    },align:'center'}
+                ,{field:'create_time', title: '营业时间',align:'cenetr',align:'center'} 
+                ,{field:'status', title: '状态',width:90, templet: '#test-table-state',align:'center'}
+                ,{field:'update_time', title: '更新时间',align:'center'}
+                ,{fixed: 'right', title:'操作',width: 100, toolbar: '#test-table-toolbar-barDemo',align:'center'}
+            ]],
+            page:true
+        });
+    }
+          
+
+    window.add_s=function(){
+        admin.popup({
+            title: "添加分店",
+            area: admin.screen() < 2 ? ['95%', '90%'] :["800px", "700px"],
+            id: "LAY-popup-add_s",
+            success: function(layero, index){
+                view(this.id).render('/storelist/add').done(function() {
+                    form.render(null, 'add_storelist'); // 弹窗的lay-filter值
+                    //监听提交
+                    form.on('submit(component-form-element)', function(data){
+                    // console.log(data.field);    
+                    admin.req({
+                        url: layui.setter.baseUrl+'merchant/shop/shop_add' //实际使用请改成服务端真实接口
+                        ,data: data.field
+                        ,type:'post'
+                        ,success: function(res){
+                            if(res.code==1){
+                                layer.msg(res.msg , {icon: 1} , function(){
+                                setTimeout(function(){
+                                    layer.close(index); //执行关闭 
+                                    layui.table.reload('test-table-simple'); //重载表格
+                                },500);
+                                
+                                });
+                            }else{
+                                layer.msg(res.msg, {icon: 5,anim: 6,shade:0.5,time: 1500});
+                            }
+                        }
+                    }); 
+                    }); 
+                    
+                });
+            }
+        });
+    };
+    //监听状态操作
+    form.on('switch(table-status-store)', function (e) {
+            var _this=this,status=e.elem.checked;
+            var id = e.value;          
+            admin.req({
+                url: layui.setter.baseUrl + 'merchant/shop/shop_status'
+                , data: { id: id },
+                type: 'post',
+                success: function (res) {
+                    if (res.code == 1) {
+                        ourJs.status_tong(table,_this,status);
+                    } else {
+                        layer.msg(res.msg, { icon: 5, anim: 6, shade: 0.5, time: 500 });
+                        e.elem.checked = !e.elem.checked;
+                        console.log(222);
+                        form.render();
+                    }
+                }
+            });
+        });
+    table.on('tool(test-table-operate)', function(obj){
+        var data=obj.data;        
+         if(obj.event === 'edit'){
+            admin.popup({
+            title: "编辑店铺信息",
+            area: admin.screen() < 2 ? ['95%', '90%'] :["800px", "700px"],
+            id: "LAY-popup-add_s",
+            success: function(layero, index){
+                view(this.id).render('/storelist/add', data).done(function() {
+                    form.render(null, 'add_storelist'); 
+                    // 编辑的的select
+                    $('#LAY-shangji').val(data.pid);
+                    form.render('select');   // 重载
+                    // 监听提交
+                    form.on('submit(component-form-element)', function(data){
+                    // console.log(data.field);  
+                    admin.req({
+                        url: layui.setter.baseUrl+'merchant/shop/shop_edit' //实际使用请改成服务端真实接口
+                        ,data: data.field
+                        ,type:'post'
+                        ,success: function(res){
+                            if(res.code==1){
+                                console.log(res.data)
+                                layer.msg(res.msg , {icon: 1} , function(){
+                                setTimeout(function(){
+                                    layer.close(index); //执行关闭 
+                                    layui.table.reload('test-table-simple'); //重载表格
+                                });
+                                });
+                            }else{
+                                layer.msg(res.msg, {icon: 5,anim: 6,shade:0.5,time: 1500});
+                            }
+                        }
+                    }); 
+                    }); 
+                    
+                });
+            }
+        });
+        }
+    });
+
+    // 搜索
+    form.on('submit(storelist_search)',function(e){
+        // console.log(e);
+        get_data(e.field);
+    });
+
+});
+</script>
+    

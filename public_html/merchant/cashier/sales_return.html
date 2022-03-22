@@ -1,0 +1,147 @@
+<title>整单退货</title>
+<style>
+.complet .layui-form-label,
+.complet_s .layui-form-label{
+    padding: 9px 0;
+}
+.complet .layui-input-block,
+.complet_s .layui-input-block{
+    margin-left: 80px;
+}
+.complet .layui-input-inline{
+    width: 15%;
+}
+.complet .layui-input{
+    padding-left: 0  ;
+}
+.complet_s .layui-input-inline{
+    width: 260px;
+}
+.user_label{
+    text-align: left;
+    width: auto;
+}
+.cope_money{
+    color: #ff0000 !important;
+    font-weight: bold;
+    font-size: 20px;
+}
+
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+}
+input[type="number"] {
+    -moz-appearance: textfield;
+}
+</style>
+
+<div class="layui-form" id="payment" lay-filter="choose_stock" style="padding: 20px 30px 0 0;">
+    <div class="layui-row layui-col-space10 complet">
+    <div class="layui-form-item">
+        <label class="layui-form-label">商品总价：</label>
+        <div class="layui-input-inline">
+            <input type="text" name="goods_price" id="goods_price" class="layui-input" style="border:none" disabled>
+        </div>
+        <label class="layui-form-label">优惠金额：</label>
+        <div class="layui-input-inline">
+            <input type="text" name="discount" id="discount" class="layui-input" style="border:none" disabled >
+        </div>
+        <label class="layui-form-label">使用积分：</label>
+        <div class="layui-input-inline">
+            <input type="text" name="integral_money" id="integral_money" class="layui-input" style="border:none" disabled  >
+        </div>
+        <label class="layui-form-label">使用余额：</label>
+        <div class="layui-input-inline">
+            <input type="text" name="user_money" id="user_money" class="layui-input" style="border:none" disabled  >
+        </div>
+        <label class="layui-form-label">实际金额：</label>
+        <div class="layui-input-inline" style="width: 30%">
+            <input type="text" name="order_amount" id="order_amount" class="layui-input" style="border:none" disabled  >
+        </div>
+    </div>
+    </div>
+    <div class="layui-form-item complet_s">
+        <label class="layui-form-label">退还积分：</label>
+        <div class="layui-input-block">
+            <input type="text" name="propose_refunds_integral" id="propose_refunds_integral" lay-verify="required" placeholder="请输入退还积分" autocomplete="off" class="layui-input" >
+        </div>
+    </div>
+    <div class="layui-form-item complet_s">
+        <label class="layui-form-label">退还金额：</label>
+        <div class="layui-input-block">
+            <input type="text" name="propose_refunds_money" id="propose_refunds_money" lay-verify="required" placeholder="请输入退还金额" autocomplete="off" class="layui-input" >
+        </div>
+    </div>
+    <div class="layui-form-item complet_s">
+        <label class="layui-form-label">退还现金：</label>
+        <div class="layui-input-block">
+            <input type="text" name="propose_returns_price" id="propose_returns_price" lay-verify="required" placeholder="请输入退还现金" autocomplete="off" class="layui-input" >
+        </div>
+    </div>
+    
+    
+    <div class="layui-form-item">
+    <div class="layui-input-block">
+        <button type="button" class="layui-btn" lay-submit lay-filter="sales_return"><i class="layui-icon">&#xe654;</i>保存</button>
+        <button type="button" class="layui-btn layui-btn-danger" data-type="close" ><i class="layui-icon">&#x1006;</i>关闭</button>
+    </div>
+    </div>
+</div>
+
+
+
+<script>
+layui.use(['admin','table','form','view','layer'], function(){
+    var $ = layui.$
+    ,admin = layui.admin
+    ,view = layui.view
+    ,setter = layui.setter
+    ,table = layui.table
+    ,layer = layui.layer
+    ,form = layui.form;
+
+    // 获取传值参数---得到id
+    var router = layui.router();
+    // console.log(router.search);
+    var order_id = router.search.order_id;
+
+                   
+    admin.req({
+        url: layui.setter.baseUrl + 'merchant/Cashier/refunds'
+        ,data: { order_id:order_id }
+        ,type: 'get'
+        ,success: function (res) {
+        if (res.code == 1) {
+            // 调接口--获取数据 
+            form.val("choose_stock",{
+                "goods_price" : res.data.goods_price,
+                "discount" : res.data.discount,
+                "integral_money" : res.data.integral_money,
+                "user_money" : res.data.user_money,
+                "order_amount" : res.data.order_amount,
+                "propose_refunds_integral" : res.data.propose_refunds_integral,
+                "propose_refunds_money" : res.data.propose_refunds_money,
+                "propose_returns_price" : res.data.propose_returns_price,
+            }); 
+        } else {
+            layer.msg(res.msg);
+        }
+        }
+    });
+   
+   //取消按钮
+   var active = {
+        close: function(){     
+            layer.closeAll('page'); //关闭所有页面层
+        }
+    }  
+    $('.layui-input-block .layui-btn').on('click', function(){
+        var type = $(this).data('type');
+        active[type] ? active[type].call(this) : '';
+    });
+
+});
+
+
+</script>

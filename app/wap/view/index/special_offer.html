@@ -1,0 +1,51 @@
+{include file="public/header"/}
+
+</head>
+<body style="background: #f8f8f8;">
+    <header class="mui-bar mui-bar-nav index_header shop_head" id="header">
+        <a class="back-page mui-icon mui-icon-left-nav mui-pull-left" href="javascript:;"></a>
+        <a id="menu" class="mui-action-menu mui-icon mui-icon-bars mui-pull-right" href="javascript:void(0);"></a>
+        <h1 class="mui-title">Promotions</h1>
+    </header>
+    <div class="mui-content street_content">
+       <div class="special_list">
+           <ul>
+               <li>
+                    <img class="fl" src="__IMG__/touxiang.png" alt="">
+                    <div class="special_txt fr">
+                        <p class="mui-ellipsis-2 spe_title">Redmi Note 7 New Products Available New Available Available New Available Available New Available Available New Available Available New Available Available </ p>
+                        <p class="spe_red"><span>1200</span>sold</p>
+                        <div class="spe_div fr">
+                            <p class="spe_em">KRC <em>19</em>.9</p>
+                            <p class="spe_hui">KRC 20</p>
+                        </div>
+                    </div>
+               </li>
+               <li>
+                    <img class="fl" src="__IMG__/touxiang.png" alt="">
+                    <div class="special_txt fr">
+                        <p class="mui-ellipsis-2 spe_title">Redmi Note 7 New Products Available New Available Available New Available Available New Available Available New Available Available New Available Available </ p>
+                        <p class="spe_red"><span>1200</span>sold</p>
+                        <div class="spe_div fr">
+                            <p class="spe_em">KRC <em>19</em>.9</p>
+                            <p class="spe_hui">KRC 20</p>
+                        </div>
+                    </div>
+               </li>
+           </ul>
+       </div>
+    </div>
+    {include file="public/head_nav"/}
+    {include file="public/footer"/}
+    <script>
+        /* Header navigation bar */
+        $('#menu').click(function(e){
+            $('.login_pop').toggle();
+            e.stopPropagation();
+        })
+        $('body').click(function(){
+            $('.login_pop').hide();          
+        }) 
+    </script>
+</body>
+</html>

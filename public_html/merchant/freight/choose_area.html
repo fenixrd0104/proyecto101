@@ -1,0 +1,367 @@
+<title>选择位置</title>
+
+<style>
+    .t_l{
+        text-align: left;
+        position: relative;
+    }
+    .t_c{
+        text-align: center;
+    }
+    .t_r{
+        text-align:right;
+    }
+    @media screen and (max-width: 992px){
+        .t_r{
+            text-align:left;
+        }
+    }
+    .layui-form>.layui-row>.layui-form-item>div{
+        line-height: 36px;
+        padding:0px 10px;
+    }
+    .layui-form>.layui-row>.layui-form-item .layui-input-inline{
+        margin-bottom: 20px;
+        margin-left: 0;
+    }
+    .layui-form-switch{
+        margin-top: 0;
+    }
+    .layui-table-cell{
+        height:auto;
+        overflow: auto;
+    }
+    #layui_item .layui-form-item{
+        margin-bottom: 6px;
+    }
+    .layui-edge{
+        position: absolute;
+        top: 55%;
+        cursor: pointer;
+        border-width: 6px;
+        border-top-color: #5FB878;
+        border-top-style: solid;
+        transition: all .3s;
+        -webkit-transition: all .3s;
+    }
+    .e_active{   
+        top: 40%;     
+        transform:rotate(180deg);
+    }
+    .l_color{
+        position: absolute;
+        top: 35px;
+        z-index: 100;
+        background: #FFF7D8;
+        padding: 0 5px 10px;
+        border: 1px solid #F7E5A5;
+        display: none;
+    }
+    .l_color .layui-edge{
+        top: -12px;
+        border-top-color: #F7E5A5;
+        transform:rotate(180deg);
+    }
+    .l_active{
+        display: block;
+    }
+    .l_color_div{
+        width: 50%;
+        float: left;
+    }
+    .first-level{
+        float: left;
+        width: 103px;
+        padding: 0 !important;
+    }
+    .second-level{
+        float: left;
+        width: 580px;
+        padding: 0 !important;
+    }
+    .province{
+        float: left;
+        width: 193px;
+    }
+</style>
+
+<form class="layui-form" action="" lay-filter="add_goods">
+<div class="layui-row" >
+
+    <div id="layui_item"></div>
+    <script id="layui_script" type="text/html" >
+        {{#  layui.each(d, function(index, item){ }}
+        <div class="layui-form-item">
+        <div class="first-level t_l ">
+            <input type="checkbox" name="region" value="{{index}}" title="{{index}}" lay-filter="region" lay-skin="primary" >   
+        </div>
+        <div class="second-level">
+        <div class="layui-row" id="layui_item"> 
+            {{#  layui.each(item, function(index, aitem){ }}           
+            <div class="t_l province">
+                <input type="checkbox" name="sheng" value="{{index}}" title="{{aitem.name}}"  lay-filter="province" lay-skin="primary" class="sheng" id="{{index}}">
+                <i class="layui-edge province_edge" onclick="zhedie(this)"></i>
+                <div class="layui-col-md12 l_color">
+                    <i class="layui-edge" ></i>  
+                    {{#  layui.each(aitem.city, function(index, bitem){ }} 
+                    <div class="layui-col-md6 t_l ">
+                        <input type="checkbox" name="city" value="{{index}}" title="{{bitem}}" lay-filter="city"  lay-skin="primary" class="city" id="{{index}}">
+                    </div>
+                    {{#  }); }}
+                </div>    
+            </div> 
+            {{#  }); }}
+        </div>                         
+        </div>  
+        </div> 
+        {{#  }); }}   
+    </script> 
+
+    <div class="layui-form-item" style="padding-top: 10px;margin-top: 30px; margin-bottom: 0; border-top:1px solid #f1f1f1;">
+    <div class="layui-col-md12 t_c">
+        <input type="hidden" name="area" id="chooseed_area">
+        <input type="hidden" name="province_s" id="chooseed_province">
+        <input type="hidden" name="district" id="chooseed_district">
+        <button type="button" class="layui-btn" lay-submit lay-filter="chooseed_area_submit"><i class="layui-icon layui-icon-link"></i>保存</button>
+    </div>
+    </div>
+
+</div>
+
+<script type="text/html" template lay-done="layui.data.sendParams(d.params)"></script>  
+</form>
+
+<script>    
+layui.data.sendParams = function(params){
+    // console.log(params);
+
+layui.use(['admin','table','form','view','laytpl','layedit','setter','layer'], function(){
+    var $ = layui.$
+    ,admin = layui.admin
+    ,setter = layui.setter
+    ,form = layui.form
+    ,table = layui.table
+    ,layer = layui.layer
+    ,element = layui.element
+    ,layedit = layui.layedit
+    ,laytpl = layui.laytpl
+    ,view = layui.view
+    ,device = layui.device();
+    
+    
+
+    // 获取地址--请求接口
+    admin.req({
+        url: layui.setter.baseUrl+'merchant/freight/add' 
+        ,data: {}
+        ,type:'get'
+        ,success: function(res){
+            if(res.code==1){
+                // console.log(res.data.reg_data);
+
+                var data_item=res.data.reg_data;
+                var getTpl_item = layui_script.innerHTML
+                    ,view_item = document.getElementById('layui_item');
+                laytpl(getTpl_item).render(data_item, function(html){
+                    view_item.innerHTML = html;
+                });
+                int_data();
+                form.render();
+                
+            }else{
+                layer.msg(res.msg, {icon: 5,anim: 6,shade:0.5,time: 1000});
+            }
+        }
+    }); 
+
+    function int_data(){
+         if( params){
+            // console.log(params);
+             
+            // all  市
+            var d=eval(params.area); 
+            checked=d;
+            $('#chooseed_area').val( JSON.stringify(checked) );              
+            for( var i in d ){ 
+                $("#"+d[i].value+"").prop('checked',true);
+            }
+            // 再一次增加市,的默认选中
+            var new_d=eval(params.new_area);             
+            for( var i in new_d ){ 
+                for( var j in new_d[i]){
+                $("#"+new_d[i][j].value+"").prop('disabled',true);  
+                $("#"+new_d[i][j].value+"").parents('.province').find("input[name='sheng']").prop('disabled',true);   
+                }                
+            }
+
+            // all  省
+            var pro_d=eval(params.province_s); 
+            pro_checked=pro_d;
+            $('#chooseed_province').val( JSON.stringify(pro_checked) );    
+            for( var i in pro_d ){ 
+                $("#"+pro_d[i].value+"").prop('checked',true);  
+            }
+            // 再一次增加省,的默认选中
+            var new_pro=eval(params.new_province);                      
+            for( var i in new_pro ){ 
+                for( var j in new_pro[i]){
+                $("#"+new_pro[i][j].value+"").prop('disabled',true);  
+                $("#"+new_pro[i][j].value+"").parents('.second-level').prev('.first-level').find('input[type="checkbox"]').prop('disabled',true);  
+                }                
+            }
+
+            // all  区域
+            var dist_d=params.district; 
+            dist_checked=dist_d;
+            $('#chooseed_district').val( dist_checked ); 
+            $('input[value="'+dist_d+'"]').prop('checked',true);  
+            // 再一次增加区域,的默认选中
+            var new_dist=eval(params.new_district);
+            for( var i in new_dist){
+                $('input[value="'+new_dist[i]+'"]').prop('disabled',true);
+            }
+             
+            
+            
+        }
+    }
+
+   
+    // 下箭头的显示
+    window.zhedie=function(that){        
+        $('.province').find('.province_edge').removeClass('e_active');
+        $(that).toggleClass('e_active');
+        $('.province').find('.l_color').removeClass('l_active');
+        $(that).parents('.province').find('.l_color').toggleClass('l_active');
+    }
+    // 选择省
+    form.on('checkbox(province)',function(e){
+        // console.log(e);        
+        var $this = $(e.elem);
+        var child = $this.siblings('.l_color').find('input[type="checkbox"]');
+		 child.each(function(index, item){
+           item.checked = e.elem.checked;
+           
+         });
+        $('.l_color').removeClass('l_active');
+        $('.province_edge').removeClass('e_active');
+
+        var pro= $this.parents('.second-level').find("input[name='sheng']").length;
+        var pro_ch= $this.parents('.second-level').find("input[name='sheng']:checked").length;  
+        if( pro==pro_ch ){
+            $this.parents('.second-level').prev('.first-level').find('input[type="checkbox"]').prop('checked',true);
+        } else{
+            $this.parents('.second-level').prev('.first-level').find('input[type="checkbox"]').prop('checked',false);
+        }  
+
+
+        get_chooseed_area();
+        form.render('checkbox');
+
+    });
+    // 选择市
+    form.on('checkbox(city)',function(e){
+        // console.log(e);  
+        var $this = $(e.elem);      
+        var le= $this.parents('.l_color').find("input").length;
+        var le_ch= $this.parents('.l_color').find("input:checked").length;
+        
+        if( le==le_ch ){
+            $this.parents('.province').find('input[name="sheng"]').prop('checked',true);
+        } else{
+            $this.parents('.province').find('input[name="sheng"]').prop('checked',false);
+        }                    
+        var sheng= $this.parents('.second-level').find("input[name='sheng']").length;
+        var sheng_ch= $this.parents('.second-level').find("input[name='sheng']:checked").length;        
+        
+        if( sheng == sheng_ch ){
+            $this.parents('.second-level').prev('.first-level').find('input').prop('checked',true);
+        } else {
+            $this.parents('.second-level').prev('.first-level').find('input').prop('checked',false);
+        }
+
+        get_chooseed_area();
+        form.render('checkbox');
+
+    });                   
+    // 选择区域
+    form.on('checkbox(region)',function(e){
+        // console.log(e);  
+        var $this = $(e.elem);
+        
+        if(e.elem.checked===true){
+            $this.parents('.first-level').next('.second-level').find('input[type="checkbox"]').prop('checked',true);
+        }else{
+            $this.parents('.first-level').next('.second-level').find('input[type="checkbox"]').prop('checked',false);
+        }
+        choose_status();
+        get_chooseed_area();
+        form.render('checkbox');
+    });
+
+
+    // 点击区域 隐藏市更改箭头指向
+    function choose_status(){
+        $('.province_edge').removeClass('e_active');
+        $('.l_color').removeClass('l_active');
+    }
+
+
+    // 选择数据获取
+    function get_chooseed_area(){  
+             
+        // 所有的市
+        var checked=[];
+        $("input[name='city']:checked").each(function(){
+            this_obj={'value':$(this).val(),'title':$(this).attr('title')};
+            checked.push(this_obj);
+            
+        });
+        // console.log(checked);
+        $('#chooseed_area').val( JSON.stringify(checked) );
+
+        // 根据市找省
+        var pro_checked=[];
+        var checked_sheng=[];
+        var this_sheng='';        
+        $('.province').each(function(){
+            if($(this).find('.l_color input[name="city"]:checked').length>0){
+                this_sheng={'value':$(this).find("input[name='sheng']").val(),'title':$(this).find("input[name='sheng']").attr('title')};
+                checked_sheng.push(this_sheng);
+
+            }
+        });
+        for( var i in pro_checked){
+            pro_checked.push(checked_sheng[i])
+        }
+        // console.log(checked_sheng);        
+
+        // 所有的省
+        $("input[name='sheng']:checked").each(function(){           
+            pro_obj={'value':$(this).val(),'title':$(this).attr('title')};
+            pro_checked.push(pro_obj);
+        });
+        // console.log(pro_checked);
+        $('#chooseed_province').val( JSON.stringify(checked_sheng) );
+
+        // 所有的区域
+        var dist_checked="";
+        $("input[name='region']:checked").each(function(){
+            dist_obj=$(this).val();
+            dist_checked=dist_obj;
+            
+        });
+        // console.log(dist_checked);
+        $('#chooseed_district').val( dist_checked );
+
+        
+        
+        
+    }
+ 
+
+
+
+});
+}
+</script>

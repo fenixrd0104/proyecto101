@@ -1,0 +1,313 @@
+{include file="public/header"/}
+<style>
+#mescroll{
+    position: fixed;
+    top: 0.83rem;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+}
+</style>
+</head>
+<body style="background: #f8f8f8;">
+<header class="mui-bar mui-bar-nav index_header shop_head bg_white" id="header">
+    <a class="back-page mui-icon mui-icon-left-nav mui-pull-left" href="javascript:;"></a>
+    <a id="menu" class="mui-action-menu mui-icon mui-icon-bars mui-pull-right" href="javascript:void(0);"></a>
+    <h1 class="mui-title">Store Street</h1>
+</header>
+<div class="mui-content street_content">
+    <div class="street_nav">
+        <ul class="mui-clearfix">
+            <li>
+                <a class="mui-ellipsis" id="showCityPicker3" href="javascript:void(0);">
+                    <span id="cityResult3">Select region</span>
+                    <i class="iconfont icon-arrDown"></i>
+                </a>
+            </li>
+            <li class="category_street">
+                <a id="showUserPicker" href="javascript:void(0);">
+                    <span id="userResult">Category</span>
+                    <i class="iconfont icon-arrDown"></i>
+                </a>
+            </li>
+            <li class="all_street on">
+                <a href="javascript:void(0);">
+                    <span>All stores</span>
+                </a>
+            </li>
+        </ul>
+    </div>
+    <div class="street_box">
+        <div id="mescroll" class="mescroll">
+        <ul class="street_box_ul" id="dataList">
+            
+        </ul>
+        </div>
+    </div>
+
+
+</div>
+<div id="showclass" class="street_class">
+    <div class="strclass_div">
+        <ul class="mui-clearfix strclass_ul">
+            <!-- <li><a href="javascript:void(0);">All Categories</a></li> -->
+        </ul>
+    </div>        
+</div>
+<div class="street_classbg"></div>
+
+{include file="public/head_nav"/}
+{include file="public/footer"/}
+<script type="text/html" id="class_type">
+    <li data-id="{{id}}"><a href="javascript:void(0);">{{name}}</a></li>
+</script>
+<script type="text/html" id="list">
+<li>
+    <div class="strbox_hd">
+        <div class="strbox_img"><a href="/wap/store/store_info.html?shop_id={{id}}"><img src="{{image}}" onerror="this.src='__IMG__/touxiang.png'"/></a></div>
+        <div class="strbox_txt">
+            <a href="/wap/store/store_info.html?shop_id={{id}}" class="name">{{name}}</a>
+            <p class="people">Already <span>{{follow_num}}</span>followed</p>
+        </div>
+        {{ if is_follow==1 }}
+        <a class="strbox_a" data-id="{{id}}" onclick="follow(this);" href="javascript:void(0);">unfollow</a>
+        {{ else }}
+        <a class="strbox_a" data-id="{{id}}" onclick="follow(this);" href="javascript:void(0);">Follow</a>
+        {{ /if end }}
+    </div>
+    <!-- <ul class="strbox_midd mui-clearfix">
+        <li>
+            <span>Baby description</span>
+            <span class="red">5.0 points</span>
+            <em>high</em>
+        </li>
+        <li>
+            <span>Seller Services</span>
+            <span class="red">5.0 points</span>
+            <em>high</em>
+        </li>
+        <li>
+            <span>Logistics speed</span>
+            <span class="red">5.0 points</span>
+            <em>high</em>
+        </li>
+    </ul> -->
+    <ul class="strbox_low mui-clearfix">
+        {{each goods_list as value }} 
+        <li><a href="/wap/index/goods_info.html?id={{value.id}}">
+            <img src="{{value.original_img}}" />
+            <p class="mui-ellipsis">{{value.goods_name}}</p>
+            <p class="price">KRC <span>{{value.shop_price}}</span></p>
+        </a></li>
+        {{/each}}
+    </ul>
+</li>
+</script>
+<script>
+var province='';
+var city='';
+var area='';
+var industry_id='';
+var par={
+    province:'',
+    city:'',
+    area:'',
+    industry_id:'',
+    page:'',
+    num:8
+};
+
+//Create a MeScroll object, the internal pull-down refresh is enabled by default, up.callback is automatically executed, and the list data is refreshed;
+var mescroll = new MeScroll("mescroll", {
+    up: {
+        callback: getListData, //Pull-up callback, which can be abbreviated here; equivalent to callback: function (page) { getListData(page); }
+        isBounce: false, //The ios bounce and parsing are prohibited here (be sure to read carefully, especially the last point): http://www.mescroll.com/qa.html#q10
+        noMoreSize: 5, //If the list has no data, you can set the total number of lists to be greater than half a page before displaying no more data; avoid too little list data (for example, only one piece of data), it will not look good to display no more data; Default 5
+        empty: {
+            icon: "/static/wap/images/none2.png", //icon, default null
+            tip: "No data at the moment~~~", //Tips
+
+        },
+        clearEmptyId: "dataList", //equivalent to setting clearId and empty.warpId at the same time; simplified writing; default null; note that this cannot be configured in vue
+        toTop: { //Configure back to top button
+            src: "/static/wap/images/top.png", //default scroll to 1000px display, configurable offset modification
+            offset: 1000
+        },
+        lazyLoad: {
+            use: true // Whether to enable lazy loading, default false
+        },
+        htmlNodata: '<p class="upwarp-nodata">-- END --</p>',
+        page: {
+            num: 0,
+            size: 8,
+            time: null
+        },
+        offset: 150,
+        loadFull: {
+            use: true,
+            delay: 500
+        }
+    }
+});
+
+function getListData(page) {
+   // load data online
+       getListDataFromNet(page.num, page.size, function(curPageData) {
+           //mescroll will automatically judge the list according to the passed parameters, if there is no data, it will prompt empty; if there is no next page of data in the list, it will prompt no more data;
+           mescroll.endSuccess(curPageData.length);
+           //set list data
+           setListData(curPageData);
+       }, function() {
+           //Callback for networking failure, hide the status of pull-down refresh and pull-up loading;
+        mescroll.endErr();
+    });
+}
+
+function setListData(curPageData) {
+    // console.log(curPageData);
+    var list = '';
+    for (var i in curPageData) {
+        list += template('list', curPageData[i]);
+    }
+    $('#dataList').append(list);
+}
+
+function getListDataFromNet(pageNum, pageSize, successCallback, errorCallback) {
+    setTimeout(function() {
+        par.page=pageNum;
+    $get('/api/shop/shop_list', par, function(data) {
+        if (data.status == 1) {
+            var curPageData = data.data;
+            var listData = [];
+            //All products (simulate pagination data)
+            for (var i in curPageData) {
+                if (i == curPageData.length) break;
+                listData.push(curPageData[i]);
+            }
+            successCallback(listData);
+        } else {
+            mescroll.endErr();
+        }
+
+    });
+    }, 1000);
+}
+
+// three-level linkage
+(function($, doc) {
+    $.init();
+    $.ready(function() {
+        var cityPicker3 = new $.PopPicker({
+            layer: 3
+        });
+        $get('/api/address/get_region_tree', {}, function (data) {
+            if (data.status) {
+                cityPicker3.setData(data.data);
+            } 
+        })
+        var showCityPickerButton = doc.getElementById('showCityPicker3');
+        var cityResult3 = doc.getElementById('cityResult3');
+        showCityPickerButton.addEventListener('tap', function(event) {
+            cityPicker3.show(function(items) {
+                cityResult3.innerText = (items[0] || {}).text + " " + (items[1] || {}).text + " " + (items[2] || {}).text;
+                province=(items[0] || {}).value;
+                city=(items[1] || {}).value;
+                area=(items[2] || {}).value;
+                
+                par.province=province;
+                par.city=city;
+                par.area=area;
+               // reset the list data
+                mescroll.resetUpScroll();
+                // hide back to top button
+                mescroll.hideTopBtn();
+            });
+        }, false);
+    });
+})(mui, document);
+// get category
+$get('/api/goods/get_con_category',{},function(data){
+    if(data.status==1){
+        var class_type="";
+        for(var i in data.data){
+            class_type +=template('class_type',data.data[i]);
+        }
+        $('.strclass_ul').html(class_type);
+    } else{
+
+    }
+});
+
+// all stores
+$('.all_street').on('tap',function(){
+    par={
+        province:'',
+        city:'',
+        area:'',
+        industry_id:'',
+        page:'',
+        num:8
+    };
+    // reset the list data
+        mescroll.resetUpScroll();
+        // hide back to top button
+        mescroll.hideTopBtn();
+    });
+    // category
+    $('.strclass_div').on('tap','.strclass_ul>li',function(){
+        industry_id=$(this).attr('data-id');
+        $(this).addClass('active').siblings().removeClass('active');
+        par.industry_id=industry_id;
+        // reset the list data
+        mescroll.resetUpScroll();
+        // hide back to top button
+    mescroll.hideTopBtn();
+});
+$('.category_street').on('tap',function(){
+    $('.street_class').css('transform','translateY(0%)');
+    $('.street_classbg').show();
+    $('.street_classbg').css('opacity','1');
+})
+$('.street_class').on('tap',function(event){
+    if(event.target==this){            
+    $('.street_class').css('transform','translateY(-100%)');
+    $('.street_classbg').hide();
+    $('.street_classbg').css('opacity','0');
+    }            
+});
+
+// tab click
+$('.street_nav ul>li').on('tap',function(){
+    $(this).addClass('on');
+    $(this).siblings().removeClass('on');
+    if(!$('.category_street').hasClass('on')){
+        $('.street_class').css('transform','translateY(-100%)');
+        $('.street_classbg').hide();
+        $('.street_classbg').css('opacity','0');
+    }
+})
+
+// focus on
+function follow($this){
+    var id=$($this).attr('data-id');
+    $get("/api/shop/follow",{id:id},function(data){
+        if(data.status==1){
+            mui.toast(data.msg);
+            if($($this).html()=='Unfollow'){
+                $($this).html('Follow');
+            } else{
+                $($this).html('Unfollow');
+            }
+        }else if(data.status==0){
+            mui.toast(data.msg);
+        }else{
+            mui.toast("Please login first");
+        }
+    });
+};
+
+
+
+</script>
+</body>
+</html>

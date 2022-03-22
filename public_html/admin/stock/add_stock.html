@@ -1,0 +1,45 @@
+<title>新增盘点单</title>
+<script type="text/html" template>
+  <link rel="stylesheet" href="{{ layui.setter.base }}style/supplier.css?v={{ layui.admin.v }}-1" media="all">
+</script>
+
+<div class="layui-form" action="" lay-filter="storecategory_edit" style="padding: 20px 30px 0 0;">
+    <!-- <div class="layui-form-item">
+        <label class="layui-form-label">盘点店铺</label>
+        <div class="layui-input-block">
+            <input type="text" name="shop_name" lay-verify="required" placeholder="" autocomplete="off" value="总部" class="layui-input" disabled style="border:none;">
+        </div>
+    </div> -->
+    <div class="layui-form-item">
+        <label class="layui-form-label">盘点范围</label>
+        <div class="layui-input-block">
+            <select name="type" id="add_type" lay-verify="required" lay-filter="aihao">
+                <option value=""></option>               
+            </select>
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">备注</label>
+        <div class="layui-input-block">
+            <textarea name="remarks" placeholder="请输入内容" class="layui-textarea"></textarea>
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <div class="layui-input-block">
+        <button type="button" class="layui-btn" lay-submit lay-filter="component-form-element">确定</button>
+        </div>
+    </div>
+</div>
+
+<script>
+layui.use(['admin', 'form'], function(){
+    var $ = layui.jquery
+    ,element = layui.element
+    ,layer = layui.layer
+    ,form = layui.form;
+
+    form.render(null, 'storecategory_edit');
+
+
+})
+</script>

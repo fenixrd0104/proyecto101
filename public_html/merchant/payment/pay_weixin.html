@@ -1,0 +1,81 @@
+<style>
+    .layui-form-label{
+        width: 102px;
+        padding-right: 0;
+        padding-left: 0;
+    }
+    .layui-form-item{
+        margin-bottom: 0;
+    }
+</style>
+
+<div class="layui-form" action="" lay-filter="pay_weixin" style="padding: 20px 30px 0 0;">
+<div class="layui-form-item">
+    <label class="layui-form-label">mch_id</label>
+    <div class="layui-input-block">
+        <input type="text" name="fullname" lay-verify="required" autocomplete="off" class="layui-input">
+    </div>
+    <div class="layui-form-mid layui-input-block layui-word-aux">商户UID</div>
+</div>
+<div class="layui-form-item">
+    <label class="layui-form-label">app_id</label>
+    <div class="layui-input-block">                   
+        <input type="text" name="username" lay-verify="required" autocomplete="off" class="layui-input" value="" >
+    </div>
+    <div class="layui-form-mid layui-input-block layui-word-aux">公众账号ID</div>
+</div>
+<div class="layui-form-item">
+    <label class="layui-form-label">md5_key</label>
+    <div class="layui-input-block">                   
+        <input type="text" name="username" lay-verify="required" autocomplete="off" class="layui-input" value="" >
+    </div>
+    <div class="layui-form-mid layui-input-block layui-word-aux">md5秘钥</div>
+</div>
+<div class="layui-form-item">
+    <label class="layui-form-label" style="width: 102px;">app_cert_pem</label>
+    <div class="layui-input-block">                   
+        <input type="text" name="username" lay-verify="required" autocomplete="off" class="layui-input" value="" >
+    </div>
+    <div class="layui-form-mid layui-input-block layui-word-aux">微信支付私钥</div>
+</div>
+<div class="layui-form-item">
+    <label class="layui-form-label" style="width: 102px;">app_key_pem</label>
+    <div class="layui-input-block">                   
+        <input type="text" name="username" lay-verify="required" autocomplete="off" class="layui-input" value="" >
+    </div>
+    <div class="layui-form-mid layui-input-block layui-word-aux">微信支付公钥</div>
+</div>
+<div class="layui-form-item">
+    <div class="layui-input-block">
+    <button type="button" class="layui-btn" lay-submit="" lay-filter="component-form-element"><i class="layui-icon">&#xe654;</i>保存信息</button>
+    <button type="button" class="layui-btn layui-btn-danger" data-type="close"><i class="layui-icon">&#x1006;</i>返回</button>
+    </div>
+</div>
+</div>
+            
+    <script>
+        layui.use(['admin','form','layer'], function(){
+            var $ = layui.$
+            ,admin = layui.admin
+            ,element = layui.element
+            ,form = layui.form
+            ,layer = layui.layer
+            ,router = layui.router();
+    
+            element.render();
+            form.render(null, 'pay_weixin');
+            
+            var $ = layui.$, active = {
+                // 返回
+                close:function(index){ 
+                    layer.closeAll('page');
+                }
+            };
+            
+            $('.layui-input-block .layui-btn').on('click', function(){
+                var type = $(this).data('type');
+                active[type] ? active[type].call(this) : '';
+            });
+    
+        });
+    </script>

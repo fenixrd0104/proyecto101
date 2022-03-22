@@ -1,0 +1,157 @@
+
+<title>系统管理</title>
+
+<div class="layui-card layadmin-header">
+  <div class="layui-breadcrumb" lay-filter="breadcrumb">
+    <a>图片上传</a>
+    <a><cite>图片上传</cite></a>
+  </div>
+</div>
+<div class="layui-fluid">
+  <div class="layui-row layui-col-space15">
+    <div class="layui-col-md12">
+      <div class="layui-card">
+        <div class="layui-card-header">图片上传</div>
+        <div class="layui-card-body layui-form"> 
+
+          <form action="" class=" layui-form" lay-filter="add_user_search">
+           <!--  <div class="test-table-reload-btn" style="margin-bottom: 10px;">
+              <div class="layui-inline">
+                <input class="layui-input" name="title" placeholder="输入需查询的名称" id="test-table-demoReload" autocomplete="off">
+              </div>
+              <button type="button" class="layui-btn"  lay-submit lay-filter="search_submit"><i class="layui-icon">&#xe615;</i>搜索</button>
+            </div>  --> 
+
+          </form>
+            
+
+            <table class="layui-hide" id="add_user" lay-filter="add_user"></table>    
+            <script type="text/html" id="test-table-add_user">
+              <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del"><i class="layui-icon layui-icon-delete"></i>删除</a>
+            </script>     
+            <script type="text/html" id="test-table-images">
+              <img src="/static/admin/src/style/res/head_default.gif" height="100%" alt="">
+            </script>  
+            
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+
+        layui.use(['admin','table', 'view', 'form','layer','ourJs'], function(){
+          var $ = layui.$
+          ,admin = layui.admin
+          ,element = layui.element
+          ,form = layui.form
+          ,view = layui.view
+          ,layer= layui.layer
+          ,setter = layui.setter
+          ,table = layui.table
+          ,ourJs = layui.ourJs
+          ,router = layui.router();
+
+          get_data(0);
+
+          
+          function get_data(d){
+            if(d==0){
+              d='';
+            }
+            table.render({
+              elem: '#add_user'
+              ,url: layui.setter.baseUrl+'admin/upload/log?title='+d
+              ,toolbar: '#table_tool'
+              ,parseData: function(res){ //res 即为原始返回的数据
+                return {
+                "code": res.code, //解析接口状态
+                "msg": res.msg, //解析提示文本
+                "count": res.data.count, //解析数据长度
+                "data": res.data.list //解析数据列表
+                };
+              }
+              ,cols: [[
+                {field:'id', width:85, title: 'ID', sort: true,  align:'center'}
+                , { field: 'file_src', title: '资源地址', align: 'center' }
+                , { field: 'path', title: '物理地址', align: 'center' }
+                , { field: 'size', title: '文件大小', align: 'center' }
+                , { field: 'file_type', title: '文件类型', align: 'center' }
+                , { field: 'type', title: '类型', align: 'center',templet:function (d) {
+                    if(d.type==1){
+                      return '<p>本地</p>';
+                    }else if(d.type==2){
+                      return '<p>阿里云</p>';
+                    }else{
+                      return '<p>七牛</p>';
+                    }
+                  }}
+                , { field: 'app', title: '模块', align: 'center' }
+                , { field: 'desc', title: '描述', align: 'center' }
+                , { field: 'create_time', title: '上传时间', align: 'center' }
+                ,{fixed: 'right', title: '操作', align:'center',  toolbar: '#test-table-add_user',width:160}
+              ]]
+              ,page:true
+            });
+          }
+            
+            var $ = layui.$, active = {
+              reload: function(){        
+              // 搜索  
+                //执行重载
+                table.reload('test-table-reload', {
+                  page: {
+                    curr: 1 //重新从第 1 页开始
+                  }
+                  ,where: {
+                    title: $('#test-table-demoReload').val()
+                  }
+                });
+              }
+            };
+            
+            $('.test-table-reload-btn .layui-btn').on('click', function(){
+              var type = $(this).data('type');
+              active[type] ? active[type].call(this) : '';
+            });
+            
+            //监听工具条
+            table.on('tool(add_user)', function(obj){
+              var data = obj.data;
+              if(obj.event === 'del'){
+                layer.confirm('确认删除此数据?', {icon: 3, title:'提示'}, function(index){
+                  admin.req({
+                  url: layui.setter.baseUrl+'admin/upload/log_del' //实际使用请改成服务端真实接口
+                  ,data: {
+                    id:data.id            
+                  },
+                  type:'post',
+                  success: function(res){
+                    if(res.code==1){
+                        layer.msg(res.msg , {icon: 1,shade:0.3,time: 1500},function(){
+                          obj.del();
+                          layer.close(index);
+                        });
+                    }else{
+                      layer.msg(res.msg, {icon: 5,anim: 6,shade:0.5,time: 1500});
+                    }
+                  }
+              });
+                
+                });
+              } else if(obj.event === 'edit'){
+                // 编辑
+                
+              } 
+            });
+
+            // 搜索
+            form.on('submit(search_submit)',function(e){
+              var title=e.field.title;
+              get_data(title);
+            });
+          
+        });
+   
+</script>

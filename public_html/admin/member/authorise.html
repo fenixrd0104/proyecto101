@@ -1,0 +1,101 @@
+
+<title>会员管理</title>
+
+<div class="layui-card layadmin-header">
+  <div class="layui-breadcrumb" lay-filter="breadcrumb">
+    <a>会员管理</a>
+    <a><cite>第三方用户</cite></a>
+  </div>
+</div>
+<div class="layui-fluid">
+  <div class="layui-row layui-col-space15">
+    <div class="layui-col-md12">
+      <div class="layui-card">
+        <div class="layui-card-header">第三方用户</div>
+        <div class="layui-card-body">             
+            <table class="layui-hide" id="auth_list" lay-filter="auth_list"></table>    
+            <!-- <script type="text/html" id="tool_auth_list">
+              <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del"><i class="layui-icon layui-icon-delete"></i>删除</a>
+            </script>    -->
+            <script type="text/html" id="test-table-images">
+              <img src="{{d.head_img||'/static/admin/src/style/res/head_default.gif'}}" height="100%" alt="">
+            </script>       
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  layui.use(['admin','table','layer'], function(){
+    var $ = layui.$
+    ,admin = layui.admin
+    ,layer = layui.layer
+    ,table = layui.table
+    ,layer = layui.layer
+    ,router = layui.router();
+
+    table.render({
+        elem: '#auth_list'
+        ,url:layui.setter.baseUrl+'admin/member/authorise'
+        ,parseData: function(res){ //res 即为原始返回的数据
+            return {
+            "code": res.code, //解析接口状态
+            "msg": res.msg, //解析提示文本
+            "count": res.data.count, //解析数据长度
+            "data": res.data.lists //解析数据列表
+            };
+        }
+        ,cols: [[
+          {field:'id', title: 'ID', sort: true, align:'center'}
+          ,{field:'from', title: '来源', align:'center'}
+          ,{field:'nickname', title: '用户名', align:'center'}
+          ,{field:'head_img', title: '头像', templet: '#test-table-images', align:'center'}
+          ,{field:'uid', title: '绑定账号', align:'center'}
+          ,{field:'create_time', title: '首次登录时间', align:'center',templet: "<div>{{layui.util.toDateString(d.create_time*1000, 'yyyy-MM-dd HH:mm:ss')}}</div>"}
+          ,{field:'update_time', title: '最后登录时间', align:'center',templet: "<div>{{layui.util.toDateString(d.update_time*1000, 'yyyy-MM-dd HH:mm:ss')}}</div>"}
+          ,{field:'last_login_ip', title: '最后登录IP', align:'center'}
+          ,{field:'login_num', title: '登录次数', align:'center'}
+          ,{field:'status', title: '关注状态', align:'center',templet:function(d){
+            if(d.status==0){
+              return '未知';
+            }else if(d.status==1){
+              return "关注";
+            }else{
+              return "取消关注";
+            }
+          }}
+          // ,{fixed: 'right', title: '操作', align:'center',  toolbar: '#tool_auth_list'}
+        ]],
+        page:true
+      });
+
+      // //监听工具条
+      // table.on('tool(auth_list)', function(obj){
+      //   var data = obj.data;
+      //   var id=data.id;
+      //   if(obj.event === 'del'){
+      //     layer.confirm('确认删除此第三方用户?', {icon: 3, title:'提示'}, function(index){
+      //       admin.req({
+      //         url: layui.setter.baseUrl+'admin/member/autorise_del'
+      //         ,data: {
+      //           id:id
+      //         },
+      //         type:'post',
+      //         success: function(res){
+      //           if(res.code==1){
+      //               layer.msg(res.msg , {icon: 1,shade:0.3,time: 1500},function(){
+      //                   obj.del();
+      //                   layer.close(index);
+      //               });
+      //           }else{
+      //             layer.msg(res.msg, {icon: 5,anim: 6,shade:0.5,time: 1500});
+      //           }
+      //         }
+      //     });
+      //     });
+      //   }
+      // });
+    
+  });
+</script>

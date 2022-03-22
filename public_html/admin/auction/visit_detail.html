@@ -1,0 +1,264 @@
+
+<title>订单管理</title>
+    
+<div class="layui-card layadmin-header">
+  <div class="layui-breadcrumb" lay-filter="breadcrumb">
+    <a>订单管理</a>
+    <a lay-href="/order/order">订单管理</a>
+    <a><cite>订单详情</cite></a>
+  </div>
+</div>
+
+<style>
+.ncap-order-details { padding: 0 20px; }
+.ncap-order-details h4 {
+    font-weight: 600;
+    margin-bottom: 10px;
+}
+.ncap-order-details .tabs-panels dt {
+    color: #999;
+    /* width: 100px; */
+    text-align: right;
+}
+.ncap-order-details .tabs-panels dd {
+    color: #333;
+    min-width: 150px;
+}
+.ncap-order-details .tabs-panels dt,
+.ncap-order-details .tabs-panels dd {
+    font-size: 12px;
+    line-height: 20px;
+    vertical-align: top;
+    display: inline-block;
+}
+dl { margin-bottom: 10px; }
+dt { font-weight: 700; }   
+hr{ margin: 20px 0; }  
+.layui-table td, .layui-table th{ text-align: center; }  
+</style>
+
+<div class="layui-fluid">
+<div class="layui-row layui-col-space15">
+<div class="layui-col-md12">
+<div class="layui-card">
+    <div class="layui-card-header">竞拍详情</div>
+    <div class="layui-card-body">
+        <!-- <div class="layui-form-item order_type">
+            <a href="/admin/#/order/edit_order" class="layui-btn" data-type="close">修改订单</a>
+        </div> -->
+        <div class="ncap-order-details">
+            <h4>基本信息</h4>
+            <div class="tabs-panels" id="info1_view">
+               
+            </div>
+        </div>
+        <script type="text/html" id="info1">
+            <dl>
+                <dt>拍卖ID：</dt>
+                <dd>{{d.id}}</dd>
+                <dt>商品名称：</dt>
+                <dd>{{d.goods_name}}</dd>
+                <dt>会员ID：</dt>
+                <dd>{{d.uid}}</dd>
+            </dl>
+            <dl>
+                <dt>联系方式：</dt>
+                <dd>{{d.contact}}</dd>
+                <dt>估值：</dt>
+                <dd>{{d.valuation}}</dd>
+                <dt>竞拍价格：</dt>
+                <dd>{{d.price}}</dd>
+            </dl>
+            
+            <dl>
+                <dt>竞拍者ID：</dt>
+                <dd>{{d.bidders || '无' }}</dd>
+                <dt>支付：</dt>
+                <dd>{{d.pay_status?'是':'否'}}</dd>
+                <dt>提货：</dt>
+                <dd>
+                    {{# if(d.goods_status == 0){ }}
+                    待提货
+                    {{# } else if(d.goods_status == 1){ }}
+                    已提货
+                    {{# } else if(d.goods_status == 2){ }}
+                    已收货
+                    {{# }else{ }}  
+                    无
+                    {{# } }}    
+                </dd>
+            </dl>
+            <dl>
+                <dt>开始时间：</dt>
+                <dd>{{d.start_time || '无' }}</dd>
+                <dt>结束时间：</dt>
+                <dd>{{d.end_time || '无' }}</dd>
+            </dl>
+            <dl>
+                <dt>状态：</dt>
+                <dd>
+                    {{# if(d.status ==0){ }}
+                    待审核
+                    {{# } else if(d.status == 1) { }}
+                    拍卖结束 
+                    {{# } else if(d.status == 2) { }}
+                    已拒绝 
+                    {{# } else if(d.status == 3) { }}
+                    已通过 
+                    {{# } else if(d.status == 4) { }}
+                    进行中 
+                    {{# } else if(d.status == 5) { }}
+                    二次拍卖申请 
+                    {{# } else if(d.status == 6) { }}
+                    提货申请 
+                    {{# } else if(d.status == 7) { }}
+                    已完成
+                    {{# }else{ }}  
+                    无
+                    {{# } }}    
+                </dd>
+                <dt>是否私有：</dt>
+                <dd>{{d.is_private?'是':'否'}}</dd>
+                <dt>私有密码：</dt>
+                <dd>{{ d.password || '' }}</dd>
+            </dl>
+        </script>
+        <div class="ncap-order-details">
+            <hr>
+            <h4>
+                收货信息
+                <!-- <button class="layui-btn layui-btn-normal layui-btn-xs" data-type="edit_info" id="edit_info" style="display: none;"><span>修改收货信息</span></button> -->
+            </h4>
+            <div class="tabs-panels" id="info2_view">
+             
+            </div>
+        </div>   
+        <script type="text/html" id="info2">
+            <dl>
+                <dt>收货人：</dt>
+                <dd>{{d.consignee || '无' }}</dd>
+                <dt>联系方式：</dt>
+                <dd>{{d.consignee_mobile || '无' }}</dd>
+            </dl>
+            <dl>
+                <dt>收货地址：</dt>
+                <dd>{{d.consignee_address || '无' }}</dd>
+            </dl>
+            <dl>
+                <dt>配送方式：</dt>
+                <dd>{{d.shipping_name || '无' }}</dd>
+            </dl>
+            <dl>
+                <dt>发货单号：</dt>
+                <dd>{{d.invoice_no || '无' }}</dd>
+            </dl>
+        </script>  
+        <div class="ncap-order-details">
+            <hr>
+            <h4>费用信息 
+                <!-- <button class="layui-btn layui-btn-normal layui-btn-xs" data-type="price" id="show_edit" style="display: none;"><span>修改费用</span></button></h4> -->
+            <div class="tabs-panels" id="info3_view">
+                
+            </div>
+            <script type="text/html" id="info3">
+                <dl>
+                    <dt>服务费用%：</dt>
+                    <dd>{{d.service_fee*100}}</dd>
+                    <dt>其他费用：</dt>
+                    <dd>{{d.other_fee}}</dd>
+                    <dt>备注：</dt>
+                    <dd>{{d.other_mark}}</dd>
+                    
+                </dl>
+                <dl>
+                    <dt>是否打款：</dt>
+                    <dd>{{d.is_remit?'是':'否'}}</dd>
+                </dl>
+            </script>
+        </div>       
+        <div class="ncap-order-details layui-clear">
+            <hr>
+            <h4>竞拍信息</h4>
+            <div class="layui-row">
+                <table class="layui-table layuiadmin-page-table" id="auction_goods_info" lay-skin="line" lay-filter="auction_goods_info"></table>
+            </div>
+            <!-- <p style="float:right;margin-bottom:0;">商品总额：￥2533.00</p> -->
+        </div>
+        
+    </div>
+</div>
+</div>
+</div>
+</div>
+<script type="text/html" template lay-done="layui.data.sendParams(d.params)">
+  
+</script>
+<script>
+layui.data.sendParams = function(params){
+    layui.use(['admin', 'table', 'form', 'view','layer'], function(){
+    var $ = layui.$
+    ,admin = layui.admin
+    ,table = layui.table
+    ,form = layui.form
+    ,layer = layui.layer
+    ,view = layui.view
+    ,laytpl = layui.laytpl
+    ,element = layui.element
+    ,router = layui.router();
+
+    var id=router.search.id;
+    var order_type=router.search.order_type;
+
+    // 初始化变量
+   
+    // 获取订单详情
+    get_data();
+    function get_data(){
+        admin.req({
+            url: layui.setter.baseUrl+'admin/auction/detail' //实际使用请改成服务端真实接口
+            ,data: {id:params.id},
+            type:'get',
+            success: function(res){
+                if(res.code==1){
+                    var data=res.data;
+
+                    var getTpl = info1.innerHTML
+                    ,view1 = document.getElementById('info1_view');
+                    laytpl(getTpl).render(data.info, function(html){
+                        view1.innerHTML = html;
+                    });
+                    var getTpl2 = info2.innerHTML
+                    ,view2 = document.getElementById('info2_view');
+                    laytpl(getTpl2).render(data.info, function(html){
+                        view2.innerHTML = html;
+                    });
+                    var getTpl3 = info3.innerHTML
+                    ,view3 = document.getElementById('info3_view');
+                    laytpl(getTpl3).render(data.info, function(html){
+                        view3.innerHTML = html;
+                    });
+
+                    // 商品信息列表
+                    table.render({
+                        elem: '#auction_goods_info'
+                        ,data:res.data.memberAuction
+                        ,cols: [[
+                            {field:'uid', title: '竞拍者', align:'center'}
+                            ,{field:'price', title: '竞拍价格', align:'center'}
+                            ,{field:'create_time', title: '时间', align:'center'}
+                        ]],
+                        limit:10000
+                    });
+                   
+                }else{
+                layer.msg(res.msg, {icon: 5,anim: 6,shade:0.5,time: 1500});
+                }
+            }
+        }); 
+    }
+
+    form.render(null, 'order_detail');  
+    
+    });
+}
+</script>

@@ -1,0 +1,152 @@
+<style>
+    .edui-tab-item{
+        line-height: 11px;
+    }
+</style>
+<form class="layui-form" action="" lay-filter="add_day" style="padding: 20px 30px 0 0;">
+    <div class="layui-form-item">
+        <label class="layui-form-label">任务标题</label>
+        <div class="layui-input-block">
+            <input type="text" name="title" lay-verify="required" placeholder="请输入标题" autocomplete="off" class="layui-input" value="" >
+        </div>
+    </div>
+
+    <div class="layui-form-item">
+        <label class="layui-form-label">任务详情</label>
+        <div class="layui-input-block">
+            <textarea name="content" id=""  placeholder="请输入描述" cols="30" rows="5"  class="layui-textarea"></textarea>
+        </div>
+    </div>
+
+    <div class="layui-form-item">
+        <label class="layui-form-label">奖励积分</label>
+        <div class="layui-input-block">
+            <input type="text" name="jl_integral" lay-verify="required" placeholder="请输入奖励积分" autocomplete="off" class="layui-input" value="" >
+        </div>
+    </div>
+ 
+    <div class="layui-form-item">
+        <label class="layui-form-label">类型</label>
+        <div class="layui-input-block">
+            <select name="jl_type" id="LAY-select" lay-verify="required" autocomplete="off" lay-filter="videos">
+                <option value="">==请选择==</option>
+                <option value="1">签到</option>
+                <option value="2">看视频</option>
+                <option value="3">推广会员</option>
+                <option value="4">代付</option>
+                <option value="5">拍卖叫价</option>
+                <option value="6">线上充值</option>
+                <option value="7">阅读</option>
+
+            </select>
+        </div>
+    </div>
+    <div class="layui-form-item hide" id="show_1" style="display:none;">
+        <label class="layui-form-label">阅读时长</label>
+        <div class="layui-input-block">
+            <input type="text" name="read_time"  placeholder="请输入阅读时长" autocomplete="off" class="layui-input" >
+        </div>
+    </div>
+    <div class="layui-form-item hide" id="show_2" style="display:none;">
+        <label class="layui-form-label">视频链接</label>
+        <div class="layui-input-block">
+            <input type="text" name="video_url"  placeholder="请输入视频链接" autocomplete="off" class="layui-input" >
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">状态</label>
+        <div class="layui-input-block">
+            <input type="checkbox" name="status" value="0" lay-skin="switch" lay-text="开启|关闭" class="layui-input"  lay-filter="statuss" id="v2">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">排序</label>
+        <div class="layui-input-block">
+            <input type="text" name="orderby"  placeholder="请输入排序" autocomplete="off" class="layui-input" value="255">
+        </div>
+    </div>
+
+
+
+
+
+
+    <div class="layui-form-item">
+        <div class="layui-input-block">
+            <button type="button" class="layui-btn" lay-submit="" lay-filter="add_ar">+保存</button>
+        </div>
+    </div>
+    <script type="text/html" template lay-done="layui.data.sendParams(d.params)">
+
+    </script>
+</form>
+<script src="/static/admin/layui/lay/modules/jquery.3.1.1.js"></script>
+<script src="/static/admin/umedit/umeditor.config.js"></script>
+<script src="/static/admin/umedit/umeditor.min.js"></script>
+<script src="/static/admin/umedit/lang/zh-cn/zh-cn.js"></script>
+
+<script>
+    layui.data.sendParams = function(params){
+        console.log(params);
+    
+
+        layui.use(['admin','form','upload','layedit','view','setter','layer'], function(){
+            var $ = layui.$
+                ,admin = layui.admin
+                ,setter = layui.setter
+                ,layedit = layui.layedit
+                ,element = layui.element
+                ,form = layui.form
+                ,view = layui.view
+                ,layer = layui.layer
+                ,upload = layui.upload
+                ,router = layui.router();
+
+            element.render();
+            form.render(null, 'add_day');
+
+            if(params.id){
+                form.val('add_day',{
+                    'jl_type':params.jl_type,
+                    'jl_integral':params.jl_integral,
+                    'video_url':params.video_url,
+                    'read_time':params.read_time,
+                    'status':params.status,
+                    'content':params.content,
+                    'title':params.title,
+                    'orderby':params.orderby,
+                });
+                $('#v2').val(params.status);
+                if(params.jl_type==2){
+                    $('#show_2').show();
+                }else if(params.jl_type==7){
+                    $('#show_1').show();
+                }
+                form.render();
+            }
+            form.on("switch(statuss)", function (data) {
+                console.log(data)
+               if(data.elem.checked==true){
+                    $('#v2').val(1)
+               }else{
+                    $('#v2').val(0)
+               }
+               form.render();
+            });
+            form.on("select(videos)", function (data) {
+                $('.hide').hide();
+                if(data.value==2){
+                    $('#show_2').show();
+                }else if(data.value==7){
+                    $('#show_1').show();
+                }
+              
+               form.render();
+            });
+
+
+
+        });
+
+    }
+</script>

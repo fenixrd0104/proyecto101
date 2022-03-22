@@ -1,0 +1,82 @@
+<script type="text/html" template>
+    <link rel="stylesheet" href="{{ layui.setter.base }}style/supplier.css?v={{ layui.admin.v }}-1" media="all">
+</script>
+
+<div class="layui-form" action="" lay-filter="industry_edit" style="padding: 20px 30px 0 0;">
+    <div class="layui-form-item">
+        <label class="layui-form-label">行业名称</label>
+        <div class="layui-input-block" lay-filter="selFilter">
+            <script type="text/html" template>
+                <input type="text" name="fullname" lay-verify="required" placeholder="" autocomplete="off" value="{{ d.params.classify || '' }}" class="layui-input">
+            </script>
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">备注</label>
+        <div class="layui-input-block" lay-filter="selFilter">
+            <script type="text/html" template>
+                <input type="text" name="fullname" lay-verify="required" placeholder="" autocomplete="off" value="{{ d.params.sign || '' }}" class="layui-input">
+            </script>
+        </div>
+    </div>
+    <!-- 以下只在编辑时显示 -->
+    <script type="text/html" template>
+    {{#  if(d.params.id){ }}
+    <div class="layui-form-item">
+        <label class="layui-form-label">链接</label>
+        <div class="layui-input-block" lay-filter="selFilter">
+            <input type="text" name="fullname" lay-verify="required" placeholder="" autocomplete="off" value="{{ d.params.sign || '' }}" class="layui-input">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">时间</label>
+        <div class="layui-input-block" lay-filter="selFilter">
+            <input type="text" name="fullname" lay-verify="required" placeholder="" autocomplete="off" value="{{ d.params.wealth || '' }}" class="layui-input">
+        </div>
+    </div>
+    {{#  } }} 
+    </script>
+    <div class="layui-form-item">
+        <div class="layui-input-block">
+        <button type="button" class="layui-btn" lay-submit="" lay-filter="component-form-element">确定</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    layui.use(['admin', 'upload','form','layer'], function(){
+      var $ = layui.jquery
+      ,upload = layui.upload
+      ,element = layui.element
+      ,layer = layui.layer
+      ,form = layui.form;
+      form.render(null, 'storecategory_edit');
+        //普通图片上传
+        var uploadInst = upload.render({
+        elem: '#test-upload-normal'
+        ,url: layui.setter.baseUrl+'upload/'
+        ,before: function(obj){
+          //预读本地文件示例，不支持ie8
+          obj.preview(function(index, file, result){
+            $('#test-upload-normal-img').attr('src', result); //图片链接（base64）
+          });
+        }
+        ,done: function(res){
+          //如果上传失败
+          if(res.code > 0){
+            return layer.msg('上传失败');
+          }
+          //上传成功
+        }
+        ,error: function(){
+          //演示失败状态，并实现重传
+          var demoText = $('#test-upload-demoText');
+          demoText.html('<span style="color: #FF5722;">上传失败</span> <a class="layui-btn layui-btn-mini demo-reload">重试</a>');
+          demoText.find('.demo-reload').on('click', function(){
+            uploadInst.upload();
+          });
+        }
+      });
+  
+  })
+  </script>

@@ -1,0 +1,536 @@
+<title>采购收货详情</title>
+<div class="layui-card layadmin-header">
+    <div class="layui-breadcrumb" lay-filter="breadcrumb">
+        <a>采购管理</a>
+        <a lay-href="/return/return">采购退货</a>
+        <a><cite>采购退货详情</cite></a>
+    </div>
+</div>
+<script type="text/html" template>
+    <link rel="stylesheet" href="{{ layui.setter.base }}style/purchase.css?v={{ layui.admin.v }}-1" media="all">
+</script>
+
+<form class="layui-form" lay-filter="choose_received_form" style="padding:10px;">
+    <div class="layui-row">
+    <div class="layui-col-md12">
+    <div class="layui-card">
+    <div class="layui-card-header">采购退货详情</div> 
+    <div class="layui-card-body choose_purchase">
+        <div class="layui-btn-group">
+            <button type="button" lay-submit lay-filter="save_submit" class="layui-btn status_hide">保存</button>
+            <button type="button" class="layui-btn status_hide"  lay-submit lay-filter="wancheng_submit">完成</button>
+            <button type="button" class="layui-btn status_hide"  lay-submit lay-filter="quxiao_submit">取消</button>
+            <button type="button" class="layui-btn"  lay-submit lay-filter="log_submit">日志</button>
+            <button type="button" class="layui-btn" onclick="my_print();">单据打印</button>
+        </div> 
+        <div class="layui-row">
+            <div class="layui-col-lg4 layui-col-md6">
+                <label class="layui-form-label">供应商：</label>
+                <div class="layui-input-block">
+                    <input type="text" name="supplier_name_s" id="supplier_name" class="layui-input" disabled style="border:none;">
+                </div>
+            </div>
+            <div class="layui-col-lg4 layui-col-md6">
+                <label class="layui-form-label">退货店铺：</label>
+                <div class="layui-input-block" style="line-height: 36px;">
+                    <input type="text" name="shop_name_s" id="shop_name" class="layui-input" disabled style="border:none;">
+                </div>
+            </div>
+            <div class="layui-col-lg12 layui-col-md12">
+                <label class="layui-form-label">备注：</label>
+                <div class="layui-input-block">
+                <input type="text" name="remarks" id="remarks" placeholder="请输入备注" class="layui-input">
+                </div>
+            </div>
+        </div>
+        <input type="hidden" id="refunds_id" name="refunds_id">
+  
+        <table class="layui-hide" id="test-table-choose_return" lay-filter="test-table-choose_return"></table>  
+        <script type="text/html" id="test-table-toolbar">
+        <div class="layui-btn-container status_hide">
+            <button type="button" class="layui-btn" lay-event="addshop"><i class="layui-icon layui-icon-add-1 layuiadmin-button-btn"></i>添加商品</button>
+            <button type="button" class="layui-btn" lay-event="saopurchase"><i class="layui-icon layui-icon-edit layuiadmin-button-btn"></i>快捷扫码</button>
+            <button type="button" class="layui-btn" id="test3"><i class="layui-icon"></i>导入</button>
+            <button type="button" class="layui-btn" lay-event="delete"><i class="layui-icon layui-icon-delete layuiadmin-button-btn"></i>删除商品</button>
+        </div>      
+        </script>
+        <script type="text/html" id="choose_remark">
+            <input type="text" name="goods[remarks][]" class="layui-input this_remarks" style="height:100%;" value='{{d.remarks||""}}'>
+        </script>
+        <script type="text/html" id="price">
+            <input type="text" name="goods[price][]" class="layui-input jisuan this_price" style="height:100%;" value="{{d.refunds_price||'0.00'}}">
+            <input type="hidden" name="goods[spec_id][]" class="layui-input" style="height:100%;" value="{{d.spec_id}}">
+        </script>
+        <script type="text/html" id="num">
+            <input type="text" name="goods[num][]" class="layui-input jisuan this_num" style="height:100%;" id="num{{d.spec_id}}" value="{{d.refunds_num||'1'}}">
+        </script>
+        <script type="text/html" id="zongjia">
+            <span class="this_zongjia">{{d.total_money||0.00}}</span>
+        </script>
+    </div>
+    </div>
+    </div>
+    </div>
+</form>
+<script>
+layui.use(['admin','table','form','laydate','view','myprint','layer','upload'], function(){
+    var $ = layui.$
+    ,admin = layui.admin
+    ,view = layui.view
+    ,setter = layui.setter
+    ,table = layui.table
+    ,layer = layui.layer
+    ,laydate = layui.laydate
+    ,myprint = layui.myprint
+    ,upload = layui.upload
+    ,form = layui.form;
+
+    form.render(null, 'choose_received_form');
+    // 获取传值参数---得到id
+    var router = layui.router();
+    // console.log(router.search);
+    var id = router.search.id; 
+    var refunds_id = router.search.refunds_id; 
+    var supplier_id = router.search.supplier_id; 
+    $('#refunds_id').val(refunds_id);
+     
+    // 自定义json
+    var json_data=[];
+    get_data();
+    var myobj=[];//打印头部内容
+    // 获取信息 “form” ---请求登入接口
+    admin.req({
+        url: layui.setter.baseUrl+'merchant/PurchaseRefunds/saveOrder'
+        ,data: { refunds_id:refunds_id}
+        ,type:'get'
+        ,success: function(res){
+            if(res.code==1){
+                // 赋值
+                var obj={
+                    "supplier_name_s" : res.data.info.supplier_name,
+                    "shop_name_s" : res.data.info.shop_name,
+                    "remarks" : res.data.info.remarks,
+                };     
+                form.val("choose_received_form",obj);  
+                myobj['供应商']=res.data.info.supplier_name;            
+                myobj['退货店铺']=res.data.info.shop_name;             
+                myobj['备注']=res.data.info.remarks;   
+                var d=res.data.lists;
+                for(var i in d){
+                    json_data.push(d[i]);
+                    get_data();
+                }
+            }else{
+                layer.msg(res.msg);
+            }
+        }
+    });    
+
+    get_data();
+    function get_data(){       
+        table.render({
+            elem: '#test-table-choose_return'
+            ,data: json_data
+            ,cellMinWidth: 80 //全局定义常规单元格的最小宽度，layui 2.2.1 新增
+            ,toolbar: '#test-table-toolbar'
+            ,cols: [[
+            {type:'checkbox'}
+            ,{field:'spec_id', width:80, title: 'ID', sort: true, align:"center"}
+            ,{field:'spec_sku', title: '商品SKU', align:"center"}
+            ,{field:'goods_name', title: '商品名称', align:"center"}
+            ,{field:'spec_name', title: '规格', align:"center"}
+            ,{field:'refunds_price',width:140, title: '价格',templet:'#price', align:"center"}
+            ,{field:'refunds_num',width:140, title: '数量',templet:"#num", align:"center"}
+            ,{field:'total_money', title: '金额',templet:'#zongjia', align:"center"}
+            ,{field: 'remarks', title:'备注',width:160,templet:'#choose_remark', align:"center"}   
+            ]]
+            ,limit: 10000
+            ,done: function(res, curr, count) {
+                upload.render({
+                    elem: '#test3'
+                    ,url: layui.setter.baseUrl+'merchant/PurchaseRefunds/inport'
+                    ,accept: 'file' //普通文件
+                    ,exts:'txt' //限制后缀名
+                    ,done: function(res){
+                        if(res.code == 1){             
+                            json_data=res.data;
+                            for(var i in res.data){
+                                json_data[i].spec_id=res.data[i].spec.spec_id;                    
+                                json_data[i].spec_sku=res.data[i].spec.spec_sku; 
+                                json_data[i].spec_name=res.data[i].spec.spec_name;    
+                                json_data[i].refunds_price=res.data[i].spec.cost_price;   
+                                json_data[i].refunds_num=res.data[i].spec.num;                    
+                            }               
+                            // console.log(json_data);
+                            get_data();
+                        }
+                    }
+                });
+            }
+        });
+        jisuan();
+    }   
+
+    // 检查是否已经添加  未重复则进行添加  重复则不进行添加
+    function check_data(data){
+        if(json_data==''){
+            json_data.push(data);
+            get_data();
+            layer.msg('添加成功' , {icon: 1,time: 1500});
+        }else{
+            for(var i in json_data){
+                if(json_data[i].spec_id==data.spec_id){
+                    layer.msg('不能重复添加', {icon: 5,anim: 6,shade:0.5,time: 1500});
+                    return ;
+                }
+            }
+            layer.msg('添加成功' , {icon: 1,time: 1500});
+            json_data.push(data);
+            get_data();
+        }
+        jisuan();
+    } 
+    function quick_check_data(data,num){
+        if(json_data==''){
+            json_data.push(data);
+            get_data();
+            layer.msg('添加成功' , {icon: 1,time: 1500});
+        }else{
+            for(var i in json_data){
+                if(json_data[i].spec_id==data.spec_id){
+                    var items_num=$('#num'+data.spec_id).val();
+                    json_data[i].refunds_num=parseInt(items_num)+parseInt(num);
+                    get_data();  
+                    jisuan();  
+                    return ;
+                }
+            }
+            layer.msg('添加成功' , {icon: 1,time: 1500});
+            json_data.push(data);
+            get_data();
+        }
+        jisuan();
+    } 
+    
+    //头部事件--调出店铺
+    var d={ supplier_id:supplier_id }
+    table.on('toolbar(test-table-choose_return)', function(obj){
+    var checkStatus = table.checkStatus(obj.config.id);
+    switch(obj.event){
+    case 'addshop':
+    admin.popup({
+    title: "添加商品",
+    area: ["880px", "600px"],
+    id: "LAY-popup-new_return",
+    success: function(e, i) {
+    view(this.id).render('/return/add_return',d).done(function() { 
+    table.on('tool(test-table-reload)', function(obj){
+        // console.log(obj);
+        var data = obj.data;
+        if(obj.event === 'choose'){
+            var d=obj.data.spec;            
+            if(obj.data.spec.length>1){
+            admin.popup({
+                title: "规格",
+                area: admin.screen() < 2 ? ['95%', '90%'] :["600px", "350px"],
+                id: "LAY-popup-choose_guige",
+                success: function(layero, index){
+                    view(this.id).render('/return/choose_guige',d).done(function() {
+                    form.render(null, 'choose_guige_rec'); // 弹窗的lay-filter值
+                    // 提交
+                    form.on('submit(submit_choose_guige)',function(datas){
+                        // for(var i in data.spec){
+                        //     if(data.spec[i].spec_id==datas.field.spec_id){
+                        //         data.goods_spec_name=data.spec[i].spec_name;
+                        //         data.goods_sku=data.spec[i].spec_sku;
+                        //         data.goods_sn=data.spec[i].spec_sku;
+                        //         data.refunds_price=data.spec[i].cost_price;
+                        //         data.goods_id=data.id; 
+                        //     }
+                        // }
+                        // data.spec_id=datas.field.spec_id;
+                        var inp_num=$('#inpnum_'+datas.field.spec_id).val(); 
+                        if(datas.field.spec_id==undefined){
+                            layer.msg('请选择商品规格', {icon: 5,anim: 6,shade:0.5,time: 1500});
+                            return
+                        }
+                        var list='';
+                        for(var i in data.spec){
+                            if(data.spec[i].spec_id==datas.field.spec_id){
+                                list=data.spec[i];
+                            }
+                        }
+                        var data_url={};
+                        data_url.spec_id=list.spec_id;
+                        data_url.spec_sku=list.spec_sku;
+                        data_url.spec_name=list.spec_name;
+                        data_url.refunds_price=list.cost_price;
+                        data_url.total_money=list.cost_price;
+                        //
+                        data_url.goods_name=data.goods_name;
+                        data_url.refunds_num=inp_num;  
+                        
+                        quick_check_data(data_url, inp_num);
+                    })  
+                    });
+                }
+            });
+            } else {
+                var data = obj.data;    
+                data.spec_id=data.spec[0].spec_id;
+                data.spec_sku=data.spec[0].spec_sku;            
+                data.spec_name=data.spec[0].spec_name;
+                data.refunds_price=data.spec[0].cost_price; 
+                data.total_money=data.cost_price; 
+
+                check_data(data);
+            }        
+        } 
+    });
+    });
+    }
+    });
+    break;
+    // 扫码
+    case 'saopurchase':
+    admin.popup({
+    title: "快捷扫码",
+    area: ["500px",'288px'],    
+    id: "LAY-popup-sao_return",
+    success: function(e, i) {
+        view(this.id).render('/return/sao_return').done(function() {
+         // 键盘回车事件
+         $(document).on('keydown', function(e){ 
+            if(e.keyCode == 13){
+                event.preventDefault();
+                $('#saoma_submit').click();
+                return false; //阻止系统默认回车事件
+            }
+        });
+        form.on('submit(saoma_submit)',function(e){
+        admin.req({
+            url: layui.setter.baseUrl+'merchant/goods/searchByGoodsSku'
+            ,data: { supplier_id:supplier_id,spec_sku:e.field.spec_sku }
+            ,type:'get'
+            ,success: function(res){
+                if(res.code==1){
+                    var data = res.data;
+                    data.spec_id=data.spec.spec_id;
+                    data.spec_sku=data.spec.spec_sku;   
+                    data.spec_name=data.spec.spec_name;
+                    data.refunds_price=data.spec.cost_price;
+                    data.refunds_num=e.field.num;   
+                    data.total_money=(data.spec.cost_price*e.field.num).toFixed(2);
+
+                    $('#spec_input').val("");
+                    $('input[name="spec_sku"]').focus();              
+                    quick_check_data(data,e.field.num);  
+                    var music_html='<audio src="/static/merchant/src/style/res/suc.mp3" controls="controls" autoplay="autoplay"></audio>';
+                    $('#add_music').html(music_html);                        
+                }else{ 
+                    $('#spec_input').val("");
+                    $('input[name="spec_sku"]').focus();             
+                    var music_html='<audio src="/static/merchant/src/style/res/suc.mp3" controls="controls" autoplay="autoplay"></audio>';
+                    $('#add_music').html(music_html);       
+                    layer.msg(res.msg, {icon: 5,anim: 6,shade:0.5,time: 1500});
+                }
+            }
+        });   
+        });
+        });
+        $(document).on('keydown', this.enterEsc); //监听键盘事件，关闭层  
+    },
+    end: function() {
+        $(document).off('keydown', this.enterEsc); //解除键盘关闭事件
+    }
+    });
+    break;
+    // 删除商品操作
+    case 'delete':
+        var checkStatus = table.checkStatus('test-table-choose_return')
+            ,data = checkStatus.data;               
+        if(checkStatus.data == ""){
+            layer.msg( "请选择您要删除的商品", {icon: 5,time: 1000});
+        } else{                
+            for(var i in data){
+                for(j in json_data){
+                    if(data[i].spec_id==json_data[j].spec_id){
+                        json_data.splice(j, 1);
+                        get_data();
+                    }
+                }
+            }
+        }
+    break;
+    };
+    });
+
+    // 保存
+    form.on('submit(save_submit)',function(e){
+        // console.log(e.field);
+        if(json_data== ''){
+            layer.msg('商品不能为空', {icon: 5,anim: 6,shade:0.5,time: 1500});
+        }else{
+            admin.req({
+                url: layui.setter.baseUrl+'merchant/PurchaseRefunds/saveOrder'
+                ,data: e.field
+                ,type:'post'
+                ,success: function(res){
+                    if(res.code==1){
+                        layer.msg(res.msg, {icon: 1,time: 1000});
+                    }else{
+                        layer.msg(res.msg, {icon: 5,anim: 6,shade:0.5,time: 1500});
+                    }       
+                } 
+            });
+        }
+    });
+    // 完成操作
+    form.on('submit(wancheng_submit)',function(e){
+        if(json_data== ''){
+            layer.msg('商品不能为空', {icon: 5,anim: 6,shade:0.5,time: 1500});
+        }else{
+            admin.req({
+                url: layui.setter.baseUrl+'merchant/PurchaseRefunds/saveOrder'
+                ,data: e.field
+                ,type:'post'
+                ,success: function(res){
+                if(res.code==1){
+                    admin.req({
+                        url: layui.setter.baseUrl+'merchant/PurchaseRefunds/completeOrder'
+                        ,data: {refunds_id:refunds_id}
+                        ,type:'get'
+                        ,success: function(res){
+                            if(res.code==1){
+                                location.href = '#/return/choose_return_detail/refunds_id='+refunds_id;
+                            }else{
+                                layer.msg(res.msg, {icon: 5,anim: 6,shade:0.5,time: 1500});
+                            }       
+                        } 
+                    });
+                    form.render();
+                }else{
+                    layer.msg(res.msg, {icon: 5,anim: 6,shade:0.5,time: 1500});
+                }       
+                } 
+            });
+        }
+    });
+    // 取消操作
+    form.on('submit(quxiao_submit)',function(e){
+        layer.confirm('是否确认取消退货订单',{icon: 3, title:'取消退货订单'}
+        ,function(){
+            admin.req({
+            url: layui.setter.baseUrl+'merchant/PurchaseRefunds/cancelOrder'
+            ,data: e.field
+            ,type:'get'
+            ,success: function(res){
+                if(res.code==1){
+                    location.href = '#/return/choose_return_detail/refunds_id='+refunds_id;
+                }else{
+                    layer.msg(res.msg, {icon: 5,anim: 6,shade:0.5,time: 1500});
+                }       
+            } 
+        });
+        });
+    });
+
+    // 日志
+    form.on('submit(log_submit)',function(e){
+        admin.popup({
+            title: "日志",
+            area: admin.screen() < 2 ? ['95%', '90%'] : ["600px", "500px"],
+            id: "LAY-popup-log_return",
+            success: function(e, i) {
+                view(this.id).render('/return/return_log',refunds_id).done(function() {
+             
+                });
+            }
+        });
+
+    });
+
+    // 更改状态
+    function choose_status(id){
+        admin.req({
+        url: layui.setter.baseUrl+'merchant/Purchase_Receipt/saveOrder'
+        ,data: { receipt_id:id }
+        ,type:'get'
+        ,success: function(res){
+            if(res.code==1){
+                // console.log(res.data);
+                // 赋值
+                var obj={
+                    "name" : res.data.info.supplier_name,
+                    "shop_name" : res.data.info.shop_name,
+                    "consignee" : res.data.info.consignee,
+                    "phone" : res.data.info.phone,
+                    "addr" : res.data.info.addr,
+                    "remarks" : res.data.info.remarks,
+                    "receipt_id" : res.data.info.id,
+                }
+                form.val("choose_received_form",obj);   
+                myobj['供应商']=res.data.info.supplier_name;            
+                myobj['退货店铺']=res.data.info.shop_name;            
+                myobj['备注']=res.data.info.remarks;            
+                laydate.render({ 
+                    elem: '#date'
+                    ,value: res.data.info.delivery_date
+                });
+                
+                for(var i in res.data.lists){
+                    res.data.lists[i].id=res.data.lists[i].goods_id;
+                    res.data.lists[i].goods_sku=res.data.lists[i].spec_sku;
+                    res.data.lists[i].goods_spec_name=res.data.lists[i].spec_name;
+                }
+                json_data=res.data.lists;
+                get_data();
+                if(res.data.info.receipt_status=='已完成'||res.data.info.return_status=='已完成'||res.data.info.receipt_status=='已取消'){
+                    $('input').css('border','none').attr({
+                        'disabled':true,
+                        'placeholder':''
+                    });
+                    $('.status_hide').hide();
+                }
+            }else{
+                layer.msg(res.msg);
+            }
+        }
+    });    
+
+    }
+
+    $('body').on('blur','.layui-table .layui-input',function(){        
+        var id=$(this).parents('tr').attr('data-index');     
+        var items_num=$(this).parents('tr').find('.this_num').val();
+        var items_price=$(this).parents('tr').find('.this_price').val();
+        var items_remarks=$(this).parents('tr').find('.this_remarks').val();
+        json_data[id].refunds_num=items_num;
+        json_data[id].refunds_price=items_price;
+        json_data[id].remarks=items_remarks;
+        // console.log(json_data);        
+    });
+    // 计算    
+    $('body').on('blur','.layui-table .jisuan',function(){
+        var items_num=$(this).parents('tr').find('.this_num').val();
+        var items_price=$(this).parents('tr').find('.this_price').val();
+        var zongjia=(items_num*items_price).toFixed(2);
+        // console.log(items_num+'******'+items_num+'*****'+zongjia);
+        $(this).parents('tr').find('.this_zongjia').html(zongjia);
+    });
+    function jisuan(){
+        $('.layui-table .jisuan').each(function(){
+            var items_num=$(this).parents('tr').find('.this_num').val();
+            var items_price=$(this).parents('tr').find('.this_price').val();
+            var zongjia=(items_num*items_price).toFixed(2);
+            // console.log(items_num+'******'+items_num+'*****'+zongjia);
+            $(this).parents('tr').find('.this_zongjia').html(zongjia);
+        });
+    }
+
+    //打印带头部
+    window.my_print=function(){
+        myprint.myprint(myobj,'test-table-choose_return');
+    };
+});
+</script>

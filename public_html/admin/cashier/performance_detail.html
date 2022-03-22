@@ -1,0 +1,63 @@
+<title>业绩统计</title>
+<style>
+    .choose_purchase .layui-input-block{ margin-left: 80px; }
+    .choose_purchase .layui-form-label{padding: 9px 0;}
+    .choose_purchase .layui-row .layui-col-lg4{ margin-bottom: 10px !important;}
+    .lay_hide{ display: none;}
+</style>
+<div class="layui-card layadmin-header">
+    <div class="layui-breadcrumb" lay-filter="breadcrumb">
+        <a>收银管理</a>
+        <a><cite>业绩统计</cite></a>
+    </div>
+</div>
+
+<div class="layui-row">
+<form class="layui-form layui-fluid" style="padding: 0;" lay-filter="performance_detail">
+    <div class="layui-inline laydata_inline">
+        <input type="text" class="layui-input" id="test-start" name="startTime" placeholder="开始时间">
+    </div>
+    <div class="layui-inline laydata_inline">
+        <input type="text" class="layui-input" name="endTime" id="test-end" placeholder="截至时间">
+    </div>
+    <div class="layui-inline">
+        <button class="layui-btn layuiadmin-btn-list" lay-submit lay-filter="detail_search" type="button">查询</button>
+    </div>
+    <div class="layui-row">
+        <table id="table_performance_detail" lay-filter="table_performance_detail"></table> 
+    </div>
+</form>
+</div>
+<script>
+layui.use(['admin','table','form','laydate','view','layer','laytpl'], function(){
+    var $ = layui.$
+    ,admin = layui.admin
+    ,view = layui.view
+    ,setter = layui.setter
+    ,table = layui.table
+    ,layer = layui.layer
+    ,laytpl = layui.laytpl
+    ,laydate = layui.laydate
+    ,myprint = layui.myprint
+    ,form = layui.form;
+
+    //日期时间选择器
+    laydate.render({
+        elem: '#test-start'
+        ,type: 'datetime'
+    });
+    laydate.render({
+        elem: '#test-end'
+        ,type: 'datetime'
+    });
+
+    form.render(null, 'performance_detail');
+
+    
+    
+
+
+
+    
+});
+</script>

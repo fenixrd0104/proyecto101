@@ -1,0 +1,172 @@
+{include file="public/header" /}
+</head>
+
+<body>
+    <header class="mui-bar mui-bar-nav" id="header">
+        <a class="mui-action-back mui-icon mui-icon-left-nav mui-pull-left" href="javascript:;"></a>
+        <a class="mui-pull-right m_rizhi" href="javascript:;" onclick="next();">Withdrawal log</a>
+        <h1 class="mui-title"><span class="bi"></span>Withdrawal</h1>
+    </header>
+    <div class="mui-content">
+        <div class="mb10"></div>
+        <form class="mui-input-group xx_form">
+            <div class="mui-input-row">
+                <label>Withdrawable<span class="bi"></span></label>
+                <input type="text" value="0.00" class="text-gold" disabled id="val_1">
+            </div>
+            <div class="mui-input-row">
+                <label>Withdrawal wallet</label>
+                <input type="text" placeholder="Please enter the withdrawal wallet address" id="val_2">
+            </div>
+
+            <div class="mui-input-row">
+                <label>Withdrawal amount</label>
+                <input type="number" placeholder="Please enter the withdrawal amount in multiples" id="val_3" autocomplete="off">
+            </div>
+            <div class="mui-input-row">
+                <label>Payment Password</label>
+                <input type="text" onfocus="this.type='password'" placeholder="Please enter payment password" id="val_4">
+            </div>
+            <div class="mui-input-row">
+                <label>Captcha</label>
+                <button class="btn_code fr " style="margin-right: 0.05rem;text-align: center;"
+                    onclick="return false;">Get verification code</button>
+               <input type="number" placeholder="CAPTCHA" style="width: 46%;" id="val_5">
+            </div>
+
+            <div class="mui-button-row">
+                <p style="text-align: right;font-size:0.14rem;padding:0.05rem 0.2rem;">Actual arrival <span id="real_num"
+                        class="text-gold">0.00</span> <span class="bi"></span></p>
+            </div>
+
+        </form>
+        <div class="mb30"></div>
+        <div class="mui-button-row">
+            <button type="button" id="submit_btn" class="submit_btn" onclick="return false;">OK</button>
+        </div>
+        <div class="mb20"></div>
+        <!-- <div class="agent_txt">
+        <h3>Warm reminder:</h3>
+        <p>1. The minimum withdrawal amount is a multiple of <span id="beishu"></span></p>
+        <p>2. This page only supports withdrawals to USDT's ERC20 address, please do not enter other currencies or non-ERC20 USDT wallet addresses, otherwise the assets will not be retrieved</p>
+        <p>3. The ratio of US to USDT is <span id="usdt_num"></span>:1</p>
+        <p>4、The fee is<span id="fee"></span>%</p>
+    </div> -->
+    </div>
+
+    {include file="public/head_nav"/}
+    {include file="public/footer"/}
+    <script type="text/javascript">
+        function getQueryString(name) {
+            var result = window.location.search.match(new RegExp("[\?\&]" + name + "=([^\&]+)", "i"));
+            if (result == null || result.length < 1) {
+                return "";
+            }
+            return result[1];
+        }
+        var c_id = getQueryString("c_id");
+        if (c_id == 1) {
+            $('.bi').html('KRC');
+        } else if (c_id == 2) {
+            $('.bi').html('USDT');
+        } else if (c_id == 3) {
+            $('.bi').html('XXX');
+        }
+        function next() {
+            window.location.href = "/wap/user/pool_withdrawal_list.html?c_id=" + c_id;
+        }
+        var click = true;
+        var s_charge = '';
+        var s_usdt = '';
+        var beishu = '';
+        get_data();
+        function get_data() {
+            $get('/api/money/withdraw', { c_id: c_id }, function (res) {
+                if (res.status == 1) {
+                    s_charge = res.data.service_charge;
+                    s_usdt = res.data.arr.usdt;
+                    beishu = res.data.beishu;
+                    if (c_id == 1) {
+                        $('#val_1').val(res.data.arr.money)
+                    } else if (c_id == 2) {
+                        $('#val_1').val(res.data.arr.pool_hatch)
+                    } else if (c_id == 3) {
+                        $('#val_1').val(res.data.arr.pool_water)
+                    };
+                    $('#fee').html(res.data.service_charge);
+                    $('#beishu').html(res.data.beishu);
+                    $('#val_3').val(res.data.beishu);
+                    s_c(res.data.beishu);
+                   $('#val_3').attr('placeholder', 'Please enter the withdrawal amount, which is a multiple of ' + res.data.beishu + ');
+                }
+            });
+        }
+
+        // Input box
+        $('#val_3').on('input', function () {
+            var reg = /^\d+(\.{0,1}\d+){0,1}$/;
+            var num = $(this).val();
+            if (!reg.test(num)) {
+                mui.toast('Amount cannot be negative');
+                $(this).val('');
+                return
+            } else {
+                s_c(num);
+            }
+        });
+        function s_c(num) {
+            var real_num_s = (num - (num * s_charge * 0.01));
+            var real_num = real_num_s.toFixed(2);
+            $('#real_num').html(real_num);
+        }
+        // ssn%100===0
+
+        // Send the verification code
+        $('body').on('tap', '.btn_code', function () {
+            var obj = $('.btn_code');
+            $get('/api/money/send_verify', {}, function (res) {
+                mui.toast(res.msg);
+                if (res.code == 1) {
+                    settime(obj);
+                }
+            });
+        });
+
+        // Withdrawal submit
+        $('body').on('tap', '#submit_btn', function () {
+
+            var tx_money = $('#val_3').val();
+            var cz_address = $('#val_2').val();
+            var password = $('#val_4').val();
+            var verify = $('#val_5').val();
+
+            if (cz_address == '') {
+                mui.toast('Withdrawal wallet address cannot be empty!');
+            } else if (tx_money == '') {
+                mui.toast('Withdrawal US amount cannot be empty!');
+            } else if (password == '') {
+                mui.toast('Payment password cannot be empty!');
+            } else if (verify == '') {
+                mui.toast('Verification code cannot be empty!');
+            } else {
+                btn_disabled($('#submit_btn'),'Submitting...');
+                $post('/api/money/withdraw', { c_id: c_id, cz_address: cz_address, tx_money: tx_money, password: password, verify: verify }, function (res) {
+                    btn_abled($('#submit_btn'),'OK');
+                    mui.toast(res.msg);
+                    if (res.status == 1) {
+                        setTimeout(function () {
+                            // mui.back();
+                            window.location.href = "/wap/user/pool_withdrawal_list.html?c_id=" + c_id;
+                        }, 1500);
+                    }
+                },function(){
+                    btn_abled($('#submit_btn'),'Sure');
+                });
+
+            }
+        });
+
+    </script>
+</body>
+
+</html>

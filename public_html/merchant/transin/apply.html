@@ -1,0 +1,204 @@
+<title>调货申请</title>
+
+<div class="layui-card layadmin-header">
+    <div class="layui-breadcrumb" lay-filter="breadcrumb">
+        <a>库存管理</a>
+        <a><cite>调货申请</cite></a>
+    </div>
+</div>
+
+<div class="layui-fluid">
+<div class="layui-row">
+<div class="layui-col-md12">
+<div class="layui-card">                   
+    <div class="layui-card-header">调货申请</div>   
+    <div class="layui-card-body">
+        <div class="layui-form" lay-filter="layadmin-useradmin-formlist" style="margin-bottom: 20px;">
+            <div class="layui-inline">
+                <input name="startTime" type="text" class="layui-input" id="laydate-datetime-start" placeholder="开始时间">
+            </div>
+            <div class="layui-inline">
+                <input name="endTime" type="text" class="layui-input" id="laydate-datetime-end" placeholder="结束时间">
+            </div>                        
+            <div class="layui-inline">
+                <select name="orderStatus" id="order_status">
+                    <!-- <option value="">全部</option> -->
+                </select>
+            </div>
+            <div class="layui-inline">
+                <select name="deliveryStatus" id="delivery_status">
+                    <!-- <option value="">全部</option> -->
+                </select>
+            </div>
+            <div class="layui-inline">
+                <input name="keyWords" type="text" placeholder="店铺名称/操作账号" autocomplete="off" class="layui-input" id="layui-key">
+            </div>
+            <div class="layui-inline">
+                <button class="layui-btn layuiadmin-btn-admin" lay-submit lay-filter="LAY-user-back-search" ><i class="layui-icon layui-icon-search layuiadmin-button-btn"></i></button>
+            </div>
+        </div>
+
+        <table class="layui-hide" id="test-table-apply" lay-filter="test-table-apply"></table>
+        <script type="text/html" id="test-table-toolbar-add_stock">
+        <div class="layui-btn-container">
+            <button type="button" class="layui-btn" lay-event="add"><i class="layui-icon layui-icon-add-1 layuiadmin-button-btn"></i>申请调入</button>
+        </div>
+        </script>        
+        <script type="text/html" id="test-table-toolbar-add_stock2">
+            {{# if( d.order_status == "待提交"){ }}
+                <a class="layui-btn layui-btn-xs layui-btn-normal" lay-href="/transin/choose_apply/order_id={{d.id}}" lay-event="detail">申请调入</a>   
+                <button type="button" class="layui-btn layui-btn-danger layui-btn-xs" lay-event="cancel">取消申请</button>   
+            {{# }else{ }}                
+                <a class="layui-btn layui-btn-xs layui-btn-normal" lay-href="/transin/choose_apply_detail/order_id={{d.id}}" lay-event="detail">申请详情</a> 
+            {{# } }}            
+        </script>
+    </div>
+</div>
+</div>
+</div>
+</div>
+<script>
+layui.use(['admin','table','form','laydate','layer'], function(){
+    var $ = layui.$
+    ,admin = layui.admin
+    ,view = layui.view
+    ,layer = layui.layer
+    ,table = layui.table
+    ,setter = layui.setter
+    ,layer = layui.layer
+    ,laydate = layui.laydate
+    ,form = layui.form;
+
+    form.render(null, 'layadmin-useradmin-formlist');
+    //日期时间选择器
+    laydate.render({
+        elem: '#laydate-datetime-start'
+        ,type: 'datetime'
+    });
+    laydate.render({
+        elem: '#laydate-datetime-end'
+        ,type: 'datetime'
+    });
+
+    var is_loading=true;
+    var list1="";
+    var list2="";
+    table.render({
+        elem: '#test-table-apply'
+        ,url: layui.setter.baseUrl + 'merchant/StockApply/toindex'
+        ,parseData: function(res){ //res 即为原始返回的数据  
+            if(is_loading==true){    
+                list1="<option value=''>全部单据状态</option>";
+                list2="<option value=''>发货状态</option>";
+                for(var i in res.data.orderStatus){
+                    list1 +="<option value='"+i+"' >"+res.data.orderStatus[i]+"</option>";
+                }
+                for(var i in res.data.deliveryStatus){
+                    list2 +="<option value='"+i+"' >"+res.data.deliveryStatus[i]+"</option>";
+                }
+                $('#order_status').html(list1);
+                $('#delivery_status').html(list2);
+                form.render('select');  
+                is_loading=false;
+            }  
+            return {
+            "code": res.code, //解析接口状态
+            "msg": res.msg, //解析提示文本
+            "count": res.data.count, //解析数据长度
+            "sum": res.data.sum, //解析数据长度
+            "data": res.data.lists //解析数据列表
+            };
+        }
+        ,toolbar: '#test-table-toolbar-add_stock'
+        ,title: "调货申请"
+        ,cellMinWidth: 80 //全局定义常规单元格的最小宽度，layui 2.2.1 新增
+        ,cols: [[
+            {field:'id', width:80, title: 'ID',align:"center",totalRowText: '总合计'}
+            ,{field:'to_shop_name', title: '申请调入店铺',align:"center"}
+            ,{field:'from_shop_name', title: '调出店铺',align:"center"}
+            ,{field:'order_status', title: '单据状态',align:"center"}
+            ,{field:'delivery_status', title: '发货状态',align:"center"}
+            ,{field:'order_num', title: '单据数量',align:"center",totalRowText: ''}
+            ,{field:'order_money', title: '单据金额',align:"center",totalRowText: ''}
+            ,{field:'update_time', title: '单据日期',align:"center"}
+            ,{field:'to_remarks', title: '备注',align:"center"}
+            ,{fixed: '', title:'操作', toolbar: '#test-table-toolbar-add_stock2',align:"center",width:160}
+        ]]
+        ,totalRow: true
+        ,done:function(res){
+        //修改 结算后余额 统计单元格文本
+        this.elem.next().find('.layui-table-total td[data-field="order_num"] .layui-table-cell').text(res.sum.order_num);
+        this.elem.next().find('.layui-table-total td[data-field="order_money"] .layui-table-cell').text(res.sum.order_money);
+        },
+        page:true
+    });    
+
+    //监听搜索
+    form.on('submit(LAY-user-back-search)', function(data){
+        var field = data.field;
+        // console.log(field);        
+        table.reload('test-table-apply', {
+            where: field
+        });
+    });
+
+    //头部事件--调出店铺
+    table.on('toolbar(test-table-apply)', function(obj){
+    var checkStatus = table.checkStatus(obj.config.id);
+    switch(obj.event){
+    case 'add':
+        admin.popup({
+            title: "调出店铺",
+            area: admin.screen() < 2 ? ['95%', '90%'] : ["800px", "620px"],
+            id: "LAY-popup-add_menu",
+            success: function (layero, index) {
+            view(this.id).render('/transin/bring_shop').done(function () {
+            table.on('tool(test-table-bring-shop)', function (obj) {
+                var data = obj.data;   
+                // console.log(data);                 
+                if (obj.event === 'edit') {                     
+                    admin.req({
+                    url: layui.setter.baseUrl + 'merchant/StockApply/toCreate'
+                    ,data: { form_shop : obj.data.id }
+                    ,type: 'get'
+                    ,success: function (res) {
+                        if (res.code == 1) {
+                            location.href = '#/transin/choose_apply/order_id='+res.data.info.id; 
+                        } else {
+                            layer.msg(res.msg);
+                        }
+                    }
+                    });
+                }
+            });
+            });
+            }
+        });
+    break;
+    };
+    });
+
+    // 监听工具条--取消
+    table.on('tool(test-table-apply)', function (obj) {
+        var data = obj.data;            
+        if (obj.event === 'cancel') {  
+            admin.req({
+                url: layui.setter.baseUrl + 'merchant/StockApply/toCancel'
+                ,data: { order_id : obj.data.id }
+                ,type: 'get'
+                ,success: function (res) {
+                    if (res.code == 1) {
+                    layer.msg(res.msg, { icon: 1, time: 500 }, function (index) {
+                        layer.close(index); //执行关闭 
+                        layui.table.reload('test-table-apply'); //重载表格
+                    });
+                    } else {
+                        layer.msg(res.msg);
+                    }
+                }
+            });
+        }
+    });
+    
+});
+</script>

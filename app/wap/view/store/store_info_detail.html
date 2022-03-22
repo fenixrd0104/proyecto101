@@ -1,0 +1,136 @@
+{include file="public/header"/}
+</head>
+<body style="background: #f0f0f0;">
+<header class="mui-bar mui-bar-nav bg_white head_line" id="header">
+    <a class="back-page mui-icon mui-icon-left-nav mui-pull-left" href="javascript:;"></a>
+    <a id="menu" class="mui-action-menu mui-icon mui-icon-bars mui-pull-right" href="javascript:void(0);"></a>
+    <h1 class="mui-title">Business Profile</h1>
+</header>
+<div class="mui-content">
+    <div class="open_list">
+        <div class="op_title"><i class="op_icon"></i>Basic Information</div>
+        <form class="mui-input-group open_form">
+            <div class="mui-input-row">
+                <label><span>*</span>Store Name</label>
+                <input type="text" value="doll wah wah wah wah" disabled>
+            </div>
+            <div class="mui-input-row">
+                <label><span>*</span>Store login master account</label>
+                <input type="text" value="oh-kkk" disabled>
+            </div>
+            <div class="mui-input-row" id="showCityPicker3">
+                <label><span>*</span>Location</label>
+                <input type="text" id="cityResult3" value="Beijing Dongcheng District" disabled>
+            </div>
+            <div class="mui-input-row">
+                <label><span>*</span>Detailed address</label>
+                <input type="text" value="Beijing Shangjie" disabled>
+            </div>
+            <div class="mui-input-row">
+                <label><span>*</span>Store Phone</label>
+                <input type="tel" value="152390" disabled>
+            </div>
+            <div class="mui-input-row">
+                <label><span>*</span>Email</label>
+                <input type="email" value="1236985052@qq.com" disabled>
+            </div>
+            <div class="mui-input-row">
+                <label><span>*</span>Contact Name</label>
+                <input type="text" value="Liang Younian" disabled>
+            </div>
+            <div class="mui-input-row">
+                <label><span>*</span>Contact phone</label>
+                <input type="tel" value="1888888888" disabled>
+            </div>
+            <div class="mui-input-row" id="showUserPicker">
+                <label><span>*</span>Main categories</label>
+                <input type="text" id="userResult" value="Beauty salon" disabled>
+            </div>
+        </form>
+    </div>
+    <div class="mb10"></div>
+    <div class="open_list">
+        <div class="op_title"><i class="op_icon"></i>Certificate Information</div>
+        <form class="mui-input-group open_form">
+            <p class="op_cream">A valid business license must be uploaded with an original photo</p>
+            <div class="mui-input-row">
+                <div class="groupImg" id="open_groupImg">
+                    <div class="img-list">
+                        <div class="upload" id="imgdiv1">
+                            <img id="head_img" src="__IMG__/img_25.png" class="uploadimg" onerror="this.src='__IMG__/img_25.png'" onclick="return false;">
+                        </div>
+                    </div>
+                </div>   
+                <p class="op_plow">*Please upload (photos must be clear and complete)</p>
+            </div>
+            <div class="mui-input-row">
+                <label><span>*</span>Long term</label>
+                <div class="op_switch op_switchon">
+                    <div class="op_handle"></div>
+                </div>
+            </div>
+            <div class="mui-input-row">
+                <label><span>*</span>Validity start time</label>
+                <input type="text" value="2019-11-11" disabled>
+            </div>
+            <div class="mui-input-row long_time">
+                <label><span>*</span>Validity end time</label>
+                <input type="text" value="long term" disabled>
+            </div>
+            <div class="mui-input-row">
+                <label><span>*</span>ID number</label>
+                <input type="text" value="45645646545646464" disabled>
+            </div>
+        </form>
+    </div>
+    <div class="mb10"></div>
+    <div class="open_list">
+        <div class="op_title"><i class="op_icon"></i>Billing bank account number</div>
+        <form class="mui-input-group open_form">
+            <div class="mui-input-row">
+                <label><span>*</span>Bank account name</label>
+                <input type="text" value="Liang Younian" disabled>
+            </div>
+            <div class="mui-input-row">
+                <label><span>*</span>Bank Account</label>
+               <input type="text" value="ICBC" disabled>
+            </div>
+            <div class="mui-input-row">
+                <label><span>*</span> account holder ID card</label>
+                <input type="text" value="41082320190101055" disabled>
+            </div>
+            <div class="mui-input-row">
+                <label><span>*</span>Bank branch of the account holder</label>
+                <input type="text" value="Construction (Xili) Branch" disabled>
+            </div>
+        </form>
+    </div>
+</div>
+
+{include file="public/head_nav"/}
+{include file="public/footer"/}
+<script>
+// expand and hide
+$('.open_list').on('tap','.op_title',function(){
+    $(this).siblings('.open_form').toggle();
+    if($(this).siblings('.open_form').is(':hidden')){
+        $(this).find('.op_icon').css('transform','rotate(-90deg)');
+    }else{
+        $(this).find('.op_icon').css('transform','rotate(0deg)');
+    }
+})
+//switch
+$('.op_switch').on('tap',function(){
+    $(this).toggleClass('op_switchon');
+    if($(this).hasClass('op_switchon')){
+        $(this).find('.op_handle').css('transform','translateX(100%)');
+        $('.long_time').slideUp();
+    }else{
+        $(this).find('.op_handle').css('transform','translateX(0%)');
+        $('.long_time').slideDown();
+    }
+})
+       
+</script>
+</body>
+</html>

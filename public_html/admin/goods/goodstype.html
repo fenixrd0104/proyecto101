@@ -1,0 +1,258 @@
+<title>商品类型</title>
+
+<div class="layui-card layadmin-header">
+    <div class="layui-breadcrumb" lay-filter="breadcrumb">
+        <a>商品管理</a>
+        <a><cite>商品类型</cite></a>
+    </div>
+</div>
+
+<div class="layui-fluid">
+<div class="layui-card">
+<div class="layui-card-header">商品类型</div>
+<div class="layui-card-body">
+    <div class="layui-form">       
+    <div class="layui-form-item">
+        <div class="layui-input-inline">
+            <select name="top_cate" id="top_cate" lay-filter="choose_top_cate">
+                <option value="" >所有模块</option>
+                <option value="1">VIP商品</option>
+                <option value="2">优享商品</option>
+                <option value="3">特惠商品</option>
+                <option value="4">直购</option>
+                <option value="5">高端</option>
+            </select>
+        </div>
+        <div class="layui-input-inline">
+            <select name="pid" id="attr_type_id" lay-filter="choose_type_id"> </select>
+        </div>
+        <div class="layui-input-inline">
+            <input type="text" name="keywords" placeholder="请输入类型名称" autocomplete="off" class="layui-input">
+        </div>  
+        <div class="layui-inline">
+            <button class="layui-btn layuiadmin-btn-list" lay-submit lay-filter="stype_search" type="button">
+                <i class="layui-icon layui-icon-search layuiadmin-button-btn"></i>
+            </button>
+        </div>
+    </div>
+    </div>
+        
+    <table id="goods_type" lay-filter="goods_type"></table>
+    <script type="text/html" id="test_table_toolbar">
+        <div class="layui-btn-container">
+            <button type="button" class="layui-btn" onclick="add_goodstype();"><i class="layui-icon layui-icon-add-1 layuiadmin-button-btn"></i>添加类型</button>
+        </div>
+    </script>      
+    <script type="text/html" id="table_goods_type">
+        <a class="layui-btn layui-btn-xs" lay-href="/goods/goodsAttribute/type={{d.id}}/pid={{d.pid}}"><i class="layui-icon">&#xe615;</i>属性列表</a>
+        <a class="layui-btn layui-btn-xs" lay-href="/goods/goodsspec/type={{d.id}}/pid={{d.pid}}"><i class="layui-icon">&#xe615;</i>规格列表</a>
+        <a class="layui-btn layui-btn-normal layui-btn-xs" lay-event="edit"><i class="layui-icon layui-icon-edit"></i>编辑</a>
+        <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del"><i class="layui-icon layui-icon-delete"></i>删除</a>
+    </script>
+</div>
+</div>
+</div>
+
+<script>
+layui.use(['admin', 'table','layer','view'], function(){
+    var $ = layui.$
+    ,admin = layui.admin
+    ,element = layui.element
+    ,view = layui.view
+    ,layer = layui.layer
+    ,table = layui.table
+    ,form = layui.form;
+
+    form.render();
+
+    var is_loading=true;
+    table.render({
+        elem: '#goods_type'
+        ,url: layui.setter.baseUrl+'admin/goods/goodsType'
+        ,parseData: function(res){ //res 即为原始返回的数据
+            // if(is_loading==true){               
+            //     var list="<option value=''>--全部类型--</option>";
+            //     for( var i in res.data.cate){
+            //         list += "<option value='"+res.data.cate[i].id+"' >"+res.data.cate[i].name+"</option> ";
+            //     }    
+            //     $('#attr_type_id').html(list);
+            //     form.render('select'); 
+            //     is_loading=false;
+            // }
+            return {
+            "code": res.code, //解析接口状态
+            "msg": res.msg, //解析提示文本
+            "count": res.data.count, //解析数据长度
+            "data": res.data.lists //解析数据列表
+            };
+        }
+        ,toolbar: '#test_table_toolbar'
+        ,cellMinWidth: 80 
+        ,cols:[[
+            {field:'id', width:80, title: 'ID',align:'center'}
+            ,{field:'name', title: '类型名称',align:'center'}
+            ,{field:'top_cate', title: '模块分类', align:'center',templet:function(d){
+              switch(d.top_cate) {
+                case 1:
+                  return 'VIP商品';
+                  break;
+                case 2:
+                  return '优享商品';
+                  break;
+                case 3:
+                  return '特惠商品';
+                  break;
+                case 4:
+                  return '直购';
+                  break;
+                case 5:
+                  return '高端';
+                  break;
+                default:
+                  return ''
+                  break;
+              } 
+
+            }}
+            ,{field:'names', title: '菜单类型',align:'center'}
+            ,{field:'sort', width:80, title: '排序',edit: 'text',align:'center'}
+            ,{fixed: 'right', title:'操作', toolbar: '#table_goods_type',align:'center',width:360}
+        ]],
+        page:true
+    }); 
+    form.on('select(choose_top_cate)',function(e){
+        // 类型
+        admin.req({
+            url: layui.setter.baseUrl+'admin/goods/catetype' //实际使用请改成服务端真实接口
+            ,data: {id:e.value}
+            ,type:'get'
+            ,success: function(res){
+                if(res.code==1){
+                    var list6="<option value=''>所有菜单</option>";
+                    for( var i in res.data){
+                        list6 += "<option value='"+res.data[i].id+"' >"+res.data[i].name+"</option> ";
+                    }
+                    $('#attr_type_id').html(list6);
+                    form.render(); 
+                }else{
+                    layer.msg(res.msg);
+                }       
+            } 
+        });
+    })
+    // 搜索
+    form.on('submit(stype_search)',function(datas){
+        //执行重载
+        table.reload('goods_type', {
+            page: { curr: 1 }
+            ,where: datas.field
+        });
+    }); 
+  
+    // 添加类型
+    window.add_goodstype=function(){
+    admin.popup({
+        title: "添加类型",
+        area: admin.screen() < 2 ? ['95%', '90%'] :["650px", "350px"],
+        id: "LAY-popup-add_goodstype",
+        success: function(layero, index){
+        view(this.id).render('/goods/add_type').done(function() {
+            form.render(null, 'add_type'); // 弹窗的lay-filter值
+            //监听提交
+            form.on('submit(component-form-element_add_type)', function(data){
+            admin.req({
+                url: layui.setter.baseUrl+'admin/goods/addGoodsType' //实际使用请改成服务端真实接口
+                ,data: { name:data.field.name, pid:data.field.pid, image:data.field.image },
+                type:'post',
+                success: function(res){
+                if(res.code==1){
+                    layer.msg(res.msg , {icon: 1,time: 1000} , function(){
+                    setTimeout(function(){
+                        layer.close(index); //执行关闭 
+                        layui.table.reload('goods_type'); //重载表格
+                    },900);                        
+                    });
+                }else{
+                    layer.msg(res.msg, {icon: 5,anim: 6,shade:0.5,time: 1000});
+                }
+                }
+            }); 
+            });            
+        });
+        }
+    });
+    };
+
+    // 监听工具条--编辑&删除
+    table.on('tool(goods_type)',function(e){
+    var d=e.data;
+    var id=d.id;
+    if(e.event==='edit'){          
+    admin.popup({
+        title: "编辑类型",
+        area: admin.screen() < 2 ? ['95%', '90%'] :["650px", "350px"],
+        id: "LAY-popup-edit_goodstype",
+        success: function(layero, index){
+        view(this.id).render('/goods/add_type',d).done(function() {
+            form.render(null, 'add_type'); // 弹窗的lay-filter值
+            //监听提交
+            form.on('submit(component-form-element_add_type)', function(data){
+            admin.req({
+                url: layui.setter.baseUrl+'admin/goods/editGoodsType' //实际使用请改成服务端真实接口
+                ,data: { id:id, name:data.field.name, pid:data.field.pid, image:data.field.image }
+                ,type:'post'
+                ,success: function(res){                
+                if(res.code==1){
+                    layer.msg(res.msg , {icon: 1,time: 1000, anim:5} , function(){
+                    setTimeout(function(){
+                        layer.close(index); //执行关闭 
+                        layui.table.reload('goods_type'); //重载表格
+                    },900);                        
+                    });
+                }else{
+                    layer.msg(res.msg, {icon: 5,anim: 6,shade:0.5,time: 1000});
+                }
+                }
+            }); 
+            });            
+        });
+        }
+    });
+    }else{
+    // 删除按钮
+    layer.confirm('确认删除此类型?', {icon: 3, title:'提示'}, function(index){
+    admin.req({
+        url: layui.setter.baseUrl+'admin/goods/delGoodsType' //实际使用请改成服务端真实接口
+        ,data: {id:d.id}
+        ,type:'get'
+        ,success: function(res){
+        if(res.code==1){            
+            e.del();
+            layer.close(index);                         
+        }else{
+            layer.msg(res.msg, {icon: 5,anim: 6,shade:0.5,time: 1000});
+        }
+        }
+    });  
+    });
+    }
+    });
+   
+    // 监听排序
+    table.on('edit(goods_type)',function(e){
+    admin.req({
+        url: layui.setter.baseUrl+'admin/goods/editSortType' //实际使用请改成服务端真实接口
+        ,data:{ id:e.data.id, sort:e.value }
+        ,type:'post'
+        ,success: function(res){
+            if(res.code==1){
+                // layer.msg(res.msg , {icon: 1,shade:0.3,time: 1500});
+            }else{
+                layer.msg(res.msg, {icon: 5,anim: 6,shade:0.5,time: 1500});
+            }
+        }
+    }); 
+    });
+
+});
+</script>

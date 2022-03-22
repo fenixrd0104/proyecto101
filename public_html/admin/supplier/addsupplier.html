@@ -1,0 +1,184 @@
+<script type="text/html" template>
+    <link rel="stylesheet" href="{{ layui.setter.base }}style/supplier.css?v={{ layui.admin.v }}-1" media="all">
+</script>
+<style>
+  .layui-form-label {
+    float: left;
+    display: block;
+    padding: 9px 10px;
+    width: 85px;
+    font-weight: 400;
+    line-height: 20px;
+    text-align: right;
+}
+</style>
+<form class="layui-form" action="" lay-filter="addsupplier" style="padding: 20px 30px 0 0;">
+    <div class="layui-row layui-col-space10 layui-form-item">
+    <div class="layui-col-md12">
+        <div class="layui-input-inline">
+            <input name="supplier_img" lay-verify="required" id="goods_img" placeholder="请上传供应商LOGO"  class="layui-input">
+        </div>
+        <div class="layui-input-inline layui-btn-container"  style="width: auto;">
+            <button type="button" class="layui-btn" id="LAY_avatarUpload" style="margin-bottom:0;">
+                <i class="layui-icon">&#xe67c;</i>上传图片
+            </button>
+            <a class="layui-btn layui-btn-primary" onclick="see_img();"  style="margin-bottom:0;">查看图片</a>
+        </div>
+    </div>
+    </div>
+    <div class="layui-row layui-col-space10 layui-form-item">
+        <div class="layui-col-md6">
+            <label class="layui-form-label">供应商名称：</label>
+            <div class="layui-input-block">
+                <input type="text" name="supplier_name" lay-verify="required" placeholder="请输入供应商名称" autocomplete="off" class="layui-input" >
+                <input type="text" name="supplier_id" class="layui-input layui-hide">
+            </div>
+        </div>
+        <div class="layui-col-md6">
+            <label class="layui-form-label">状态：</label>
+            <div class="layui-input-block">
+                <select name="supplier_status" id="supplier_status"></select>
+            </div>
+        </div>
+    </div>
+    <div class="layui-row layui-col-space10 layui-form-item">
+        <div class="layui-col-md6">
+            <label class="layui-form-label">联系人：</label>
+            <div class="layui-input-block">
+                <input type="text" name="supplier_contacts" lay-verify="required" placeholder="请输入联系人" autocomplete="off" class="layui-input">
+            </div>
+        </div>
+        <div class="layui-col-md6">
+            <label class="layui-form-label">联系电话：</label>
+            <div class="layui-input-block">
+                <input type="text" name="supplier_phone" lay-verify="required" placeholder="请输入联系电话" autocomplete="off" class="layui-input">
+            </div>
+        </div>
+    </div>
+    <div class="layui-row layui-col-space10 layui-form-item">
+        <div class="layui-col-md6">
+            <label class="layui-form-label">邮箱：</label>
+            <div class="layui-input-block">
+                <input type="text" name="supplier_email"  placeholder="请输入联系邮箱" autocomplete="off" class="layui-input">
+            </div>
+        </div>
+        <div class="layui-col-md6">
+            <label class="layui-form-label">传真：</label>
+            <div class="layui-input-block">
+                <input type="text" name="supplier_fax"  placeholder="请输入联系传真" autocomplete="off" class="layui-input">
+            </div>
+        </div>
+    </div>
+    <div class="layui-row layui-col-space10 layui-form-item">
+        <div class="layui-col-md6">
+            <label class="layui-form-label">公司电话：</label>
+            <div class="layui-input-block">
+                <input type="text" name="supplier_tel"  placeholder="请输入公司电话" autocomplete="off" class="layui-input">
+            </div>
+        </div>
+        <div class="layui-col-md6">
+            <label class="layui-form-label">官网地址：</label>
+            <div class="layui-input-block">
+                <input type="text" name="supplier_web"  placeholder="请输入官网地址" autocomplete="off" class="layui-input">
+            </div>
+        </div>
+    </div>
+    <div class="layui-row layui-col-space10 layui-form-item">
+        <div class="layui-col-md6">
+            <label class="layui-form-label">开户行：</label>
+            <div class="layui-input-block">
+                <input type="text" name="supplier_bank"  placeholder="请输入开户行" autocomplete="off" class="layui-input">
+            </div>
+        </div>
+        <div class="layui-col-md6">
+            <label class="layui-form-label">银行账号：</label>
+            <div class="layui-input-block">
+                <input type="text" name="supplier_card"  placeholder="请输入银行卡号" autocomplete="off" class="layui-input">
+            </div>
+        </div>
+    </div>
+    <div class="layui-row layui-col-space10 layui-form-item">
+        <div class="layui-col-md12">
+            <label class="layui-form-label">地址：</label>
+            <div class="layui-input-block">
+                <input type="text" name="supplier_addr"  placeholder="请输入详细地址" autocomplete="off" class="layui-input">
+            </div>
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <div class="layui-input-block" style="text-align: center;margin-left:0;">
+            <button class="layui-btn" lay-submit lay-filter="add_supplier_submit" type="button">保存</button>
+        </div>
+    </div>
+</form>
+
+
+<script>   
+layui.use(['admin', 'upload','form','layer','table'], function(){
+    var $ = layui.jquery
+    ,admin = layui.admin
+    ,layer = layui.layer
+    ,element = layui.element
+    ,form = layui.form
+    ,setter = layui.setter
+    ,upload = layui.upload
+    ,view = layui.view
+    ,table = layui.table
+    ,router = layui.router();
+
+    form.render();
+
+    admin.req({
+        url: layui.setter.baseUrl+'admin/supplier/edit' 
+        ,data:{ }
+        ,type:'get'
+        ,success: function(res){
+        if(res.code==1){
+            var list1;
+            for(var i in res.data.supplier_status){
+                list1+="<option value='"+i+"' >"+res.data.supplier_status[i]+"</option>";
+            }
+            $('#supplier_status').html(list1);     
+            form.render();
+            }else{
+                layer.msg(res.msg, {icon: 5,anim: 6,shade:0.5,time: 1500});
+            }
+        }
+    });
+
+    // 图上传
+    upload.render({
+        elem: '#LAY_avatarUpload'
+        ,url: layui.setter.baseUrl+'admin/upload/upload'
+        ,multiple: true
+        ,before: function(obj){
+        //预读本地文件示例，不支持ie8
+            obj.preview(function(index, file, result){
+                $('#upload_goods_images_box').append('<img src="'+ result +'" alt="'+ file.name +'" class="layui-upload-img" style="width:120px;height:120px;margin:0 15px 15px 0px;">')
+            });
+        }
+        ,done: function(res){
+        //上传完毕
+
+        $('#goods_img').val(res.data);
+        }
+    });
+
+    // 查看图片
+    window.see_img=function(){
+        var i = $('#goods_img').val();
+        layer.photos({
+            photos: {
+                title: "查看头像",
+                data: [{
+                    src: i
+                }]
+            },
+            shade: 0.5,
+            closeBtn: 1,
+            anim: 5
+        });
+    };
+
+});
+</script>

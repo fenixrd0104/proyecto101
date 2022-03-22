@@ -1,0 +1,46 @@
+{include file="public/header" /}
+</head>
+<body>
+<header class="mui-bar mui-bar-nav bg_white" id="header">
+    <a class="back-page mui-icon mui-icon-left-nav mui-pull-left" href="javascript:;"></a>
+    <a id="menu" class="mui-action-menu mui-icon mui-icon-bars mui-pull-right" href="javascript:void(0);"></a>
+    <h1 class="mui-title">News Details Knife Guest Source Code Network</h1>
+</header>
+<div class="mui-content">
+    <div class="news_detail">
+        
+    </div>
+</div>
+
+{include file="public/head_nav"/}
+{include file="public/footer" /}
+<script type="text/html" id="list">
+    <h1>{{title}}</h1>
+    <h3>{{create_time}}</h3>
+    {{#content}}
+</script>
+<script>
+var id=getQueryString('id');
+get_data();
+function get_data(){
+    $get('/api/article/information_detail',{id:id}, function(data) {
+        if (data.status == 1) {
+            data.data.create_time=new Date(data.data.create_time*1000).Format("yyyy year MM month dd day hh:mm");
+            var list = template('list', data.data);
+            $('.news_detail').html(list);
+        } else {
+            
+        }
+
+    });
+};
+
+// address bar information    
+function getQueryString(name){
+    var reg = new RegExp("(^|&)"+ name +"=([^&]*)(&|$)");
+    var r = window.location.search.substr(1).match(reg);
+    if(r!=null)return  unescape(r[2]); return null;
+}
+</script>
+</body>
+</html>

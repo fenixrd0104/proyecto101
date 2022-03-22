@@ -1,0 +1,143 @@
+{include file="public/header" /}
+<style>
+    #mescroll {
+        position: fixed;
+        top: 44px;
+        bottom: 0px;
+        left: 0;
+        width: 100%;
+        height: auto;
+    }
+
+    .text_green {
+        color: #28bb5b !important;
+    }
+</style>
+</head>
+
+<body>
+    <header class="mui-bar mui-bar-nav" id="header">
+        <a class="mui-action-back mui-icon mui-icon-left-nav mui-pull-left" href="javascript:;"></a>
+        <a id="menu" class="mui-action-menu mui-icon mui-icon-bars mui-pull-right" href="javascript:void(0);"></a>
+        <h1 class="mui-title"><span class="bi"></span>Recharge log</h1>
+    </header>
+    <div class="mui-content">
+        <div class="mescroll" id="mescroll">
+            <ul class="pool_re_ul" id="dataList">
+
+            </ul>
+        </div>
+    </div>
+
+    {include file="public/head_nav"/}
+    {include file="public/footer" /}
+    <script type="text/template" id="list">
+    <li>
+        <div class="pool_txt">
+            <h3>{{mark}}</h3>
+            <p>Recharge amount: {{money}}{{currency}}</p>
+            <p>Address: {{chongzhi_url}}</p>
+            <p>Hash value: {{ti_id}}</p>
+            <p>Deposit time: {{created_at}}</p>
+        </div>
+        {{ if status==1 }}
+        <p class="text_red">Unpaid</p>
+        {{ else if status==2 }}
+        <p class="text_green">paid</p>
+        {{ /if end }}
+    </li>
+</script>
+    <script>
+        function getQueryString(name) {
+            var result = window.location.search.match(new RegExp("[\?\&]" + name + "=([^\&]+)", "i"));
+            if (result == null || result.length < 1) {
+                return "";
+            }
+            return result[1];
+        }
+        var c_id = getQueryString("c_id");
+        var currency = '';
+        if (c_id == 1) {
+            currency = 'KRC';
+            $('.bi').html('KRC');
+        } else if (c_id == 2) {
+            currency = 'USDT';
+            $('.bi').html('USDT');
+        } else if (c_id == 3) {
+            currency = 'XXXX';
+            $('.bi').html('XXX');
+        }
+       //Create a MeScroll object, the internal pull-down refresh is enabled by default, up.callback is automatically executed, and the list data is refreshed;
+        var mescroll = new MeScroll("mescroll", {
+            up: {
+                callback: getListData,
+                isBounce: false,
+                noMoreSize: 3,
+                empty: {
+                    icon: "/static/wap/images/none4.png", //icon, default null
+                    tip: "There is no balance record at the moment~~", //Tips
+                },
+                clearEmptyId: "dataList",
+                toTop: {
+                    src: "/static/wap/images/top.png", //default scroll to 1000px display, configurable offset modification
+                    offset: 1000
+                },
+                lazyLoad: {
+                    use: true // Whether to enable lazy loading, default false
+                },
+                page: {
+                    num: 0,
+                    size: 10,
+                    time: null
+                },
+                htmlNodata: '<p class="upwarp-nodata">-- all loaded --</p>',
+                offset: 150,
+                loadFull: {
+                    use: true,
+                    delay: 500
+                }
+            }
+        });
+        function getListData(page) {
+            // load data online
+            getListDataFromNet(page.num, page.size, function (curPageData) {
+                //mescroll will automatically judge the list according to the passed parameters, if there is no data, it will prompt empty; if there is no next page of data in the list, it will prompt no more data;
+                mescroll.endSuccess(curPageData.length);
+                //set list data
+                setListData(curPageData);
+            }, function () {
+                //Callback for networking failure, hide the status of pull-down refresh and pull-up loading;
+                mescroll.endErr();
+            });
+        }
+        function setListData(curPageData) {
+            var list = '';
+            for (var i in curPageData) {
+                list += template('list', curPageData[i]);
+            }
+            $('#dataList').append(list);
+        }
+        function getListDataFromNet(pageNum, pageSize, successCallback, errorCallback) {
+            // Delay one second, simulate networking
+            setTimeout(function () {
+                $get('/api/money/recharge_lists', { page: pageNum, currency: currency }, function (d) {
+                    if (d.status == 1) {
+                        var curPageData = d.data;
+                        var listData = [];
+                        for (var i in curPageData) {
+                            if (i == curPageData.length) break;
+                            listData.push(curPageData[i]);
+                        }
+                        successCallback(listData);
+                    } else {
+                        mescroll.endErr();
+                    }
+                });
+            }, 1000);
+
+        }
+
+    </script>
+</body>
+
+</html>

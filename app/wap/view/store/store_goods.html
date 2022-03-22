@@ -1,0 +1,206 @@
+{include file="public/header"/}
+<style>
+    .dotey_list{
+        padding:0px 15px;
+    }
+    .dotey_up{
+        padding:10px 0px;
+    }
+    #mescroll{
+        position: fixed;
+        top: 0.9rem;
+        bottom: 0px;
+        left: 0;
+        width: 100%;
+        height:auto;
+    }
+</style>
+</head>
+<body style="background: #f0f0f0;">
+<header class="mui-bar mui-bar-nav bg_white" id="header">
+    <a class="back-page mui-icon mui-icon-left-nav mui-pull-left" href="javascript:;"></a>
+    <a id="menu" class="mui-action-menu mui-icon mui-icon-bars mui-pull-right" href="javascript:void(0);"></a>
+   <h1 class="mui-title">Baby management</h1>
+   </header>
+   <div class="mui-content">
+       <div class="focus_tab bg_white">
+           <ul>
+               <li data-type="1" class="on">For sale<span id="p_1" style="font-size: 0.13rem;">(0)</span></li>
+               <li data-type="2"><span id="p_2" style="font-size: 0.13rem;">(0)</span></li> in the warehouse
+               <!-- <li data-type="3">SOLD OUT<span id="p_3" style="font-size: 0.13rem;">(0)</span></li> -->
+        </ul>
+    </div>
+    
+    <div class="mescroll" id="mescroll">
+        <div class="dotey_bd" id="dataList">
+            
+        </div>  
+    </div>  
+    
+</div>
+{include file="public/head_nav"/}
+{include file="public/footer"/}
+<script type="text/template" id="list">
+    <div class="dotey_div" style="display:block;">
+        <div class="dotey_list">
+            <div class="dotey_up flex_center">
+                <img src="{{original_img}}" alt="">
+                <div class="dotey_txt">
+                    <h3 class="mui-mui-ellipsis-2">{{goods_name}}</h3>
+                    <p class="text_orange">KRC {{shop_price}}</p> 
+                    <span>Inventory: {{spec_num}}</span>
+                </div>
+            </div>
+            <ul class="dotey_ull">
+                <li>
+                    {{ if this_type ==1}}
+                        {{ if spec_num !=0}}
+                        <a href="javascript:;" onclick="sx_goods({{id}});">Removed</a>
+                        {{ /if end }}
+                    {{ else if this_type ==2}}
+                        {{ if spec_num !=0}}
+                        <a href="javascript:;" onclick="sx_goods({{id}});">Listed</a>
+                        {{ /if end }}
+                    {{ /if end }}
+                </li>
+                <li><a href="javascript:;" onclick="del_goods({{id}});">delete</a></li>
+            </ul>
+        </div>
+    </div>
+</script>
+<script>
+    var type=1;
+// initialize the menu
+$('.dotey_bd .dotey_div').eq(0).show();
+$(".focus_tab li").click(function() {
+    type = $(this).attr('data-type');
+    $(this).addClass('on').siblings().removeClass('on');
+    
+    $('.dotey_bd .dotey_div').eq($(this).index()).fadeIn();
+    $('.dotey_bd .dotey_div').eq($(this).index()).siblings().hide();
+    // reset the list data
+    mescroll.resetUpScroll();
+    // hide back to top button
+    mescroll.hideTopBtn();
+});
+//Create a MeScroll object
+var mescroll = new MeScroll("mescroll", {
+    up: {
+        callback: getListData, //Pull-up callback, which can be abbreviated here; equivalent to callback: function (page) { getListData(page); }
+        isBounce: false, //The ios bounce and parsing are prohibited here (be sure to read carefully, especially the last point): http://www.mescroll.com/qa.html#q10
+        noMoreSize: 5, //If the list has no data, you can set the total number of lists to be greater than half a page before displaying no more data; avoid too little list data (for example, only one piece of data), it will not look good to display no more data; Default 5
+        empty: {
+            icon: "/static/wap/images/none2.png", //icon, default null
+            tip: "No data at the moment~~~", //Tips
+
+        },
+        clearEmptyId: "dataList", //equivalent to setting clearId and empty.warpId at the same time; simplified writing; default null; note that this cannot be configured in vue
+        toTop: { //Configure back to top button
+            src: "/static/wap/images/top.png", //default scroll to 1000px display, configurable offset modification
+            offset: 1000
+        },
+        lazyLoad: {
+            use: true // Whether to enable lazy loading, default false
+        },
+        htmlNodata: '<p class="upwarp-nodata">-- END --</p>',
+        page: {
+            num: 0,
+            size: 8,
+            time: null
+        },
+        offset: 150,
+        loadFull: {
+            use: true,
+            delay: 500
+        }
+    }
+});
+
+function getListData(page) {
+    // load data online
+    getListDataFromNet(page.num, page.size, function(curPageData) {
+        //mescroll will automatically judge the list according to the passed parameters, if there is no data, it will prompt empty; if there is no next page of data in the list, it will prompt no more data;
+        mescroll.endSuccess(curPageData.length);
+        //set list data
+        setListData(curPageData);
+    }, function() {
+        //Callback for networking failure, hide the status of pull-down refresh and pull-up loading;
+        mescroll.endErr();
+    });
+}
+
+function setListData(curPageData) {
+    // console.log(curPageData);
+    var list = '';
+    for (var i in curPageData) {
+        curPageData[i].this_type=type; 
+        curPageData[i].create_time=new Date(curPageData[i].create_time*1000).Format("MM-dd"); 
+        list += template('list', curPageData[i]);
+    }
+    $('#dataList').append(list);
+}
+
+function getListDataFromNet(pageNum, pageSize, successCallback, errorCallback) {
+   
+    $get('/api/merchant/sell_goods',{page:pageNum,type:type}, function(data) {
+        if (data.status == 1) {
+            $('#p_3').html('（'+data.data.ysw_count+'）');
+            $('#p_2').html('（'+data.data.ck_count+'）');
+            $('#p_1').html('（'+data.data.cs_count+'）');
+            setTimeout(function() {
+                var curPageData = data.data.list;
+                var listData = [];
+                //All products (simulate pagination data)
+                for (var i in curPageData) {
+                    if (i == curPageData.length) break;
+                    listData.push(curPageData[i]);
+                }
+                successCallback(listData);
+            }, 1000);
+        } else {
+            mescroll.endErr();
+        }
+
+    });
+   
+}
+
+
+// unload
+function sx_goods(id){
+    $get('/api/merchant/putaway',{goods_id:id},function(res){
+        // console.log(res);
+        mui.toast(res.msg);
+        if(res.status==1){
+            // reset the list data
+            mescroll.resetUpScroll();
+            // hide back to top button
+            mescroll.hideTopBtn();
+        }
+    });
+}
+// delete
+function del_goods(id){
+    $get('/api/merchant/good_delete',{goods_id:id},function(res){
+        // console.log(res);
+        mui.toast(res.msg);
+        if(res.status==1){
+            // reset the list data
+            mescroll.resetUpScroll();
+            // hide back to top button
+            mescroll.hideTopBtn();
+        }
+    });
+}
+
+
+
+
+
+
+
+
+
+</script>
+</body>
+</html>

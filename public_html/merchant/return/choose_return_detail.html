@@ -1,0 +1,171 @@
+<title>采购收货详情</title>
+
+<div class="layui-card layadmin-header">
+    <div class="layui-breadcrumb" lay-filter="breadcrumb">
+        <a>采购管理</a>
+        <a lay-href="/return/return">采购退货</a>
+        <a><cite>采购退货详情</cite></a>
+    </div>
+</div>
+<script type="text/html" template>
+    <link rel="stylesheet" href="{{ layui.setter.base }}style/purchase.css?v={{ layui.admin.v }}-1" media="all">
+</script>
+<style>
+#return_detail input{ padding: 0; }
+#return_detail .layui-form-label{ padding: 9px 0; }
+#return_detail .layui-input-block{ margin-left: 80px; }
+</style>
+
+<form class="layui-form" lay-filter="choose_received_form" style="padding:10px;">
+<div class="layui-row">
+<div class="layui-col-md12">
+<div class="layui-card">
+    <div class="layui-card-header">采购退货详情</div> 
+    <div class="layui-card-body choose_purchase">
+        <div class="layui-btn-group">
+            <button type="button" class="layui-btn"  lay-submit lay-filter="log_submit">日志</button>
+            <button type="button" class="layui-btn" data-type="print" >单据打印</button>
+            <button type="button" class="layui-btn" data-type="export" > 导出Excel</button>
+        </div> 
+        <hr>
+        <div class="layui-row" id="return_detail" style="margin-bottom: 15px;">
+            <div class="layui-col-lg4 layui-col-md4">
+                <label class="layui-form-label">供应商：</label>
+                <div class="layui-input-block">
+                    <input type="text" name="supplier_name" id="name" class="layui-input" disabled style="border:none;">
+                </div>
+            </div>
+            <div class="layui-col-lg4 layui-col-md4">
+                <label class="layui-form-label">退货店铺：</label>
+                <div class="layui-input-block" style="line-height: 36px;">
+                    <input type="text" name="shop_name" id="shop_name" class="layui-input" disabled style="border:none;">
+                </div>
+            </div>
+            <div class="layui-col-lg12 layui-col-md12">
+                <label class="layui-form-label">备注：</label>
+                <div class="layui-input-block">
+                    <input type="text" name="remarks" id="remarks" class="layui-input" disabled style="border:none;">
+                </div>
+            </div>
+        </div>
+        <input type="hidden" id="receipt_id" name="receipt_id">      
+
+        <table class="layui-hide" id="test-table-choose_rec" layui-filter="test-table-choose_rec"></table>      
+    </div>
+</div>
+</div>
+</div>    
+</form>
+<script>
+layui.use(['admin','table','form','laydate','view','myprint','layer'], function(){
+    var $ = layui.$
+    ,admin = layui.admin
+    ,view = layui.view
+    ,setter = layui.setter
+    ,table = layui.table
+    ,layer = layui.layer
+    ,laydate = layui.laydate
+    ,myprint = layui.myprint
+    ,form = layui.form;
+
+    form.render(null, 'choose_received_form');
+    // 获取传值参数---得到id
+    var router = layui.router();
+    // console.log(router.search);
+    var id = router.search.id; 
+    var refunds_id = router.search.refunds_id; 
+     
+    // 自定义json
+    var json_data=[];
+    get_data();
+    var myobj=[];//打印头部内容
+    // 获取信息 “form” ---请求登入接口
+    admin.req({
+        url: layui.setter.baseUrl+'merchant/PurchaseRefunds/saveOrder'
+        ,data: { refunds_id:refunds_id}
+        ,type:'get'
+        ,success: function(res){
+            if(res.code==1){
+                // 赋值
+                var obj={
+                    "supplier_name" : res.data.info.supplier_name,
+                    "shop_name" : res.data.info.shop_name,
+                    "remarks" : res.data.info.remarks,
+                };     
+                form.val("choose_received_form",obj);  
+                myobj['供应商']=res.data.info.supplier_name;            
+                myobj['退货店铺']=res.data.info.shop_name;             
+                myobj['备注']=res.data.info.remarks; 
+                var d=res.data.lists;
+                for(var i in d){
+                    json_data.push(d[i]);
+                    get_data();
+                }
+            }else{
+                layer.msg(res.msg);
+            }
+        }
+    });    
+
+    var table_xls;
+    var data_xls;
+    get_data();
+    function get_data(){
+        table_xls =table.render({
+            elem: '#test-table-choose_rec'
+            ,data: json_data
+            ,title: "采购退货"
+            ,cellMinWidth: 80 //全局定义常规单元格的最小宽度，layui 2.2.1 新增
+            ,toolbar: '#test-table-toolbar'
+            ,cols: [[
+            {type:'checkbox'}
+            ,{field:'spec_id', width:80, title: 'ID', sort: true, align:"center"}
+            ,{field:'spec_sku', title: '商品SKU', align:"center"}
+            ,{field:'goods_name', title: '商品名称', align:"center"}
+            ,{field:'spec_name', title: '规格', align:"center"}
+            ,{field:'refunds_price', title: '价格',width:140, align:"center"}
+            ,{field:'refunds_num', title: '数量',width:140, align:"center"}
+            ,{field:'total_money', title: '金额', align:"center",
+            templet: function (d) {                         
+                return (d.refunds_price*d.refunds_num).toFixed(2)
+            }}
+            ,{field: 'remarks', title:'备注',width:160, align:"center"}   
+            ]]
+            ,limit: 10000
+            ,done: function (res, page, count){
+                data_xls = res.data;                
+            }
+        });
+    }    
+    // 日志
+    form.on('submit(log_submit)',function(e){
+        admin.popup({
+            title: "日志",
+            area: admin.screen() < 2 ? ['95%', '90%'] : ["600px", "500px"],
+            id: "LAY-popup-log_return",
+            success: function(e, i) {
+                view(this.id).render('/return/return_log',refunds_id).done(function() {
+             
+                });
+            }
+        });
+
+    });
+
+    var active = {
+        //打印带头部 
+        print: function () {
+            myprint.myprint(myobj,'test-table-choose_rec');
+        },
+        // 导出表格
+        export: function () {
+            table.exportFile(table_xls.config.id, data_xls,'xls');
+        }
+    }
+    $('.layui-btn-group .layui-btn').on('click', function () {
+        var type = $(this).data('type');
+        active[type] ? active[type].call(this) : '';
+    });
+
+});
+</script>

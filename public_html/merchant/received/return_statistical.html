@@ -1,0 +1,159 @@
+
+<title>退货统计</title>
+
+<div class="layui-card layadmin-header">
+    <div class="layui-breadcrumb" lay-filter="breadcrumb">
+        <a>采购管理</a>
+        <a><cite>退货统计</cite></a>
+    </div>
+</div>
+
+<div class="layui-fluid">
+<div class="layui-row layui-col-space15">
+<div class="layui-col-md12">
+    <div class="layui-card">
+    <div class="layui-card-header">退货统计</div>
+    <div class="layui-card-body"> 
+        <div class="layui-form" lay-filter="layadmin-useradmin-formlist" style="margin-bottom: 20px;">
+            <div class="layui-inline">
+                <input type="text" name="startTime" class="layui-input" placeholder="开始时间" id="test1">
+            </div>
+            <div class="layui-inline">
+                <input type="text" name="endTime" class="layui-input" placeholder="结束时间" id="test2">
+            </div>
+            <div class="layui-inline">
+                <select name="shop_id" id="shop_lists"> </select>
+            </div>
+            <div class="layui-inline">
+                <input name="keyWords" type="text" placeholder="商品名称" class="layui-input" id="layui-key">
+            </div>
+            <div class="layui-inline">
+                <button class="layui-btn layuiadmin-btn-admin" lay-submit lay-filter="LAY-user-back-search" ><i class="layui-icon layui-icon-search layuiadmin-button-btn"></i></button>
+            </div>
+        </div>
+        <table class="layui-hide" id="table_statistical" lay-filter="table_statistical"></table> 
+        <script type="text/html" id="test-table-images">
+            <img src="{{d.original_img||'/static/merchant/src/style/res/head_default.gif'}}" height="100%" alt="" onerror="javascript:this.src='/static/merchant/src/style/res/head_default.gif'">
+        </script>        
+    </div>
+    </div>
+</div>
+</div>
+</div>
+
+<script>
+layui.use(['admin','table','form','laydate','view','myprint','layer','tableMerge'], function(){
+    var $ = layui.$
+    ,admin = layui.admin
+    ,view = layui.view
+    ,setter = layui.setter
+    ,table = layui.table
+    ,layer = layui.layer
+    ,tableMerge = layui.tableMerge
+    ,laydate = layui.laydate
+    ,myprint = layui.myprint
+    ,form = layui.form;
+
+    //执行一个laydate实例
+    laydate.render({
+        elem: '#test1' 
+        ,type: 'datetime'
+    });
+    laydate.render({
+        elem: '#test2'
+        ,type: 'datetime'
+    });
+
+    var is_loading=true;
+    table.render({
+        elem: '#table_statistical'
+        ,url: layui.setter.baseUrl + 'merchant/PurchaseRefunds/statistical'
+        ,parseData: function(res){ //res 即为原始返回的数据     
+            if(is_loading==true){
+                var list = "<option value=''>全部商店</option>";
+                for (var i in res.data.shop_lists) {
+                    list += "<option value='" + i + "' >" + res.data.shop_lists[i] + "</option>";
+                }
+                $('#shop_lists').html(list);
+                form.render();
+                is_loading=false;
+            }
+            return {
+                "code": res.code, //解析接口状态
+                "msg": res.msg, //解析提示文本
+                "sum": res.data.sum, //解析提示文本
+                "count": res.data.count, //解析数据长度
+                "data": res.data.lists //解析数据列表
+            };
+        }
+        ,toolbar: '#test-table-toolbar'
+        ,title: "库存统计"
+        ,totalRow: true
+        ,cols: [[
+            {field:'goods_name', title: '商品名称', merge: true, align:"center",totalRowText: '总合计'}
+            ,{field:'goods_sn', title: 'SN',align:"center",merge: ['goods_name','goods_sn'],sort:true}
+            ,{field:'shop_name', title: '商店名称',align:"center",merge: ['goods_name','shop_name']}
+            ,{field:'spec_sku', title: 'SKU属性',align:"center",sort:true}
+            ,{field:'original_img', title: '图片',align:"center", width:100, templet: '#test-table-images',}
+            ,{field:'spec_name', title: '规格',align:"center"} 
+            ,{field:'refunds_num', title: '数量',align:"center",width:110,sort:true, totalRowText: ''}
+            ,{field:'refunds_price', title: '价格',align:"center",width:110,sort:true, totalRowText: ''}
+        ]]
+        ,page:true
+        ,limits:[10,20,30,40,50,60,70,80,90,500,1000]
+        ,done: function(res){
+            tableMerge.render(this);
+            this.elem.next().find('.layui-table-total td[data-field="refunds_num"] .layui-table-cell').text(res.sum.refunds_num);
+            this.elem.next().find('.layui-table-total td[data-field="refunds_price"] .layui-table-cell').text(res.sum.refunds_price);
+        }
+    });  
+    table.on('sort(table_statistical)', function(obj){
+        table.reload('table_statistical', {
+            initSort: obj 
+            ,where: { 
+                field: obj.field 
+                ,order: obj.type 
+            }
+        });
+    }); 
+
+    //监听搜索
+    form.on('submit(LAY-user-back-search)', function(data){
+        var field = data.field;
+        // console.log(field);        
+        table.reload('table_statistical', {
+            where: field
+        });
+    });
+
+    // 监听工具条--取消
+    table.on('tool(table_statistical)', function (obj) {
+    var data = obj.data;  
+    if (obj.event === 'detail') { 
+        admin.popup({
+            title: "库存日志",
+            area: admin.screen() < 2 ? ['95%', '90%'] : ["600px", "500px"],
+            id: "LAY-popup-log_return",
+            success: function(e, i) {
+                view(this.id).render('/stock/statistical_log', data.spec_id).done(function() {
+             
+                });
+            }
+        });
+    } else if(obj.event === 'price'){
+        admin.popup({
+            title: "价格日志",
+            area: admin.screen() < 2 ? ['95%', '90%'] : ["600px", "500px"],
+            id: "LAY-popup-log_return",
+            success: function(e, i) {
+                view(this.id).render('/stock/price_log', data.spec_id).done(function() {
+             
+                });
+            }
+        });
+    }
+    }); 
+
+
+})    
+</script>

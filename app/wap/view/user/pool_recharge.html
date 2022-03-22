@@ -1,0 +1,76 @@
+{include file="public/header" /}
+</head>
+<body style="background: #f8f8f8;">
+<header class="mui-bar mui-bar-nav bg_white" id="header">
+    <a class="mui-action-back mui-icon mui-icon-left-nav mui-pull-left" href="javascript:;"></a>
+    <a class="mui-pull-right m_rizhi" href="javascript:;" onclick="next();">充值日志</a>
+    <h1 class="mui-title">Top-up</h1>
+</header>
+<div class="mui-content">
+<div class="pool_address">
+    <div class="pool_span">
+        <div class="pool_qrcode" id="qrcode"></div>
+        <span class="hui">QR code</span>
+    </div>
+    <div class="pool_ress">
+        <p class="hei" id="code_num" title=""></p>
+        <p class="hui">Address</p>
+        <button class="submit_btn" title="" id="btn_code" disabled>Copy address</button>
+    </div>
+    <!-- <div class="pool_p">
+        <p>Note:</p>
+        <p>1. The wallet pays US and USDT currency assets to recharge. </p>
+        <p>2. The recharge of USDT currency is automatically converted into US to the balance, the current US:USDT = 7:1. </p>
+        <p>3. Please do not recharge any currency assets that are not supported by the wallet, otherwise the assets will not be recovered. </p>
+        <p>4. The confirmation time of ERC20 Ethereum network is about 0-1 hour. The time of recharge arrival is subject to the actual arrival time. Please pay attention to SMS to check the balance. </p>
+    </div> -->
+</div>
+</div>
+
+{include file="public/head_nav"/}
+{include file="public/footer"/}
+<script type="text/javascript">
+function getQueryString(name) {
+        var result = window.location.search.match(new RegExp("[\?\&]" + name + "=([^\&]+)", "i"));
+        if (result == null || result.length < 1) {
+            return "";
+        }
+        return result[1];
+    }
+    var c_id = getQueryString("c_id");
+get_data();
+function next(){
+    window.location.href="/wap/user/pool_recharge_list.html?c_id="+c_id;
+}
+function get_data(){
+    $get('/api/money/recharge',{c_id:c_id},function(res){
+        if(res.status==1){
+            $('#code_num').html(res.data)
+            var html=$('#code_num').html();
+            $('#code_num').attr('title',html);
+            $('#btn_code').attr('title',html).removeAttr('disabled');
+            // generate QR code
+            jQuery('#qrcode').qrcode({
+                render: "canvas",
+                width: 120,
+                height: 120,
+                text: html
+            });
+            // copy the address
+            $('#btn_code').on('tap',function(){
+                mui.toast("Copied");
+                var val = $(this).attr('title');
+                $(this).attr('data-clipboard-text', val);
+                var clipboard = new ClipboardJS('#btn_code');
+            });
+        }else{
+            mui.toast(res.msg);            
+            setTimeout(function(){
+                mui.back();
+            },1500);
+        }
+    });
+}
+</script>
+</body>
+</html>

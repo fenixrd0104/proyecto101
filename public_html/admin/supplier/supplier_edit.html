@@ -1,0 +1,77 @@
+<script type="text/html" template>
+    <link rel="stylesheet" href="{{ layui.setter.base }}style/supplier.css?v={{ layui.admin.v }}-1" media="all">
+</script>
+<style>
+    .layui-form-label {
+      float: left;
+      display: block;
+      padding: 9px 10px;
+      width: 85px;
+      font-weight: 400;
+      line-height: 20px;
+      text-align: right;
+  }
+  </style>
+<div class="layui-col-md12">
+    <form class="layui-form" action="" lay-filter="component-supplier_edit">
+        <div class="layui-row layui-col-space10 layui-form-item supplier_edit">
+          <div class="layui-col-lg4">
+            <div class="layui-input-block">
+                <input type="radio" name="role" value="" title="供应商状态">
+            </div>
+          </div>
+          <div class="layui-col-lg5">
+            <div class="layui-input-block">
+              <select name="type" lay-verify="required" lay-filter="aihao">
+                <option value=""></option>
+                <option value="0">前端工程师</option>
+                <option value="1">Node.js工程师</option>
+                <option value="2">PHP工程师</option>
+                <option value="3">Java工程师</option>
+                <option value="4">运维</option>
+                <option value="4">视觉设计师</option>
+              </select>
+            </div>
+          </div>
+          <div class="layui-col-lg3">
+           
+          </div>
+        </div>
+        <div class="layui-row layui-col-space10 layui-form-item supplier_edit">
+          <div class="layui-col-lg4">
+            <div class="layui-input-block">
+                <input type="radio" name="role" value="" title="员工">
+            </div>
+          </div>
+          <div class="layui-col-lg5">
+            <div class="layui-input-block">
+                <input type="text" name="fullname" lay-verify="required" placeholder="" autocomplete="off" class="layui-input">
+            </div>
+          </div>
+          <div class="layui-col-lg3">
+              <div class="layui-input-block" style="line-height: 36px;color:#4292f1;">更新员工</div>
+          </div>
+        </div>
+        <div class="layui-row layui-col-space10 layui-form-item supplier_edit">
+          <div class="layui-col-lg12">
+            <div class="layui-input-block" style="text-align: right; border-top:1px solid #f1f1f1;">
+                <button class="layui-btn" lay-submit lay-filter="component-form-element" style="margin-top: 20px;">确定</button>
+            </div>
+          </div>
+         
+        </div>
+    </form>
+</div>
+
+<script>
+  layui.use(['admin', 'upload','form'], function(){
+    var $ = layui.jquery
+    ,upload = layui.upload
+    ,layer = layui.layer
+    ,element = layui.element
+    ,form = layui.form;
+    form.render(null, 'component-supplier_edit');
+  
+
+})
+</script>

@@ -1,0 +1,109 @@
+<div class="layui-form" action="" lay-filter="add_grade" style="padding: 20px 30px 0 0;">
+  <div class="layui-form-item">
+    <label class="layui-form-label">等级名称</label>
+    <div class="layui-input-block">
+      <!-- <input type="text" name="fullname" lay-verify="required" placeholder="请输入账号" autocomplete="off" class="layui-input">   -->
+      <script type="text/html" template>                        
+        <input type="text" name="username" lay-verify="required" autocomplete="off" class="layui-input" value="{{ d.params.username || '' }}" >
+      </script>            
+    </div>
+  </div>
+  <div class="layui-form-item">
+      <label class="layui-form-label">等级图片</label>
+      <div class="layui-input-block">
+        <div class="layui-upload">
+          <button type="button" class="layui-btn" id="test-upload-normal">选择图片</button>
+          <div class="layui-upload-list">
+            <img class="layui-upload-img" style="width: 92px; height: 92px; margin: 0 10px 10px 0;" id="test-upload-normal-img">
+            <p id="test-upload-demoText"></p>
+          </div>
+        </div> 
+      </div>
+    </div>
+  <div class="layui-form-item">
+    <label class="layui-form-label">最大值</label>
+    <div class="layui-input-block">
+      <input type="number" name="max" lay-verify="required" autocomplete="off" class="layui-input">
+    </div>
+  </div>
+  <div class="layui-form-item">
+    <label class="layui-form-label">最小值</label>
+    <div class="layui-input-block">
+      <input type="number" name="min" lay-verify="required" autocomplete="off" class="layui-input">
+    </div>
+  </div>
+  <div class="layui-form-item">
+    <div class="layui-input-block">
+      <button type="button" class="layui-btn" lay-submit="" lay-filter="component-form-element"><i class="layui-icon">&#xe654;</i>保存</button>
+      <button type="button" class="layui-btn layui-btn-danger" data-type="close"><i class="layui-icon">&#x1006;</i>返回</button>
+    </div>
+  </div>
+</div>
+    
+<script>
+  layui.use(['admin','form','upload','layer'], function(){
+    var $ = layui.$
+    ,admin = layui.admin
+    ,element = layui.element
+    ,layer = layui.layer
+    ,form = layui.form
+    ,layer = layui.layer
+    ,upload = layui.upload
+    ,router = layui.router();
+
+    element.render();
+    form.render(null, 'add_grade');
+    
+    //普通图片上传
+    var uploadInst = upload.render({
+      elem: '#test-upload-normal'
+      ,url: layui.setter.baseUrl+'upload/'
+      ,before: function(obj){
+        //预读本地文件示例，不支持ie8
+        obj.preview(function(index, file, result){
+          $('#test-upload-normal-img').attr('src', result); //图片链接（base64）
+        });
+      }
+      ,done: function(res){
+        //如果上传失败
+        if(res.code > 0){
+          return layer.msg('上传失败');
+        }
+        //上传成功
+      }
+      ,error: function(){
+        //演示失败状态，并实现重传
+        var demoText = $('#test-upload-demoText');
+        demoText.html('<span style="color: #FF5722;">上传失败</span> <a class="layui-btn layui-btn-mini demo-reload">重试</a>');
+        demoText.find('.demo-reload').on('click', function(){
+          uploadInst.upload();
+        });
+      }
+    });
+    
+    // 监听提交
+    form.on('submit(component-form-element)', function(data){ 
+      var field = data.field; //获取提交的字段
+      var max=field.max;
+      var min=field.min;
+      if(parseInt(max) <= parseInt(min)){          
+        layer.msg('最大值不能小于最小值',{icon:2,time:1500,shade: 0.1}, function(index){
+          layer.close(index);
+        });
+      }     
+    });
+
+    var $ = layui.$, active = {
+      // 返回--按钮
+      close:function(index){ 
+        layer.closeAll('page');
+      }
+    };
+    
+    $('.layui-input-block .layui-btn').on('click', function(){
+      var type = $(this).data('type');
+      active[type] ? active[type].call(this) : '';
+    });
+    
+  });
+</script>

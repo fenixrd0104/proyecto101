@@ -1,0 +1,149 @@
+<title>收益统计日志</title>
+<style>
+    form .layui-inline{
+        margin-bottom: 20px;
+    }
+</style>
+<div class="layui-card layadmin-header">
+  <div class="layui-breadcrumb" lay-filter="breadcrumb">
+      <a>财务管理</a>
+      <a><cite>收益统计日志</cite></a>
+  </div>
+</div>
+<div class="layui-fluid">
+        <div class="layui-row layui-col-space15">
+          <div class="layui-col-md12">
+            <div class="layui-card">
+              <div class="layui-card-header">收益统计日志</div>
+              <div class="layui-card-body"> 
+                  <div class="test-table-reload-btn" style="margin-bottom: 10px;">
+                    
+                    <div class="layui-input-inline">
+      
+                        <form class="layui-form">
+                            <div class="layui-inline">
+                                <div class="layui-input-inline">
+                                  <input type="text" class="layui-input" id="test-laydate-type-datetime-start" name="start_time" placeholder="开始时间">
+                                </div>
+                              </div>
+                              <div class="layui-inline">
+                                <div class="layui-input-inline">
+                                  <input type="text" class="layui-input"  name="end_time" id="test-laydate-type-datetime-end" placeholder="结束时间">
+                                </div>
+                              </div>
+                              <div class="layui-inline">
+                                <select name="act" id="earn_log_status">
+                                    <option value="">操作类型</option>
+                                    <option value="1">挖矿收益</option>
+                                    <option value="2">邀请奖励</option>
+                                    <option value="3">矿工奖励</option>
+                                    <option value="4">矿长奖励</option>
+                                    <option value="5">矿主分红</option>
+                                    <option value="6">平台操作</option>
+                                </select>
+                             </div>
+                            <div class="layui-inline">
+                                <input class="layui-input" name="uid" placeholder="搜索会员ID" id="test-table-demoReload" autocomplete="off">
+                              </div>
+                            <div class="layui-inline">
+                                <input class="layui-input" name="account" placeholder="搜索会员账号" id="test-table-demoReload" autocomplete="off">
+                              </div>
+                            <div class="layui-inline">
+                                <button class="layui-btn" type="button" lay-submit lay-filter="earn_log_search"><i class="layui-icon">&#xe615;</i>搜索</button>
+                              </div>
+                              
+                        </form>
+                       
+                    </div>
+                   
+                  </div>   
+
+                  <table class="layui-hide" id="earn_log" lay-filter="earn_log"></table>    
+                  <script id="tool_earn_log" type='text/html' templet>
+                      总收益：<span id="t_1" style="font-weight:800;color:orangered;margin-right:15px;">0.00</span>
+                      挖矿收益：<span id="t_2" style="font-weight:800;color:orangered;margin-right:15px;">0.00</span>
+                      邀请奖励：<span id="t_3" style="font-weight:800;color:orangered;margin-right:15px;">0.00</span>
+                      矿工奖励：<span id="t_4" style="font-weight:800;color:orangered;margin-right:15px;">0.00</span>
+                      矿长奖励：<span id="t_5" style="font-weight:800;color:orangered;margin-right:15px;">0.00</span>
+                      矿主分红：<span id="t_6" style="font-weight:800;color:orangered;margin-right:15px;">0.00</span>
+                      平台操作：<span id="t_7" style="font-weight:800;color:orangered;margin-right:15px;">0.00</span>
+                  </script>
+ 
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <script>
+      layui.use(['admin','table', 'view', 'form','layer','laydate'], function(){
+        var $ = layui.$
+        ,admin = layui.admin
+        ,element = layui.element
+        ,form = layui.form
+        ,view = layui.view
+        ,laydate = layui.laydate
+        ,layer = layui.layer
+        ,table = layui.table;
+          //日期时间选择器
+          laydate.render({
+            elem: '#test-laydate-type-datetime-start'
+            ,type: 'datetime'
+        });
+        laydate.render({
+            elem: '#test-laydate-type-datetime-end'
+            ,type: 'datetime'
+        });
+        form.render();
+
+
+        form.on('submit(earn_log_search)',function(datas){
+            get_data(datas.field);
+        });
+       
+      
+          var keywords="";
+          var act="";
+          var n=1;
+          get_data({keywords:''});
+          function get_data(param){
+            table.render({
+              elem: '#earn_log'
+              ,url: layui.setter.baseUrl+'admin/member/tjbtc_log'
+              ,toolbar: '#tool_earn_log'
+              ,parseData: function(res){ //res 即为原始返回的数据
+                $('#t_1').html(res.data.z_num);
+                $('#t_2').html(res.data.wk_num);
+                $('#t_3').html(res.data.yq_num);
+                $('#t_4').html(res.data.kg_num);
+                $('#t_5').html(res.data.kc_num);
+                $('#t_6').html(res.data.kz_num);
+                $('#t_7').html(res.data.tt_num);
+                  return {
+                  "code": res.code, //解析接口状态
+                  "msg": res.msg, //解析提示文本
+                  "count": res.data.count, //解析数据长度
+                  "data": res.data.lists //解析数据列表
+                  };
+              }
+              ,cols: [[
+                {field:'uid',  title: '会员ID',align:'center'}
+                ,{field:'account',title: '会员昵称', align:'center'}
+                ,{field:'1',title: '挖矿收益', align:'center',sort:true}
+                ,{field:'2',title: '邀请奖励', align:'center',sort:true}
+                ,{field:'3',title: '矿工奖励', align:'center',sort:true}
+                ,{field:'4',title: '矿长奖励', align:'center',sort:true}
+                ,{field:'5',title: '矿主分红', align:'center',sort:true}
+                ,{field:'6',title: '平台操作', align:'center',sort:true}
+                ,{field:'zongnum', title: '日总收益', align:'center',sort:true}
+                ,{field:'times', title: '时间', align:'center',sort:true}
+              ]],
+              page:true,
+              where:param
+            });
+          }
+         
+         
+      
+      });
+      </script>

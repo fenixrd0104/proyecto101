@@ -1,0 +1,79 @@
+<style>
+#guige_box .layui-form-label{
+    padding: 4px 0;
+    width: 40px;
+    text-align: center;
+}
+#guige_box .layui-form-radio{
+    margin: 0;
+    padding-right: 5px;
+}
+#guige_box .layui-inline{
+    margin-bottom: 0;
+    margin-right: 5px;
+}
+#guige_box .layui-input-inline{
+    width: 70px;
+}
+#guige_box .layui-input-inline input{
+    height: 28px;
+    line-height: 28px; 
+}
+#guige_box li{
+    display: inline-block;
+    margin-bottom: 7px;
+}
+</style>
+<form class="layui-form" action="" lay-filter="choose_guige_rec" style="padding: 10px 0 0 0;">
+    <div class="layui-form-item">
+        <label class="layui-form-label" style="width: 28px;padding: 4px 15px 4px 0;">规格</label>
+        <div class="layui-input-block" id="guige_box" style="margin-left: 43px;">
+            <ul id="guige_box_ul">
+                
+            </ul>   
+        </div>
+    </div>    
+    <div class="layui-form-item">
+        <div class="layui-input-block">
+        <button type="button" class="layui-btn" lay-submit lay-filter="submit_choose_guige"><i class="layui-icon">&#xe654;</i>保存</button>
+        </div>
+    </div>
+</form>
+<script type="text/html" template lay-done="layui.data.sendParams(d.params)"></script>   
+<script>
+layui.data.sendParams = function(params){
+layui.use(['admin', 'upload','form','table','view','setter','layer'], function(){
+    var $ = layui.$
+    ,setter = layui.setter
+    ,admin = layui.admin
+    ,upload = layui.upload
+    ,layer = layui.layer
+    ,element = layui.element
+    ,view = layui.view
+    ,layer = layui.layer
+    ,form = layui.form;
+
+    form.render();
+    // console.log(params);
+    var list='';
+    for(var i in params){
+        list+='<li>'
+        +'<input type="radio" name="spec_id" id="" value="'+params[i].spec_id+'" title="'+params[i].spec_name+'">'
+        +'<div class="layui-inline">'
+        +'<label class="layui-form-label">数量</label>'
+        +'<div class="layui-input-inline">'
+        +'<input type="text" name="inpnum" id="inpnum_'+params[i].spec_id+'" class="layui-input inpnum" value="1">'
+        +'</div></div></li>';
+    }
+    $('#guige_box_ul').html(list);
+    form.render();
+    // input获取焦点 radio变为选中状态
+    $('body').on('focus','#guige_box_ul .inpnum',function(){
+        $(this).parents('li').find('input[type="radio"]').prop('checked',true);
+        form.render();        
+    });
+    
+
+});
+}
+</script>

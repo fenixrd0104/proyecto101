@@ -1,0 +1,133 @@
+{include file="public/header" /}
+</head>
+
+<body style="background: #f0f0f0;">
+    <header class="mui-bar mui-bar-nav bg_white" id="header">
+        <a class="mui-action-back mui-icon mui-icon-left-nav mui-pull-left" href="javascript:;"></a>
+        <a id="menu" class="mui-action-menu mui-icon mui-icon-bars mui-pull-right" href="javascript:;"></a>
+        <h1 class="mui-title">Shipping address</h1>
+    </header>
+    <div class="mui-content">
+        <ul class="address_ul">
+            <div class="mescroll-upwarp" style="visibility: visible;
+        display: block;padding: 5px 0;">
+            <p class="upwarp-progress mescroll-rotate" style="transform: rotate(439.2deg);"></p>
+            <p class="upwarp-tip">Loading..</p>
+        </div>
+        </ul>
+        <div class="null_message hide">
+            <div class="mb50"></div>
+            <div class="none2">
+                <img src="__IMG__/none4.png" alt="">
+                <p>The address is empty! </p>
+            </div>
+        </div>
+        <a class="address_btn" href="/wap/user/add_address.html">add new address</a>
+    </div>
+
+    {include file="public/head_nav"/} {include file="public/footer"/}
+    <script type="text/html" id="list">
+        <li>
+            <div class="address_top">
+                <h3>{{consignee}}</h3>
+                <span class="fr">{{mobile}}</span>
+                <p class="">{{address_detail}}</p>
+            </div>
+            <div class="address_bottom flex_between">
+                <div class="mui-input-row mui-radio" onclick="radio_checked({{address_id}});">
+                    {{ if is_default==0 }}
+                    <input name="radio1" type="radio"> {{ else }}
+                    <input name="radio1" type="radio" checked> {{ /if end }}
+                    <label class="text_90">default address</label>
+                </div>
+                <div class="address_low_i">
+                    <a class="text_90" onclick="go_add({{address_id}})" href="javascript:;"><i class="iconfont icon-bianji"></i>edit</a>
+                    <a class="text_90" href="javascript:;" onclick="delete_li({{address_id}});"><i class="iconfont icon-shan_chu"></i>delete</a>
+                </div>
+            </div>
+        </li>
+    </script>
+    <script type="text/javascript">
+        window.onpageshow = function (event) {
+            if(localStorage.getItem('load_list')=='true'){
+                setTimeout(() => {
+                    get_list();
+                    localStorage.setItem('load_list','false');
+                }, 1000);
+                
+            }else{
+                get_list();
+            }
+
+        };
+        var href = getQueryString('href');
+        var from = getQueryString('from') ? getQueryString('from') : '';
+        
+        function go_add(h) {
+            window.location.href = '/wap/user/add_address.html?id=' + h + '&from=' + from;
+        }
+        function get_list() {
+            $get('/api/address/get_addressList', {}, function (data) {
+                if (data.status == 1) {
+                    var list = "";
+                    for (var i in data.data) {
+                        list += template("list", data.data[i]);
+                    }
+                    $('.address_ul').html(list);
+                } else {
+                    // mui.toast(data.msg);
+                    $('.null_message').show();
+                }
+            });
+        }
+        // set default address
+        function radio_checked($id) {
+            $get('/api/address/set_normal', {
+                id: $id
+            }, function (d) {
+                if (d.status == 1) {
+                    // mui.toast(d.msg);
+                    // get_list();
+                } else {
+                    mui.toast(d.msg);
+                }
+            });
+        };
+        // delete address
+        function delete_li($id) {
+            var del = layer.confirm('Are you sure you want to delete this address?', {
+                title: false,
+                closeBtn: 0,
+                skin: 'addcat_demo',
+                shadeClose: true, //Turn on the mask to close
+                btn: ['Cancel', 'OK'] //Button
+            }, function () {
+                $('.layui-layer-btn a').attr('href', 'javascript:;');
+                layer.close(del);
+            }, function () {
+                $get('/api/address/del_address', {
+                    id: $id
+                }, function (d) {
+                    if (d.status == 1) {
+                        mui.toast(d.msg);
+                        setTimeout(function () {
+                            get_list();
+                        }, 900);
+                    } else {
+                        mui.toast(d.msg);
+                    }
+                });
+            });
+        };
+
+        // address bar information    
+        function getQueryString(name) {
+            var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)");
+            var r = window.location.search.substr(1).match(reg);
+            if (r != null) return unescape(r[2]);
+            return null;
+        }
+    </script>
+</body>
+
+</html>

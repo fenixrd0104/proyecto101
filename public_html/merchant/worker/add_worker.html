@@ -1,0 +1,145 @@
+<script type="text/html" template>
+    <link rel="stylesheet" href="{{ layui.setter.base }}style/supplier.css?v={{ layui.admin.v }}-1" media="all">
+</script>
+
+<div class="layui-form" action="" lay-filter="add_worker" style="padding: 20px 30px 0 0;">
+    <div class="layui-form-item">
+        <label class="layui-form-label">归属店铺</label>
+        <div class="layui-input-block" lay-filter="selFilter">
+            <select name="shop_id" id="select_worker" lay-verify="select_worker" lay-filter="">
+            </select>
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">登录账号</label>
+        <div class="layui-input-block">
+            <script type="text/html" template>
+                <input type="text" name="account" lay-verify="required" placeholder="" autocomplete="off" class="layui-input" value="{{d.params.account||''}}"{{ d.params.id  ? 'disabled' : '' }}>
+            </script>
+                   
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">真实姓名</label>
+        <div class="layui-input-block">
+            <script type="text/html" template>
+                <input type="text" name="reusername" lay-verify="required" placeholder="" autocomplete="off" class="layui-input" value="{{d.params.reusername||''}}" {{ d.params.id  ? 'disabled' : '' }}>
+            </script>     
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">密码</label>
+        <div class="layui-input-block">
+            <script type="text/html" template>
+                <input type="password" name="password" class="layui-input" value="">   
+            </script>    
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">状态</label>
+        <div class="layui-input-block">
+            <script type="text/html" template>
+                {{# if(d.params.status>-1){ }}
+                    <input type="radio" name="status" value="1" title="开启" {{ d.params.status=== 1 ? 'checked': '' }} >
+                    <input type="radio" name="status" value="0" title="关闭" {{ d.params.status=== 0 ? 'checked': '' }}>                    
+                {{# }else{ }}
+                    <input type="radio" name="status" value="1" title="开启" checked>
+                    <input type="radio" name="status" value="0" title="关闭" >
+                {{# } }}  
+            </script>        
+        </div>
+    </div>
+<!--    <div class="layui-form-item">-->
+    <script>
+        layui.data.sendParams = function (params) {
+            var chec_id = params.id;
+            var shop_id = params.shop_id;
+            var info = params.group_id;
+            // console.log(params)
+
+            layui.use(['admin', 'upload','form','layer'], function(){
+                var $ = layui.jquery
+                    ,upload = layui.upload
+                    ,layer = layui.layer
+                    ,admin = layui.admin
+                    ,element = layui.element
+                    ,form = layui.form;
+
+                element.render();
+                form.render(null, 'add_worker');
+
+
+                if( params.id ){
+                    console.log("edit");
+                    var url=layui.setter.baseUrl + 'merchant/shop/edit_staff';
+                    var data= { id:params.id };
+                } else {
+                    console.log("add");
+                    var url=layui.setter.baseUrl + 'merchant/shop/add_staff';
+                    var data= {  };
+                }
+
+                admin.req({
+                    url: url
+                    ,data: data
+                    ,type: 'get'
+                    ,success: function (res) {
+                        console.log(res);
+                        if (res.code == 1) {
+                            // 下拉框的值
+                            var list = "<option value='' >--请选择--</option> ";
+                            for (var i in res.data.shop_lists) {
+                                list += "<option value='" + i + "' >" + res.data.shop_lists[i] + "</option> ";
+                            }
+                            $('#select_worker').html(list);
+                            $('#select_worker').val(shop_id);
+
+                            // 默认---下拉框的选中
+                            if (chec_id) {
+                                $('#select_worker').val(shop_id);
+                                // $('#manage').val(group_id);
+                            } else {
+
+                                $('#select_worker').val(1);
+                            }
+                            // 复选框的选中
+                            for(var g in res.data.auth_checked){
+                                $('#'+g).prop('checked',true);
+                            }
+
+                            form.render();
+                        } else {
+                            layer.msg(res.msg);
+                        }
+                    }
+                });
+
+
+                var $ = layui.$, active = {
+                    // 返回
+                    close: function (index) {
+                        layer.closeAll('page');
+                    }
+                };
+                $('.layui-input-block .layui-btn').on('click', function () {
+                    var type = $(this).data('type');
+                    active[type] ? active[type].call(this) : '';
+                });
+
+            })
+
+        }
+    </script>
+    <!--        <label class="layui-form-label">管理员角色</label>-->
+    <!--        <div class="layui-input-block" id="manage">-->
+    <!--            &lt;!&ndash; <input type="checkbox" name="group_ids" value="1" id="1" title="角色" lay-skin="primary" >-->
+    <!--            <input type="checkbox" name="group_ids" value="2" id="2" title="角色" lay-skin="primary" > &ndash;&gt;-->
+    <!--        </div>-->
+    <!--    </div>-->
+    <div class="layui-form-item">
+        <div class="layui-input-block">
+            <button type="button" class="layui-btn" lay-submit="" lay-filter="component-form-element">确定</button>
+        </div>
+    </div>
+</div>
+<script type="text/html" template lay-done="layui.data.sendParams(d.params)"></script>

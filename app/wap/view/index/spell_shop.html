@@ -1,0 +1,48 @@
+{include file="public/header"/}
+
+</head>
+<body style="background: #f8f8f8;">
+    <header class="mui-bar mui-bar-nav index_header shop_head" id="header">
+        <a class="back-page mui-icon mui-icon-left-nav mui-pull-left" href="javascript:;"></a>
+        <a id="menu" class="mui-action-menu mui-icon mui-icon-bars mui-pull-right" href="javascript:void(0);"></a>
+        <h1 class="mui-title">Mobile phone</h1>
+    </header>
+    <div class="mui-content street_content">
+        <div class="spell_navbg">
+            <div class="speshop_nav">
+                <ul class="mui-clearfix">
+                    <li class="on"><p>All</p></li>
+                    <li><p>Mobile communication</p></li>
+                    <li><p>Carrier</p></li>
+                    <li><p>Mobile Accessories</p></li>
+                    <li><p>Photography</p></li>
+                    <li><p>Smart Devices</p></li>
+                    <li><p>Electronic Education</p></li>
+                </ul>
+            </div>
+        </div>
+       <div class="speshop_none">
+           <img src="__IMG__/img_21.png" alt="">
+           <p>Sorry no data found! </p>
+           <a href="index.html">Go shopping</a>
+       </div>
+    </div>
+    {include file="public/head_nav"/}
+    {include file="public/footer"/}
+    <script>
+        //
+        $('.speshop_nav ul>li').on('tap',function(){
+            $(this).addClass('on');
+            $(this).siblings().removeClass('on');
+        })
+        /* Header navigation bar */
+        $('#menu').click(function(e){
+            $('.login_pop').toggle();
+            e.stopPropagation();
+        })
+        $('body').click(function(){
+            $('.login_pop').hide();          
+        })        
+    </script>
+</body>
+</html>

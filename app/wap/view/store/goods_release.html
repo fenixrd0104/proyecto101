@@ -1,0 +1,135 @@
+{include file="public/header"/}
+</head>
+<body style="background: #f0f0f0;">
+<header class="mui-bar mui-bar-nav bg_white head_line" id="header">
+    <a class="back-page mui-icon mui-icon-left-nav mui-pull-left" href="javascript:;"></a>
+    <a id="menu" class="mui-action-menu mui-icon mui-icon-bars mui-pull-right" href="javascript:void(0);"></a>
+    <h1 class="mui-title">Post items</h1>
+</header>
+<div class="mui-content">
+    <form class="mui-input-group open_form ">
+        <div class="mui-input-row">
+            <textarea name="" id="" cols="30" rows="3" placeholder="Enter item title"></textarea>
+        </div>
+        <div class="mui-input-row" id="showUserPicker">
+            <label>Category</label>
+            <input type="text" id="userResult" placeholder="Please select a category">
+        </div>
+        <div class="mb10 bg_hui"></div>
+        <div class="mui-input-row" id="showOrigin">
+            <label>Origin</label>
+            <input type="text" id="userOrigin" placeholder="Please select the origin">
+        </div>
+        <div class="mb10 bg_hui"></div>
+        <div class="mui-input-row">
+            <label>price</label>
+            <input type="number" placeholder="Please fill in the price">
+        </div>
+        <div class="mui-input-row">
+            <label>Stock</label>
+            <input type="number" placeholder="Please fill in the inventory">
+        </div>
+        <div class="mui-input-row">
+            <label>Shipping</label>
+            <input type="number" placeholder="Please fill in the shipping fee">
+        </div>
+        <div class="mb10 bg_hui"></div>
+        <div class="mui-input-row" id="showCityPicker3">
+            <label>Baby Description</label>
+            <input type="text" id="cityResult3" placeholder="Please enter baby description">
+        </div>
+        <div class="mb10 bg_hui"></div>
+        <div class="mui-input-row" id="showCityPicker3">
+            <label>Origin of Shipping</label>
+            <input type="text" id="cityResult3" placeholder="Please select the place of delivery">
+        </div>
+        <div class="mb30 bg_hui"></div>
+        <div class="mui-button-row">
+            <button type="button" id="submit_btn" class="submit_btn" onclick="return false;">publish now</button>
+        </div>
+    </form>
+   
+</div>
+
+{include file="public/head_nav"/}
+{include file="public/footer"/}
+<script>
+// upload picture
+uploadImg(1, '#upload_1', '/api/user/upload_img');
+// input focus
+$("input").on("blur", function () {
+    $("body").removeClass("mui-focusin")
+})
+var shop_province={},shop_city={},shop_area={};
+(function($, doc) {
+$.init();
+$.ready(function() {
+    // main category
+    var userPicker = new $.PopPicker();
+    userPicker.setData([{
+        text: 'Women's/Men's/Underwear'
+    }, {
+        text: 'shoes/bags/accessories'
+    }, {
+        text: 'Home appliances/digital/mobile phone'
+    }, {
+        text: 'Beauty/Shampoo/Health Products'
+    }, {
+        text: 'jewelry/glasses/watch'
+    }, {
+        text: 'Gourmet/Fresh/Snacks'
+    }, {
+        text: 'Furniture/Home Decoration/Home Textile'
+    }, {
+        text: 'Sports/Outdoor/Instrument'
+    }, {
+        text: 'Book/Audio/E-Book'
+    }, {
+        text: 'Virtual Product'
+    }, {
+        text: '医药保健/计生情趣'
+    }]);
+    var showUserPickerButton = doc.getElementById('showUserPicker');
+    var userResult = doc.getElementById('userResult');
+    showUserPickerButton.addEventListener('tap', function(event) {
+        userPicker.show(function(items) {
+            userResult.value = (items[0] || {}).text;
+        });
+    }, false);				
+    // main category
+        var userPicker_1 = new $.PopPicker();
+        userPicker_1.setData([{
+            text: 'Mainland China'
+        }, {
+            text: 'Other overseas regions'
+        }]);
+        var showOriginButton = doc.getElementById('showOrigin');
+        var userOrigin = doc.getElementById('userOrigin');
+        showOriginButton.addEventListener('tap', function(event) {
+            userPicker_1.show(function(items) {
+                userOrigin.value = (items[0] || {}).text;
+            });
+        }, false);
+        // address -- three-level linkage
+    var cityPicker3 = new $.PopPicker({
+        layer: 3
+    });
+    cityPicker3.setData(cityData3);
+    var showCityPickerButton = doc.getElementById('showCityPicker3');
+    var cityResult3 = doc.getElementById('cityResult3');
+    showCityPickerButton.addEventListener('tap', function(event) {
+        cityPicker3.show(function(items) {
+            shop_province=(items[0] || {});
+            shop_city=(items[1] || {});
+            shop_area=(items[2] || {});
+            cityResult3.value =shop_province.text + " " + shop_city.text + " " + shop_area.text;
+            //Return false to prevent the selection box from closing
+            //return false;
+        });
+    }, false);
+});
+})(mui, document);
+        
+</script>
+</body>
+</html>

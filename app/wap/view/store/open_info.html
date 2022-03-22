@@ -1,0 +1,305 @@
+{include file="public/header"/}
+<style>
+.op_cream{
+    text-indent: 0;
+    padding-left: 0.1rem;
+}
+.op_cream p{
+    color: #666;
+    font-size: 0.12rem;
+    line-height: 0.22rem;
+}
+</style>
+</head>
+<body style="background: #f0f0f0;">
+<header class="mui-bar mui-bar-nav bg_white" id="header">
+    <a class="back-page mui-icon mui-icon-left-nav mui-pull-left" href="javascript:;"></a>
+    <a id="menu" class="mui-action-menu mui-icon mui-icon-bars mui-pull-right" href="javascript:void(0);"></a>
+    <h1 class="mui-title">Merchant entry</h1>
+</header>
+<div class="mui-content" style="padding-bottom: 1.4rem !important;">
+        <div class="open_list">
+                <div class="op_title"><i class="op_icon"></i>Basic Information</div>
+                <form class="mui-input-group open_form">
+                    <div class="mui-input-row">
+                        <label><span>*</span>Store Name</label>
+                        <input type="text" placeholder="Please fill in the shop name" id="shop_name">
+                    </div>
+                    <!-- <div class="mui-input-row">
+                        <label><span>*</span>Store login master account</label>
+                        <input type="text" placeholder="Please fill in the main store account ID" id="login_name">
+                    </div> -->
+                    <div class="mui-input-row" id="showCityPicker3">
+                        <label><span>*</span>Location</label>
+                        <input type="text" id="cityResult3" placeholder="Please select your region">
+                    </div>
+                    <div class="mui-input-row">
+                       <label><span>*</span>Detailed address</label>
+                        <input type="text" placeholder="Please fill in the shop address" id="shop_address">
+                    </div>
+                    <div class="mui-input-row">
+                        <label><span>*</span>Store Phone</label>
+                        <input type="tel" placeholder="Can fill in multiple contact information" id="shop_phone">
+                    </div>
+                    <div class="mui-input-row">
+                        <label><span>*</span>Email</label>
+                        <input type="email" placeholder="Please fill in the email address" id="shop_email">
+                    </div>
+                    <div class="mui-input-row" id="showUserPicker">
+                        <label><span>*</span>Main categories</label>
+                        <input type="text" id="userResult" placeholder="Please select">
+                    </div>
+                    <div class="mui-input-row" id="showUserPickers">
+                        <label><span>*</span>Store Type</label>
+                        <input type="text" id="userResults" placeholder="Please select">
+                    </div>
+                </form>
+            </div>
+            <div class="mb10"></div>
+            <div class="open_list">
+                <div class="op_title"><i class="op_icon"></i>Certificate Information</div>
+                <form class="mui-input-group open_form">
+                    <div class="op_cream">
+                        <p>1. When applying for a store, the company needs to upload the business license within the validity period, and the original photo</p>
+                        <p>2. To apply for a store, please upload a photo of your ID card</p>
+                    </div>
+                    <div class="mui-input-row">
+                        <div class="groupImg" id="open_groupImg">
+                            <input type="hidden" value="" name="avatar">
+                            <input type="file" class="choose" id="upload_1" accept="image/*" multiple="">
+                            <div class="img-list">
+                                <div class="upload" id="imgdiv1">
+                                    <img id="head_img" src="__IMG__/img_25.png" class="uploadimg" onerror="this.src='__IMG__/img_25.png'" onclick="return false;" style="border-radius: 0!important;">
+                                </div>
+                            </div>
+                            <div id="picDiv1" style="width: 1px; height: 1px;"></div>
+                        </div>
+                        <p class="op_plow">*Please upload (photos must be clear and complete)</p>
+                    </div>
+                    <div class="mui-input-row">
+                        <label><span>*</span>Long term</label>
+                        <div class="op_switch op_switchon">
+                            <div class="op_handle"></div>
+                        </div>
+                    </div>
+                    <div class="mui-input-row">
+                        <label><span>*</span>Validity start time</label>
+                        <input type="text" placeholder="eg: 2019-11-11" id="start_eff">
+                    </div>
+                    <div class="mui-input-row long_time">
+                        <label><span>*</span>Validity end time</label>
+                        <input type="text" value="" id="end_eff" placeholder="long term" readonly>
+                    </div>
+                    <div class="mui-input-row">
+                        <label><span>*</span>ID number</label>
+                        <input type="text" placeholder="Please match the ID photo" id="company_number">
+                    </div>
+                    <p class="op_rules">Please fill in the information according to the ID number or business license registration number. Only numbers, letters and Chinese characters are supported. Such as: 410998000018866 (1-1), please input: 410998000018866</p>
+                    <div class="mb15"></div>
+                </form>
+            </div>
+            <div class="mb10"></div>
+            <div class="open_down">
+        <p class="op_agree">
+            <!-- Agree to the <a href="javascript;;">Mall Service Agreement</a> -->
+        </p>
+        <input class="op_submit" id="submit_btn" type="button" value="Confirm Submission" name="" id="">
+    </div>
+
+</div>
+
+
+
+{include file="public/head_nav"/}
+{include file="public/footer"/}
+<script>
+// upload picture
+uploadImg(1, '#upload_1', '/api/user/upload');
+// input focus
+$("input").on("blur", function () {
+    $("body").removeClass("mui-focusin")
+});
+        
+var shop_province={},shop_city={},shop_area={};
+var goods_cate_id='';
+var id='';
+var goods_type='';
+var shop_province='';
+var shop_city='';
+var shop_area='';
+
+mui.init();
+mui.ready(function() {	
+    // main category
+    var userPicker = new mui.PopPicker();
+    $get('/api/shop/getIndustry',{},function(res){
+        for(var i in res.data){
+            res.data[i].text=res.data[i].value;
+        }
+        userPicker.setData(res.data);
+    });
+    var showUserPickerButton = document.getElementById('showUserPicker');
+    var userResult = document.getElementById('userResult');
+    showUserPickerButton.addEventListener('tap', function(event) {
+        userPicker.show(function(items) {
+            userResult.value = (items[0] || {}).text;
+            goods_cate_id=items[0].ids;
+        });
+    }, false);
+    // store type
+    var userPickers = new mui.PopPicker();
+    var cityPicker3 = new mui.PopPicker({
+        layer: 3
+    });
+    $get('/api/merchant/apply_merchant',{},function(res){
+        // get default information
+        if(res.data.info){
+            var info=res.data.info;
+            shop_province=info.province;
+            shop_city=info.city;
+            shop_area=info.area;
+            goods_cate_id=info.industry_id;
+            goods_type=info.type;
+            id=info.id;
+            $('#shop_name').val(info.name);
+            $('#cityResult3').val(info.checkadress);
+            $('#shop_address').val(info.address);
+            $('#shop_phone').val(info.phone);
+            $('#shop_email').val(info.email);
+            $('#userResult').val(info.industry_name);
+            $('#userResults').val(info.type_name);
+            $('#head_img').attr('data-src',info.zz_image);
+            $('#head_img').attr('src',info.zz_image);            
+            if(info.is_valid==1){
+                $('.op_switch').addClass('op_switchon');
+            } else{
+                $('.op_switch').removeClass('op_switchon');
+            }
+            get_switch('.op_switch');
+            if(info.vaild_time!=0){
+                info.vaild_time=new Date(info.vaild_time*1000).Format("yyyy-MM-dd");
+            } else{
+                info.vaild_time='';
+            }
+            if(info.vaild_etime!=0){
+                info.vaild_etime=new Date(info.vaild_etime*1000).Format("yyyy-MM-dd");
+            }else{
+                info.vaild_etime='';
+            }
+            $('#start_eff').val(info.vaild_time);
+            $('#end_eff').val(info.vaild_etime);
+            $('#company_number').val(info.company_number);
+
+        }
+        for(var i in res.data.type){
+            res.data.type[i].text=res.data.type[i].name;
+        }
+        userPickers.setData(res.data.type);
+        cityPicker3.setData(res.data.address);
+    });			
+    var showUserPickerButtons = document.getElementById('showUserPickers');
+    var userResults = document.getElementById('userResults');
+    showUserPickerButtons.addEventListener('tap', function(event) {
+        userPickers.show(function(items) {
+            userResults.value = (items[0] || {}).text;
+            goods_type=items[0].id;
+        });
+    }, false);				
+    // address -- three-level linkage
+    var showCityPickerButton = document.getElementById('showCityPicker3');
+    var cityResult3 = document.getElementById('cityResult3');
+    showCityPickerButton.addEventListener('tap', function(event) {
+        cityPicker3.show(function(items) {
+
+            shop_province=(items[0] || {}).value;
+            shop_city=(items[1] || {}).value;
+            shop_area=(items[2] || {}).value;
+            cityResult3.value =(items[0] || {}).text + " " + (items[1] || {}).text + " " + (items[2] || {}).text;
+            //Return false to prevent the selection box from closing
+            //return false;
+        });
+    }, false);
+});
+// expand and hide
+$('.open_list').on('tap','.op_title',function(){
+    $(this).siblings('.open_form').toggle();
+    if($(this).siblings('.open_form').is(':hidden')){
+        $(this).find('.op_icon').css('transform','rotate(-90deg)');
+    }else{
+        $(this).find('.op_icon').css('transform','rotate(0deg)');
+    }
+})
+//switch
+$('.op_switch').on('tap',function(){
+    $(this).toggleClass('op_switchon');
+    get_switch(this);
+});
+function get_switch($this){
+if($($this).hasClass('op_switchon')){    
+    $($this).find('.op_handle').css('transform','translateX(100%)');
+    $('.long_time').slideUp();
+    $('#end_eff').attr('placeholder','long').prop('readonly');
+}else{    
+    $($this).find('.op_handle').css('transform','translateX(0%)');
+    $('.long_time').slideDown();
+    $('#end_eff').attr('placeholder','Such as：2019-11-11').removeAttr('readonly');
+}
+};
+
+$('.op_submit').click(function(){
+    // alert(goods_cate_id);    
+    var shop_name=$('#shop_name').val();
+    var login_name=$('#login_name').val();    
+    var shop_address=$('#shop_address').val();
+    var shop_phone=$('#shop_phone').val();
+    var shop_email=$('#shop_email').val();
+    var user_name=$('#user_name').val();
+    var goods_cate=$('#userResult').val();
+    var company_img=$("#head_img").attr('data-src');
+    var is_eff=$('.op_switch').hasClass('op_switchon');
+    var start_eff=$('#start_eff').val();
+    var vaild_etime=$('#end_eff').val();
+    var end_eff=$('#end_eff').val();
+    var company_number=$('#company_number').val();
+    is_eff=is_eff?1:0;
+ 
+    if(shop_name==''){
+       mui.toast('Store name cannot be empty');
+    }else if(shop_province==''){
+        mui.toast('Please select your region');
+    }else if(shop_address==''){
+        mui.toast('The detailed address of the store cannot be empty');
+    }else if(shop_phone==''){
+        mui.toast('shop phone number cannot be empty');
+    }else if(shop_email==''){
+        mui.toast('Email cannot be empty');
+    }else if(user_name==''){
+        mui.toast('Contact name cannot be empty');
+    }else if(goods_cate==''){
+        mui.toast('Main category cannot be empty');
+    }else if(goods_type==''){
+        mui.toast('Type cannot be null');
+    }else if(company_img==''){
+        mui.toast('Business license cannot be empty');
+    }else if(start_eff==''){
+        mui.toast('Valid time cannot be empty');
+    }else if(company_number==''){
+        mui.toast('Certificate number cannot be empty');
+    }else{
+        $post('/api/merchant/apply_merchant',{id:id,name:shop_name,province:shop_province,city:shop_city,area:shop_area,address:shop_address,phone:shop_phone,email:shop_email,industry_id:goods_cate_id,zz_image:company_img,is_valid:is_eff,vaild_time:start_eff,vaild_etime:vaild_etime,type:goods_type,company_number:company_number},function(data){
+            if(data.status==1){ 
+                mui.toast(data.msg);
+                setTimeout(() => {
+                    window.location.href='/wap/user/my.html';
+                }, 1000);
+            }else{
+                mui.toast(data.msg);
+            }
+        });
+    }
+  
+});
+        
+</script>
+</body>
+</html>

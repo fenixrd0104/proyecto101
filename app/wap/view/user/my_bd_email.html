@@ -1,0 +1,75 @@
+{include file="public/header" /}
+</head>
+<body>
+<header class="mui-bar mui-bar-nav" id="header">
+    <a class="mui-action-back mui-icon mui-icon-left-nav mui-pull-left" href="javascript:;"></a>
+    <a id="menu" class="mui-action-menu mui-icon mui-icon-bars mui-pull-right" href="javascript:;"></a>
+   <h1 class="mui-title">Bind mailbox</h1>
+   </header>
+   <div class="mui-content register-content">
+       <div class="mb10"></div>
+       <form class="mui-input-group xx_form">
+           <div class="mui-input-row">
+               <label>Email</label>
+               <input type="text" id="email" placeholder="Please enter your email"">
+           </div>
+           <div class="mui-input-row">
+               <label>Captcha</label>
+               <input type="text" id="verify" placeholder="Please enter the verification code" style="width: 46%;float: left;">
+               <button class="btn_code fr" id="btn_code" type="button" style="margin-right: 0.05rem;">Get verification code</button>
+           </div>
+           <div class="mb30"></div>
+           <div class="mui-button-row">
+               <button type="button" id="submit_btn" class="submit_btn" onclick="return false;">Confirm binding</button>
+           </div>
+       </form>
+   </div>
+   
+   {include file="public/head_nav"/}
+   {include file="public/footer"/}
+   <script type="text/javascript">
+   // Modify phone number or email
+$('#submit_btn').on('tap', function () {
+    var phone = $('#email').val();
+    var verify = $('#verify').val();
+    // var check_type = $('.mui_type .active').attr('data-type');
+    var check_type = 'email';
+
+    if (phone=="") {
+        mui.toast('Please enter your email address');
+            } else if (verify=="") {
+                mui.toast('Please enter the verification code');
+            } else {
+            $get("/api/user/send_bind_mobile", { check_type:check_type,phone:phone,verify:verify }, function (d) {
+                mui.toast(d.msg);
+                if (d.code == 1) {
+                    setTimeout(function () {
+                        mui.back();
+                    }, 1000);
+                }
+            });
+            }
+        });
+        
+        // get verification code
+        $('#btn_code').click(function(){
+            var country_code="86";
+            var phone = $('#email').val();
+            var check_type = 'email';
+            var obj = $('#btn_code');
+           
+            if(phone==''){
+                mui.toast('Please enter your email address');
+    } else{
+    $get("/api/user/send_bang_verifys", { country_code:country_code,phone:phone,check_type:check_type }, function (d) {
+        mui.toast(d.msg);       
+        if (d.code == 1) {
+            settime(obj);
+        } else{            
+        }         
+    });
+    }
+});
+</script>
+</body>
+</html>

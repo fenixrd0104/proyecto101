@@ -1,0 +1,117 @@
+{include file="public/header" /}
+<style>
+#mescroll{
+    position: fixed;
+    top: 0.44rem;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+}
+</style>
+</head>
+<body>
+<header class="mui-bar mui-bar-nav" id="header">
+    <a class="back-page mui-icon mui-icon-left-nav mui-pull-left" href="javascript:;"></a>
+    <a id="menu" class="mui-action-menu mui-icon mui-icon-bars mui-pull-right" href="javascript:void(0);"></a>
+    <h1 class="mui-title">My Friends</h1>
+</header>
+<div class="mui-content">
+    <div id="mescroll" class="mescroll">
+    <ul class="friend_ul" id='dataList'>
+        
+    </ul>
+    </div>
+</div>
+
+{include file="public/head_nav"/}
+{include file="public/footer" /}
+<script type="text/html" id="list">
+    <li>
+        <img src="{{head_img}}" onerror="this.src='__IMG__/touxiang.png'" alt="">
+        <div class="friend_txt">
+            <p>Username: {{nickname}}</p>
+            <p>Grade: {{grade.name}}</p>
+            <span>Time: {{create_time}}</span>
+        </div>
+    </li>
+</script>
+<script>
+//Create a MeScroll object
+var mescroll = new MeScroll("mescroll", {
+    up: {
+        callback: getListData, //Pull-up callback, which can be abbreviated here; equivalent to callback: function (page) { getListData(page); }
+        isBounce: false, //The ios bounce and parsing are prohibited here (be sure to read carefully, especially the last point): http://www.mescroll.com/qa.html#q10
+        noMoreSize: 5, //If the list has no data, you can set the total number of lists to be greater than half a page before displaying no more data; avoid too little list data (for example, only one piece of data), it will not look good to display no more data; Default 5
+        empty: {
+            icon: "/static/wap/images/none2.png", //icon, default null
+            tip: "No data at the moment~~~", //Tips
+
+        },
+        clearEmptyId: "dataList", //equivalent to setting clearId and empty.warpId at the same time; simplified writing; default null; note that this cannot be configured in vue
+        toTop: { //Configure back to top button
+            src: "/static/wap/images/top.png", //default scroll to 1000px display, configurable offset modification
+            offset: 1000
+        },
+        lazyLoad: {
+            use: true // Whether to enable lazy loading, default false
+        },
+        htmlNodata: '<p class="upwarp-nodata">-- END --</p>',
+        page: {
+            num: 0,
+            size: 8,
+            time: null
+        },
+        offset: 150,
+        loadFull: {
+            use: true,
+            delay: 500
+        }
+    }
+});
+
+function getListData(page) {
+    // load data online
+    getListDataFromNet(page.num, page.size, function(curPageData) {
+        //mescroll will automatically judge the list according to the passed parameters, if there is no data, it will prompt empty; if there is no next page of data in the list, it will prompt no more data;
+        mescroll.endSuccess(curPageData.length);
+        //set list data
+        setListData(curPageData);
+    }, function() {
+        //Callback for networking failure, hide the status of pull-down refresh and pull-up loading;
+        mescroll.endErr();
+    });
+}
+
+function setListData(curPageData) {
+    // console.log(curPageData);
+    var list = '';
+    for (var i in curPageData) {
+        curPageData[i].create_time=new Date(curPageData[i].create_time*1000).Format("yyyy-MM-dd hh:mm:ss"); 
+        list += template('list', curPageData[i]);
+    }
+    $('#dataList').append(list);
+}
+
+function getListDataFromNet(pageNum, pageSize, successCallback, errorCallback) {
+    setTimeout(function() {
+    $get('/api/user/user_friend',{page:pageNum,num:8}, function(data) {
+        if (data.code == 1) {
+            var curPageData = data.data;
+            var listData = [];
+            //All products (simulate pagination data)
+            for (var i in curPageData) {
+                if (i == curPageData.length) break;
+                listData.push(curPageData[i]);
+            }
+            successCallback(listData);
+        } else {
+            mescroll.endErr();
+        }
+
+    });
+    }, 1000);
+}
+    
+</script>
+</body>
+</html>

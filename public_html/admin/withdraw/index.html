@@ -1,0 +1,188 @@
+<title>提现管理</title>
+<div class="layui-card layadmin-header">
+  <div class="layui-breadcrumb" lay-filter="breadcrumb">
+      <a>会员管理</a>
+      <a><cite>提现管理</cite></a>
+  </div>
+</div>
+<div class="layui-fluid">
+        <div class="layui-row layui-col-space15">
+          <div class="layui-col-md12">
+            <div class="layui-card">
+              <div class="layui-card-header">提现管理</div>
+              <div class="layui-card-body"> 
+                  <div class="test-table-reload-btn" style="margin-bottom: 10px;">
+                    
+                    <!-- <div class="layui-input-inline">
+                        <button type="button" class="layui-btn layuiadmin-btn-admin" style="margin-right: 30px;" data-type="add"><i class="layui-icon layui-icon-add-1 layuiadmin-button-btn"></i>添加会员组</button>
+                    </div> -->
+                    <div class="layui-input-inline">
+      
+                        <form class="layui-form">
+                            <div class="layui-inline">
+                               <select name="act" id="tixian_status">
+                                   <option value="4">全部</option>
+                                   <option value="0">待处理</option>
+                                   <option value="1">已处理</option>
+                                   <option value="2">已拒绝</option>
+                               </select>
+                              </div>
+                            <div class="layui-inline">
+                                <input class="layui-input" name="keywords" placeholder="搜索账号" id="test-table-demoReload" autocomplete="off">
+                              </div>
+                              <button class="layui-btn" type="button" lay-submit lay-filter="tixian_search"><i class="layui-icon">&#xe615;</i>搜索</button>
+                        </form>
+                       
+                    </div>
+                   
+                  </div>   
+                  <div class="test-table-reload-btn" style="margin-bottom: 10px;">
+                    
+                 
+                    <div class="layui-input-inline" style="margin-left: 0;">
+                        <div class="layui-inline" style="margin-left: 0;">
+                            <div class="layui-input-block" id="zong"  style="margin-left: 0;"></div>
+                        </div>
+                           
+                    </div>
+                   
+                  </div>   
+                  <table class="layui-hide" id="tixian" lay-filter="tixian"></table>    
+                  <script type="text/html" id="tool_tixian">
+                    {{# if(d.status==0){ }}
+                        <a class="layui-btn layui-btn-normal layui-btn-xs" lay-event="tongyi">同意</a>
+                        <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="jujue">拒绝</a>
+                    {{# }else{ }}  
+                    <a class="layui-btn layui-btn-disabled layui-btn-xs">同意</a>
+                    <a class="layui-btn layui-btn-disabled layui-btn-xs">拒绝</a>
+                    {{# } }} 
+
+
+                  </script>           
+ 
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <script>
+      layui.use(['admin','table', 'view', 'form','layer'], function(){
+        var $ = layui.$
+        ,admin = layui.admin
+        ,element = layui.element
+        ,form = layui.form
+        ,view = layui.view
+        ,layer = layui.layer
+        ,table = layui.table;
+        
+        form.on('submit(tixian_search)',function(datas){
+            get_data(datas.field);
+        });
+       
+      
+          var keywords="";
+          get_data({keywords:'',act:4});
+          function get_data(param){
+            table.render({
+              elem: '#tixian'
+              ,url: layui.setter.baseUrl+'admin/withdrawal/index'
+              ,toolbar: '#test-table'
+              ,parseData: function(res){ //res 即为原始返回的数据
+                $('#zong').html('积分数量：<b style="color:orangered;font-size:20px;">'+res.data.zongnum+'</b>');
+                  return {
+                  "code": res.code, //解析接口状态
+                  "msg": res.msg, //解析提示文本
+                  "count": res.data.count, //解析数据长度
+                  "data": res.data.lists, //解析数据列表
+                  "sum": res.data.sum //解析数据列表
+                  };
+              }
+              ,cols: [[
+                {field:'id', width:60, title: 'ID', sort: true, align:'center',totalRowText: '总合计'}
+                ,{field:'uid', width:80, title: '会员ID',align:'center'}
+                ,{field:'account',width:160,title: '账号',width:100, align:'center'}
+                ,{field:'type',width:100,title: '提现方式', align:'center',templet:function(e){
+                    return '支付宝';
+                }}
+                // ,{field:'username',width:120,title: '姓名', align:'center'}
+                ,{field:'zfb_hao',title: '提现账号', align:'center'}
+                ,{field:'money', width:100,title: '提现积分', align:'center'}
+                ,{field:'feilv', width:80,title: '费率', align:'center',templet:function(d){
+                    return d.feilv+'%';
+                }}
+                ,{field:'user_money', width:100,title: '实际积分', align:'center',totalRowText: ''}
+                ,{field:'status',  width:100, title: '状态', templet:function(d){
+                    if(d.status==0){
+                        return '<span class="layui-btn layui-btn-sm ">待处理</span>'
+                    }else if(d.status==1){
+                        return '<span class="layui-btn layui-btn-sm layui-btn-normal">已处理</span>';
+                    }else if(d.status==2){
+                        return '<span class="layui-btn layui-btn-sm  layui-btn-danger">已拒绝</span>';
+                    }
+                }, align:'center',style:"height:60px;"}
+                ,{field:'create_time', title: '申请时间', align:'center'}
+                ,{field:'update_time', title: '操作时间', align:'center'}
+                ,{fixed: 'right',style:"height:60px;", title: '操作', align:'center',  toolbar: '#tool_tixian',width:140}
+              ]],
+              page:true,
+              where:param
+                ,totalRow: true
+                ,done:function(res){
+                    //修改 结算后余额 统计单元格文本
+                    this.elem.next().find('.layui-table-total td[data-field="user_money"] .layui-table-cell').text(res.sum.user_money);
+                }
+            });
+          }
+      
+           
+
+      
+          
+          //监听工具条
+          table.on('tool(tixian)', function(obj){
+            var id=obj.data.id;
+            if(obj.event=='tongyi'){
+                layer.confirm('是否同意提现?', {icon: 3, title:'提示'}, function(index){
+                    admin.req({
+                    url: layui.setter.baseUrl+'admin/withdrawal/dakuan' //实际使用请改成服务端真实接口
+                    ,data: {id:id},
+                    type:'get',
+                    success: function(res){
+                        if(res.code==1){
+                        // console.log(res.msg)
+                        layer.msg(res.msg, {icon: 1,anim: 6,shade:0.5,time: 1500},function(){
+                            layui.table.reload('tixian'); //重载表格
+                        });  
+                                
+                        }else{
+                        layer.msg(res.msg, {icon: 5,anim: 6,shade:0.5,time: 1500});
+                        }
+                    }
+                    });  
+                });
+            }else{
+                layer.confirm('是否拒绝提现?', {icon: 3, title:'提示'}, function(index){
+                    admin.req({
+                    url: layui.setter.baseUrl+'admin/withdrawal/jujue_dakuan' //实际使用请改成服务端真实接口
+                    ,data: {id:id},
+                    type:'get',
+                    success: function(res){
+                        if(res.code==1){
+                        // console.log(res.msg)
+                        layer.msg(res.msg, {icon: 1,anim: 6,shade:0.5,time: 1500},function(){
+                            layui.table.reload('tixian'); //重载表格
+                        });  
+                                
+                        }else{
+                        layer.msg(res.msg, {icon: 5,anim: 6,shade:0.5,time: 1500});
+                        }
+                    }
+                    });  
+                });
+            }
+          });
+         
+      form.render();
+      });
+      </script>

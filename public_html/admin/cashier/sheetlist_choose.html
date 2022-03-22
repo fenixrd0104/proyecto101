@@ -1,0 +1,1100 @@
+<title>在线收银</title>
+<style>
+    table tr:hover input{
+        background:#f2f2f2;
+    }
+    #sheet .layui_green{ border-color:#5FB878!important; }
+    #sheet .layui_none{ border: none; }
+    #sheet .layui-input-block{ margin-left: 80px; }
+    #sheet .layui-input{ padding-left: 5px; }
+    #sheet .layui-form-label{padding: 9px 0;}
+    .layui-row .layui-col-lg4{ margin-bottom: 6px !important; }
+    .change_btn:hover{ color: #4292f1;  }
+    .change_btn{
+        background: transparent;
+        display: inline-block;
+        padding-left: 5px;
+        font-size: 13px;
+        color: #4292f1;
+    }
+</style>
+<script type="text/html" template>
+    <link rel="stylesheet" href="{{ layui.setter.base }}style/purchase.css?v={{ layui.admin.v }}-1" media="all">
+</script>
+<div class="layui-card layadmin-header">
+    <div class="layui-breadcrumb" lay-filter="breadcrumb">
+        <a>收银管理</a>
+        <a lay-href="/cashier/sheetlist">收银单</a>
+        <a><cite>在线收银</cite></a>
+    </div>
+</div>
+
+<form class="layui-form layui-fluid" lay-filter="choose_stock">
+<div class="layui-row">
+<div class="layui-col-md12">
+<div class="layui-card">
+    <div class="layui-card-header">在线收银</div> 
+    <div class="layui-card-body">
+        <div class="layui-row">
+        <div class="layui-btn-group">
+            <button type="button" class="layui-btn" lay-submit lay-filter="save_submit" >保存</button>
+            <button type="button" class="layui-btn" lay-submit lay-filter="wancheng_submit">完成</button>
+            <button type="button" class="layui-btn" lay-submit lay-filter="quxiao_submit">取消</button>
+            <button type="button" class="layui-btn" lay-submit lay-filter="print">单据打印</button>
+        </div>            
+        </div>
+        <hr style="margin: 20px 0;">
+        <div class="layui-row" id="sheet">              
+            <div class="layui-col-lg4 layui-col-md6">
+                <label class="layui-form-label">店铺名称：</label>
+                <div class="layui-input-block">
+                    <input type="text" name="shop_name_s" id="shop_name" class="layui-input" disabled style="border: none;">
+                    <input type="text" name="order_id" id="order_id" class="layui-input" disabled style="display: none;">
+                    <input type="text" name="invoice_title" id="invoice_title" class="layui-input" disabled style="display: none;">
+                    <input type="text" name="invoice_tax_number" id="invoice_tax_number" class="layui-input" disabled style="display: none;">
+                </div>
+            </div>
+            <div class="layui-col-lg4 layui-col-md6">
+                <label class="layui-form-label">订 单 号：</label>
+                <div class="layui-input-block">
+                    <input type="text" name="shop_id_s" id="shop_id" class="layui-input" disabled style="border: none;">
+                </div>
+            </div>
+            <div class="layui-col-lg4 layui-col-md6">
+                <label class="layui-form-label">订单状态：</label>
+                <div class="layui-input-block">
+                    <input type="text" name="order_status_s" id="order_status" class="layui-input" disabled style="border: none;">
+                </div>
+            </div>
+
+            <div class="layui-col-lg4 layui-col-md6">
+                <label class="layui-form-label">收 银 员：</label>
+                <div class="layui-input-inline">
+                    <input type="text" name="cashier_account_s" id="cashier_account" class="layui-input" disabled style="border: none;">
+                </div>
+            </div>   
+            <div class="layui-col-lg4 layui-col-md6">
+                <label class="layui-form-label">售 货 员：</label>
+                <div class="layui-input-block" style="line-height: 36px;">                    
+                    <input type="text" name="sale_account_s" id="sale_account" style="width: 215px;" class="layui-input demo_input lay_focus" data-focus="focus" >
+                    <input type="hidden" name="sale_uid" id="sale_uid" class="layui-input" disabled style="display: none;">
+                    <button type="button" class="layui-btn change_btn" id="change_sale" lay-submit lay-filter="change_shop">更换售货员</button>
+                    <button type="button" class="layui-btn change_btn" lay-submit lay-filter="search_shop">搜索售货员</button>
+                </div>
+            </div>   
+            <div class="layui-col-lg4 layui-col-md6">
+                <label class="layui-form-label">会  员：</label>
+                <div class="layui-input-block" style="line-height: 36px;">                   
+                    <input type="text" name="user_account_s" id="user_account" style="width: 215px;" class="layui-input demo_input lay_focus" data-focus="focus">
+                    <input type="hidden" name="user_id" id="user_id" class="layui-input" disabled style="display: none;">
+                    <button type="button" class="layui-btn change_btn" id="change_user" lay-submit lay-filter="change_member">更换会员</button>
+                    <button type="button" class="layui-btn change_btn" lay-submit lay-filter="search_member">搜索会员</button>
+                </div>
+            </div>   
+        </div>
+        <div class="layui-row" id="sheet">     
+            <div class="layui-col-lg4 layui-col-md6">
+                <label class="layui-form-label">销售数量：</label>
+                <div class="layui-input-inline">
+                    <input type="text" name="num_s" id="num" class="layui-input" disabled style="border: none;">
+                </div>
+            </div> 
+            <div class="layui-col-lg4 layui-col-md6">
+                <label class="layui-form-label">使用积分：</label>
+                <div class="layui-input-inline">
+                    <input type="text" name="integral_money_s" id="integral_money" class="layui-input" disabled style="border: none;">
+                </div>
+            </div>            
+            <div class="layui-col-lg4 layui-col-md6">
+                <label class="layui-form-label">使用余额：</label>
+                <div class="layui-input-inline">
+                    <input type="text" name="user_money_s" id="user_money" class="layui-input" disabled style="border: none;">
+                </div>
+            </div>            
+            <div class="layui-col-lg4 layui-col-md6">
+                <label class="layui-form-label">总 金 额：</label>
+                <div class="layui-input-inline">
+                    <input type="text" name="total_amount_s" id="total_amount" class="layui-input" disabled style="border: none;">
+                </div>
+            </div>            
+            <div class="layui-col-lg4 layui-col-md6">
+                <label class="layui-form-label">优惠金额：</label>
+                <div class="layui-input-inline">
+                    <input type="text" name="discount_s" id="discount" class="layui-input" disabled style="border: none;">
+                </div>
+            </div>            
+            <div class="layui-col-lg4 layui-col-md6">
+                <label class="layui-form-label">实际金额：</label>
+                <div class="layui-input-inline">
+                    <input type="text" name="order_amount_s" id="order_amount" class="layui-input" disabled style="border: none;">
+                </div>
+            </div>            
+            <div class="layui-col-lg4 layui-col-md6">
+                <label class="layui-form-label">本单积分：</label>
+                <div class="layui-input-inline">
+                    <input type="text" name="integral_s" id="integral" class="layui-input" disabled style="border: none;">
+                </div>
+            </div>            
+            <div class="layui-col-lg4 layui-col-md6">
+                <label class="layui-form-label">支付方式：</label>
+                <div class="layui-input-inline">
+                    <input type="text" name="pay_name_s" id="pay_name" class="layui-input" disabled style="border: none;">
+                </div>
+            </div>      
+            <div class="layui-col-lg4 layui-col-md6">
+                <label class="layui-form-label">下单时间：</label>
+                <div class="layui-input-inline">
+                    <input type="text" name="create_time_s" id="create_time" class="layui-input" disabled style="border: none;">
+                </div>
+            </div>
+            <div class="layui-col-lg12 layui-col-md12">
+                <label class="layui-form-label">备注：</label>
+                <div class="layui-input-block">
+                    <input type="text" name="admin_note" id="admin_note" class="layui-input lay_focus" data-focus="focus">
+                </div>
+            </div>
+        </div>   
+        <hr style="margin: 20px 0;">
+        <input type="hidden" name="order_id" id="order_id">
+        <input type="hidden" name="pay_id" id="pay_id">
+        <div class="layui-row" id="sheet">
+
+            <table class="layui-hide" id="test-table-stock" lay-filter="test-table-stock"></table>
+            <script type="text/html" id="test-table-toolbar">  
+            <div class="layui-btn-container status_hide">
+                <button type="button" class="layui-btn" lay-event="addshop"><i class="layui-icon layui-icon-add-1 layuiadmin-button-btn"></i>添加商品</button>
+                <button type="button" class="layui-btn" lay-event="saopurchase"><i class="layui-icon layui-icon-edit layuiadmin-button-btn"></i>快捷扫码</button>
+                <button type="button" class="layui-btn" lay-event="delete"><i class="layui-icon layui-icon-delete layuiadmin-button-btn"></i>删除商品</button>
+            </div>
+            </script>
+            <script type="text/html" id="shop_price"> 
+            {{# if( d.member_goods_price ) { }}
+                <input type="text" name="goods[price][]" class="layui-input jisuan this_price lay_focus" data-focus="focus" style="height:100%;" value="{{d.member_goods_price}}">
+            {{# } else { }}
+                <input type="text" name="goods[price][]" class="layui-input jisuan this_price lay_focus" data-focus="focus" style="height:100%;" value="{{d.shop_price}}"> 
+            {{# } }}  
+            </script>
+            <script type="text/html" id="shop_num"> 
+                <input type="text" name="goods[num][]" class="layui-input jisuan this_num lay_focus" data-focus="focus" style="height:100%;" id="num{{d.spec_id}}" value="{{d.goods_num}}">
+            </script>
+            <script type="text/html" id="discount_num"> 
+                <input type="text" name="goods[discount_num][]" class="layui-input jisuan this_discount lay_focus" data-focus="focus" style="height:100%;" value="{{d.discount_num || ''}}">
+            </script>
+            <script type="text/html" id="all_price">
+                <input type="text" name="" class="layui-input all_price" style="height:100%;border:none;color: #666;text-align:center;" value="{{ d.all_price}}" disabled>
+                <input type="hidden" name="goods[spec_id][]" class="layui-input" value="{{d.spec_id}}" style="height:100%;display:none;">   
+            </script>
+            <script type="text/html" id="choose_remark">
+                {{# if( d.remarks ) { }}
+                    <input type="text" name="goods[remarks][]" class="layui-input this_remarks lay_focus" data-focus="focus" style="height:100%;" value="{{d.remarks}}">
+                {{# } else { }}
+                    <input type="text" name="goods[remarks][]" class="layui-input this_remarks lay_focus" data-focus="focus" style="height:100%;" value="">   
+                {{# } }}                
+            </script>
+        </div>
+    </div>
+</div>
+</div>
+</div>    
+</form>
+<script>
+layui.use(['admin','table','form','laydate','view','myprint','layer','laytpl'], function(){
+    var $ = layui.$
+    ,admin = layui.admin
+    ,view = layui.view
+    ,setter = layui.setter
+    ,table = layui.table
+    ,layer = layui.layer
+    ,laytpl = layui.laytpl
+    ,laydate = layui.laydate
+    ,myprint = layui.myprint
+    ,form = layui.form;
+
+    // $('.layadmin-tabspage-none').addClass('layadmin-side-shrink');
+    // $('#nav_slide').addClass('layui-this');
+    form.render(null, 'choose_stock');
+
+    // 获取传值参数---得到id
+    var router = layui.router();
+    // console.log(router.search);
+    var id = router.search.order_id;
+    $('#order_id').val(id);
+    
+    get_data();
+    function get_data(){  
+        // console.log(json_data);        
+        for(var i in json_data){
+            if( json_data[i].member_goods_price ){
+                json_data[i].all_price= (json_data[i].goods_num* parseFloat(json_data[i].member_goods_price)) .toFixed(2);
+            } else{
+                json_data[i].all_price= (json_data[i].goods_num* parseFloat(json_data[i].shop_price)) .toFixed(2);               
+            }   
+        }
+        // console.log(json_data)
+        if( id ){
+        var cols_val=[[
+            {type:'checkbox'}
+            ,{field:'id', width:80, title: 'ID',align:"center", sort: true,}
+            ,{field:'goods_sku', title: '商品SKU',align:"center"}
+            ,{field:'goods_name', title: '商品名称',align:"center"}
+            ,{field:'spec_key_name', title: '规格',align:"center"}
+            ,{field:'shop_price', title: '原价',align:"center",width: 90}
+            ,{field:'member_goods_price', title: '实际售价',align:"center",templet:'#shop_price'}
+            ,{field:'goods_num', title: '数量',align:"center",templet:'#shop_num',width: 110}
+            ,{field:'all_price', title: '金额',align:"center",templet:'#all_price'}
+            ,{field: 'remarks', title:'备注',width:160,align:"center",templet:'#choose_remark'}   
+            ]]
+        } else{
+        var cols_val=[[
+            {type:'checkbox'}
+            ,{field:'id', width:80, title: 'ID',align:"center", sort: true,}
+            ,{field:'goods_sku', title: '商品SKU',align:"center"}
+            ,{field:'goods_name', title: '商品名称',align:"center"}
+            ,{field:'spec_key_name', title: '规格',align:"center"}
+            ,{field:'shop_price', title: '原价',align:"center",width: 90}
+            ,{field:'member_goods_price', title: '实际售价',align:"center",templet:'#shop_price'}
+            ,{field:'discount_num', title: '折扣',align:"center",templet:'#discount_num',width: 90}
+            ,{field:'goods_num', title: '数量',align:"center",templet:'#shop_num',width: 110}
+            ,{field:'all_price', title: '金额',align:"center",templet:'#all_price'}
+            ,{field: 'remarks', title:'备注',width:160,align:"center",templet:'#choose_remark'}   
+            ]]
+        }
+        
+        table.render({
+            elem: '#test-table-stock'
+            ,data: json_data
+            ,title: "在线收银"
+            ,cellMinWidth: 80 //全局定义常规单元格的最小宽度，layui 2.2.1 新增
+            ,toolbar: '#test-table-toolbar'
+            ,cols: cols_val
+            ,where: { supplier_id:id }
+            ,limit: 10000
+        });
+        jisuan();
+        
+    }
+
+    var myobj=[];//打印头部    
+    var json_data;
+    var change_val={};
+    // 获取信息 “form” ---请求登入接口
+    $('#user_account').hide();
+    $('#sale_account').hide();
+    admin.req({
+    url: layui.setter.baseUrl+'admin/Cashier/lists' 
+    ,data: { order_id:id}
+    ,type:'get'
+    ,success: function(res){
+    if(res.code==1){
+        // console.log(res.data);
+        
+        $('#user_id').val(res.data.info.user_id);
+        $('#sale_uid').val(res.data.info.sale_uid);
+
+        // if( res.data.info.sale_account === "" &&  res.data.info.user_account === ""){
+        //     $('#sale_account').hide();
+        //     $('#user_account').hide();
+        // } else if(res.data.info.sale_account === ""){
+        //     $('#sale_account').hide();
+        // } else if( res.data.info.user_account === ""){
+        //     $('#user_account').hide();
+        // }
+        change_val.num=res.data.info.num;
+        change_val.total_amount=res.data.info.total_amount;
+        change_val.discount=res.data.info.discount;
+        change_val.order_amount=res.data.info.order_amount;
+        
+        // 赋值                  
+        form.val("choose_stock",{
+            "order_id" : res.data.info.order_id,
+            "pay_id" : res.data.info.pay_id,
+            "order_status_s" : res.data.info.order_status,
+            "shop_name_s" : res.data.info.shop_name,
+            "shop_id_s" : res.data.info.shop_id,
+            "create_time_s" : res.data.info.create_time,
+            "cashier_account_s" : res.data.info.cashier_account,
+            // "sale_account_s" : res.data.info.sale_uid,
+            // "user_account_s" : res.data.info.user_id,
+            "num_s" : change_val.num,
+            "total_amount_s" : change_val.total_amount,
+            "discount_s" : change_val.discount,
+            "order_amount_s" : change_val.order_amount,
+            "integral_money_s" : res.data.info.integral_money,
+            "user_money_s" : res.data.info.user_money,
+            "integral_s" : res.data.info.integral,
+            "pay_name" : res.data.info.pay_name,
+            "admin_note" : res.data.info.admin_note,
+        }); 
+
+        if( id ){
+            // 会员---1172
+           if(res.data.info.user_id == ""){
+                $('#user_account').hide();
+           } else{
+            $('#user_account').show();
+            $('#user_account').addClass('layui_none');
+            admin.req({
+                url: layui.setter.baseUrl + 'admin/Cashier/getUserById'
+                ,data: { uid:res.data.info.user_id  }
+                ,type: 'get'
+                ,success: function (res) {
+                    if (res.code == 1) {
+                        // 确认--时的默认设置
+                        $('#user_account').addClass('layui_none');             
+                        $('#user_account').attr('disabled',true);             
+                        $('#user_account').removeClass('layui_green');    
+                        $('#user_account').val( res.data.account ); 
+                        $('#user_id').val( res.data.id ); 
+                    } else {           
+                        $('#user_account').val("");  
+                        layer.msg(res.msg);
+                    }
+                }
+            }); 
+            }
+        
+            // 售货员---1004
+            if( res.data.info.sale_uid == ""){
+                $('#sale_account').hide();
+            } else{
+            $('#sale_account').show();
+            $('#sale_account').addClass('layui_none');
+            admin.req({
+                url: layui.setter.baseUrl + 'admin/Cashier/getWorkerById' 
+                ,data: { uid:res.data.info.sale_uid  }
+                ,type: 'get'
+                ,success: function (res) {
+                    if (res.code == 1) {
+                        // 确认--时的默认设置
+                        $('#sale_account').addClass('layui_none');             
+                        $('#sale_account').attr('disabled',true);             
+                        $('#sale_account').removeClass('layui_green');    
+                        $('#sale_account').val( res.data.username ); 
+                        $('#sale_uid').val( res.data.id ); 
+                    } else {           
+                        $('#sale_account').val("");  
+                        layer.msg(res.msg);
+                    }
+                }
+            }); 
+            }
+        } else{
+            $('#user_account').show();
+            $('#sale_account').show();
+            $('#user_account').addClass('layui_green');
+            $('#sale_account').addClass('layui_green');
+            $('#user_account').val("");
+            $('#sale_account').val("");
+        }
+        
+        
+        // 打印
+        myobj['店铺名称']=res.data.info.shop_name;           
+        myobj['订 单 号']=res.data.info.shop_id;              
+        myobj['订单状态']=res.data.info.order_status; 
+        myobj['收 银 员']=res.data.info.cashier_account;                         
+        myobj['售 货 员']=res.data.info.sale_account; 
+        myobj['会   员']=res.data.info.user_account;        
+        myobj['销售数量']=res.data.info.num;       
+        myobj['使用积分']=res.data.info.integral_money;       
+        myobj['使用余额']=res.data.info.user_money;       
+        myobj['总 金 额']=res.data.info.total_amount;       
+        myobj['优惠金额']=res.data.info.discount;       
+        myobj['实际金额']=res.data.info.order_amount;       
+        myobj['本单积分']=res.data.info.integral;       
+        myobj['支付方式']=res.data.info.pay_name;       
+        myobj['下单时间']=res.data.info.create_time;       
+        myobj['备注']=res.data.info.admin_note;    
+        
+        // 自定义json
+        json_data = res.data.lists;        
+        // console.log(JSON.stringify(json_data));   
+        get_data();
+        jisuan();
+
+        form.render();
+    }else{
+        layer.msg(res.msg);
+    }
+    }
+    }); 
+    
+    function change_data_num(){
+        var total=0;  // 销售数量
+        var all_money=0;  // 总金额
+        var yh_money=0;  // 优惠金额
+        var really_money=0;  // 实际金额
+        $.each(json_data,function(i, val) {
+            v1 = parseFloat(val.goods_num);
+            total += v1;           
+            v2 = parseFloat(val.shop_price)*val.goods_num;
+            all_money += v2;
+            v3 = parseFloat(val.shop_price-val.member_goods_price)*val.goods_num;
+            v3 = isNaN(v3)? parseFloat(val.shop_price-val.shop_price)*val.goods_num:v3;
+            yh_money += v3;
+            v4 = parseFloat(all_money-yh_money);
+            really_money = v4;
+        });
+        change_val.num=total; 
+        change_val.total_amount=all_money.toFixed(2); 
+        change_val.discount=yh_money.toFixed(2); 
+        change_val.order_amount=really_money.toFixed(2); 
+        // 赋值                  
+        form.val("choose_stock",{
+            "num_s" : change_val.num,
+            "total_amount_s" : change_val.total_amount,
+            "discount_s" : change_val.discount,
+            "order_amount_s" : change_val.order_amount
+        }); 
+        // console.log(yh_money);
+    }
+
+    $('body').on('blur','.layui-table .layui-input',function(){              
+        var id=$(this).parents('tr').attr('data-index');     
+        var items_num=$(this).parents('tr').find('.this_num').val();
+        var items_price=$(this).parents('tr').find('.this_price').val();
+        var items_remarks=$(this).parents('tr').find('.this_remarks').val();
+        json_data[id].goods_num=items_num;
+        json_data[id].member_goods_price=items_price;
+        json_data[id].remarks=items_remarks;
+        // console.log(json_data); 
+        var items_discount=$(this).parents('tr').find('.this_discount').val();
+        json_data[id].discount_num=items_discount;           
+        change_data_num();         
+    });
+    
+    // 计算   
+    jisuan(); 
+    function jisuan(){
+        $('body').on('blur','.layui-table .jisuan',function(){         
+            var index=$(this).parents('tr').attr('data-index');            
+            var items_num=$(this).parents('tr').find('.this_num').val();
+            var items_price=$(this).parents('tr').find('.this_price').val();            
+            // console.log(items_num+'******'+items_num+'*****'+zongjia);            
+            var zongjia=(items_num*items_price).toFixed(2);
+            $(this).parents('tr').find('.all_price').val(zongjia);
+        });
+        if( !id ){
+        $('body').on('change','.layui-table .this_discount',function(){         
+            var index=$(this).parents('tr').attr('data-index'); 
+            // 当改变折扣时
+            var items_discount=$(this).parents('tr').find('.this_discount').val();
+            // console.log(discount);     
+            var result_zk=(json_data[index].shop_price*items_discount).toFixed(2);
+            $(this).parents('tr').find('.this_price').val(result_zk);           
+        });
+        $('body').on('change','.layui-table .this_price',function(){     
+            console.log(json_data);                            
+            var index=$(this).parents('tr').attr('data-index'); 
+            var items_price=$(this).parents('tr').find('.this_price').val(); 
+            // 当改变实际售价时  
+            var result_sj=parseFloat(items_price)/parseFloat(json_data[index].shop_price);
+            $(this).parents('tr').find('.this_discount').val(result_sj.toFixed(2));           
+        });
+        }
+    }
+  
+    $('body').on('keypress',".lay_focus",function(event){
+    if(event.keyCode ==13){
+        // console.log(event);
+        focusNextInput(this)
+    }
+    });
+    function focusNextInput(thisInput){  
+        var inputs = $('input[data-focus="focus"]');   
+        for(var i = 0;i<inputs.length;i++){   
+            // 如果是最后一个，则焦点回到第一个   
+            if(i==(inputs.length-1)){   
+                inputs[0].focus(); break;   
+            }else if(thisInput == inputs[i]){   
+                inputs[i+1].focus(); break;   
+            }   
+        }    
+    }   
+    
+    // 更换会员
+    $('#user_account').on('keypress',function(event){           
+        if(event.keyCode == 13){  
+            var val=$(this).val(); 
+            // 值
+            admin.req({
+                url: layui.setter.baseUrl + 'admin/Cashier/getUserById'
+                ,data: { uid:val  }
+                ,type: 'get'
+                ,success: function (res) {
+                    if (res.code == 1) {
+                        // 确认--时的默认设置
+                        $('#user_account').addClass('layui_none');             
+                        $('#user_account').attr('disabled',true);             
+                        $('#user_account').removeClass('layui_green');    
+                        $('#user_account').val( res.data.account ); 
+                        $('#user_id').val( res.data.id ); 
+                    } else {           
+                        $('#user_account').val("");  
+                        layer.msg(res.msg);
+                    }
+                }
+            });         
+        }  
+    });
+    form.on('submit(change_member)', function(data){
+        // 点击--时的默认设置    
+        $('#user_account').show();  
+        $('#user_account').addClass('layui_green');             
+        $('#user_account').attr('disabled',false);             
+        $('#user_account').removeClass('layui_none');     
+        var u_id=$('#user_id').val(); 
+        $('#user_account').val(u_id);  
+        $('#user_account').focus();    
+    });
+    // 搜索会员
+    form.on('submit(search_member)', function(data){
+    admin.popup({
+        title: "选择会员",
+        area: admin.screen() < 2 ? ['95%', '90%'] : ["800px", "640px"],
+        id: "LAY-popup-add_menu",
+        success: function (layero, index) {
+        view(this.id).render('/cashier/get_user').done(function () {
+        form.render(null, 'app-content-list');
+        table.on('tool(test-table-add_store)', function (obj) {
+            // console.log(obj.data);
+            $('#user_account').show();
+            $('#user_account').addClass('layui_none');             
+            $('#user_account').attr('disabled',true);             
+            $('#user_account').removeClass('layui_green');    
+            $('#user_account').val( obj.data.account ); 
+            $('#user_id').val( obj.data.id ); 
+            layer.close(index); 
+        });
+        });
+        }
+    });
+    });
+    
+    // 更换售货员
+    $('#sale_account').on('keypress',function(event){           
+        if(event.keyCode == 13){    
+            var val=$(this).val();    
+            // 值
+            admin.req({
+                url: layui.setter.baseUrl + 'admin/Cashier/getWorkerById' 
+                ,data: { uid:val  }
+                ,type: 'get'
+                ,success: function (res) {
+                    if (res.code == 1) {
+                        // 确认--时的默认设置
+                        $('#sale_account').addClass('layui_none');             
+                        $('#sale_account').attr('disabled',true);             
+                        $('#sale_account').removeClass('layui_green'); 
+                        $('#sale_account').val( res.data.username ); 
+                        $('#sale_uid').val( res.data.id ); 
+                        $('#user_account').focus();  
+                        
+                        $('#change_user').click();
+                    } else {
+                        $("#sale_account").val("");  
+                        layer.msg(res.msg);
+                    }
+                }
+            });         
+        }  
+    });
+    form.on('submit(change_shop)', function(data){
+        // 点击--时的默认设置   
+        $('#sale_account').show();  
+        $('#sale_account').addClass('layui_green');             
+        $('#sale_account').attr('disabled',false);             
+        $('#sale_account').removeClass('layui_none'); 
+        var s_uid=$('#sale_uid').val();     
+        $('#sale_account').val(s_uid);  
+        $('#sale_account').focus();     
+    });
+    // 搜索售货员
+    form.on('submit(search_shop)', function(data){
+    admin.popup({
+        title: "选择售货员",
+        area: admin.screen() < 2 ? ['95%', '90%'] : ["800px", "640px"],
+        id: "LAY-popup-add_menu",
+        success: function (layero, index) {
+        view(this.id).render('/cashier/get_worker').done(function () {
+        form.render(null, 'app-content-list');
+        table.on('tool(test-table-add_store)', function (obj) {
+            // console.log(obj.data);
+            $('#sale_account').show();
+            $('#sale_account').addClass('layui_none');             
+            $('#sale_account').attr('disabled',true);             
+            $('#sale_account').removeClass('layui_green'); 
+            $('#sale_account').val( obj.data.real_name ); 
+            $('#sale_uid').val( obj.data.id ); 
+            layer.close(index); 
+
+        });
+        });
+        }
+    });
+    });
+
+    // 检查是否已经添加  
+    function check_data(data){
+        if(json_data==''){
+            json_data.push(data);
+            get_data();
+            layer.msg('添加成功' , {icon: 1,time: 1500});
+        }else{
+            for(var i in json_data){
+                if(json_data[i].spec_id==data.spec_id){
+                    layer.msg('不能重复添加', {icon: 5,anim: 6,shade:0.5,time: 1500});
+                    return;
+                }
+            }
+            layer.msg('添加成功' , {icon: 1,time: 1500});
+            json_data.push(data);
+            get_data();  
+            jisuan();  
+        }
+    }
+
+    // 检查是否已经添加  未重复则进行添加  重复则 数量up 
+    function quick_check_data(data,num){        
+        if(json_data==''){
+            json_data.push(data);
+            get_data();
+            layer.msg('添加成功' , {icon: 1,time: 1500});
+        }else{
+            for(var i in json_data){
+                    // console.log("json_data["+i+"].spec_id"+":"+json_data[i].spec_id);
+                    // console.log("data.spec_id"+":"+data.spec_id); 
+                if(json_data[i].spec_id==data.spec_id){
+                    var items_num=$('#num'+data.spec_id).val();
+                    // layer.msg('重复添加!!!');
+                    json_data[i].goods_num=parseInt(items_num)+parseInt(num);
+                    get_data();  
+                    jisuan();  
+                    return ;
+                }
+            }
+            layer.msg('添加成功' , {icon: 1,time: 1500});
+            json_data.push(data);
+            get_data();  
+            jisuan();  
+        }
+    }
+    
+    //头部事件--调出店铺
+    table.on('toolbar(test-table-stock)', function(obj){
+    var checkStatus = table.checkStatus(obj.config.id);
+    switch(obj.event){
+    case 'addshop':
+    admin.popup({
+        title: "添加商品",
+        area: ["880px", "600px"],
+        success: function(e, i) {
+        view(this.id).render('/cost/add_goods').done(function() { 
+        table.on('tool(test-table-reload)', function(obj){
+            var data = obj.data;
+            if(obj.event === 'choose'){
+            var d=obj.data.spec;
+            if(obj.data.spec.length>1){
+            admin.popup({
+                title: "规格",
+                area: admin.screen() < 2 ? ['95%', '90%'] :["550px", "350px"],
+                id: "LAY-popup-choose_guige",
+                success: function(layero, index){
+                view(this.id).render('/stock/choose_guige',d).done(function() {
+                    form.render(null, 'choose_guige'); // 弹窗的lay-filter值
+                    // 提交
+                    form.on('submit(submit_choose_guige)',function(datas){
+                    // console.log(datas.field);
+                    if(datas.field.spec_id==undefined){
+                        layer.msg('请选择商品规格', {icon: 5,anim: 6,shade:0.5,time: 1500});
+                        return
+                    }
+                    admin.req({
+                    url: layui.setter.baseUrl + 'admin/Cashier/getSpecStock' 
+                    ,data: { spec_id : datas.field.spec_id }
+                    ,type: 'get'
+                    ,success: function (res) {
+                        if (res.code == 1) {
+                            if( res.data.stock <=0){
+                                layer.msg("库存不足", {icon: 5,anim: 6,shade:0.5,time: 1000});  
+                            } else{
+                                if( id == undefined){
+                                    res.data.member_goods_price =res.data.shop_price;
+                                } else{
+                                }      
+                                res.data.goods_num ="1"; 
+                                res.data.spec_key_name = res.data.spec_name;      
+                                res.data.goods_sku = res.data.spec_sku;      
+                                check_data(res.data);
+                                change_data_num();
+                                jisuan();
+                            }                                    
+                        } else {
+                            layer.msg(res.msg);
+                        }
+                    }
+                    });
+                    });
+                    
+                
+                });
+                }
+            });
+            }else{
+                admin.req({
+                url: layui.setter.baseUrl + 'admin/Cashier/getSpecStock' 
+                ,data: { spec_id : obj.data.spec[0].spec_id }
+                ,type: 'get'
+                ,success: function (res) {
+                if (res.code == 1) { 
+                    // console.log(res.data);
+                    if( res.data.stock <=0){
+                        layer.msg("库存不足", {icon: 5,anim: 6,shade:0.5,time: 1000});
+                    } else{                                
+                        if( id == undefined){
+                            res.data.member_goods_price =res.data.shop_price;
+                        } else{
+                        }      
+                        res.data.goods_sku =res.data.spec_sku;                          
+                        res.data.goods_num ="1";                                              
+                        check_data(res.data);
+                        change_data_num();
+                        jisuan();
+                    }
+                } else {
+                    layer.msg(res.msg);
+                }
+                }
+                });
+            }            
+            } 
+        });
+        });
+    }   
+    });
+    break;
+    // 扫码
+    case 'saopurchase':
+    admin.popup({
+    title: "快捷扫码",
+    area: ["500px",'300px'],            
+    id: "LAY-popup-sao_purchase",
+    success: function(e, i) {
+        view(this.id).render('/purchase/sao_purchase').done(function() {
+        // 键盘回车事件
+        $(document).on('keydown', function(e){ 
+            if(e.keyCode == 13){
+                event.preventDefault();
+                $('#saoma_submit').click();
+                return false; //阻止系统默认回车事件
+            }
+        });
+        form.on('submit(saoma_submit)',function(e){
+            // console.log(e.field);
+            admin.req({
+            url: layui.setter.baseUrl+'admin/Cashier/searchByGoodsSku' 
+            ,data: { spec_sku: e.field.spec_sku }
+            ,type:'get'
+            ,success: function(res){
+                if(res.code==1){      
+                    var data = res.data; 
+                    // if( !id ){
+                    //     var items_discount=$('.layui-table .jisuan').parents('tr').find('.this_discount').val();                 
+                    //     data.discount_num=items_discount; 
+                    // }
+                                        
+                    data.id=res.data.spec_id;                  
+                    data.goods_sku=res.data.spec_sku;                  
+                    data.spec_key_name=res.data.spec_name;                  
+                    data.goods_num=e.field.num;                   
+                    data.all_price=(res.data.shop_price*e.field.num).toFixed(2);   
+                    
+                    $('#spec_input').val("");
+                    $('input[name="spec_sku"]').focus();               
+                    quick_check_data(data,e.field.num);    
+                    change_data_num(); 
+                    var music_html='<audio src="/static/admin/src/style/res/suc.mp3" controls="controls" autoplay="autoplay"></audio>';
+                    $('#add_music').html(music_html);                   
+                }else{
+                    $('#spec_input').val("");
+                    $('input[name="spec_sku"]').focus(); 
+                    var music_html='<audio src="/static/admin/src/style/res/err.mp3" controls="controls" autoplay="autoplay"></audio>';
+                    $('#add_music').html(music_html);         
+                    layer.msg(res.msg, {icon: 5,anim: 6,shade:0.5,time: 1500});
+                }
+            }
+            });   
+        });
+        });
+            $(document).on('keydown', this.enterEsc); //监听键盘事件，关闭层  
+        },
+        end: function() {
+            $(document).off('keydown', this.enterEsc); //解除键盘关闭事件
+        }
+        
+     });
+    break;
+    // 删除商品操作
+    case 'delete':
+        var checkStatus = table.checkStatus('test-table-stock')
+            ,data = checkStatus.data;   
+
+        if(checkStatus.data == ""){
+            layer.msg( "请选择您要删除的商品", {icon: 5,time: 1000});
+            
+        } else{                
+            for(var i in data){
+            for(j in json_data){
+                if(data[i].id==json_data[j].id){
+                    json_data.splice(j, 1);
+                    change_data_num();
+                    get_data();
+                }
+            }
+            }
+        }         
+    break;
+    };
+    });
+
+    // 保存
+    form.on('submit(save_submit)',function(e){
+        // console.log(e.field);   
+        // return     
+        if(json_data== ''){
+            layer.msg('商品不能为空', {icon: 5,anim: 6,shade:0.5,time: 1500});
+        }else{
+            admin.req({
+                url: layui.setter.baseUrl+'admin/Cashier/lists'
+                ,data: e.field
+                ,type:'post'
+                ,success: function(res){
+                    if(res.code==1){   
+                        if( id == undefined){
+                            location.href="#/cashier/sheetlist_choose/order_id="+res.data.id
+                        } else{                            
+                            layer.msg(res.msg, {icon: 1,time: 900});  
+                        }   
+                                     
+                        form.render();                       
+                    }else{
+                        layer.msg(res.msg, {icon: 5,anim: 6,shade:0.5,time: 1500});
+                    }       
+                } 
+            });
+        }        
+    });
+
+    // 完成
+    form.on('submit(wancheng_submit)',function(e){
+    // console.log(e.field);        
+    // return;
+
+    if(json_data== ''){
+        layer.msg('商品不能为空', {icon: 5,anim: 6,shade:0.5,time: 1500});
+    }else{          
+    // 先保存
+    admin.req({
+    url: layui.setter.baseUrl+'admin/Cashier/lists'
+    ,data: e.field
+    ,type: 'post'
+    ,success: function(res){
+    if(res.code==1){                
+    // 再弹窗
+    admin.popup({
+        title: "在线收银",
+        area: admin.screen() < 2 ? ['95%', '90%'] : ["600px", "370px"],
+        id: "LAY-popup-add_menu",
+        success: function (layero, index) {
+        view(this.id).render('/cashier/complete',res.data.id).done(function () {
+        //监听提交
+        form.on('submit(component-form-element)', function (data) {
+            var field = data.field; //获取提交的字段
+            if( $('#moling').prop('checked')==true ){
+                field.moling=1;
+            } else{
+                field.moling=0;
+            }   
+            console.log(field);     
+            var p_data={};
+            p_data.order_id= field.order_id;
+            p_data.pay_id= e.field.pay_id;
+
+                
+            var value =$('#u_integral').val();                                        
+            var value1 =$('#u_money').val();   
+                                                
+            if( value >parseInt(field.use_integral) ){
+                layer.msg("积分不足!!!");
+            } else if( value1 > parseInt(field.use_money) ){
+                layer.msg("余额不足!!!");
+            } else if( $("#order_amount_s").html() <0){
+                layer.msg("应付余额输入错误!!!");
+            } else{       
+            admin.req({
+            url: layui.setter.baseUrl+'admin/Cashier/complete'
+            ,data:  { order_id:field.order_id,use_integral:field.u_integral,use_money:field.u_money,moling:field.moling }
+            ,type: 'post'
+            ,success: function(res){
+                if(res.code==1){
+                layer.close(index); // 关闭弹窗
+                admin.popup({
+                    title: "零售单支付",
+                    area: admin.screen() < 2 ? ['95%', '90%'] : ["600px", "520px"],
+                    id: "LAY-popup-add",
+                    success: function (layero, index) {
+                    view(this.id).render('/cashier/payment',p_data).done(function () {
+                    // 线上支付
+                    form.on("submit(lay_online)", function(online){ 
+                    var lay_id=$(this).attr('lay-id');
+                    if( lay_id == 1 ){
+                        admin.req({
+                        url: layui.setter.baseUrl+'admin/Cashier/getPayConfig'
+                        ,data:  { order_id:field.order_id, pay_id:lay_id}
+                        ,type: 'post'
+                        ,success: function(res){
+                            if(res.code==1){
+                                // console.log(res.data);
+                                layer.msg(res.msg, {icon: 1,time: 1000},function(){
+                                    location.href="#/cashier/sheetlist_detail/order_id="+field.order_id
+                                });
+                            }else{
+                                layer.msg(res.msg, {icon: 5,anim: 6,shade:0.5,time: 1500});
+                            }       
+                        } 
+                        });
+                    } else{
+                    admin.popup({
+                    title: "请扫码",
+                    area: ["500px",'170px'],            
+                    id: "LAY-popup-sao_purchase",
+                    success: function(e, i) {
+                        view(this.id).render('/cashier/sweep_code').done(function() {
+                        $('#code_inp').focus();
+                        form.on("submit(code_btn)", function(code){ 
+                        // console.log(code.field);
+                        admin.req({
+                        url: layui.setter.baseUrl+'admin/Cashier/getPayConfig'
+                        ,data:  { order_id:field.order_id, pay_id:lay_id,auth_code:code.field.auth_code}
+                        ,type: 'post'
+                        ,success: function(res){
+                            if( res.code == 1 ){
+                                // console.log(res.data);  
+                                layer.msg(res.msg, {icon: 1,time: 1000},function(){
+                                    location.href="#/cashier/sheetlist_detail/order_id="+field.order_id
+                                });
+                            } else if( res.code == 2 ){
+                                var a_code = $('#code_inp').val();
+
+                                var myMsg = layer.msg(res.msg, {
+                                        icon: 16,
+                                        time:false //取消自动关闭
+                                });
+                                // layer.msg(res.msg, { icon: 16});
+                                
+                               let aa = setInterval(function(){
+                                admin.req({
+                                    url: layui.setter.baseUrl+'admin/Cashier/getPayStatus'
+                                    ,data:  { order_id:field.order_id}
+                                    ,type: 'get'
+                                    ,success: function(res){
+                                        if( res.code == 1 ){
+                                            clearInterval(aa);  
+                                            layer.close(myMsg);//手动关闭 
+                                            layer.msg(res.msg, {icon: 1,time: 1000},function(){
+                                                location.href="#/cashier/sheetlist_detail/order_id="+field.order_id
+                                            });
+                                        } else if( res.code == 2 ){
+                                            layer.msg(res.msg, { icon: 16 });                                         
+                                        } else if( res.code == 0 ){
+                                            clearInterval(aa);
+                                            layer.close(myMsg);//手动关闭 
+                                            layer.msg(res.msg, {icon: 5,anim: 6,shade:0.5,time: 1500});
+                                        }
+                                    } 
+                                }); 
+                                
+                               },3000);
+                               
+                           
+                            // 288097395358345959
+                                
+                                
+                                
+                            } else if( res.code == 0 ){
+                                layer.msg(res.msg, {icon: 5,anim: 6,shade:0.5,time: 1500});
+                            }       
+                        } 
+                        });
+                            
+                        });
+                        });
+                    }   
+                    });    
+                    }
+                  
+                        
+                    });  
+
+   
+                    
+                    
+                    });
+                    }
+                });
+                }else{
+                    layer.msg(res.msg, {icon: 5,anim: 6,shade:0.5,time: 1500});
+                }       
+            } 
+            });
+            }
+
+            
+
+
+
+        
+        });
+        
+        });
+        }
+    });           
+    }else{
+        layer.msg(res.msg, {icon: 5,anim: 6,shade:0.5,time: 1500});
+    }       
+    } 
+    });    
+        
+    }
+    });
+
+    // 取消订单
+    form.on('submit(quxiao_submit)',function(e){
+        // console.log(e.field);
+        // return
+        admin.req({
+            url: layui.setter.baseUrl+'admin/Cashier/cancel'
+            ,data: {order_id: e.field.order_id}
+            ,type:'get'
+            ,success: function(res){
+                if(res.code==1){
+                    location.href = '#/cashier/sheetlist_detail/order_id='+e.field.order_id;
+
+                }else{
+                    layer.msg(res.msg, {icon: 5,anim: 6,shade:0.5,time: 1000});
+                }       
+            } 
+        });
+      
+    });
+
+    // 单据打印
+    form.on('submit(print)',function(e){
+        // console.log(e.field);
+        myprint.myprint(myobj,'test-table-stock');
+    });
+    
+    
+
+});
+</script>

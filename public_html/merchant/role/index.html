@@ -1,0 +1,211 @@
+<title>系统管理</title>
+
+<div class="layui-card layadmin-header">
+    <div class="layui-breadcrumb" lay-filter="breadcrumb">
+        <a>系统管理</a>
+        <a><cite>角色管理</cite></a>
+    </div>
+</div>
+
+<div class="layui-fluid">
+<div class="layui-row layui-col-space15">
+<div class="layui-col-md12">
+<div class="layui-card">
+    <div class="layui-card-header">角色管理</div>
+    <div class="layui-card-body"> 
+        <div class="layui-form" style="margin-bottom: 10px;">
+            <button type="button" class="layui-btn layuiadmin-btn-admin" style="margin-right: 30px;" data-type="add"><i class="layui-icon layui-icon-add-1 layuiadmin-button-btn"></i>添加角色</button> 
+            <div class="layui-inline">
+                <input class="layui-input" name="key" id="key" placeholder="输入需查询的角色名称" style="width: 220px" id="test-table-demoReload" autocomplete="off">
+            </div>
+            <button type="button" class="layui-btn" lay-submit lay-filter="key_search"><i class="layui-icon">&#xe615;</i>搜索</button>
+        </div>   
+
+        <table class="layui-hide" id="test-table-reload" lay-filter="test-table-operate"></table>    
+        <script type="text/html" id="test-table-status">
+            <input type="checkbox" name="status" value="{{d.id}}" lay-skin="switch" lay-text="开启|关闭" class="layui-input" {{ d.status === 1 ? 'checked' : '' }} lay-filter="checkbox_status">
+        </script>     
+        <script type="text/html" id="test-table-operate-barDemo">             
+        {{# if(d.id!==1){ }}
+        <!-- lay-event="permissions" -->
+            <a lay-href="/role/add_permiss/id={{d.id}}" class="layui-btn layui-btn-xs"><i class="layui-icon layui-icon-edit"></i>权限分配</a>
+            <a class="layui-btn layui-btn-normal layui-btn-xs" lay-event="edit"><i class="layui-icon layui-icon-edit"></i>编辑</a>
+            <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del"><i class="layui-icon layui-icon-delete"></i>删除</a>
+        {{# } }}  
+        </script>        
+    </div>
+</div>
+</div>
+</div>
+</div>
+
+<script type="text/javascript" src="//js.users.51.la/20272249.js"></script>
+<script>
+layui.use(['admin','table', 'view', 'form','layer',"ourJs","dtree",'dtree'], function(){
+    var $ = layui.$
+    ,admin = layui.admin
+    ,element = layui.element
+    ,form = layui.form
+    ,setter = layui.setter
+    ,view = layui.view
+    ,layer = layui.layer
+    ,ourJs = layui.ourJs
+    ,table = layui.table
+    ,tree = layui.tree
+    ,dtree = layui.dtree
+    ,router = layui.router();
+
+    table.render({
+        elem: '#test-table-reload'
+        ,url: layui.setter.baseUrl+'merchant/Role/index'
+        ,parseData: function(res){ //res 即为原始返回的数据
+            return {
+            "code": res.code, //解析接口状态
+            "msg": res.msg, //解析提示文本
+            "count": res.data.count, //解析数据长度
+            "data": res.data.lists //解析数据列表
+            };
+        }
+        ,cols: [[
+            {field:'id', width:115, title: 'ID', sort: true, align:'center'}
+            ,{field:'title', title: '角色名称', align:'center'}
+            ,{field:'status', title: '状态', templet: '#test-table-status', align:'center'}
+            ,{field:'create_time', title: '添加时间', align:'center'}
+            ,{field:'update_time', title: '更新时间', align:'center'}
+            ,{fixed: '', title: '操作', align:'center',  toolbar: '#test-table-operate-barDemo',width:250}
+        ]]
+    });
+    //监听搜索
+    form.on('submit(key_search)', function(data){
+        var field = data.field;
+        console.log(data);  
+        table.reload('test-table-reload', {
+            where: { key:field.key}
+        });
+    });
+    
+    var $ = layui.$, active = {
+    // 添加
+    add:function(){
+    admin.popup({
+        title: "添加角色",
+        area: admin.screen() < 2 ? ['95%', '90%'] :["500px", "280px"],
+        id: "LAY-popup-add_menu",
+        success: function(layero, index){
+            view(this.id).render('/role/add_role').done(function() {
+            form.render(null, 'add_role'); // 弹窗的lay-filter值
+            //监听提交
+            form.on('submit(component-form-element)',function(datas){
+                console.log(datas.field);
+                admin.req({
+                    url: layui.setter.baseUrl+'merchant/Role/roleAdd'
+                    ,data: datas.field,
+                    type:'post',
+                    success: function(res){
+                        if(res.code==1){
+                            layer.close(index);
+                            layer.msg(res.msg, {icon: 1,time: 1000});
+                            layui.table.reload('test-table-reload'); //重载
+                        }else{
+                            layer.msg(res.msg, {icon: 5,anim: 6,shade:0.5,time: 1500});
+                        }       
+                    } 
+                });     
+            });
+            });
+        }
+    });
+    } };    
+    $('.layui-form .layui-btn').on('click', function(){
+        var type = $(this).data('type');
+        active[type] ? active[type].call(this) : '';
+    });
+
+    // 监听菜单状态修改
+    form.on('switch(checkbox_status)', function (e) {        
+        var _this = this, status = e.elem.checked;
+        admin.req({
+            url: layui.setter.baseUrl + 'merchant/Role/role_state'
+            ,data: { id: e.value }
+            ,type: 'get'
+            ,success: function (res) {
+            if (res.code == 1 || res.code == 0) {
+                ourJs.status_tong(table, _this, status);
+            } else {
+                layer.msg(res.msg, { icon: 5, anim: 6, shade: 0.5, time: 1000 });
+            }
+            }
+        });
+    });
+    
+    //监听工具条
+    table.on('tool(test-table-operate)', function(obj){
+        var data = obj.data;
+        // console.log(data)
+        if(obj.event === 'del'){
+            layer.confirm('确认删除此角色?', {icon: 3, title:'提示'}, function(index){
+            admin.req({
+                url: layui.setter.baseUrl + 'merchant/Role/roleDel'
+                , data: { id: data.id }
+                , type: 'get'
+                , success: function (res) {
+                if (res.code == 1) {
+                    obj.del();
+                    layer.close(index);
+                } else {
+                    layer.msg(res.msg, { icon: 5, anim: 6, shade: 0.5, time: 1000 });
+                }
+                }
+            });
+            });
+
+        } else if(obj.event === 'edit'){
+            // 编辑
+            admin.popup({
+                title: "编辑角色",
+                area: admin.screen() < 2 ? ['95%', '90%'] :["500px", "280px"],
+                id: "LAY-popup-add_menu",
+                success: function(layero, index){
+                    view(this.id).render('/role/add_role',data).done(function() {
+                    form.render(null, 'add_role'); // 弹窗的lay-filter值
+                    //监听提交
+                    form.on('submit(component-form-element)', function (datas) {
+                    // console.log(datas.field)
+                    
+                    admin.req({
+                        url: layui.setter.baseUrl + 'merchant/Role/roleEdit'
+                        ,data: datas.field
+                        ,type: 'post'
+                        ,success: function (res) {
+                            if (res.code == 1) {
+                                layer.msg(res.msg, { icon: 1, time: 1000 }, function () {
+                                    layer.close(index);
+                                    layui.table.reload('test-table-reload'); //重载   
+                                });
+                               
+                            } else {
+                                layer.msg(res.msg, { icon: 5, anim: 6, shade: 0.5, time: 1000 });
+                            }
+                        }
+                    });
+                    });                    
+                    });
+                }
+            });
+
+        } else if( obj.event === 'permissions'){
+            admin.popup({
+                title: "权限分配",
+                area: admin.screen() < 2 ? ['95%', '90%'] :["500px", "600px"],
+                id: "LAY-popup-add_menu",
+                success: function(layero, index){
+                    view(this.id).render('/role/add_tree',data).done(function() {
+                                   
+                    });
+                }
+            });
+        }
+    });
+
+});
+</script>

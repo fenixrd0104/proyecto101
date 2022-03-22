@@ -1,0 +1,343 @@
+{include file="public/header"/}
+<style>
+    #submit_btn2 {
+        margin-left: 0.1rem;
+        width: 0.8rem;
+        border-right: 1px solid rgba(192, 192, 192, 0.8);
+        display: none;
+    }
+
+    .buy_content {
+        padding-bottom: 0 !important;
+    }
+
+    html,
+    body {
+        height: 100%;
+        min-height: 100%;
+        position: relative;
+    }
+</style>
+</head>
+
+<body style="background: #f2f2f2;">
+    <header class="mui-bar mui-bar-nav index_header shop_head bg_white" id="header">
+        <a class="mui-action-back mui-icon mui-icon-left-nav mui-pull-left" href="javascript:;"></a>
+        <a id="menu" class="mui-action-menu mui-icon mui-icon-bars mui-pull-right" href="javascript:void(0);"></a>
+        <h1 class="mui-title">Fill out order</h1>
+    </header>
+    <div class="mui-content buy_content">
+        <!-- Default address information -->
+        <div class="buy_address">
+            <a class="buyadd_txt_a" href="javascript:;">
+                <div class="buyadd_txt">
+                    <span class="name"></span>
+                    <span class="phone"></span>
+                    <p class="address mui-ellipsis"><i class="iconfont icon-dizhi"></i>&nbsp;&nbsp;</p>
+                </div>
+                <i class="iconfont icon-rightArrow"></i>
+            </a>
+            <div class="buyadd_none" style="display: none;">
+                <p>The user has not set the delivery address, please fill in immediately</p>
+            </div>
+            <div class="bg"><img src="__IMG__/tt.png" alt=""></div>
+        </div>
+        <!-- Product Information -->
+        <div class="buy_cont" id="buy_cont">
+            <!-- <div class="buy_logo">
+                <i class="iconfont icon-shandian1"></i>
+                <p class="mui-ellipsis"></p>
+            </div> -->
+            <div class="buy_store mui-clearfix">
+                <div class="buyst_pic fl"><img src="__IMG__/upload_1.png" alt=""></div>
+                <div class="buyst_content fr">
+                    <h1 class="mui-ellipsis-2"></h1>
+                    <p class="hui"></p>
+                    <p class="red"></p>
+                    <span class="num fr"></span>
+                </div>
+            </div>
+        </div>
+        <!-- <div class="buy_shipping">
+        <p class="s_title">Choose a shipping method</p>
+        <ul class="buyship_ul">
+            <li>
+                <p class="b_hei fl">Fast Shipping</p>
+                <i class="iconfont icon-duihao1 fr i_red"></i>
+                <p class="b_hui cfl">Delivery available on weekdays, weekends and holidays</p>
+            </li>
+        </ul>
+    </div> -->
+        <!-- Points, Balance -->
+        <ul class="buy_maler">
+            <li>
+                <p class="m_hei fl">Basic Services:</p>
+                <p class="m_yellow fr">Seven days no reason to return is not supported</p>
+            </li>
+            <li>
+                <p class="m_hei fl">Order Notes:</p>
+                <input class="m_inp fr" id="content_s" type="text" placeholder="optional, please fill in order notes">
+            </li>
+            <li>
+                <p class="m_hei fl">Total items:</p>
+                <p class="m_red fr">Total <span id="anum"></span>pieces</p>
+            </li>
+            <li>
+                <p class="m_hei fl">Item Amount:</p>
+                <p class="m_red fr"><span id="goods_price">0.00</span> KRC</p>
+            </li>
+            <li>
+                <p class="m_hei fl">Shipping Fees:</p>
+                <p class="m_red fr"><span id="shipping_price">0.00</span> KRC</p>
+            </li>
+            <!-- <li>
+            <p class="m_hei fl">Offer:</p>
+            <p class="m_red fr"><span id="cut_fee">0.00</span>yuan</p>
+        </li> -->
+            <li id="preferential" style="display:none;">
+                <p class="m_hei fl">Coupon credit:</p>
+                <p class="m_red fr">- <span id="integral_money">0.00</span>KRC</p>
+            </li>
+            <!-- <li>
+            <p class="m_hei fl">Use balance:</p>
+            <p class="m_red fr"><span id="user_money">0.00</span>$</p>
+        </li> -->
+        </ul>
+        <div class="mb10"></div>
+        <ul class="buy_information">
+            <li class="buy_pay">
+                <p class="text-gray fl">Payment Password:</p>
+                <div class="inp_incorise fl">
+                    <input class="text" id="password" type="password" placeholder="Please enter payment password">
+                </div>
+                <a class="red" href="/wap/user/my_paypassword.html">Please set a payment password first?</a>
+            </li>
+        </ul>
+    </div>
+    <div class="buy_sumbit mui-clearfix">
+        <button class="sub fr" href="javascript:;" id="submit_btn" onclick="btnorders();">Submit order</button>
+        <button class="sub fr" href="javascript:;" id="submit_btn2" onclick="daifu();">Pay on your behalf</button>
+        <p class="fr">Amount due: <span id="order_amount">0</span> <span>KRC</span></p>
+    </div>
+    <div class="goods_choosebg"></div>
+    {include file="public/head_nav"/}
+    {include file="public/footer"/}
+    <script type="text/template" id="address">
+    <span class="name">{{consignee}}</span>
+    <span class="phone">{{mobile}}</span>
+    <p class="address mui-ellipsis"><i class="iconfont icon-dizhi"></i>&nbsp;&nbsp;{{address_detail}}</p>
+</script>
+    <script type="text/html" id="goods_list">
+{{each goods_list as value index}}
+    {{each goods_list[index] as avalue aindex }} 
+    <div class="buy_store mui-clearfix">
+        <div class="buyst_pic fl"><img src="{{avalue.goods_img}}" alt=""></div>
+        <div class="buyst_content fr">
+            <h1 class="mui-ellipsis-2">{{avalue.goods_name}}</h1>
+            <p class="hui">{{avalue.spec_key_name}}</p>
+            <p class="red">KRC{{avalue.goods_price}}</p>
+            <span class="num fr">×{{avalue.goods_num}}</span>
+        </div>
+    </div>
+    {{/each}}
+{{/each}}
+</script>
+    <script>
+        // Get select address
+        var top_cate = 0;
+        var address_id = getQueryString('address_id');
+        var goods_id = getQueryString("goods_id");
+        var num = getQueryString("num");
+        var goods_spec_key = getQueryString("goods_spec_key");
+
+        if (address_id) {
+            $get('/api/address/get_address', { id: address_id }, function (data) {
+                if (data.status == 1) {
+                    var str = '';
+                    str += template('address', data.data);
+                    $('.buyadd_txt').html(str);
+                } else {
+
+                }
+            });
+        }
+        // get default address
+        var url;
+        var ppar = {};
+        if (goods_id) {
+            url = '/api/order/confirm_purch';
+            ppar = { goods_id: goods_id, num: num, goods_spec_key: goods_spec_key };
+            $('.buyadd_txt_a').click(function (param) {
+                window.location.href = "/wap/user/address_select.html?goods_id=" + goods_id + "&num=" + num + "&goods_spec_key=" + goods_spec_key;
+            });
+        } else {
+            url = '/api/order/confirm_order';
+            ppar = {};
+            $('.buyadd_txt_a').click(function (param) {
+                window.location.href = "/wap/user/address_select.html";
+            });
+        }
+        addresss(url, ppar);
+        function addresss($url, $ppar) {
+            $get($url, $ppar, function (d) {
+                if (d.status == 1) {
+                    if (d.data.address == "") {
+                        $('.buyadd_txt_a').hide();
+                        $('.buyadd_none').show();
+                    } else {
+                        $('.buyadd_txt_a').show();
+                        $('.buyadd_none').hide();
+                        if (!address_id) {
+                            var str = '';
+                            str += template('address', d.data.address);
+                            $('.buyadd_txt').html(str);
+                            address_id = d.data.address.address_id;
+                        }
+                    }
+                    for (const i in d.data.goods_list) {
+                        top_cate = d.data.goods_list[i][0].top_cate;
+                        if (d.data.goods_list[i][0].top_cate == 2) {
+                            $('#submit_btn').hide();
+                            $('#submit_btn2').show();
+                        }
+
+                    }
+                    var goods_list = template("goods_list", d.data);
+                    $('#buy_cont').html(goods_list);
+                    $('#anum').html(d.data.goods_price.anum);
+                    $('#goods_price').html(d.data.goods_price.goods_price);
+                    $('#shipping_price').html(d.data.goods_price.shipping_price);
+                    $('#cut_fee').html(d.data.goods_price.cut_fee);
+                    $('#integral_money').html(d.data.goods_price.integral_money);
+                    $('#user_money').html(d.data.goods_price.user_money);
+                    var o_amount = parseFloat(d.data.goods_price.user_money) + parseFloat(d.data.goods_price.order_amount);
+                    $('#order_amount').html(o_amount);
+                    if (d.data.goods_price.integral_money) {
+                        $('#preferential').show();
+                    }
+                } else {
+                    $('.buyadd_txt_a').hide();
+                    $('.buyadd_none').show();
+                }
+            });
+        }
+
+       // fill in the address
+        $('.buyadd_none').on('tap', function () {
+            window.location.href = "/wap/user/address.html";
+        });
+        // pay for the order
+        function daifu() {
+            $('#submit_btn2').attr("disabled", "true"); //Set the grayed out button
+            $('#submit_btn2').html("Submitting...");
+            var password = $('#password').val();
+            $get('/api/order/take_order', { goods_id: goods_id, num: num, goods_spec_key: goods_spec_key, address_id: address_id, password: password }, function (d) {
+                $('#submit_btn2').removeAttr('disabled');
+                $('#submit_btn2').html('Payment');
+                if (d.status == 1) {
+                    $$toast(d.msg);
+                    setTimeout(function () {
+                        location.href = '/wap/user/order_list.html?id=' + top_cate;
+                    }, 1500);
+                } else {
+                    if (d.msg == "Insufficient balance, please recharge") {
+                        layer.confirm(d.msg, {
+                            title: false,
+                            closeBtn: 0,
+                            skin: 'addcat_demo',
+                            btn: ['Deposit', 'Cancel'] //Button
+                        }, function () {
+                            $('.layui-layer-btn a').attr('href', '/wap/user/pool_recharge.html?c_id=1');
+                        }, function () {
+                            $('.layui-layer-btn a').attr('href', 'javascript:;');
+                        });
+                    } else {
+                        $$toast(d.msg);
+                    }
+                }
+            });
+        }
+        //Submit orders
+        function btnorders() {
+
+            var password = $('#password').val();
+            var content = $('#content_s').val();
+            var that_url;
+            var that_ppar = {};
+            if (password == "") {
+                mui.toast("Please enter the payment password!");
+                return
+            }
+            if (goods_id) {
+                that_url = '/api/order/purch_order';
+                that_ppar = { content: content, goods_id: goods_id, num: num, goods_spec_key: goods_spec_key, address_id: address_id, password: password };
+            } else {
+                that_url = '/api/order/add_order';
+                that_ppar = { content: content, address_id: address_id, password: password };
+            }
+
+            if (address_id == undefined) {
+                $$toast('Please select the delivery address');
+            } else {
+                $('#submit_btn').attr("disabled", "true"); //Set the grayed out button
+                $('#submit_btn').html("Submitting...");
+                $get(that_url, that_ppar, function (d) {
+                    $('#submit_btn').removeAttr('disabled');
+                    $('#submit_btn').html('Submit order');
+                    if (d.status == 1) {
+                        $$toast(d.msg);
+                        setTimeout(function () {
+                            location.href = '/wap/user/order_list.html?id=' + top_cate;
+                        }, 1500);
+                    } else {
+                        if (d.msg == "Insufficient balance, please recharge") {
+                            layer.confirm(d.msg, {
+                                title: false,
+                                closeBtn: 0,
+                                skin: 'addcat_demo',
+                                btn: ['Deposit', 'Cancel'] //Button
+                            }, function () {
+                                $('.layui-layer-btn a').attr('href', '/wap/user/pool_recharge.html?c_id=1');
+                            }, function () {
+                                $('.layui-layer-btn a').attr('href', 'javascript:;');
+                            });
+                        } else {
+                            $$toast(d.msg);
+                        }
+                    }
+                });
+            }
+        };
+
+        function $$toast(param) {
+            layer.open({
+                type: 1,
+               skin: 'store_demo', //style class name
+                closeBtn: 0, // do not display the close button
+                anim: 2,
+                title: false, //do not display the title
+                shadeClose: true, //Turn on the mask to close
+                content: param
+            });
+        };
+        var winHeight = $(window).height(); //Get the current page height
+        $(window).resize(function () {
+            var thisHeight = $(this).height();
+            if (winHeight - thisHeight > 50) {
+                //When the soft keyboard pops up, operate in it
+                $(".buy_sumbit").css("position", "static")
+            } else {
+                //When the soft keyboard is closed, operate here
+                $(".buy_sumbit").css("position", "absolute")
+            }
+        });
+        // address bar information  
+        function getQueryString(name) {
+            var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)");
+            var r = window.location.search.substr(1).match(reg);
+            if (r != null) return unescape(r[2]); return null;
+        }
+    </script>
+</body>
+
+</html>

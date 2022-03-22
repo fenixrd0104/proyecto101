@@ -1,0 +1,166 @@
+<div class="layui-form" action="" lay-filter="add_ad" style="padding: 20px 30px 0 0;">
+    <div class="layui-form-item">
+        <label class="layui-form-label">标题</label>
+        <div class="layui-input-block">   
+            <script type="text/html" template>                        
+            <input type="text" name="title" lay-verify="required" placeholder="请输入广告标题" autocomplete="off" class="layui-input" value="{{ d.params.title || '' }}" >
+            </script>    
+        </div>
+    </div>                
+    <div class="layui-form-item">
+        <label class="layui-form-label">广告位</label>
+        <div class="layui-input-block">   
+            <select name="ad_position_id" id="ad_position_id" lay-verify="required" autocomplete="off" >
+                
+            </select>
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">链接地址</label>
+        <div class="layui-input-block"> 
+            <script type="text/html" template>                        
+            <input type="text" name="link_url" lay-verify="required" placeholder="请输入广告链接地址" autocomplete="off" class="layui-input" value="{{ d.params.link_url || '' }}" >
+            </script>  
+        </div>
+    </div>            
+    <div class="layui-form-item">
+        <label class="layui-form-label">广告图片</label>
+        <div class="layui-input-block">
+            <div class="layui-input-inline">
+                <script type="text/html" template>
+                    <input name="images" lay-verify="required" id="goods_img" placeholder="请上传供应商LOGO" value="{{d.params.images||''}}"  class="layui-input">
+                </script>
+                    
+                </div>
+                <div class="layui-input-inline layui-btn-container"  style="width: auto;">
+                    <button type="button" class="layui-btn" id="LAY_avatarUpload" style="margin-bottom:0;">
+                        <i class="layui-icon">&#xe67c;</i>上传图片
+                    </button>
+                    <a class="layui-btn layui-btn-primary" onclick="see_img();"  style="margin-bottom:0;">查看图片</a>
+                </div> 
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">广告日期</label>
+        <div class="layui-input-block"> 
+            <div class="layui-inline">
+                <script type="text/html" template>
+                    <input type="text" name="start_date" class="layui-input" id="test1" placeholder="开始日期"  autocomplete="off" lay-verify="date" value="{{ d.params.start_date || '' }}">
+                </script>  
+                
+            </div>
+            <div class="layui-inline">
+                    <script type="text/html" template>              
+                        <input type="text" name="end_date" class="layui-input" id="test2" placeholder="结束日期"  autocomplete="off" lay-verify="date"  value="{{ d.params.end_date || '' }}">
+                    </script>  
+                
+            </div>
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">状态</label>
+        <div class="layui-input-block">
+            <script type="text/html" template>              
+                {{# if(d.params.id){ }}
+                    <input type="radio" name="status" value="1" title="开启" {{ d.params.status=== 1? 'checked': '' }} >
+                    <input type="radio" name="status" value="0" title="关闭" {{ d.params.status=== 0 ? 'checked': '' }}>
+                
+                {{# }else{ }}
+                    <input type="radio" name="status" value="1" title="开启" checked>
+                    <input type="radio" name="status" value="0" title="关闭" >
+                {{# } }}
+
+            </script>  
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">排序</label>
+        <div class="layui-input-block">
+            <script type="text/html" template>              
+                <input type="text"  lay-verify="required" placeholder="请输入排序" autocomplete="off" class="layui-input" name="orderby" value="{{d.params.orderby||'255'}}" title="开启" >
+            </script>  
+        </div>
+    </div>
+ 
+    <div class="layui-form-item">
+        <div class="layui-input-block">
+            <button type="button" class="layui-btn" lay-submit="" lay-filter="ad_submit"><i class="layui-icon">&#xe654;</i>保存信息</button>
+            <button type="button" class="layui-btn layui-btn-danger" data-type="close"><i class="layui-icon">&#x1006;</i>返回</button>
+        </div>
+    </div>
+</div>
+<script type="text/html" template lay-done="layui.data.sendParams(d.params)"></script>        
+<script>
+layui.data.sendParams = function(params){
+    var chec_id=params.id;
+    layui.use(['admin','form','upload', 'laydate', 'setter','layer'], function(){
+        var $ = layui.$
+        ,admin = layui.admin
+        ,setter = layui.setter
+        ,element = layui.element
+        ,form = layui.form
+        ,layer = layui.layer
+        ,laydate = layui.laydate
+        ,upload = layui.upload
+        ,router = layui.router();
+            
+       
+        element.render();     
+        form.render(null, 'add_ad');
+
+        laydate.render({ // 日期
+            elem: '#test1'
+        });
+        laydate.render({ // 日期
+            elem: '#test2'
+        });
+    
+        var $ = layui.$, active = {
+        // 返回--按钮
+            close:function(index){ 
+                layer.closeAll('page');
+            }
+        };
+        
+        $('.layui-input-block .layui-btn').on('click', function(){
+            var type = $(this).data('type');
+            active[type] ? active[type].call(this) : '';
+        });
+         
+        // 图片上传
+        upload.render({
+            elem: '#LAY_avatarUpload'
+            ,url: layui.setter.baseUrl+'merchant/upload/upload'
+            ,multiple: true
+            ,before: function(obj){
+            //预读本地文件示例，不支持ie8
+                obj.preview(function(index, file, result){
+                    $('#upload_goods_images_box').append('<img src="'+ result +'" alt="'+ file.name +'" class="layui-upload-img" style="width:120px;height:120px;margin:0 15px 15px 0px;">')
+                });
+                }
+                ,done: function(res){
+                //上传完毕
+
+                $('#goods_img').val(res.data);
+                }
+            });
+            // 查看图片
+            window.see_img=function(){
+                var i = $('#goods_img').val();
+                layer.photos({
+                    photos: {
+                        title: "查看头像",
+                        data: [{
+                            src: i
+                        }]
+                    },
+                    shade: 0.5,
+                    closeBtn: 1,
+                    anim: 5
+                });
+            };
+
+        
+    });
+}
+</script>

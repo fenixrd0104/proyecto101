@@ -1,0 +1,400 @@
+{include file="public/header"/}
+<style>
+    * {
+        font-family: 'PingFangSC';
+    }
+
+    #bad_ul .ul {
+        display: none;
+    }
+
+</style>
+</head>
+
+<body style="background: #f0f0f0;">
+    <header class="mui-bar mui-bar-nav index_head" id="index_head">
+        <div class="index_left fl flex">
+            <img src="__IMG__/logo.png?id=2" alt="">
+        </div>
+        <div class="index_right fr">
+            <input type="search" name="searchgoods" class="index-search" placeholder="Please enter the product you are searching for" id="search_input">
+            <img class="index_pic small_search" src="__IMG__/search_btn.png" />
+        </div>
+    </header>
+    <div class="mui-content" style="padding-top: 60px !important;">
+        <!-- banner image -->
+        <div class="swiper-container lunbo">
+            <div class="swiper-wrapper" id="s_wrapper">
+            </div>
+            <div class="swiper-pagination"></div>
+        </div>
+        <!-- Announcement -->
+        <div class="flex_between notice">
+            <div class="notice_left flex">
+                <img src="__IMG__/logo2.png" alt="">
+            </div>
+            <div id="notice_swiper" class="swiper-container swiper-no-swiping notice_swiper">
+                <div class="swiper-wrapper" id="s_notice">
+
+                </div>
+            </div>
+        </div>
+        <!--eBook -->
+        <div class="mb5"></div>
+        <div class="bg-1515 p-15">
+            <div class="bg-tiaowen">
+                <div class="index_box1">
+                    <p class="text-gold t-c">SPECLAL</p>
+                    <div class="t-c">
+                        <span class="text-gold t-c">· eBooks ·</span>
+                    </div>
+                </div>
+                <div class="dzs_slide">
+                    <div class="swiper-container show-swiper">
+                        <div class="swiper-wrapper">
+                            <div class="swiper-slide">
+                                <a href="javascript:;" class="block">
+                                    <div class="dzs">
+                                        <img src="__IMG__/dzs2.png" alt="">
+                                        <p class="text-gold t-c font-24">Explore</p>
+                                        <p class="text-gray t-c font-10">267,468 people have read</p>
+                                    </div>
+                                </a>
+                            </div>
+                            <div class="swiper-slide">
+                                <a href="javascript:;" class="block">
+                                    <div class="dzs">
+                                        <img src="__IMG__/dzs1.png" alt="">
+                                       <p class="text-gold t-c font-24">Explore your luxury senses</p>
+                                        <p class="text-gray t-c font-10">267,468 people have read</p>
+                                    </div>
+                                </a>
+                            </div>
+                            <div class="swiper-slide">
+                                <a href="javascript:;" class="block">
+                                    <div class="dzs">
+                                        <img src="__IMG__/dzs3.png" alt="">
+                                        <p class="text-gold t-c font-24">Explore</p>
+                                        <p class="text-gray t-c font-10">267,468 people have read</p>
+                                    </div>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- Brand -->
+        <div class="bg-1515 p-15">
+            <div class="bg-tiaowen">
+                <div class="index_box1">
+                    <p class="text-gold t-c">BRAND</p>
+                    <div class="t-c">
+                        <span class="text-gold t-c"> · Branding ·</span>
+                    </div>
+                </div>
+                <div class="mb30"></div>
+                <div class="bad_slide cont">
+                    <div style="overflow: scroll;">
+                        <ul id="bad_nav" class="mui-clearfix">
+                            <!-- <li class="on">Luxury recommendation</li>
+                        <li>Fashion</li>
+                        <li>Skin care</li>
+                        <li>Makeup</li>
+                        <li>Mother and baby</li>
+                        <li>Personal Care</li> -->
+                        </ul>
+                    </div>
+
+                    <div id="bad_ul" class="bad_scroll">
+                        <p class="text-gold text-14"><span id="nav_type">FLASH SALE</span> Ends In</p>
+                        <div class="mescroll-upwarp" style="visibility: visible;
+        display: block;padding: 5px 0;">
+                            <p class="upwarp-progress mescroll-rotate" style="transform: rotate(439.2deg);"></p>
+                            <p class="upwarp-tip">Loading..</p>
+                        </div>
+                        <!-- <div style="overflow: scroll;">
+                            <ul class="">
+                                <li>
+                                    <a href="javascript:;"><img src="__IMG__/pp1.png" alt=""></a>
+                                </li>
+                                <li>
+                                    <a href="javascript:;"><img src="__IMG__/pp2.png" alt=""></a>
+                                </li>
+                                <li>
+                                    <a href="javascript:;"><img src="__IMG__/pp3.png" alt=""></a>
+                                </li>
+                                <li>
+                                    <a href="javascript:;"><img src="__IMG__/pp4.png" alt=""></a>
+                                </li>
+                            </ul>
+                        </div> -->
+
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="bg-15 p-t-15 article">
+            <!-- <div class="mui-card">
+                <a href="javascript:;" class="block">
+                    <div class="mui-card-title flex">
+                        <img src="__IMG__/head.png" alt="">
+                        <span class="text-gold font-15">Joseph Smith</span>
+                        <p>
+                            <img src="__IMG__/sc.png" alt="">
+                            <span class="text-gold font-15">6457</span>
+                        </p>
+                    </div>
+                    <div class="mui-card-media">
+                        <img src="__IMG__/tw.png" alt="">
+                    </div>
+                    <div class="mui-card-content">
+                        <div class="mui-card-content-inner">
+                            <p class="text-gold font-15">Posted on January 18, 2016</p>
+                            <p class="font-12 text-gray">The article abstract is displayed here to give readers a rough idea of ​​the article content...</p>
+                        </div>
+                    </div>
+                </a>
+            </div> -->
+        </div>
+        <div class="index_stop" onclick="$('html,body').animate({'scrollTop':0},600);"><i class="iconfont icon-top"></i>
+        </div>
+    </div>
+    {include file="public/nav"/} {include file="public/footer"/}
+    <script type="text/html" id="lunbo">
+        {{ if link_url==0 || !link_url}}
+        <div class="swiper-slide">
+            <img src="{{images}}" alt="">
+        </div>
+        {{ else }}
+        <div class="swiper-slide" onclick="window.location.href='{{link_url}}'">
+            <img src="{{images}}" alt="">
+        </div>
+        {{ /if }}
+    </script>
+    <script type="text/html" id="notice">
+        <div class="swiper-slide">
+            <a class="mui-ellipsis" href="/wap/index/notice_detail.html?id={{id}}">{{title}}</a>
+        </div>
+    </script>
+    <script type="text/html" id="article">
+        <div class="mui-card">
+            <a href="/wap/index/notice_detail.html?id={{id}}&type=3" class="block">
+                <div class="mui-card-title flex">
+                    <img src="{{writer_img}}" alt="">
+                    <span class="text-gold font-15">{{writer}}</span>
+                    <p>
+                        <img src="__IMG__/sc.png" alt="">
+                        <span class="text-gold font-15">{{views}}</span>
+                    </p>
+                </div>
+                <div class="mui-card-media">
+                    <img src="{{photo}}" alt="">
+                </div>
+                <div class="mui-card-content">
+                    <div class="mui-card-content-inner">
+                        <p class="text-gold font-15">{{title}}</p>
+                        <p class="font-12 text-gray mui-ellipsis-2">{{remark}}</p>
+                    </div>
+                </div>
+            </a>
+        </div>
+    </script>
+    <!-- empty prompt -->
+        <script type="text/template" id="null">
+            <div class="mescroll-empty"><img class="empty-icon" src="/static/wap/images/none4.png"><p class="empty-tip">No category yet</p ></div>
+        </script>
+        <!-- Loading -->
+        <script type="text/template" id="load">
+            <div class="mescroll-upwarp" style="visibility: visible;
+            display: block;padding: 5px 0;">
+                <p class="upwarp-progress mescroll-rotate" style="transform: rotate(439.2deg);"></p>
+                <p class="upwarp-tip">Loading..</p>
+        </div>
+    </script>
+    <script type="text/template" id="classify">
+        {{ if child.length==0 }}
+            <div class="mescroll-empty ul"><img class="empty-icon" src="/static/wap/images/none4.png"><p class="empty-tip">暂无分类</p></div>  
+        {{ else }}
+            <div class="ul" style="overflow: scroll;">
+                    <ul>
+                        {{ each child value index}}
+                            <li>
+                                {{ if value.image}}
+                                <a href="/wap/index/goods_list?tid={{value.id}}"><img src="{{value.image}}"></a>
+                                {{ else }}
+                                <a href="/wap/index/goods_list?tid={{value.id}}"><img src="__IMG__/class.png"></a>
+                                {{ /if}}
+                            </li>
+                        {{ /each }}
+                    </ul>
+            </div>
+        {{ /if }} 
+    </script>
+    <script>
+        //scroll width
+        var slides = $('.show-swiper>.swiper-wrapper>.swiper-slide').length;
+        var mid_slide = Math.ceil(slides / 2.0) - 1; //The middle slide is displayed by default
+        $('body').on('tap', '#bad_nav li', function () {
+            $(this).addClass('on').siblings('li').removeClass('on');
+            $('#bad_ul .ul').eq($(this).index()).show().siblings('.ul').hide();
+        });
+        var dzs_wid = $('.show-swiper').width(); //swiper offset
+        swiperShow = new Swiper(".show-swiper", {
+            slidesPerView: "auto",
+            watchSlidesProgress: !0,
+            slidesOffsetBefore: dzs_wid * 0.2,
+            slidesOffsetAfter: dzs_wid * 0.2,
+            spaceBetween: 17,
+            resistanceRatio: 1,
+            initialSlide: mid_slide,
+            on: {
+                progress: function (b) {
+                    for (i = 0; i < this.slides.length; i++)
+                        slide = this.slides.eq(i),
+                            slideProgress = this.slides[i].progress,
+                            prevIndent = 4 == i ? .3228 : .0898,
+                            scale = 1 > Math.abs(slideProgress + prevIndent) ? .1 * (1 - Math.abs(slideProgress + prevIndent)) + 1 : 1,
+                            slide.find(".dzs").transform("scale3d(" + scale + "," + scale + ",1)")
+                },
+                setTransition: function (b) {
+                    for (var a = 0; a < this.slides.length; a++)
+                        this.slides.eq(a).find(".dzs").transition(b)
+                },
+                // touchMove: function() {
+                //     this.controller.control = .01 > this.progress ? "" : swiperBg
+                // },
+                touchEnd: function () {
+                    -1515 > this.translate && alert("\u8df3\u8f6c")
+                }
+            }
+        });
+        // carousel
+        var mySwiper = new Swiper('.lunbo', {
+            autoplay: true,
+            pagination: {
+                el: '.swiper-pagination',
+            },
+        });
+        // list of announcements
+        var noticeSwiper = new Swiper('#notice_swiper', {
+            direction: 'vertical',
+            slidesPerView: 2, // Display several slides per page
+            autoplay: {
+                delay: 3000,
+                disableOnInteraction: false,
+            }
+
+        });
+        // 
+        // $('#bad_ul').append(template('load'));
+        get_info();
+
+        function get_info() {
+            $get('/api/user/getuserinfo', {}, function (data) {
+                if (data.code == 1) {
+                    $('.index_right img').show();
+                } else {
+                    // mui.toast(data.msg);
+                    $('.index_right a').show();
+                }
+            });
+            $get('/api/goods/home_category', {}, function (data) {
+                var list = data.data.list;
+                if (data.status == 1) {
+                    var str1 = '', str2 = '';
+                    for (const i in list) {
+                        if (i == 0) {
+                            str1 += '<li class="on">' + list[i].name + '</li>';
+                        } else {
+                            str1 += '<li>' + list[i].name + '</li>';
+                        }
+                        str2 += template('classify', list[i]);
+                    }
+                    $('#bad_nav').html(str1);
+                    //Calculate navigation width
+                    var w = 0;
+                    $('#bad_nav').find('li').each(function () {
+                        w += $(this).width() + 15;
+                    });
+                    $('#bad_nav').css('width', w);
+                    if (str2) {
+                        $('#bad_ul').append(str2);
+                        // Calculate the width of the scroll area
+                        $('#bad_ul .ul').each(function () {
+                            var lis = $(this).find('li').length;
+                            var u_wid = lis * 100 + 5 * (lis - 1);
+                            $(this).find('ul').css('width', u_wid + 'px')
+                        });
+                        $('#bad_ul .ul').eq(0).show();
+                        $('.mescroll-upwarp').remove();
+                    } else {
+                        $('#bad_ul').append(template('null'));
+                    }
+                } else {
+                    $('#bad_ul').append(template('null'));
+                }
+            });
+            $get('/api/ad/wap_index', {}, function (data) {
+                var lunbo = "";
+                for (var i in data[1]) {
+                    lunbo += template("lunbo", data[1][i]);
+                }
+                mySwiper.appendSlide(lunbo);
+                var notice = "";
+                for (var a in data[2]) {
+                    notice += template("notice", data[2][a]);
+                }
+                var article = "";
+                for (var a in data[3]) {
+                    article += template("article", data[3][a]);
+                }
+                $('.article').html(article);
+                noticeSwiper.appendSlide(notice);
+            });
+        }
+
+        // search
+        $('.small_search').on('tap', function () {
+            var sear_inp = $("input[name = searchgoods]").val();
+            if (sear_inp == "") {
+                mui.toast("Please enter the search content");
+            } else {
+                window.location.href = '/wap/index/goods_list/searchname/' + sear_inp;
+            }
+        });
+        $("#search_input").on('keypress', function (e) {
+            var keycode = e.keyCode;
+            //Get the value of the search box
+            var searchContent = $(this).val();
+            if (keycode == '13') {
+                e.preventDefault();
+                //Request search interface
+                if (searchContent == '') {
+                    mui.toast('Please enter the search content');
+                } else {
+                    console.log('click to search')
+                    window.location.href = '/wap/index/goods_list/searchname/' + searchContent;
+                }
+            }
+        });
+        
+        // header background color
+        // $(window).scroll(function() {
+        // var head_height = $(window).scrollTop();
+        // if (head_height > $('.index_head').height()) {
+        // $('.index_head').addClass('index_head_red');
+        // } else {
+        // $('.index_head').removeClass('index_head_red');
+        // };
+        // });
+        // Back to top
+        $(".comebackTop").on('tap', function () {
+            $('body,html').animate({
+                scrollTop: 0
+            }, 300);
+        });
+    </script>
+</body>
+
+</html>

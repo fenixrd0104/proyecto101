@@ -1,0 +1,126 @@
+/* 商品管理 */
+
+
+/* 商品列表 */
+.goods_list_search .layui-form-item .layui-inline{
+    margin-right:0;
+    float: left;
+}
+.goods_list_search .layui-form-item .layui-input-inline{
+    margin-right: 10px;
+    float: left;
+}
+.table-bordered{
+    border: 1px solid #EBEBEB;
+    width: 100%;
+    max-width: 100%;
+    margin-bottom: 20px;
+    background-color: transparent;
+    border-spacing: 0;
+    border-collapse: collapse;
+}
+.table-bordered td{
+    border-top: 1px solid #e7eaec;
+    line-height: 1.42857;
+    padding: 8px;
+    vertical-align: middle;
+    border: 1px solid #e7e7e7;
+    text-align: left;
+}
+#leixing_1.table-bordered td{
+    padding: 8px 8px 0px 8px;
+}
+#leixing_1.table-bordered td label{
+    width: 35px;
+    height: 35px;
+    display: inline-block;
+    vertical-align: middle;
+    margin-bottom: 8px;
+    margin-left: 2px;
+    position: relative;
+}
+.table-bordered .spec_img{
+    width: 35px;
+    height: 35px;
+    display: block;
+    /* background: url("/static/merchant/src/style/res/layui-logo.jpg");
+    background-size: 100% 100%; */
+}
+.table-bordered .spec_img img,
+.table-bordered .spec_img .pic_div{
+    width: 100%;
+    height: 100%;
+}
+.table-bordered .spec_img .lay_ico{
+    color: #333;
+    position: absolute;
+    top: -8px;
+    right: -7px;
+    z-index: 999;
+    cursor: pointer;
+}
+.table-bordered .updata_img{
+    display: none;
+}
+.table-bordered  button {
+    display: inline-block;
+    padding: 6px 12px;
+    margin-bottom: 8px;
+    margin-left: 10px;
+    font-size: 14px;
+    font-weight: 400;
+    height: 40px;
+    line-height: 1.42857143;
+    text-align: center;
+    white-space: nowrap;
+    vertical-align: middle;
+    -ms-touch-action: manipulation;
+    touch-action: manipulation;
+    cursor: pointer;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    background-image: none;
+    border: 1px solid transparent;
+    border-radius: 3px;
+    -webkit-appearance: button;
+}
+#leixing_1 tr>td:first-child{
+    width: 10% !important;
+}
+#leixing_2 input{
+    background-color: #FFF;
+    background-image: none;
+    border: 1px solid #e5e6e7;
+    border-radius: 1px;
+    color: inherit;
+    display: block;
+    padding: 6px 12px;
+    -webkit-transition: border-color .15s ease-in-out 0s,box-shadow .15s ease-in-out 0s;
+    transition: border-color .15s ease-in-out 0s,box-shadow .15s ease-in-out 0s;
+    width: 90%;
+    font-size: 14px;
+    height: 34px;
+    line-height: 1.42857143;
+}
+.table-bordered  .choosed{
+    background-color: #1ab394;
+    color: #fff;
+}
+.table-bordered  .layui-form-select{
+    border:1px solid #e7eaec;
+}
+.table-bordered  .layui-form-select input{
+    border:none !important;
+}
+.upload_img_btn{
+    padding: 0 !important;
+    width: 40px !important;
+    height: 40px !important;
+}
+#tableTpl input{
+    text-align: center;
+    height:35px;
+    border:1px solid #e7eaec;
+}

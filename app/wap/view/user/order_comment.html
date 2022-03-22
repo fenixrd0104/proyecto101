@@ -1,0 +1,225 @@
+{include file="public/header" /}
+</head>
+<body style="background: #f8f8f8;">
+<header class="mui-bar mui-bar-nav bg_white" id="header">
+    <a class="mui-action-back mui-icon mui-icon-left-nav mui-pull-left" href="javascript:;"></a>
+    <a id="menu" class="mui-action-menu mui-icon mui-icon-bars mui-pull-right" href="javascript:;"></a>
+    <h1 class="mui-title">Order review</h1>
+</header>
+<div class="mui-content">
+    <div class="ocomm_list" id="comment">
+        
+    </div>
+    <div class="ocomm_btn">
+        <button id="submit_btn" class="issue_btn bg-gold">Post</button>
+    </div>
+</div>
+
+{include file="public/head_nav"/}
+{include file="public/footer"/}
+<script type="text/html" id="list">
+<div class="ocomm_div bg_white" data-id="{{goods_id}}" data-recid="{{rec_id}}">
+    <div class="ocomm_ul flex_start_s">
+        <img src="{{img}}" alt="">
+        <div class="aply_txt">
+            <h3 class="mui-ellipsis">{{goods_name}}</h3>
+            <p>{{spec_key_name}}</p>
+        </div>
+    </div>
+    <div class="mb20"></div>
+    <div class="ocomm_row flex_start">
+        <p>Product Reviews</p>
+        <div class="ocomm_star">
+            <i class="iconfont icon-star"></i>
+            <i class="iconfont icon-star"></i>
+            <i class="iconfont icon-star"></i>
+            <i class="iconfont icon-star"></i>
+            <i class="iconfont icon-star"></i>
+            <span class="starText" data-rank="0"></span>
+        </div>
+    </div>
+    <div class="mb10"></div>
+    <div class="ocomm_row">
+       <textarea class="content" name="" placeholder="Are you satisfied with the product? Come and share your experience!" cols="30" rows="4"></textarea>
+    </div>
+    <div class="ocomm_row">
+        <div class="groupImg">
+            <input type="file" class="choose" accept="image/*" multiple>
+            <ul class="img-list">
+                <div class="upload img_add"><i class="iconfont icon-jia"></i><p class="text-mini">Add image</p></div>
+            </ul>
+            <div class="mui-clearfix"></div>
+        </div>
+    </div>
+</div>
+</script>
+<script type="text/javascript">
+var order_id=getQueryString('order_id');
+var type=getQueryString('type');
+var goods_list=[];
+var par={
+    order_id:order_id,
+    goods_list:goods_list
+}
+// order_id:order_id,
+// goods_id:goods_id,
+// content:'',
+// img:'',
+// rank:''
+
+if(type){
+    $('#submit_btn').html("Post a follow-up review");
+}
+
+
+get_data();
+function get_data(){
+    $get('/api/order/order_detail',{order_id:order_id}, function(data) {
+        if (data.status == 1) {
+            var list='';
+            for( var i in data.data.goods_list){
+            goods_list.push( {goods_id:data.data.goods_list[i].goods_id,rec_id:data.data.goods_list[i].rec_id});
+                list += template('list', data.data.goods_list[i]);
+            }       
+            $('#comment').html(list);
+            console.log(goods_list);
+            
+            // upload picture
+            imgFileupload(4,'.choose','/api/user/upload');
+        } else {
+            
+        }
+    });
+};
+
+$('.mui-content').on('change','.choose', function() {
+var src='';
+    var $li=$(this).parents('.groupImg');
+    $li.find('.img-list li').each(function() {
+        src= $(this).attr('data-src')
+        console.log(src);
+        
+    });
+});
+
+// submit
+$('#submit_btn').click(function(){
+var content_url=[];
+var rank_url=[];
+var pic_url=[];
+    
+    $('.content').each(function() {
+        content_url.push( $(this).val() );  
+    });
+    $('.starText').each(function() {
+        rank_url.push( $(this).attr('data-rank') );  
+    });
+    var src_list=[];
+   
+    $('.img-list').each(function() {
+        var src=[];
+        $(this).find('li').each(function() {
+            var img_src=$(this).attr('data-src');
+            src.push(img_src);
+        });
+        pic_url.push(src);
+    });
+    // console.log(pic_url);
+    // console.log($('.img-list').length)
+    
+    console.log(goods_list);
+    
+for( var a in goods_list){    
+    goods_list[a].content=content_url[a];
+    goods_list[a].rank=rank_url[a];
+    goods_list[a].img=pic_url[a];    
+    goods_list[a].is_anony='';
+
+    if(goods_list[a].rank==0){
+        mui.toast("Please rate the product");  
+        return 
+    }
+}
+par.goods_list=goods_list
+// console.log(par)
+// return
+
+    $get('/api/goods/comment',par, function(data) {
+        if (data.status == 1) {
+            mui.toast(data.msg);   
+            setTimeout(function(){
+                mui.back();
+            },1000);  
+        } else {
+            mui.toast(data.msg); 
+            setTimeout(function(){
+                location.reload();  
+            },1500);
+                  
+        }
+    });
+});
+
+// rating
+$('.mui-content').on('tap','.ocomm_star i', function() {
+    var $this = $(this);
+    var starBox=$(this).parents('.ocomm_star');
+    
+    switch($this.index()){
+    case 0:
+    starBox.html('<i class="iconfont icon-star_active"></i>\
+        <i class="iconfont icon-star"></i>\
+        <i class="iconfont icon-star"></i>\
+        <i class="iconfont icon-star"></i>\
+        <i class="iconfont icon-star"></i>\
+        <span class="starText"></span>');
+        starBox.find('.starText').text('bad').attr('data-rank', 1);
+        break;
+    case 1:
+    starBox.html('<i class="iconfont icon-star_active"></i>\
+        <i class="iconfont icon-star_active"></i>\
+        <i class="iconfont icon-star"></i>\
+        <i class="iconfont icon-star"></i>\
+        <i class="iconfont icon-star"></i>\
+        <span class="starText"></span>');
+        starBox.find('.starText').text('bad').attr('data-rank', 2);
+        break;
+    case 2:
+    starBox.html('<i class="iconfont icon-star_active"></i>\
+        <i class="iconfont icon-star_active"></i>\
+        <i class="iconfont icon-star_active"></i>\
+        <i class="iconfont icon-star"></i>\
+        <i class="iconfont icon-star"></i>\
+        <span class="starText"></span>');
+        starBox.find('.starText').text('General').attr('data-rank', 3);
+        break;
+    case 3:
+    starBox.html('<i class="iconfont icon-star_active"></i>\
+        <i class="iconfont icon-star_active"></i>\
+        <i class="iconfont icon-star_active"></i>\
+        <i class="iconfont icon-star_active"></i>\
+        <i class="iconfont icon-star"></i>\
+        <span class="starText"></span>');
+        starBox.find('.starText').text('good').attr('data-rank', 4);
+        break;
+    case 4:
+    starBox.html('<i class="iconfont icon-star_active"></i>\
+        <i class="iconfont icon-star_active"></i>\
+        <i class="iconfont icon-star_active"></i>\
+        <i class="iconfont icon-star_active"></i>\
+        <i class="iconfont icon-star_active"></i>\
+        <span class="starText"></span>');
+        starBox.find('.starText').text('very good').attr('data-rank', 5);
+        break;
+    };
+});
+
+// address bar information
+function getQueryString(name){
+    var reg = new RegExp("(^|&)"+ name +"=([^&]*)(&|$)");
+    var r = window.location.search.substr(1).match(reg);
+    if(r!=null)return  unescape(r[2]); return null;
+}
+</script>
+</body>
+</html>

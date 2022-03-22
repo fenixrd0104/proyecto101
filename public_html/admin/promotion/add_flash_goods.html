@@ -1,0 +1,109 @@
+<!-- 选择商品 -->
+<style>
+    #choose_search .layui-input-inline{
+        width:100px;
+    }
+    #choose_search .layui-input-inline:last-child{
+        width:50px;
+    }
+</style>
+
+<div class="layui-form" action="" lay-filter="choose_flash_goods_form" style="padding: 20px 30px 0 0;">
+    
+    <div class="layui-form-item" id="choose_search">
+        <div class="layui-input-inline"  style="margin-left:0;">
+            <select name="label">
+                <option value="">所有分类</option>
+                <option value="0">美食</option>
+                <option value="1">新闻</option>
+                <option value="2">八卦</option>
+                <option value="3">体育</option>
+                <option value="4">音乐</option>
+            </select>
+        </div>
+        <div class="layui-input-inline">
+            <select name="label">
+                <option value="">所有品牌</option>
+                <option value="0">美食</option>
+                <option value="1">新闻</option>
+                <option value="2">八卦</option>
+                <option value="3">体育</option>
+                <option value="4">音乐</option>
+            </select>
+        </div>
+        <div class="layui-input-inline">
+            <select name="label">
+                <option value="">全部</option>
+                <option value="0">美食</option>
+                <option value="1">新闻</option>
+                <option value="2">八卦</option>
+                <option value="3">体育</option>
+                <option value="4">音乐</option>
+            </select>
+        </div>
+        <div class="layui-input-inline">
+            <select name="label">
+                <option value="">全部</option>
+                <option value="0">美食</option>
+                <option value="1">新闻</option>
+                <option value="2">八卦</option>
+                <option value="3">体育</option>
+                <option value="4">音乐</option>
+            </select>
+        </div>
+        <div class="layui-input-inline">
+            <input type="text" name="title" placeholder="搜索" autocomplete="off" class="layui-input">
+        </div>
+        <div class="layui-input-inline">
+            
+            <button class="layui-btn layuiadmin-btn-list" lay-submit lay-filter="LAY-app-contlist-search">
+            <i class="layui-icon layui-icon-search layuiadmin-button-btn"></i>
+            </button>
+                
+        </div>
+    </div>
+
+    <div class="layui-form-item">
+        <div class="layui-input-block" style="margin-left:0;">
+            <table id="LAY-choose_flash_goods" lay-filter="LAY-choose_flash_goods"></table>
+
+            <script type="text/html" id="table-choose_flash_goods">
+                <a class="layui-btn layui-btn-normal layui-btn-xs" lay-event="edit">选择</a>
+            </script>
+        </div>
+    </div>
+
+    
+</div>
+    
+    <script>
+      layui.use(['admin', 'table','form','laydate'], function(){
+        var $ = layui.jquery
+        ,admin = layui.admin
+        ,upload = layui.upload
+        ,element = layui.element
+        ,laydate = layui.laydate
+  ,setter = layui.setter
+        ,table = layui.table
+        ,layer = layui.layer
+        ,view = layui.view
+        ,form = layui.form;
+
+        form.render(null, 'choose_flash_goods_form');
+
+        table.render({
+            elem: '#LAY-choose_flash_goods'
+            ,url: layui.setter.baseUrl+'json/table/user.js'
+            ,cellMinWidth: 80 //全局定义常规单元格的最小宽度，layui 2.2.1 新增
+            ,cols: [[
+            {field:'username', title: '名称',align:'center', sort: true}
+            ,{field:'sign', title: '价格', width: 100,align:'center', sort: true} 
+            ,{field:'wealth',title: '库存',align:'center', sort: true}
+            ,{fixed: 'right', title:'操作', toolbar: '#table-choose_flash_goods',align:'center'}
+            ]]
+        });
+
+      
+    
+    })
+    </script>

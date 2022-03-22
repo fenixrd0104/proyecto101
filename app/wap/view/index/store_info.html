@@ -1,0 +1,292 @@
+{include file="public/header"/}
+<style>
+#mescroll{
+    position: fixed;
+    top: 2.2rem;
+    bottom: 0.5rem;
+    left: 0;
+    width: 100%;
+}
+</style>
+</head>
+<body style="background: #f8f8f8;">
+<header class="mui-bar mui-bar-nav index_header shop_head" id="header">
+    <a class="back-page mui-icon mui-icon-left-nav mui-pull-left" href="javascript:;"></a>
+    <a id="menu" class="mui-action-menu mui-icon mui-icon-bars mui-pull-right" href="javascript:void(0);"></a>
+    <h1 class="mui-title">Store details</h1>
+</header>
+<div class="mui-content">
+<div class="storeinfo_up bg_red">
+    <div class="goods_storeup mui-clearfix">
+        <div class="store_img fl"><img id="image" src="/static/wap/images/touxiang.png"></div>
+        <p class="name fl mui-ellipsis" id="name"></p>
+        <button type="button" class="store_focus"><i class="iconfont icon-heart"></i>Follow</button>
+        <span><b id="follow_num"></b> people followed</span>
+    </div>
+    <ul class="dp_myshin">
+        <li><a class="active" href="javascript:void(0);">All items</a></li>
+        <li><a href="javascript:void(0);" onclick="goodslist_new();">New</a></li>
+        <li><a href="javascript:void(0);" onclick="goodslist_hot();">Hot Sale</a></li>
+    </ul>
+    <div class="search_pro fr"><a href="javascript:void(0);" onclick="goodslist_all();">
+        <i class="iconfont icon-search"></i>Search for products
+    </a></div>
+</div>
+<div class="street_nav saearch_listup">
+    <ul class="mui-clearfix sto_ul_div">
+        <li class="saearch_li on li_synthe">
+            <a href="javascript:void(0);">
+                <span>Default</span>
+            </a>
+        </li>
+        <li class="saearch_li li_sales">
+            <a href="javascript:void(0);">
+                <span>Sales</span>
+            </a>
+        </li>
+        <li class="saearch_li li_price li_price_arr">
+            <a href="javascript:void(0);">
+                <span>Price</span>
+                <img class="arrow" src="__IMG__/jiantou_1.png" alt="">
+                <img class="arrow_asc" src="__IMG__/jiantou_2.png" alt="">
+                <img class="arrow_desc" src="__IMG__/jiantou_3.png" alt="">
+            </a>
+        </li>
+        <li class=""></li>
+        <li>
+            <a href="javascript:void(0);">
+                <i style="color: #bbbabf;" class="iconfont icon-list2 i_list"></i>
+            </a>
+        </li>
+    </ul>
+</div>
+<div class="search_listlow search_big">
+    <div id="mescroll" class="mescroll">
+    <ul class="sto_ul" id="dataList">
+       
+    </ul>
+    </div>
+    <div class="mb10"></div>
+</div>
+</div>
+<div class="store_footer">
+    <a class="active" href="/wap/index/store_about.html"><img src="__IMG__/img_27.png" alt=""><p>Store Details</p></a>
+    <a href="javascript:void(0);" onclick="goods_class();"><img src="__IMG__/img_28.png" alt=""><p>Goods classification</p></a >
+    <a href="javascript:void(0);"><img src="__IMG__/img_29.png" alt=""><p>Contact Customer Service</p></a>
+</div>
+{include file="public/head_nav"/}
+{include file="public/footer"/}
+<script type="text/html" id="list">
+    <li><a class="mui-clearfix" href="/wap/index/goods_info.html?id={{id}}">
+        <div class="searimg"><img src="{{original_img}}" alt=""></div>
+        <div class="seartxt">
+            <p class="name mui-ellipsis-2">{{goods_name}}</p>
+            <div class="mb mb15"></div>
+            <p class="red">KRC {{shop_price}}$</p>
+        </div>
+    </a></li>
+</script>
+<script>
+var shop_id=getQueryString('shop_id');
+var par={
+    keywords:'',
+    order:0,
+    page:'',
+    limit:8,
+    shop_id:shop_id
+}
+
+// product category jump
+function goods_class(){
+    window.location.href="/wap/index/store_goods_class.html?shop_id="+shop_id;
+};
+// All & New Products & Hot Selling Jump
+function goodslist_new(){
+    window.location.href="/wap/index/store_goodslist.html?shop_id="+shop_id+"&type=new";
+};
+function goodslist_hot(){
+    window.location.href="/wap/index/store_goodslist.html?shop_id="+shop_id+"&type=hot";
+};
+function goodslist_all(){
+    window.location.href="/wap/index/store_goodslist.html?shop_id="+shop_id;
+};
+
+//Create a MeScroll object
+var mescroll = new MeScroll("mescroll", {
+    up: {
+        callback: getListData, //Pull-up callback, which can be abbreviated here; equivalent to callback: function (page) { getListData(page); }
+        isBounce: false, //The ios bounce and parsing are prohibited here (be sure to read carefully, especially the last point): http://www.mescroll.com/qa.html#q10
+        noMoreSize: 5, //If the list has no data, you can set the total number of lists to be greater than half a page before displaying no more data; avoid too little list data (for example, only one piece of data), it will not look good to display no more data; Default 5
+        empty: {
+            icon: "/static/wap/images/none2.png", //icon, default null
+            tip: "No data at the moment~~~", //Tips
+
+        },
+        clearEmptyId: "dataList", //equivalent to setting clearId and empty.warpId at the same time; simplified writing; default null; note that this cannot be configured in vue
+        toTop: { //Configure back to top button
+            src: "/static/wap/images/top.png", //default scroll to 1000px display, configurable offset modification
+            offset: 1000
+        },
+        lazyLoad: {
+            use: true // Whether to enable lazy loading, default false
+        },
+        htmlNodata: '<p class="upwarp-nodata">All information displayed</p>',
+        page: {
+            num: 0,
+            size: 8,
+            time: null
+        },
+        offset: 150,
+        loadFull: {
+            use: true,
+            delay: 500
+        }
+    }
+});
+
+function getListData(page) {
+   // load data online
+    getListDataFromNet(page.num, page.size, function(curPageData) {
+        //mescroll will automatically judge the list according to the passed parameters, if there is no data, it will prompt empty; if there is no next page of data in the list, it will prompt no more data;
+        mescroll.endSuccess(curPageData.length);
+        //set list data
+        setListData(curPageData);
+    }, function() {
+        //Callback for networking failure, hide the status of pull-down refresh and pull-up loading;
+        mescroll.endErr();
+    });
+}
+
+function setListData(curPageData) {
+    // console.log(curPageData);
+    var list = '';
+    for (var i in curPageData) {
+        list += template('list', curPageData[i]);
+    }
+    $('#dataList').append(list);
+}
+
+function getListDataFromNet(pageNum, pageSize, successCallback, errorCallback) {
+    setTimeout(function() {
+    par.page=pageNum;
+    $get('/api/merchant/merchant_index', par, function(data) {
+        if (data.status == 1) {
+            $('#name').html(data.data.name);
+            $('#follow_num').html(data.data.follow_num);
+            $('#image').attr('src',data.data.image);
+            $('.store_focus').attr('data-id',data.data.id);
+            if(data.data.is_follow==1){
+                $('.store_focus').find('i').addClass('icon-heart-red').removeClass('icon-heart');
+                $('.store_focus').addClass('focus_active');
+            } else{
+                $('.store_focus').find('i').addClass('icon-heart').removeClass('icon-heart-red');
+                $('.store_focus').removeClass('focus_active');
+            }
+            var curPageData = data.data.list;
+            var listData = [];
+            //All products (simulate pagination data)
+            for (var i in curPageData) {
+                if (i == curPageData.length) break;
+                listData.push(curPageData[i]);
+            }
+            successCallback(listData);
+        } else {
+            mescroll.endErr();
+        }
+
+    });
+    }, 1000);
+}
+
+//The selected style of 'Comprehensive' 'Sales'...
+$('.street_nav .saearch_li').on('tap',function(){
+    $(this).addClass('on');
+    $(this).siblings().removeClass('on');
+    if(!$('.li_price').hasClass('on')){
+        $('.li_price').addClass('li_price_arr').removeClass('li_price_asc').removeClass('li_price_desc');
+    }
+});
+//Change the graphic list style
+$('.i_list').on('tap',function(){
+    if($(this).hasClass('icon-list1')){
+        $(this).addClass('icon-list2').removeClass('icon-list1');
+        $('.search_listlow').addClass('search_big').removeClass('search_small');
+    }else{
+        $(this).addClass('icon-list1').removeClass('icon-list2');
+        $('.search_listlow').addClass('search_small').removeClass('search_big');
+    }
+});
+//default
+$('.li_synthe').on('tap',function(){
+    $('.search_synthebg').show();
+    par.order=0;
+    // reset the list data
+    mescroll.resetUpScroll();
+    // hide back to top button
+    mescroll.hideTopBtn();
+});
+// sales
+$('.li_sales').on('tap',function(){
+    par.order='sales';
+    // reset the list data
+    mescroll.resetUpScroll();
+   // hide back to top button
+       mescroll.hideTopBtn();
+   });
+   //price
+   $('.li_price').on('tap',function(){
+       if($(this).hasClass('li_price_arr')){
+           $(this).addClass('li_price_asc').removeClass('li_price_arr');
+           par.order='priceup';
+       }else if($(this).hasClass('li_price_asc')){
+           $(this).addClass('li_price_desc').removeClass('li_price_asc');
+           par.order='pricedown';
+       }else {
+           $(this).addClass('li_price_asc').removeClass('li_price_desc');
+           par.order='priceup';
+       }
+       // reset the list data
+       mescroll.resetUpScroll();
+       // hide back to top button
+       mescroll.hideTopBtn();
+   });
+   //focus on
+$('.store_focus').click(function(){
+    var id=$(this).attr('data-id');
+    $get("/api/shop/follow",{id:id},function(data){
+        if(data.status==1){
+            // mui.toast(data.msg);
+            layer.open({
+                type: 1,
+                skin: 'store_demo', //style class name
+                closeBtn: 0, // do not display the close button
+                anim: 2,
+                time: 1000,
+                title: false, //do not display the title
+                shadeClose: true, //Turn on the mask to close
+                content: data.msg
+            });
+        }else{
+            mui.toast(data.msg);            
+        }
+    });
+    var num=$('#follow_num').html();
+    if($(this).find('i').hasClass('icon-heart')){
+        num++;
+        $(this).find('i').addClass('icon-heart-red').removeClass('icon-heart');
+    }else{
+        num--;
+        $(this).find('i').addClass('icon-heart').removeClass('icon-heart-red');
+    } 
+    $('#follow_num').html(num);
+});
+
+// address bar information    
+function getQueryString(name){
+    var reg = new RegExp("(^|&)"+ name +"=([^&]*)(&|$)");
+    var r = window.location.search.substr(1).match(reg);
+    if(r!=null)return  unescape(r[2]); return null;
+}
+</script>
+</body>
+</html>

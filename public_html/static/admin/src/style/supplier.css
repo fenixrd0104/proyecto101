@@ -1,0 +1,31 @@
+/*
+ * @Author: 王世文1198627433@qq.com 
+ * @Date: 2019-06-18 08:58:25 
+ * @Last Modified by: 王世文1198627433@qq.com
+ * @Last Modified time: 2019-06-18 11:33:54
+ */
+/* 供应商列表 */
+.supplier_list_search .layui-input-inline{
+    width:300px;
+}
+@media screen and (max-width: 450px){
+    .supplier_list_search .layui-input-inline{
+        margin:0;
+    } 
+}
+
+
+/* .supplier_edit>div{
+    float: left;
+}
+.supplier_edit>div:first-child{
+    width:40%;
+    text-align: right;
+}
+.supplier_edit>div:last-child{
+    width:60%;
+} */
+.supplier_edit .layui-input-block{
+    margin-left: 0;
+    
+}

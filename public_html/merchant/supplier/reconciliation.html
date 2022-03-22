@@ -1,0 +1,170 @@
+<title>供应商对账</title>
+
+<div class="layui-card layadmin-header">
+    <div class="layui-breadcrumb" lay-filter="breadcrumb">
+        <a>采购管理</a>
+        <a><cite>供应商对账</cite></a>
+    </div>
+</div>
+
+<div class="layui-fluid">
+<div class="layui-row">
+<div class="layui-col-md12">
+<div class="layui-card">
+    <div class="layui-card-header">供应商对账</div>                    
+    <div class="layui-card-body">
+        <form class="layui-form" lay-filter="received_search_form" style="margin-bottom: 20px;">
+            <div class="layui-inline laydata_inline" style="width:160px;">
+                <input type="text" class="layui-input" id="test-laydate-type-datetime-start" name="startTime" placeholder="开始时间">
+            </div>
+            <div class="layui-inline laydata_inline" style="width:160px;">
+                <input type="text" class="layui-input" name="endTime" id="test-laydate-type-datetime-end" placeholder="截至时间">
+            </div>
+            <div class="layui-inline select_inline" style="width:130px;">
+                <select name="type" id="type"> </select>
+            </div>
+            <div class="layui-inline select_inline" style="width:130px;">
+                <select name="settlement" id="settlement"> </select>
+            </div>
+            <div class="layui-inline select_inline" style="width:130px;">
+                <select name="shopId" id="shop_lists"> </select>
+            </div>
+            <div class="layui-inline" style="width:200px;">
+                <input type="text" name="keyWords" placeholder="商店名称/供货商名称" autocomplete="off" class="layui-input" >
+            </div>
+            <div class="layui-inline">
+                <button class="layui-btn layuiadmin-btn-list" lay-submit lay-filter="received_search" type="button"><i class="layui-icon layui-icon-search layuiadmin-button-btn"></i></button>
+            </div>
+        </form>
+
+        <table class="layui-hide" id="table_reconciliation" lay-filter="table_reconciliation"></table>
+        <script type="text/html" id="test-table-operation">
+        {{# if( d.settlement == "已结算" ){ }}
+            <button class="layui-btn layui-btn-xs layui-btn-disabled" lay-event="settle" disabled>结算</button>
+        {{# }else{ }}  
+            <button class="layui-btn layui-btn-xs" lay-event="settle">结算</button>
+        {{# } }}
+        </script>
+    </div>
+</div>
+</div>
+</div>
+
+<script>
+layui.use(['admin','table','form','laydate'], function(){
+    var $ = layui.$
+    ,admin = layui.admin
+    ,view = layui.view
+    ,table = layui.table
+    ,setter = layui.setter
+    ,layer = layui.layer
+    ,laydate = layui.laydate
+    ,form = layui.form;
+      
+    form.render();
+    //日期时间选择器
+    laydate.render({
+        elem: '#test-laydate-type-datetime-start'
+        ,type: 'datetime'
+    });
+    laydate.render({
+        elem: '#test-laydate-type-datetime-end'
+        ,type: 'datetime'
+    });
+
+    var is_loading=true;
+    table.render({
+        elem: '#table_reconciliation'
+        ,url: layui.setter.baseUrl+'merchant/Supplier/settlementLists'
+        ,toolbar: '#test-table-toolbar-purchase'
+        ,parseData: function(res){   
+            if(is_loading==true){
+                list1="<option value=''>类型</option>";
+                for(var i in res.data.type){
+                    list1 +="<option value='"+i+"' >"+res.data.type[i]+"</option>";
+                }
+                $('#type').html(list1);
+                list2="<option value=''>结算状态</option>";
+                for(var a in res.data.settlement){
+                    list2 +="<option value='"+a+"' >"+res.data.settlement[a]+"</option>";
+                }
+                $('#settlement').html(list2);
+                list3="<option value=''>店铺列表</option>";
+                for(var b in res.data.shop_lists){
+                    list3 +="<option value='"+b+"' >"+res.data.shop_lists[b]+"</option>";
+                }
+                $('#shop_lists').html(list3);
+                form.render('select');          
+                is_loading=false;
+            }
+            return {
+            "code": res.code, //解析接口状态
+            "msg": res.msg, //解析提示文本
+            "count": res.data.count, //解析数据长度
+            "data": res.data.lists //解析数据列表
+            };
+        }
+        ,cols: [[
+            {field:'id', width:80, title: 'ID',align:"center"}
+            ,{field:'shop_name', title: '商店',align:"center"}
+            ,{field:'supplier_name', title: '供应商',align:"center"}
+            ,{field:'money', title: '结算金额',align:"center"}
+            ,{field:'settlement', title: '结算状态',align:"center"}
+            ,{field:'type', title: '类型',align:"center"}
+            ,{field:'remark', title: '备注',align:"center"} 
+            ,{field:'update_time', title: '结算日期',align:"center"} 
+            ,{fixed: '', title:'操作',width:120, toolbar: '#test-table-operation',align:"center"}
+        ]]
+        ,page:true
+    });
+
+    //监听搜索
+    form.on('submit(received_search)', function(data){
+        var field = data.field;
+        // console.log(field);        
+        table.reload('table_reconciliation', {
+            where: field
+        });
+    });
+   
+   // 监听工具条
+   table.on('tool(table_reconciliation)',function(e){
+        var data_s=e.data;
+        console.log(data_s);
+    if(e.event==='settle'){
+    admin.popup({
+        title: "业绩详情",
+        area: admin.screen() < 2 ? ['95%', '80%'] : ["500px", "240px"],
+        id: "LAY-popup-add_autoreply",
+        success: function (layero, index) {
+        view(this.id).render('/supplier/reconcil_detail').done(function () {
+            form.render(null, 'reconcil_detail'); 
+            //监听提交
+            form.on('submit(component-form-element)', function (data) {
+                var field = data.field; //获取提交的字段                
+                admin.req({
+                    url: layui.setter.baseUrl+'merchant/Supplier/SettlementAct'
+                    ,data: {id:data_s.id,remark:field.remark}
+                    ,type:'post'
+                    ,success: function(res){
+                    if(res.code==1){
+                        layui.table.reload('table_reconciliation'); //重载表格
+                        layer.close(index); //执行关闭 
+                        layer.msg(res.msg, {icon: 1,time: 1000});                 
+                    }else{
+                        layer.msg(res.msg, {icon: 5,anim: 6,shade:0.5,time: 1500});
+                    }
+                    }
+                });  
+            });
+        });
+        }
+    }); 
+         
+    } 
+    });
+      
+  
+});
+</script>
+  

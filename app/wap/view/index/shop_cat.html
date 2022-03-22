@@ -1,0 +1,207 @@
+{include file="public/header"/}
+</head>
+<body style="background: #f0f0f0;">
+<header class="mui-bar mui-bar-nav index_header shop_head bg_red_head" id="header">
+    <a class="mui-action-back mui-icon mui-icon-left-nav mui-pull-left" href="javascript:;"></a>
+    <a id="menu" class="mui-action-menu mui-icon mui-icon-bars mui-pull-right" href="javascript:void(0);"></a>
+    <h1 class="mui-title">Shopping Cart</h1>
+</header>
+<div class="mui-content cat_content">
+    <!-- When not logged in -->
+    <div class="no_login hide">
+        <div class='cart_info t_c'>
+            <p><img src="/static/wap/images/no_login.png" alt=""></p>
+            <p>The items in the mobile shopping cart can be synchronized after logging in</p>
+            <div class="mb10"></div>
+            <div class="mb10"></div>
+            <p> <a href="/wap/index/login.html" class="normal_btn">Login now</a></p>
+        </div>
+    </div>
+    <!-- Signed in, no products -->
+    <div class="ok_login hide">
+        <div class="cart_info">
+            <p><img src="/static/wap/images/none4.png" alt=""></p>
+            <p>The shopping cart is empty, let's go shopping~</p>
+        </div>
+    </div>
+
+    <!-- Cart selected item -->
+    <div class="gwc_item ok_login">
+        <!-- total price -->
+        <div class="shopcat_down">
+            <p class="radio_all">
+               <img src="/static/wap/images/img_false.png" alt="" id="check_all" class="fl">
+                <label for="" class="iconfont"></label>
+                select all
+            </p>
+            <div class="shopdown_txt">
+                <p class="total_text">Total: ￥<span id="zong_num">0.00</span></p>
+            </div>
+            <div class="shopdown_btn"><p>Go to settlement(<span class="piece_num">0</span>)</p></div>
+        </div>
+        <div class="goods_choosebg"></div>
+    </div>
+    <!-- Product list -->
+    <div class="car_box cont">
+        <div class="car_list_box">
+            <div class="car_list flexs">
+                <div>
+                    <img src="/static/wap/images/img_false.png" alt="" class="check_goods">
+                </div>
+                <div>
+                    <a href="/wap/index/goods_info.html?id=167"><img src="http://us.universalmall.co/uploads/images/2019/12/14/5df477028a15d.jpg">< /a>
+                </div>
+                <div>
+                    <p>Brand watches</p>
+                    <p>Color: Silver</p>
+                    <p>Unit price: ￥<span class="this_price">800.00</span></p>
+                    <div class="num_box">
+                        <span class="num_jian num_btn">-</span>
+                        <span class="num_val">1</span>
+                        <span class="num_jia num_btn">+</span>
+                    </div>
+                </div>
+            </div>
+            <p><button>Add Favorites</button><button>Delete</button></p>
+        </div>
+        <div class="car_list_box">
+            <div class="car_list flexs">
+                <div>
+                    <img src="/static/wap/images/img_false.png" alt="" class="check_goods">
+                </div>
+                <div>
+                    <a href="/wap/index/goods_info.html?id=167"><img src="http://us.universalmall.co/uploads/images/2019/12/14/5df477028a15d.jpg">< /a>
+                </div>
+                <div>
+                    <p>Brand watches</p>
+                    <p>Color: Silver</p>
+                    <p>Unit price: ￥<span class="this_price">1000.00</span></p>
+                    <div class="num_box">
+                        <span class="num_jian num_btn">-</span>
+                        <span class="num_val">1</span>
+                        <span class="num_jia num_btn">+</span>
+                    </div>
+                </div>
+            </div>
+            <p><button>Add Favorites</button><button>Delete</button></p>
+        </div>
+
+    </div>
+
+
+
+
+
+
+
+    
+</div>
+
+{include file="public/head_nav"/}
+{include file="public/footer"/}
+<script type="text/html" id="list">
+
+</script>
+    
+
+<script>
+// select all
+$('body').on('click','.radio_all',function(){
+    if($('#check_all').attr('src')=='/static/wap/images/img_false.png'){
+        // select all
+        $('#check_all').attr('src','/static/wap/images/img_true.png');
+        $('.check_goods').attr('src','/static/wap/images/img_true.png');
+        $('.car_list_box').addClass('check_this_goods');
+    }else{
+        // unselect all
+        $('#check_all').attr('src','/static/wap/images/img_false.png');
+        $('.check_goods').attr('src','/static/wap/images/img_false.png');
+        $('.car_list_box').removeClass('check_this_goods');
+    }
+    total_zong();
+});
+// single item selection
+$('body').on('click','.check_goods',function(){
+    if($(this).attr('src')=='/static/wap/images/img_false.png'){
+        // select all
+        $(this).attr('src','/static/wap/images/img_true.png');
+        $(this).parents('.car_list_box').addClass('check_this_goods');
+    }else{
+        // unselect all
+        $(this).attr('src','/static/wap/images/img_false.png');
+        $(this).parents('.car_list_box').removeClass('check_this_goods');
+    }
+    total_zong();
+});
+
+// add quantity
+$('body').on('click','.num_jia',function(){
+    var val=$(this).parent('.num_box').find('.num_val').text();
+    val++;
+    $(this).parent('.num_box').find('.num_val').text(val);
+    total_zong();
+});
+
+// count down
+$('body').on('click','.num_jian',function(){
+    var val=$(this).parent('.num_box').find('.num_val').text();
+    val--;
+    if(val<=0){
+        mui.toast('Can't subtract any more');
+        return ;
+    }else{
+        $(this).parent('.num_box').find('.num_val').text(val);
+    }
+    total_zong();
+});
+
+total_zong();
+
+// total calculation
+function total_zong(){
+    // Determine if all is selected
+    var len_1=$('.car_list_box').length;
+    var len_2=$('.check_this_goods').length;
+    if(len_1==len_2){
+        $('#check_all').attr('src','/static/wap/images/img_true.png');           
+    }else{
+        $('#check_all').attr('src','/static/wap/images/img_false.png');
+    }
+    // Count the total quantity selected &&&& Count the total price
+        var zong_n='0';
+        var zone_p='0.00'
+        $('.check_this_goods').each(function(){
+            var this_num=parseFloat($(this).find('.num_val').text());
+            var this_p=parseFloat($(this).find('.this_price').text());
+            zong_p=((zong_p*100+this_p*100*this_num)/100).toFixed(2);
+            zong_n=(zong_n*100+this_num*100)/100;
+        });
+    
+    
+        $('.piece_num').html(zong_n);
+        $('#zong_num').html(zong_p);
+    }
+    
+    // Get shopping cart information
+    get_data();
+    
+    function get_data(){
+    
+    }
+    
+    
+    // jump settlement
+$('body').on('click','.shopdown_btn',function(){
+    var pricenum = $('.piece_num').html();
+    if(pricenum==0){        
+        mui.toast('Please select the item to be billed！');
+    }else{
+        window.location.href='/wap/user/buy_now.html';
+    }
+});
+
+
+
+</script>
+</body>
+</html>

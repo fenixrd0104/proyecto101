@@ -1,0 +1,397 @@
+<style>
+    table td{
+        padding:10px 40px 10px 0;
+    }
+</style>
+<form class="layui-form" lay-filter="add_category" style="padding: 20px 30px 0 0;">
+    <div class="layui-form-item">
+        <label class="layui-form-label">分类名称</label>
+        <div class="layui-input-block">
+            <script type="text/html" template>
+                <input type="text" name="name" id="LAY-title" lay-verify="required" placeholder="输入分类名称" autocomplete="off" class="layui-input" value="{{d.params.name||''}}">
+            </script>
+       
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">WAP名称</label>
+        <div class="layui-input-block">
+            <script type="text/html" template>
+                <input type="text" name="mobile_name" id="LAY-title" lay-verify="required" placeholder="输入WAP显示名称" autocomplete="off" class="layui-input" value="{{d.params.mobile_name||''}}">
+            </script>
+       
+        </div>
+    </div>
+
+    <div class="layui-form-item">
+        <label class="layui-form-label">顶级分类</label>
+        <div class="layui-input-block">
+            <select name="parent_id_1" id="LAY-fenlei" lay-filter="LAY-fenlei">
+
+            </select>
+        </div>
+
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">二级分类</label>
+        <div class="layui-input-block">
+            <select name="parent_id_2" id="LAY-fl" lay-filter="LAY-fl">
+            </select>
+        </div>
+
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">展示图片</label>
+        <div class="layui-input-block">
+            <div class="layui-input-inline">
+                <input name="image" lay-verify="required" id="goods_img" placeholder="图片地址" value="" class="layui-input">
+               
+                </div>
+                <div class="layui-input-inline layui-btn-container" style="width: auto;">
+                <button type="button" class="layui-btn" id="LAY_avatarUpload">
+                    <i class="layui-icon">&#xe67c;</i>上传图片
+                </button>
+                <a class="layui-btn layui-btn-primary" onclick="see_img();">查看图片</a>
+            </div>
+        </div>
+    </div>
+
+    <div class="layui-form-item">
+        <label class="layui-form-label">是否推荐</label>
+        <div class="layui-input-block">
+            <script template type="text/html">
+              {{# if(d.params.id){ }}
+                <input type="radio" name="is_hot" value="1" title="是" {{d.params.is_hot===1? 'checked':' '}}>
+                <input type="radio" name="is_hot" value="0" title="否" {{d.params.is_hot===0? 'checked':''}}>
+              {{# }else{ }}  
+                <input type="radio" name="is_hot" value="1" title="是" >
+                <input type="radio" name="is_hot" value="0" title="否" checked>
+              {{# } }}  
+               
+            </script>
+        </div>                    
+    </div>
+
+    <div class="layui-form-item">
+        <label class="layui-form-label">是否显示</label>
+        <div class="layui-input-block">
+            <script template type="text/html">
+                {{# if(d.params.id){ }}
+                    <input type="radio" name="is_show" value="1" title="是" {{d.params.is_show===1? 'checked':' '}}>
+                    <input type="radio" name="is_show" value="0" title="否" {{d.params.is_show===0? 'checked':''}}>
+                {{# }else{ }}  
+                    <input type="radio" name="is_show" value="1" title="是" checked>
+                    <input type="radio" name="is_show" value="0" title="否" >
+                {{# } }}  
+            </script>
+        </div>                    
+    </div>
+    <div class="layui-form-item">
+            <label class="layui-form-label">排序</label>
+            <div class="layui-input-block">
+                <script template type="text/html">
+                    <input type="text" name="order" id="LAY-title" lay-verify="required" placeholder="输入排序" autocomplete="off" class="layui-input" value="{{d.params.order||'255'}}">
+                </script>
+            </div>
+            <input type="hidden" name="spec_id" value="0">
+    </div>
+    <!-- <div class="layui-form-item">
+            <label class="layui-form-label">筛选规格</label>
+            <div class="layui-input-block">
+                    <script type="text/html" id="test-table-toolbar-sx_guige">
+                        <div class="layui-btn-container">
+                            <button type="button" class="layui-btn" id="sx_guige"><i class="layui-icon layui-icon-add-1 layuiadmin-button-btn"></i>添加</button>
+                        </div>
+                    </script>
+                    <div class="layui-btn-container">
+                        <button type="button" class="layui-btn layui-btn-normal" id="sx_guige"><i class="layui-icon layui-icon-add-1 layuiadmin-button-btn"></i>添加</button>
+                    </div>
+                    <table id="shaixuan_guige" lay-filter="shaixuan_guige" style="width:100%;">
+                        <tr>
+                            <td>
+                                <select name="1" class="f1" lay-filter="f1">
+                                </select>
+                            </td>
+                            <td>
+                                <select name="2" class="f2" lay-filter="f2">
+                                </select>
+                            </td>
+                            <td>
+                                <a class="layui-btn layui-btn-danger layui-btn-xs del" ><i class="layui-icon layui-icon-delete"></i>删除</a>
+                            </td>
+                            
+                        </tr>
+                  
+                    </table>
+                   
+                    <script type="text/html" id="table_shaixuan_guige">
+                      <a class="layui-btn layui-btn-normal layui-btn-xs" lay-event="edit"><i class="layui-icon layui-icon-edit"></i>编辑</a>
+                      <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del"><i class="layui-icon layui-icon-delete"></i>删除</a>
+                    </script>
+            </div>
+    </div> -->
+    <div class="layui-form-item">
+        <div class="layui-input-block">
+        <button class="layui-btn"  type="button" lay-submit lay-filter="category_submit"><i class="layui-icon">&#xe654;</i>保存</button>
+        </div>
+    </div>
+    <script type="text/html" template lay-done="layui.data.sendParams(d.params)"></script>  
+</form>
+ 
+<script>
+
+layui.data.sendParams = function(params){
+    console.log(params);
+    var chec_id=params.parent_id;
+    var fl_id=params.cat_id;
+    
+    layui.use(['admin', 'upload','form','table','view','layer','setter'], function(){
+    var $ = layui.$
+    ,admin = layui.admin
+    ,setter = layui.setter
+    ,layer = layui.layer
+    ,element = layui.element
+    ,form = layui.form
+    ,upload = layui.upload
+    ,view = layui.view
+    ,table = layui.table
+    ,router = layui.router();
+
+    if(params.image){
+        $('#goods_img').val(params.image);
+    }
+    form.render();
+
+    admin.req({
+        url: layui.setter.baseUrl+'merchant/goods/goodsCategory' 
+        ,data: {},
+        type:'get',
+        success: function(res){
+            if(res.code==1){
+                var list="<option value='0'>--顶级分类--</option>";
+                for( var i in res.data){
+                    if(res.data[i].level===1){
+                        list += "<option value='"+res.data[i].id+"' >"+res.data[i].name+"</option> ";
+                    }
+                    
+                }
+                if(params.id){
+                    $('#LAY-fenlei').html(list);
+                    if(params.level==1){
+                        $('#LAY-fenlei').val(params.id);
+                    }else  if(params.level==2){
+                        $('#LAY-fenlei').val(params.parent_id);
+                        admin.req({
+                            url: layui.setter.baseUrl+'merchant/goods/ajaxGetCategory' 
+                            ,data: {pid:params.parent_id},
+                            type:'get',
+                            success: function(res){
+                                if(res.code==1){
+                                    var list="<option value='0'>--全部分类--</option>";
+                                    for( var i in res.data){
+                                        list += "<option value='"+res.data[i].id+"' >"+res.data[i].name+"</option> ";
+                                    }
+                                    $('#LAY-fl').html(list);
+                                    $('#LAY-fl').val(params.id);
+                                    form.render();
+                                }else if(res.code===0){
+                                    var list="<option value=''>该分类下无子分类</option>";
+                                    $('#LAY-fl').html(list);
+                                }else if(res.data===""&&res.code===1){
+                                    var list="<option value=''>该分类下无子分类</option>";
+                                    $('#LAY-fl').html(list);
+                                }else{
+                                    layer.msg(res.msg);
+                                }       
+                            } 
+                        });
+                    }else{
+                        var str=params.parent_id_path;
+                        var cur_str = str.split("_");
+                        var id_1=cur_str[1];
+                        var id_2=cur_str[2];
+                        $('#LAY-fenlei').val(id_1);
+                        admin.req({
+                            url: layui.setter.baseUrl+'merchant/goods/ajaxGetCategory' 
+                            ,data: {pid:id_1},
+                            type:'get',
+                            success: function(res){
+                                if(res.code==1){
+                                    var list="<option value=''>--全部分类--</option>";
+                                    for( var i in res.data){
+                                        list += "<option value='"+res.data[i].id+"' >"+res.data[i].name+"</option> ";
+                                    }
+                                    $('#LAY-fl').html(list);
+                                    $('#LAY-fl').val(id_2);
+                                    form.render();
+                                }else if(res.code===0){
+                                    var list="<option value=''>该分类下无子分类</option>";
+                                    $('#LAY-fl').html(list);
+                                }else if(res.data===""&&res.code===1){
+                                    var list="<option value=''>该分类下无子分类</option>";
+                                    $('#LAY-fl').html(list);
+                                }else{
+                                    layer.msg(res.msg);
+                                }       
+                            } 
+                        });
+                    }
+                }else{
+                    $('#LAY-fenlei').html(list);
+                }    
+                
+                form.render();
+            }else{
+                layer.msg(res.msg);
+            }       
+        } 
+    }); 
+    // table.render({
+    //     elem: '#shaixuan_guige'
+    //     ,url: layui.setter.baseUrl+'merchant/goods/goodsCategory'
+    //     ,cellMinWidth: 80 ,
+    //     toolbar:'#test-table-toolbar-sx_guige'
+    //     ,cols: [[
+    //     {field:'name', title: '商品类型',align:'center',templet:'#f1',style:'height:80px;'}
+    //     ,{field:'mobile_name',  title: '筛选规格',align:'center',templet:'#f2',style:'height:80px;'}
+    //     ,{fixed: 'right', title:'操作', toolbar: '#table_shaixuan_guige',align:'center'}
+    //     ]]
+    // });
+    table.render();
+
+    form.on('select(LAY-fenlei)',function(e){
+        admin.req({
+            url: layui.setter.baseUrl+'merchant/goods/ajaxGetCategory' 
+            ,data: {pid:e.value},
+            type:'get',
+            success: function(res){
+                if(res.code==1){
+                    var list="<option value=''>--全部分类--</option>";
+                    for( var i in res.data){
+                        list += "<option value='"+res.data[i].id+"' >"+res.data[i].name+"</option> ";
+                    }
+                    if(chec_id){
+                        $('#LAY-fl').html(list);
+                        $('#LAY-fl').val(fl_id);
+                    }else{
+                        $('#LAY-fl').html(list);
+                    }    
+                    
+                    form.render();
+                }else if(res.code===0){
+                    var list="<option value=''>该分类下无子分类</option>";
+                    $('#LAY-fl').html(list);
+                }else if(res.data===""&&res.code===1){
+                    var list="<option value=''>该分类下无子分类</option>";
+                    $('#LAY-fl').html(list);
+                }else{
+                    layer.msg(res.msg);
+                }       
+            } 
+        });
+    });
+
+    // 查看图片
+    window.see_img=function(){
+        var i = $('#goods_img').val();
+        layer.photos({
+            photos: {
+                title: "查看头像",
+                data: [{
+                    src: i
+                }]
+            },
+            shade: 0.5,
+            closeBtn: 1,
+            anim: 5
+        });
+    };    
+    //多图片上传
+    upload.render({
+        elem: '#LAY_avatarUpload'
+        ,url: layui.setter.baseUrl+'merchant/upload/upload'
+        ,multiple: true
+        ,before: function(obj){
+        //预读本地文件示例，不支持ie8
+        obj.preview(function(index, file, result){
+            $('#upload_goods_images_box').append('<img src="'+ result +'" alt="'+ file.name +'" class="layui-upload-img" style="width:120px;height:120px;margin:0 15px 15px 0px;">')
+        });
+        }
+        ,done: function(res){
+        //上传完毕
+
+        $('#goods_img').val(res.data);
+        }
+    });
+    // 初始化下拉框
+    // 商品规格
+    admin.req({
+        url: layui.setter.baseUrl+'merchant/goods/goodsSpec?type_id=0'
+        ,data: {},
+        type:'get',
+        success: function(res){
+            if(res.code==1){
+                var list="<option value=''>--全部类型--</option>";
+                for( var i in res.data.typeList){
+                    list += "<option value='"+res.data.typeList[i].id+"' >"+res.data.typeList[i].name+"</option> ";
+                }
+                $('.f1').html(list);
+                
+                form.render();
+            }else{
+                layer.msg(res.msg);
+            }       
+        } 
+    }); 
+
+    function get_data(type_id,elem){
+        admin.req({
+            url: layui.setter.baseUrl+'merchant/goods/goodsSpec?type_id='+type_id
+            ,data: {},
+            type:'get',
+            success: function(res){
+                if(res.code==1){
+                    var list="<option value=''>--全部类型--</option>";
+                    for( var i in res.data.lists){
+                        list += "<option value='"+res.data.lists[i].id+"' >"+res.data.lists[i].name+"</option> ";
+                    }
+                    elem.html(list);
+                    
+                    form.render();
+                }else{
+                    layer.msg(res.msg);
+                }       
+            } 
+        }); 
+
+    }
+
+    // 添加
+    $('body').on('click','#sx_guige',function(){
+        var tr=$('#shaixuan_guige tr:first-child').clone();
+        $('#shaixuan_guige').append(tr);
+        table.render();
+        form.render();
+    });
+    // 删除
+    $('body').on('click','.del',function(){
+       if($('#shaixuan_guige tr').length<2){
+           layer.msg('不能再删除了')
+       }else{
+        $(this).parents('tr').remove();
+        table.render();
+        form.render();
+       }
+    });
+    form.on('select(f1)',function(e){
+        var elem=$('.'+e.elem.className).parents('tr').find('.f2');
+        get_data(e.value,elem);
+    });
+
+
+
+
+
+});
+}
+</script>

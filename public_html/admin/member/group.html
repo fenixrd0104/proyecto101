@@ -1,0 +1,219 @@
+<title>会员管理</title>
+
+<div class="layui-card layadmin-header">
+  <div class="layui-breadcrumb" lay-filter="breadcrumb">
+    <a>会员管理</a>
+    <a><cite>会员组</cite></a>
+  </div>
+</div>
+<div class="layui-fluid">
+  <div class="layui-row layui-col-space15">
+    <div class="layui-col-md12">
+      <div class="layui-card">
+        <div class="layui-card-header">会员组列表</div>
+        <div class="layui-card-body">
+          <div class="test-table-reload-btn" style="margin-bottom: 10px;">
+
+            <div class="layui-input-inline">
+              <button type="button" class="layui-btn layuiadmin-btn-admin" style="margin-right: 30px;"
+                data-type="add"><i class="layui-icon layui-icon-add-1 layuiadmin-button-btn"></i>添加会员组</button>
+            </div>
+            <div class="layui-input-inline">
+
+              <div class="layui-form">
+                <div class="layui-inline">
+                  <input class="layui-input" name="keywords" placeholder="输入需查询的会员组" id="test-table-demoReload"
+                    autocomplete="off">
+                </div>
+                <button class="layui-btn" type="button" lay-submit lay-filter="gr_search"><i
+                    class="layui-icon">&#xe615;</i>搜索</button>
+              </div>
+
+            </div>
+
+          </div>
+          <table class="layui-hide" id="member_group" lay-filter="member_group"></table>
+          <script type="text/html" id="tool_member_group">
+              <a class="layui-btn layui-btn-normal layui-btn-xs" lay-event="edit"><i class="layui-icon layui-icon-edit"></i>编辑</a>
+              <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del"><i class="layui-icon layui-icon-delete"></i>删除</a>
+            </script>
+          <script type="text/html" id="status">
+                <input type="checkbox" name="status" lay-skin="switch" lay-text="开启|禁用" lay-filter="user_status" value="{{d.id}}" {{ d.status === 1 ? 'checked' : '' }}>
+              
+            </script>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  layui.use(['admin', 'table', 'view', 'form', 'layer','ourJs'], function () {
+    var $ = layui.$
+      , admin = layui.admin
+      , element = layui.element
+      , form = layui.form
+      , view = layui.view
+      , layer = layui.layer
+      , table = layui.table
+      , ourJs = layui.ourJs
+      , router = layui.router();
+
+
+
+    var keywords = "";
+    get_data(keywords);
+    function get_data(keywords) {
+      table.render({
+        elem: '#member_group'
+        , url: layui.setter.baseUrl + 'admin/Member/group'
+        , parseData: function (res) { //res 即为原始返回的数据
+          return {
+            "code": res.code, //解析接口状态
+            "msg": res.msg, //解析提示文本
+            "count": res.data.count, //解析数据长度
+            "data": res.data.lists //解析数据列表
+          };
+        }
+        , cols: [[
+          { field: 'id', width: 85, title: 'ID', sort: true, align: 'center' }
+          , { field: 'group_name', width: 225, title: '会员组名称', align: 'center' }
+          , { field: 'status', width: 115, title: '状态', templet: '#status', align: 'center' }
+          , { field: 'create_time', title: '创建时间', align: 'center' }
+          , { field: 'update_time', title: '更新时间', align: 'center' }
+          , { fixed: 'right', title: '操作', align: 'center', toolbar: '#tool_member_group', width: 160 }
+        ]],
+        page: true,
+        where: { keywords: keywords }
+      });
+    }
+
+
+    var $ = layui.$, active = {
+      // 添加会员组
+      add: function () {
+        admin.popup({
+          title: "添加会员组",
+          area: admin.screen() < 2 ? ['95%', '80%'] : ["500px", "270px"],
+          id: "LAY-popup-add_gr",
+          success: function (layero, index) {
+            view(this.id).render('/member/add_group').done(function () {
+              form.render(null, 'add_group'); // 弹窗的lay-filter值
+              //监听提交
+              //监听提交
+              form.on('submit(member_group_submit)', function (datas) {
+                admin.req({
+                  url: layui.setter.baseUrl + 'admin/member/add_group'
+                  , data: datas.field,
+                  type: 'post',
+                  success: function (res) {
+                    if (res.code == 1) {
+                      layer.msg(res.msg, { icon: 1, shade: 0.5, time: 1000 }, function () {
+                        setTimeout(function () {
+                          layer.close(index); //执行关闭 
+                          layui.table.reload('member_group'); //重载表格
+                        }, 1000);
+
+                      });
+                    } else {
+                      layer.msg(res.msg, { icon: 5, anim: 6, shade: 0.5, time: 1000 });
+                    }
+                  }
+                });
+              });
+            });
+          }
+        });
+      }
+
+    };
+    // 搜索
+    form.on('submit(gr_search)', function (e) {
+      get_data(e.field.keywords);
+    });
+
+    $('.test-table-reload-btn .layui-btn').on('click', function () {
+      var type = $(this).data('type');
+      active[type] ? active[type].call(this) : '';
+    });
+
+    //监听工具条
+    table.on('tool(member_group)', function (obj) {
+      var data = obj.data;
+      var id = data.id;
+      if (obj.event === 'del') {
+        layer.confirm('确认删除此会员组?', { icon: 3, title: '提示' }, function (index) {
+          admin.req({
+            url: layui.setter.baseUrl + 'admin/member/del_group'
+            , data: { id: id }
+            , type: 'post'
+            , success: function (res) {
+              if (res.code == 1) {
+                obj.del();
+                layer.close(index);
+              } else {
+                layer.msg(res.msg, { icon: 5, anim: 6, shade: 0.5, time: 1000 });
+              }
+            }
+          });
+        });
+      } else if (obj.event === 'edit') {
+
+        // 编辑
+        admin.popup({
+          title: "编辑会员组",
+          area: admin.screen() < 2 ? ['95%', '80%'] : ["500px", "270px"],
+          id: "LAY-popup-edit_gr",
+          success: function (layero, index) {
+            view(this.id).render('/member/add_group', data).done(function () {
+              form.render(null, 'add_group'); // 弹窗的lay-filter值
+              //监听提交
+              form.on('submit(member_group_submit)', function (datas) {
+                datas.field.id = id;
+                admin.req({
+                  url: layui.setter.baseUrl + 'admin/member/edit_group'
+                  , data: datas.field,
+                  type: 'post',
+                  success: function (res) {
+                    if (res.code == 1) {
+                      layer.msg(res.msg, { icon: 1, shade: 0.5, time: 1000 }, function () {
+                        setTimeout(function () {
+                          layer.close(index); //执行关闭 
+                          layui.table.reload('member_group'); //重载表格
+                        }, 1000);
+
+                      });
+                    } else {
+                      layer.msg(res.msg, { icon: 5, anim: 6, shade: 0.5, time: 1000 });
+                    }
+                  }
+                });
+              });
+
+            });
+          }
+        });
+      }
+    });
+    //编辑状态
+    form.on('switch(user_status)', function (e) {
+      var _this = this;
+      var status = e.elem.checked;
+      var id = e.value;
+      admin.req({
+        url: layui.setter.baseUrl + 'admin/member/group_status'
+        , data: { id: id }
+        , type: 'post'
+        , success: function (res) {
+          if (res.code == 1 || res.code == 0) {
+            ourJs.status_tong(table, _this, status);
+          } else {
+            layer.msg(res.msg, { icon: 5, anim: 6, shade: 0.5, time: 1000 });
+          }
+        }
+      });
+
+    });
+
+  });
+</script>

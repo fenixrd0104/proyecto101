@@ -1,0 +1,773 @@
+<title>编辑商品</title>
+<link href="/static/admin/umedit/themes/default/css/umeditor.css" type="text/css" rel="stylesheet">
+<script src="/static/admin/layui/lay/modules/jquery.3.1.1.js"></script>
+<script src="/static/admin/umedit/umeditor.config.js"></script>
+<script src="/static/admin/umedit/umeditor.min.js"></script>
+<script src="/static/admin/umedit/lang/zh-cn/zh-cn.js"></script>
+
+<div class="layui-card layadmin-header">
+    <div class="layui-breadcrumb" lay-filter="breadcrumb">
+        <a>商品管理</a>
+        <a><cite>商品列表</cite></a>
+        <a><cite>编辑商品</cite></a>
+    </div>
+</div>
+<script type="text/html" template>
+    <link rel="stylesheet" href="{{ layui.setter.base }}style/goods.css?v={{ layui.admin.v }}-1" media="all">
+</script>
+<style>
+    .t_l { text-align: left; }
+    .t_c { text-align: center; }
+    .t_r { text-align: right; }
+    @media screen and (max-width: 992px) {
+        .t_r { text-align: left; }
+    }
+    form .layui-row>.layui-form-item>div {
+        line-height: 36px;
+        padding: 0px 10px;
+    }
+    form .layui-row>.layui-form-item .layui-input-inline {
+        margin-bottom: 20px;
+        margin-left: 0;
+    }
+    .layui-form-switch{ margin-top: 0; }
+    .layui-upload-list img{
+        width:120px;
+        height:120px;
+        margin-right:20px;
+        margin-bottom:20px;
+    }
+    #tableTpl input{ width:80px; }
+    .edui-tab-item{ line-height: 12px!important; }
+</style>
+<div id="component-tabs">
+<div class="layui-row">
+<div class="layui-col-md12">
+<div class="layui-card">
+<!-- <div class="layui-card-header">添加商品</div> -->
+<form class="layui-form" lay-filter="edit_goods_1">
+<div class="layui-tab layui-tab-card">
+    <ul class="layui-tab-title">
+        <li class="layui-this">通用信息</li>
+        <li>商品相册</li>
+        <li>商品类型</li>
+        <li>积分折扣</li>
+    </ul>
+    <div class="layui-tab-content">
+    <div class="layui-tab-item layui-show">
+    <script template type="text/html">
+    <div class="layui-row">
+        <div class="layui-form-item">
+            <div class="layui-col-md3 t_r ">商品名称</div>
+            <div class="layui-col-md5">
+                <input type="text" name="goods_name" lay-verify="title" autocomplete="off" placeholder="请输入商品名称" class="layui-input" value="{{d.params.goods_name}}">
+            </div>
+            <div class="layui-col-md4 layui-word-aux">输入商品的名称</div>
+        </div>
+        <div class="layui-form-item">
+            <div class="layui-col-md3 t_r ">商品简介</div>
+            <div class="layui-col-md5">
+                <textarea name="goods_remark" placeholder="请输入内容" class="layui-textarea" id="goods_remark">{{d.params.goods_remark}}</textarea>
+            </div>
+            <div class="layui-col-md4 layui-word-aux">请输入对商品的简单介绍</div>
+        </div>
+        <div class="layui-form-item">
+            <div class="layui-col-md3 t_r ">商品货号</div>
+            <div class="layui-col-md5">
+                <input type="text" name="goods_sn" lay-verify="title" autocomplete="off" placeholder="请输入商品货号" class="layui-input"  value="{{d.params.goods_sn}}">
+            </div>
+            <div class="layui-col-md4 layui-word-aux">如果不填写会自动生成唯一值</div>
+        </div>
+        <div class="layui-form-item">
+            <div class="layui-col-md3 t_r ">商品条码</div>
+            <div class="layui-col-md5">
+                <input type="text" name="sku" lay-verify="title" autocomplete="off" placeholder="请输入商品条码" class="layui-input"  value="{{d.params.sku}}">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <div class="layui-col-md3 t_r ">商品单位</div>
+            <div class="layui-col-md5">
+                <input type="text" name="unit" lay-verify="title" autocomplete="off"  placeholder="请输入商品单位" class="layui-input" value="{{d.params.unit}}">
+            </div>
+            <div class="layui-col-md4 layui-word-aux">商品单位</div>
+        </div>
+        <div class="layui-form-item">
+            <div class="layui-col-md3 t_r ">商品分类</div>
+            <div class="layui-col-md9">
+                <div class="layui-input-inline">
+                    <select name="cat_id_1" id="cat_id_1" lay-filter="cat_id_1"> </select>
+                </div>
+                <div class="layui-input-inline">
+                    <select name="cat_id_2" id="cat_id_2" lay-filter="cat_id_2"> </select>
+                </div>
+                <div class="layui-input-inline">
+                    <select name="cat_id_3" id="cat_id_3" lay-filter="cat_id_3"> </select>
+                </div>
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <div class="layui-col-md3 t_r ">拓展分类</div>
+            <div class="layui-col-md9">
+                <div class="layui-input-inline">
+                    <select name="extend_cat_id_1" id="extend_cat_id_1" lay-filter="extend_cat_id_1"></select>
+                </div>
+                <div class="layui-input-inline">
+                    <select name="extend_cat_id_2" id="extend_cat_id_2" lay-filter="extend_cat_id_2"></select>
+                </div>
+                <div class="layui-input-inline">
+                    <select name="extend_cat_id_3" id="extend_cat_id_3" lay-filter="extend_cat_id_3"></select>
+                </div>
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <div class="layui-col-md3 t_r ">商品品牌</div>
+            <div class="layui-col-md5">
+                <select name="brand_id" id="brandList"></select>
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <div class="layui-col-md3 t_r ">本店售价</div>
+            <div class="layui-col-md5">
+                <input type="text" name="shop_price" lay-verify="title" autocomplete="off" placeholder="请输入本店售价" class="layui-input"  value="{{d.params.shop_price}}">
+            </div>
+            <div class="layui-col-md4 layui-word-aux">输入商品的本店售价</div>
+        </div>
+        <div class="layui-form-item">
+            <div class="layui-col-md3 t_r ">市场价</div>
+            <div class="layui-col-md5">
+                <input type="text" name="market_price"  lay-verify="title" autocomplete="off" placeholder="请输入市场价" class="layui-input"  value="{{d.params.market_price}}">
+            </div>
+            <div class="layui-col-md4 layui-word-aux">输入商品的市场价</div>
+        </div>
+        <!-- <div class="layui-form-item">
+            <div class="layui-col-md3 t_r ">代理价格</div>
+            <div class="layui-col-md5">
+                <input type="text" name="trade_price" lay-verify="title" autocomplete="off" placeholder="请输入代理价格" class="layui-input" value="{{d.params.trade_price}}">
+            </div>
+            <div class="layui-col-md4 layui-word-aux">批发价</div>
+        </div> -->
+        <div class="layui-form-item">
+            <div class="layui-col-md3 t_r ">成本价</div>
+            <div class="layui-col-md5">
+                <input type="text" name="cost_price"  lay-verify="title" autocomplete="off" placeholder="请输入成本价" class="layui-input" value="{{d.params.cost_price}}">
+            </div>
+            <div class="layui-col-md4 layui-word-aux">进货进价</div>
+        </div>
+        <!-- <div class="layui-form-item">
+            <div class="layui-col-md3 t_r ">成本价</div>
+            <div class="layui-col-md5">
+                <input type="text" name="title" lay-verify="title" autocomplete="off"
+                    placeholder="请输入成本价" class="layui-input">
+            </div>
+            <div class="layui-col-md4 layui-word-aux">输入商品的成本价</div>
+        </div> -->
+        <div class="layui-form-item">
+            <div class="layui-col-md3 t_r ">图片上传</div>
+            <div class="layui-col-md9">
+                <div class="layui-input-inline">
+                    <input name="original_img" lay-verify="required" id="goods_img" placeholder="图片地址"  class="layui-input" value="{{d.params.original_img}}">
+                </div>
+                <div class="layui-input-inline layui-btn-container" style="width: auto;">
+                    <button type="button" class="layui-btn" id="LAY_avatarUpload"> <i class="layui-icon">&#xe67c;</i>上传图片</button>
+                    <a class="layui-btn layui-btn-primary" id="see_img" onclick="see_img();">查看图片</a>
+                </div>
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <div class="layui-col-md3 t_r ">商品重量</div>
+            <div class="layui-col-md5">
+                <input type="text" name="weight" lay-verify="title" autocomplete="off" placeholder="请输入商品重量" class="layui-input"  value="{{d.params.weight}}">
+            </div>
+            <div class="layui-col-md4 layui-word-aux">务必设置商品重量, 用于计算物流费.以克为单位</div>
+        </div>
+        <div class="layui-form-item">
+            <div class="layui-col-md3 t_r ">是否包邮</div>
+            <div class="layui-col-md5">
+                <!-- <input type="checkbox" name="all_check" lay-skin="switch" lay-text="是|否" lay-filter="all_check"> -->
+                <input type="radio" name="is_free_shipping" value="1" title="是"  {{d.params.is_free_shipping===1?'checked':""}}>
+                <input type="radio" name="is_free_shipping" value="0" title="否" {{d.params.is_free_shipping===0?'checked':''}}>
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <div class="layui-col-md3 t_r ">运费模板</div>
+            <div class="layui-col-md5">
+                <select name="fid" id="fid"></select>
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <div class="layui-col-md3 t_r ">选择供应商</div>
+            <div class="layui-col-md5">
+                <select name="supplier_id" id="supplier"></select>
+            </div>
+            <div class="layui-col-md4 layui-word-aux">选择供应商</div>
+        </div>
+        <div class="layui-form-item">
+            <div class="layui-col-md3 t_r ">商品关键词</div>
+            <div class="layui-col-md5">
+                <input type="text" name="keywords" lay-verify="title" autocomplete="off"  placeholder="请输入商品关键词" class="layui-input"  value="{{d.params.keywords}}">
+            </div>
+            <div class="layui-col-md4 layui-word-aux">多个以逗号隔开</div>
+        </div>
+        <div class="layui-form-item">
+            <div class="layui-col-md3 t_r ">排序</div>
+            <div class="layui-col-md5">
+                <input type="text" name="sort" lay-verify="title" autocomplete="off"  placeholder="请输入排序" class="layui-input" value="{{d.params.sort}}">
+            </div>
+            <div class="layui-col-md4 layui-word-aux">商品排序</div>
+        </div>
+        <div class="layui-form-item">
+            <div class="layui-col-md3 t_r ">商品状态</div>
+            <div class="layui-col-md5">
+                <input type="radio" name="status" value="1" title="开启"  {{d.params.status===1?'checked':""}}>
+                <input type="radio" name="status" value="0" title="关闭" {{d.params.status===0?'checked':''}}>
+            </div>
+            <div class="layui-col-md4 layui-word-aux"></div>
+        </div>
+        <!-- <div class="layui-form-item">
+            <div class="layui-col-md3 t_r ">商品详情描述</div>
+            <div class="layui-col-md9">
+                <textarea id="goods_detail" style="display: none;" name="goods_contents" value=""></textarea>
+                
+            </div>
+        </div> -->
+    </script>
+        <div class="layui-form-item">
+            <div class="layui-col-md3 t_r ">商品详情描述</div>
+            <div class="layui-col-md9">
+                <input type="hidden" name="goods_content" id="get_content" value="{{d.params.goods_content}}">           
+                <script id="editors" type="text/plain" style="width:100%;height:500px;"></script>
+            </div>
+        </div>
+        <div class="layui-form-item" style="padding:20px 0;border-top:1px solid #f1f1f1;">
+            <div class="layui-col-md12 t_c">
+                <button type="button" class="layui-btn add_submit_btn" lay-submit lay-filter="submit_edit_goods_1"><i  class="layui-icon layui-icon-link"></i>保存</button>
+            </div>
+        </div>
+    </div>
+    <div class="layui-tab-item">
+    <div class="layui-row">
+        <div class="layui-form-item">
+            <div class="layui-col-md3 t_r"></div>
+            <div class="layui-col-md9">
+            <div class="layui-card-body">
+            <div class="layui-upload">
+                <button type="button"  class="layui-btn" id="upload_goods_images"><i class="layui-icon layui-icon-upload-drag"></i>上传商品图</button>
+                <blockquote class="layui-elem-quote layui-quote-nm" style="margin-top: 10px;">
+                    <div class="layui-upload-list" id="upload_goods_images_box"></div>
+                </blockquote>
+            </div>
+            </div>
+            </div>
+        </div>
+        <div class="layui-form-item" style="padding:20px 0;border-top:1px solid #f1f1f1;">
+        <div class="layui-col-md12 t_c">
+                <button type="button" class="layui-btn add_submit_btn" lay-submit lay-filter="submit_edit_goods_1"><i  class="layui-icon layui-icon-link"></i>保存</button>
+        </div>
+        </div>
+    </div>
+    </div>
+    <div class="layui-tab-item">
+    <div class="layui-row">
+        <div class="layui-form-item">
+            <div class="layui-col-md3 t_r ">商品类型</div>
+            <div class="layui-col-md5">
+                <select name="goods_type" id="leixing" lay-filter="choose_type_id"></select>
+            </div>
+            <div class="layui-col-md4 layui-word-aux">请选择对应商品类型</div>
+        </div>
+        <div class="layui-form-item">
+            <div class="layui-row">
+                <div class="layui-col-md7">
+                    <table id="leixing_1" class="table-bordered"></table>
+                </div>
+                <div class="layui-col-md1">&nbsp;</div>
+                <div class="layui-col-md4">
+                    <table id="leixing_2" class="table-bordered"></table>
+                </div>
+            </div>
+            <div class="layui-row">
+                <div class="goods_table2 layui-col-md7" >
+                <table class="table-bordered">
+                    <tbody id="tableTpl"></tbody>
+                </table>
+                </div>
+            </div>
+        </div>
+        <div class="layui-form-item" style="padding:20px 0;border-top:1px solid #f1f1f1;">
+        <div class="layui-col-md12 t_c">
+            <button type="button" class="layui-btn add_submit_btn" lay-submit lay-filter="submit_edit_goods_1"><i  class="layui-icon layui-icon-link"></i>保存</button>
+        </div>
+        </div>
+    </div>
+    </div>
+    <div class="layui-tab-item">
+    <script template type="text/html">
+    <div class="layui-row">
+        <div class="layui-form-item">
+            <div class="layui-col-md3 t_r ">赠送积分</div>
+            <div class="layui-col-md5">
+                <input type="text" name="give_integral" autocomplete="off" placeholder="请输入" class="layui-input" value="{{d.params.give_integral||'0'}}">
+            </div>
+            <div class="layui-col-md4 layui-word-aux">订单完成后赠送的积分</div>
+        </div>
+        <div class="layui-form-item">
+            <div class="layui-col-md3 t_r ">兑换积分</div>
+            <div class="layui-col-md5">
+                <input type="text" name="exchange_integral" autocomplete="off" placeholder="请输入" class="layui-input" value="{{d.params.exchange_integral||'0'}}">
+            </div>
+            <div class="layui-col-md4 layui-word-aux">如果设置0，则不支持积分抵扣</div>
+        </div>
+        <div class="layui-form-item" style="padding:20px 0;border-top:1px solid #f1f1f1;">
+            <div class="layui-col-md12 t_c">
+                <button type="button" class="layui-btn edit_submit_btn" lay-submit lay-filter="submit_edit_goods_1"><i  class="layui-icon layui-icon-link"></i>保存</button>
+            </div>
+        </div>
+    </div>
+    </script>
+    </div>
+    </div>
+</div>  
+</form>
+</div>
+</div>
+</div>
+</div>
+
+<script type="text/template" template lay-done="layui.data.sendParams(d.params)"></script>
+<script>
+var um = UM.getEditor('editors',
+    {
+        initialFrameWidth:500,
+        initialFrameHeight:350,
+        imageFieldName:"upfile" //上传图片的表单的name
+    });
+    UM.getEditor('editors').addListener('blur',function(editor){
+    $('#get_content').val(UM.getEditor('editors').getContent());
+});
+//按钮点击变色
+function choosed(_this){
+    // $(_this).toggleClass('choosed');
+    console.log("规格点击事件");
+}
+</script>
+<script>
+var layedit;
+layui.data.sendParams = function(params){
+console.log(params);
+
+layui.use(['admin','table','form','view','upload','layedit','layer'], function(){
+    var $ = layui.$
+    ,admin = layui.admin
+    ,table = layui.table
+    ,layer = layui.layer
+    ,element = layui.element
+    ,layedit = layui.layedit
+    ,setter = layui.setter
+    ,upload = layui.upload
+    ,layer = layui.layer
+    ,view = layui.view
+    ,form = layui.form
+    ,device = layui.device();
+
+    var id=params.id;
+    
+
+    var cate_arr=[];
+    var extend_arr=[];
+        
+    // 图片上传
+    window.see_img=function(){
+        var i = $('#goods_img').val();
+        layer.photos({
+            photos: {
+                title: "查看",
+                data: [{
+                    src: i
+                }]
+            },
+            shade: 0.5,
+            closeBtn: 1,
+            anim: 5
+        });
+    };
+    //多图片上传
+    upload.render({
+        elem: '#LAY_avatarUpload'
+        ,url: layui.setter.baseUrl+'admin/upload/upload'
+        ,multiple: true
+        ,done: function(res){
+            $('#goods_img').val(res.data);
+            form.render();
+        },error:function(res){
+            layer.msg(res.msg);
+        }
+    });
+    // 商品详情  富文本编辑器
+    layedit.set({
+        uploadImage: {
+            url: layui.setter.baseUrl+'admin/upload/upload' //接口url
+            , type: 'post' //默认post
+        }
+    });
+    var editIndex = layedit.build('goods_detail');
+    // 获取富文本的内容
+    // 多图片上传
+    upload.render({
+        elem: '#upload_goods_images'
+        ,url: layui.setter.baseUrl+'admin/upload/upload'
+        ,multiple: true
+        ,before: function(obj){
+            //预读本地文件示例，不支持ie8
+            obj.preview(function(index, file, result){
+            // $('#upload_goods_images_box').append('<img src="'+ result +'" alt="'+ file.name +'" class="layui-upload-img">');
+            });
+        }
+        ,done: function(res){
+            var img='<div class="img_box"><img src="'+ res.data +'" alt=""><span class="layui-btn layui-btn-danger del_img">删除</span><a class="layui-btn layuiadmin-btn-list look_images" data-src="'+res.data+'"><i class="layui-icon layui-icon-search layuiadmin-button-btn"></i></a><input type="hidden" name="goods_images[]" value="'+ res.data +'"></div>';
+            //上传完毕
+            $('#upload_goods_images_box').append(img);
+        }
+    });
+    // 删除
+    $('body').on('click','.del_img',function(){
+    //   console.log($(this).parents('.img_box'));
+        $(this).parents('.img_box').remove();
+    });
+    // 查看图片
+    $('body').on('click','.look_images',function(){
+    layer.photos({
+        photos: {
+            title: "查看头像",
+            data: [{
+                src: $(this).attr('data-src')
+            }]
+        },
+        shade: 0.5,
+        closeBtn: 1,
+        anim: 5
+    });
+    });
+
+    admin.req({
+        url: layui.setter.baseUrl+'admin/goods/editGoods' //实际使用请改成服务端真实接口
+        ,data:{id:id},
+        type:'get',
+        success: function(res){
+        if(res.code==1){
+            var list1="<option value=''>--请选择分类--</option>";
+            var list4="<option value=''>--请选择分类--</option>";
+            var list2="<option value=''>--请选择运费模板--</option>";
+            var list3="<option value=''>--请选择品牌--</option>";
+            var list5="<option value=''>--请选择供应商--</option>";
+            for( var i in res.data.typeList){
+                list1 += "<option value='"+res.data.typeList[i].id+"' >"+res.data.typeList[i].name+"</option> ";
+            }
+            for( var i in res.data.categoryList){
+                list4 += "<option value='"+res.data.categoryList[i].id+"' >"+res.data.categoryList[i].name+"</option> ";
+            }
+            
+            for( var i in res.data.fid){
+                list2 += "<option value='"+res.data.fid[i].id+"' >"+res.data.fid[i].name+"</option> ";
+            }
+            for( var i in res.data.brandList){
+                list3 += "<option value='"+res.data.brandList[i].id+"' >"+res.data.brandList[i].name+"</option> ";
+            }
+            for( var i in res.data.brandList){
+                list3 += "<option value='"+res.data.brandList[i].id+"' >"+res.data.brandList[i].name+"</option> ";
+            }
+            for( var i in res.data.supplierLists){
+                list5 += "<option value='"+i+"' >"+res.data.supplierLists[i]+"</option> ";
+            }
+            $('#cat_id_1').html(list4);
+            $('#extend_cat_id_1').html(list4);
+            $('#brandList').html(list3);
+            $('#supplier').html(list5);
+            $('#fid').html(list2);
+            
+            $('#fid').val(params.fid);
+            $('#brandList').val(params.brand_id);
+            $('#supplier').val(res.data.info.supplier_id);
+
+            var cate_id=res.data.info.cat_id_path;
+            var extend_cat_id=res.data.info.extend_cat_id_path;
+
+            cate_id=cate_id.split('_');
+            extend_cat_id=extend_cat_id.split('_');
+            
+            cate_id=cate_id.slice(1,-1);
+            extend_cat_id=extend_cat_id.slice(1,-1);
+            
+            for(var i in cate_id){
+                if(cate_id[i]!=','){
+                    cate_arr.push(cate_id[i]);
+                        
+                }
+            }
+            for(var i in extend_cat_id){
+                if(extend_cat_id[i]!=','){
+                    extend_arr.push(extend_cat_id[i]);    
+                }
+            }
+            // console.log(cate_arr[1]+'*****'+extend_arr[1]);
+            get_cate(); 
+            form.render();
+            // 设置默认图片
+            var  img='';
+            var img_cunt=res.data.info.goods_images;
+            for(var i in img_cunt){
+                img+= '<div class="img_box"><img src="'+ img_cunt[i] +'" alt=""><span class="layui-btn layui-btn-danger del_img">删除</span><a class="layui-btn layuiadmin-btn-list look_images" data-src="'+img_cunt[i]+'"><i class="layui-icon layui-icon-search layuiadmin-button-btn"></i></a><input type="hidden" name="goods_images[]" value="'+ img_cunt[i] +'"></div>';
+            }
+            $('#upload_goods_images_box').append(img);
+            UM.getEditor('editors').setContent(res.data.info.goods_content);
+        }else{
+            layer.msg(res.msg, {icon: 5,anim: 6,shade:0.5,time: 1500});
+        }
+        }
+    });
+    
+    // 更改类型
+    form.on('select(cat_id_1)',function(e){
+        get_data(e.value,'cat_id_2');
+        $('#cat_id_3').html('');
+    });
+    form.on('select(cat_id_2)',function(e){
+        get_data(e.value,'cat_id_3');
+    });
+    form.on('select(extend_cat_id_1)',function(e){
+        get_data(e.value,'extend_cat_id_2');
+        $('#extend_cat_id_3').html('');
+    });
+    form.on('select(extend_cat_id_2)',function(e){
+        get_data(e.value,'extend_cat_id_3');
+    });
+
+    // 分类筛选  封装
+    function get_data(type_id,elem){
+    admin.req({
+        url: layui.setter.baseUrl+'admin/goods/ajaxGetCategory' //实际使用请改成服务端真实接口
+        ,data: {pid:type_id},
+        type:'get',
+        success: function(res){
+            if(res.code==1){
+                var list='<option value="">--请选择--</option>';
+                for( var i in  res.data){
+                    list += "<option value='"+res.data[i].id+"' >"+res.data[i].name+"</option> ";
+                }
+                $('#'+elem).html(list);
+                form.render();
+            }else{
+                layer.msg(res.msg);
+            }       
+        } 
+    }); 
+    } 
+    
+    admin.req({
+        url: layui.setter.baseUrl+'admin/goods/goodsSpec' //实际使用请改成服务端真实接口
+        ,data: {},
+        type:'get',
+        success: function(res){
+        if(res.code==1){
+            // console.log(res.data)
+            var list="<option value=''>--全部类型--</option>";
+            for( var i in res.data.typeList){
+                list += "<option value='"+res.data.typeList[i].id+"' >"+res.data.typeList[i].name+"</option> ";
+            }    
+            $('#leixing').html(list);
+            $('#leixing').val(params.goods_type);
+            get_data_cate(params.goods_type);
+            form.render(); 
+        }else{
+            layer.msg(res.msg);
+        }       
+        } 
+    });
+        
+    // 获取分类
+    function get_cate(){
+        console.log('获取分类数据'+cate_arr+'****'+extend_arr);
+        // 设置商品分类
+        if(cate_arr[1]){
+            $('#cat_id_1').val(cate_arr[1]);
+            get_data(cate_arr[1],'cat_id_2');
+            if(cate_arr[2]){
+                get_datas(cate_arr[1],'cat_id_2',cate_arr[2]);
+                if(cate_arr[3]){
+                    get_datas(cate_arr[2],'cat_id_3',cate_arr[3]);
+                }
+            }
+        }
+        // 设置拓展分类
+        if(extend_arr[1]){
+            $('#extend_cat_id_1').val(extend_arr[1]);
+            get_data(extend_arr[1],'extend_cat_id_2');
+            if(extend_arr[2]){
+                get_datas(extend_arr[1],'extend_cat_id_2',extend_arr[2]);
+                if(extend_arr[3]){
+                    get_datas(extend_arr[2],'extend_cat_id_3',extend_arr[3]);
+                }
+            }
+        }
+        form.render();
+    }
+
+    function get_datas(type_id,elem,val){
+    admin.req({
+        url: layui.setter.baseUrl+'admin/goods/ajaxGetCategory' //实际使用请改成服务端真实接口
+        ,data: {pid:type_id},
+        type:'get',
+        success: function(res){
+        if(res.code==1){
+            var list='<option value="">--请选择--</option>';
+            for( var i in  res.data){
+                list += "<option value='"+res.data[i].id+"' >"+res.data[i].name+"</option> ";
+            }
+            $('#'+elem).html(list);
+            $('#'+elem).val(val);
+            form.render();
+        }else{
+            layer.msg(res.msg);
+        }       
+        } 
+    }); 
+    }
+    
+    // 更改类型
+    form.on('select(choose_type_id)',function(e){
+        get_data_cate(e.value);
+    });
+
+    function get_data_cate(type_id){
+    admin.req({
+        url: layui.setter.baseUrl+'admin/goods/ajaxGetAttr' //实际使用请改成服务端真实接口
+        ,data: {type_id:type_id,goods_id:id},
+        type:'get',
+        success: function(res){
+            if(res.code==1){
+                console.log(res);
+                $('#leixing_1').html(res.data.specTpl);
+                $('#leixing_2').html(res.data.attributeTpl);
+                get_tpl();
+                setpl_img();
+                form.render();
+            }else{
+                $('#leixing_1').html('');
+                $('#leixing_2').html('');
+            }       
+        } 
+    }); 
+    }
+    
+    window.choosed = function (that) {
+        $(that).toggleClass('choosed');
+        get_tpl();
+    }
+    $('#tableTpl').html('<p style="text-align:center;">加载中...</p>');
+    function get_tpl(){
+    setTimeout(function(){
+        var list='';
+        $(".choosed").each(function(){
+            // alert($(this).text());
+            list+='spec_arr['+$(this).attr("spec_id")+'][]='+$(this).attr("item_id")+'&';
+        });
+        var params=list+'goods_id='+id;
+        admin.req({
+            url: layui.setter.baseUrl+'admin/goods/ajaxGetSpecInput' 
+            ,data: params,
+            type:'get',
+            success: function(res){
+                if(res.code==1){
+                    
+                    $('#tableTpl').html(res.data);
+                    hbdyg();
+                    form.render();
+                }else{
+                    layer.msg(res.msg);
+                }       
+            } 
+        }); 
+    },5000);    
+    }
+    // 选择商品规格旁边的img
+    function setpl_img(){
+    $("#leixing_1 .spec_img").each(function(index,element){
+        var id = $(element).attr('id');
+        var item_id = $(element).attr('item_id');
+        var pic  = $(element).attr('pic');
+        var img;
+    
+        // console.log(id+','+item_id+','+pic);
+        if(pic!=""){
+            img='<div class="pic_div" id="pic_div'+item_id+'"><img src="'+pic+'" alt=""></div><i class="layui-icon layui-icon-close-fill lay_ico" onclick="delete_img(this);"></i>';
+        } else{
+            img='<div class="pic_div" id="pic_div'+item_id+'"></div><i class="layui-icon layui-icon-close-fill lay_ico layui-hide" onclick="delete_img(this);"></i>';
+        }
+        $('#item_pic_'+item_id).html(img);
+        upload.render({
+            elem: '#pic_div'+item_id
+            ,url: layui.setter.baseUrl+'admin/upload/upload'
+            ,multiple: true
+            ,done: function(res){
+                console.log(res);
+                var img='<img src="'+ res.data +'" alt="">';
+                //上传完毕
+                $('#pic_div'+item_id).html(img);   
+                $('#item_pic_'+item_id+' .lay_ico').removeClass('layui-hide');   
+                $('#item_pic_'+item_id).attr('pic',res.data); 
+                $("input[name='item_img["+item_id+"]']").val(res.data); 
+            }
+        });
+    });
+    }
+    // 删除图片
+    window.delete_img = function (that) {
+        var id = $(that).parents('span').attr('id');
+        var item_id = $(that).parents('span').attr('item_id');  
+    
+        $('#pic_div'+item_id).html("");
+        $('#item_pic_'+item_id+' .lay_ico').addClass('layui-hide');   
+        $("input[name='item_img["+item_id+"]']").val(""); 
+    }
+    
+    
+    function hbdyg() {
+        var tab = document.getElementById("tableTpl"); //要合并的tableID
+        var maxCol = 2, val, count, start;  //maxCol：合并单元格作用到多少列
+        if (tab != null) {
+            for (var col = maxCol - 1; col >= 0; col--) {
+                count = 1;
+                val = "";
+                for (var i = 0; i < tab.rows.length; i++) {
+                    if (val == tab.rows[i].cells[col].innerHTML) {
+                        count++;
+                    } else {
+                        if (count > 1) { //合并
+                            start = i - count;
+                            tab.rows[start].cells[col].rowSpan = count;
+                            for (var j = start + 1; j < i; j++) {
+                                tab.rows[j].cells[col].style.display = "none";
+                            }
+                            count = 1;
+                        }
+                        val = tab.rows[i].cells[col].innerHTML;
+                    }
+                }
+                if (count > 1) { //合并，最后几行相同的情况下
+                    start = i - count;
+                    tab.rows[start].cells[col].rowSpan = count;
+                    for (var j = start + 1; j < i; j++) {
+                        tab.rows[j].cells[col].style.display = "none";
+                    }
+                }
+            }
+        }
+    }
+    
+    layedit.setContent(editIndex,params.goods_content);
+    form.render();
+
+
+
+  });
+}
+</script>

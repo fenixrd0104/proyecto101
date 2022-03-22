@@ -1,0 +1,284 @@
+<style>
+.flex{
+    display:flex;
+    align-content: space-around;
+    align-items: center;
+}
+  #tree_box{
+      min-height:300px;
+      border-top:1px solid #f1f1f1;
+      padding:30px 0;
+  }
+  .tree_row_box{
+      margin-left: 50px;
+      position: relative;
+  }
+  .tree_row_box:before{
+      content:'';
+      width:1px;
+      height:calc(100% - 11px);
+      position: absolute;
+      top:-10px;
+      left:-20px;
+      background:#999;
+  }
+  
+  .tree_row{
+      position: relative;
+      min-height:40px;
+      line-height: 40px;
+      
+  }
+ 
+  .tree_row>.tree_row{
+      margin-left: 40px;
+  }
+  .on:after{
+      content:'';
+      position: absolute;
+      top:40px;
+      left:20px;
+      width:1px;
+      height:calc(100% - 62px);
+      background:#999;
+  }
+  
+  .tree_row:before{
+      content:'';
+      position: absolute;
+      top:20px;
+      left:-20px;
+      width:20px;
+      height:1px;
+      background:#999;
+  }
+  
+  #current_info>.tree_row:before{
+      background:rgba(0,0,0,0);
+  }
+  .tree_info{
+    margin-bottom: 10px;
+  }
+  .tree_info i{
+      padding:0px 15px;
+      color:#519fdb;
+  }
+  .tree_info>div:first-child{
+      border:1px solid #999;
+      border-radius:5px;
+      padding-right:10px;
+      cursor:pointer;
+  }
+  .tree_info>div{
+      margin-right: 20px;
+  }
+        
+</style>
+    
+
+<div class="layui-fluid">
+    <div class="layui-row layui-col-space15">
+        <div class="layui-col-md12">
+            <div class="layui-card">
+                <div class="layui-card-header">会员结构树状图</div>
+                <div class="layui-card-body">
+                    <div class="test-table-reload-btn" style="margin-bottom: 20px;">
+                        <div class="layui-input-inline">
+                            <form class="layui-form" lay-filter="tree_form">
+                                <div class="layui-inline" style="width:300px;">
+                                    <input class="layui-input" name="keywords" placeholder="请输入会员账号/手机号" autocomplete="off">
+                                </div>
+                                <button class="layui-btn" type="button" lay-submit lay-filter="search"><i class="layui-icon">&#xe615;</i>搜索</button>
+                            </form>
+                        </div>
+                    </div>
+                   <div class="layui-row" id="tree_box">
+                       <div class="current_info" id="current_info">
+                            <p style="padding:20px;text-align:center;">加载中...</p>
+                       </div>
+                       <div class="tree_row_box">
+                            
+                           
+                       </div>
+                        
+                   </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+
+    layui.use(['admin', 'table', 'view', 'form', 'setter', 'layer', 'laydate'], function () {
+        var $ = layui.$
+            , admin = layui.admin
+            , element = layui.element
+            , setter = layui.setter
+            , form = layui.form
+            , layer = layui.layer
+            , view = layui.view
+            , table = layui.table
+            , laydate = layui.laydate
+            , router = layui.router();
+        form.on('submit(search)', function (datas) {
+            get_data(datas.field);
+        });
+        get_data();
+        function get_data(param) {
+            var tishi =layer.load(0, {shade: [0.3,'#000'] });
+            admin.req({
+                url: layui.setter.baseUrl + 'admin/member/tree'
+                , data: param,
+                type: 'get',
+                success: function (res) {
+                    var obj=res.data;
+                    
+                    if (res.code == 1) {
+                        var list='';
+                        for (var i in res.data) {
+                            if(res.data[i].user_status==1){
+                                var status='<b style="color:#2ab577;">正常</b>';
+                            }else{
+                                var status='<b style="color:orangered;">禁用</b>';
+                            }
+                            if(res.data[i].level_earn>0){
+                                var icon="fa-group";
+                                var clicks="tree_click";
+                            }else{
+                                var icon="fa-user-o";
+                                var clicks="";
+                            }
+
+                            if(res.data[i].level==1){
+                                var dengjis = 'SS';
+                            }else if(res.data[i].level==2){
+                                var dengjis = 'SSS';
+                            }else if(res.data[i].level==3){
+                                var dengjis = 'SSSS';
+                            }else {
+                                var dengjis = 'S0';
+                            }
+                            
+                           list+='<div class="tree_row"><div class="tree_info flex '+clicks+'" data-id="'+res.data[i].id+'" style="min-height:40px;line-height:40px;"><div><i class="'+icon+' fa"></i>'+res.data[i].user_login+'</div><div>会员等级： <b>'+ dengjis +' — E'+res.data[i].ty_level+'</b> </div><div>会员状态： '+status+' </div><div>直推人数： <b>'+res.data[i].level_earn+'</b> </div><div>团队人数： <b>'+res.data[i].tdnum+'</b> </div><div>团充U总： <b>'+res.data[i].chongzhi+'</b> </div><div>团提U总： <b>'+res.data[i].tixian+'</b> </div><div>团队E人数： <b>'+res.data[i].enums+'</b> </div><div>团队SS人数： <b>'+res.data[i].ssnum+'</b> </div><div>团队SSS人数： <b>'+res.data[i].sssnum+'</b> </div></div></div>'
+                        }
+                        $('#current_info').html(list);
+                        $('.tree_row_box').html('');
+                        layer.close(tishi);
+                    } else {
+                        layer.msg(res.msg);
+                    }
+                }
+            });
+        }
+
+        $(document).on('click','.first_click',function(){
+            var tishi =layer.load(0, {shade: [0.3,'#000'] });
+            var id=$(this).attr('data-id');
+            admin.req({
+                url: layui.setter.baseUrl + 'admin/member/tree_ajax'
+                , data: {id:id},
+                type: 'get',
+                success: function (res) {
+                    var obj=res.data;
+                    if (res.code == 1) {
+                        var list='';
+                        for (var i in res.data) {
+                            if(res.data[i].user_status==1){
+                                var status='<b style="color:#2ab577;">正常</b>';
+                            }else{
+                                var status='<b style="color:orangered;">禁用</b>';
+                            }
+                            if(res.data[i].level_earn>0){
+                                var icon="fa-group";
+                                var clicks="tree_click";
+                            }else{
+                                var icon="fa-user-o";
+                                var clicks='';
+                            }
+
+                            if(res.data[i].level==1){
+                                var dengjis = 'SS';
+                            }else if(res.data[i].level==2){
+                                var dengjis = 'SSS';
+                            }else if(res.data[i].level==3){
+                                var dengjis = 'SSSS';
+                            }else {
+                                var dengjis = 'S0';
+                            }
+                            
+                           list+='<div class="tree_row"><div class="tree_info flex '+clicks+'" data-id="'+res.data[i].id+'" ><div><i class="'+icon+' fa"></i>'+res.data[i].user_login+'</div><div>会员等级： <b>'+dengjis+' — E'+res.data[i].ty_level+'</b> </div><div>会员状态： '+status+' </div><div>直推人数： <b>'+res.data[i].level_earn+'</b> </div><div>团队人数： <b>'+res.data[i].tdnum+'</b> </div><div>团充U总： <b>'+res.data[i].chongzhi+'</b> </div><div>团提U总： <b>'+res.data[i].tixian+'</b> </div><div>团队E人数： <b>'+res.data[i].enums+'</b> </div><div>团队SS人数： <b>'+res.data[i].ssnum+'</b> </div><div>团队SSS人数： <b>'+res.data[i].sssnum+'</b> </div></div></div>'
+                        }
+                        $('.tree_row_box').html(list);
+                        layer.close(tishi);
+                    } else {
+                        layer.msg(res.msg);
+                    }
+                }
+            });
+        });
+        $(document).on('click','.tree_click',function(){
+            var tishi =layer.load(0, {shade: [0.3,'#000'] });
+            var id=$(this).attr('data-id');
+            $(this).parent('.tree_row').addClass('inner_box');
+            if($('.inner_box>.tree_row').length>0){
+                $('.inner_box>.tree_row').remove();
+                $('.inner_box').removeClass('on');
+                $('.tree_row').removeClass('inner_box');
+                layer.close(tishi);
+            }else{
+                admin.req({
+                    url: layui.setter.baseUrl + 'admin/member/tree_ajax'
+                    , data: {id:id},
+                    type: 'get',
+                    success: function (res) {
+                        var obj=res.data;
+                        if (res.code == 1) {
+                            var list='';
+                            for (var i in res.data) {
+                                if(res.data[i].user_status==1){
+                                    var status='<b style="color:#2ab577;">正常</b>';
+                                }else{
+                                    var status='<b style="color:orangered;">禁用</b>';
+                                }
+                                if(res.data[i].level_earn>0){
+                                    var icon="fa-group";
+                                    var clicks='tree_click';
+                                }else{
+                                    var icon="fa-user-o";
+                                    var clicks='';
+                                }
+
+                                if(res.data[i].level==1){
+                                    var dengjis = 'SS';
+                                }else if(res.data[i].level==2){
+                                    var dengjis = 'SSS';
+                                }else if(res.data[i].level==3){
+                                    var dengjis = 'SSSS';
+                                }else {
+                                    var dengjis = 'S0';
+                                }
+                                
+                            list+='<div class="tree_row"><div class="tree_info  flex '+clicks+'" data-id="'+res.data[i].id+'" ><div><i class="'+icon+' fa"></i>'+res.data[i].user_login+'</div><div>会员等级： <b>'+dengjis+' — E'+res.data[i].ty_level+'</b> </div><div>会员状态： '+status+' </div><div>直推人数： <b>'+res.data[i].level_earn+'</b> </div><div>团队人数： <b>'+res.data[i].tdnum+'</b> </div><div>团充U总： <b>'+res.data[i].chongzhi+'</b> </div><div>团提U总： <b>'+res.data[i].tixian+'</b> </div><div>团队E人数： <b>'+res.data[i].enums+'</b> </div><div>团队SS人数： <b>'+res.data[i].ssnum+'</b> </div><div>团队SSS人数： <b>'+res.data[i].sssnum+'</b> </div></div></div>'
+                            }
+                            if(list!=''){
+                                $('.inner_box .tree_row').remove();
+                                $('.inner_box').append(list).addClass('on');
+                            }else{
+                                $('.inner_box').find('i').removeClass('fa-group').addClass('fa-user-o');
+                            }
+                            
+                            $('.tree_row').removeClass('inner_box');
+                            layer.close(tishi);
+                        } else {
+                            layer.msg(res.msg);
+                        }
+                    }
+                });
+            }
+            // $(this).find('i').removeClass('fa-user-o').addClass('fa-group');
+            
+        });
+
+    });
+
+</script>

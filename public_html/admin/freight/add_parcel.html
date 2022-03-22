@@ -1,0 +1,158 @@
+<title>添加条件</title>
+<style>
+    .t_l{
+        text-align: left;
+    }
+    .t_c{
+        text-align: center;
+    }
+    .t_r{
+        text-align:right;
+    }
+    @media screen and (max-width: 992px){
+        .t_r{
+            text-align:left;
+        }
+    }
+    .layui-form>.layui-row>.layui-form-item>div{
+        line-height: 36px;
+        padding:0px 10px;
+    }
+    .layui-form>.layui-row>.layui-form-item .layui-input-inline{
+        margin-bottom: 20px;
+        margin-left: 0;
+    }
+    .layui-form-switch{
+        margin-top: 0;
+    }
+    .layui-table-cell{
+        height:auto;
+        overflow: auto;
+    }
+</style>
+
+<div class="layui-form" action="" lay-filter="add_goods" style="padding: 20px 0 0 0;">
+    <div class="layui-row">
+        <div class="layui-form-item">
+            <div class="layui-col-md3 t_r ">地区</div>
+            <div class="layui-col-md5">
+                <a class="layui-btn" id="" onclick="yufei_choose_area();">选择地区</a>
+                <div class="layui-word-aux" id="show_area" style="width:80px;float:right;"></div>
+                <input type="hidden" name="choose_area" id="choose_area">
+                <input type="hidden" name="choose_province" id="choose_province">
+                <input type="hidden" name="choose_district" id="choose_district">
+                <input type="hidden" name="region" id="region">
+                <input type="hidden" name="provice" id="provice">
+                <input type="hidden" name="new_area" id="new_area">
+                <input type="hidden" name="new_province" id="new_province">
+                <input type="hidden" name="new_district" id="new_district">
+            </div>
+            <div class="layui-col-md4 layui-word-aux">选择指定地区</div>
+        </div>
+
+        <div class="layui-form-item">
+            <div class="layui-col-md3 t_r ">设置条件</div>
+            <div class="layui-col-md5">
+                <div style="width:45%;float:left;margin-right:10%;">
+                    <select name="type" id="" lay-filter="set_parcel_type">
+                        <option value="weight">重量</option>
+                        <option value="price">金额</option>
+                    </select>
+                </div>
+                <div style="width:45%;float:left;">
+                    <input type="text" name="range" lay-verify="required" autocomplete="off" class="layui-input">
+                </div>
+            </div>
+            <div class="layui-col-md4 layui-word-aux" id="parcel_text">KG内包邮</div>
+        </div>
+    
+
+        <div class="layui-form-item" style="padding-top: 20px;margin-top: 40px;margin-bottom: 0; border-top:1px solid #f1f1f1;">
+            <div class="layui-col-md12 t_c">
+                <button type="button" class="layui-btn" lay-submit="" lay-filter="component-form-element"><i class="layui-icon layui-icon-link"></i>保存</button>
+            </div>
+        </div>
+
+
+    </div>
+</div>
+
+<script>
+    layui.use(['admin','table','form','view','upload','layedit','setter','layer'], function(){
+        var $ = layui.$
+        ,admin = layui.admin
+        ,setter = layui.setter
+        ,form = layui.form
+        ,table = layui.table
+        ,element = layui.element
+        ,layer = layui.layer
+        ,layedit = layui.layedit
+        ,upload = layui.upload
+        ,view = layui.view
+        ,device = layui.device();
+        
+        form.render();
+
+
+        // 条件监听
+        form.on('select(set_parcel_type)',function(e){
+            if(e.value==='1'){
+                $('#parcel_text').html('KG内包邮');
+            }else{
+                $('#parcel_text').html('元包邮');
+            }
+        });
+
+        var choose_region=[];  // 存放数据并传给-选择地区
+        window.yufei_choose_area=function(){        
+            // var d=$('#choose_area').val();
+
+            admin.popup({
+                title: "选择位置",
+                area: admin.screen() < 2 ? ['95%', '90%'] :["740px", "610px"],
+                id: "LAY-popup-yufei_choose_area",
+                success: function(layero, index){                    
+                    choose_region.new_area=$('#new_area').val();
+                    choose_region.new_province=$('#new_province').val();
+                    choose_region.new_district=$('#new_district').val();  
+                    view(this.id).render('/freight/choose_area',choose_region).done(function() {
+                    form.render(null, 'choose_area'); // 弹窗的lay-filter值
+                    //监听提交
+                    form.on('submit(chooseed_area_submit)',function(datas){
+                        if(datas.field.area){
+                            $('#show_area').html('已选择');
+                            $('#choose_area').val(datas.field.area);
+                            $('#choose_province').val(datas.field.province_s);
+                            $('#choose_district').val(datas.field.district);
+                            // console.log(datas.field.area);
+                            datas.field.new_area=$('#new_area').val();
+                            datas.field.new_province=$('#new_province').val();
+                            datas.field.new_district=$('#new_district').val();
+                            choose_region = datas.field;
+                            datas.field.province_s=eval(datas.field.province_s);
+                            var title=[];
+                            var value=[];
+                            for( var i in datas.field.province_s){
+                                title+=datas.field.province_s[i].title+',';
+                            }
+                            for( var i in eval(datas.field.area)){
+                                value+= eval(datas.field.area)[i].value+',';
+                            }
+                            $('#provice').val(title);
+                            $('#region').val(value);
+                            
+                        }else{
+                            $('#show_area').html('');
+                        }
+                        layer.close(index);
+                    });
+                    
+                    });
+                }
+            });
+        };
+
+  
+
+      });
+</script>

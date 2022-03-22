@@ -1,0 +1,233 @@
+<title>调货申请</title>
+<style>
+    table tr:hover input{
+        background:#f2f2f2;
+    }
+    .layui-input-block{ margin-left: 80px; }
+    .layui-input{ padding-left: 5px; }
+    .layui-form-label{padding: 9px 0;}
+</style>
+<script type="text/html" template>
+    <link rel="stylesheet" href="{{ layui.setter.base }}style/purchase.css?v={{ layui.admin.v }}-1" media="all">
+</script>
+<div class="layui-card layadmin-header">
+    <div class="layui-breadcrumb" lay-filter="breadcrumb">
+        <a>库存管理</a>
+        <a lay-href="/purchase/purchase_list">调货发货</a>
+        <a><cite>发货详情</cite></a>
+    </div>
+</div>
+
+<form class="layui-form layui-fluid" lay-filter="choose_stock">
+<div class="layui-row">
+<div class="layui-col-md12">
+<div class="layui-card">
+    <div class="layui-card-header">发货详情</div> 
+    <div class="layui-card-body choose_purchase">
+        <div class="layui-row">
+            <div class="layui-btn-group">
+                <button type="button" class="layui-btn" lay-submit lay-filter="log_submit">日志</button>
+                <button type="button" class="layui-btn" onclick="my_print();">单据打印</button>
+            </div> 
+        </div>
+        <div class="layui-row">
+            <div class="layui-col-lg4 layui-col-md6">
+                <label class="layui-form-label">调出店铺：</label>
+                <div class="layui-input-block">
+                    <input type="text" name="from_shop_name_s" id="from_shop_name " class="layui-input" disabled style="border:none;">
+                </div>
+            </div>            
+            <div class="layui-col-lg4 layui-col-md6">
+                <label class="layui-form-label">单号：</label>
+                <div class="layui-input-block">
+                    <input type="text" name="id_s" id="id" class="layui-input" disabled style="border:none;">
+                </div>
+            </div>           
+            <div class="layui-col-lg4 layui-col-md6">
+                <label class="layui-form-label">调入店铺：</label>
+                <div class="layui-input-inline">
+                    <input type="text" name="to_shop_name_s" id="to_shop_name" class="layui-input" disabled style="border:none;">
+                </div>
+            </div>
+            <div class="layui-col-lg4 layui-col-md6">
+                <label class="layui-form-label">单据状态：</label>
+                <div class="layui-input-block">
+                    <input type="text" name="status_s" id="status" class="layui-input" disabled style="border:none;">
+                </div>
+            </div>
+            <div class="layui-col-lg4 layui-col-md6">
+                <label class="layui-form-label">单据金额：</label>
+                <div class="layui-input-block">
+                    <input type="text" name="order_money_s" id="order_money" class="layui-input" disabled style="border:none;">
+                </div>
+            </div>
+            <div class="layui-col-lg4 layui-col-md6">
+                <label class="layui-form-label">单据日期：</label>
+                <div class="layui-input-block">
+                    <input type="text" name="create_time_s" id="create_time" class="layui-input" disabled style="border:none;">
+                </div>
+            </div>
+            <div class="layui-col-lg4 layui-col-md6">
+                <label class="layui-form-label">修改日期：</label>
+                <div class="layui-input-block">
+                    <input type="text" name="update_time_s" id="update_time" class="layui-input" disabled style="border:none;">
+                </div>
+            </div>
+            <div class="layui-col-lg12 layui-col-md12">
+                <label class="layui-form-label">备注：</label>
+                <div class="layui-input-block">
+                    <input type="text" name="remarks" id="remarks" class="layui-input" disabled style="border:none;">
+                </div>
+            </div>
+        </div>
+        
+        <input type="hidden" id="receipt_id" name="receipt_id">
+        <div class="layui-row">
+            <table class="layui-hide" id="test-table-apply" lay-filter="test-table-apply"></table>
+        </div>
+    </div>
+</div>
+</div>
+</div>   
+</form>
+<script>
+layui.use(['admin','table','form','laydate','view','myprint','layer'], function(){
+    var $ = layui.$
+    ,admin = layui.admin
+    ,view = layui.view
+    ,setter = layui.setter
+    ,table = layui.table
+    ,layer = layui.layer
+    ,laydate = layui.laydate
+    ,myprint = layui.myprint
+    ,form = layui.form;
+
+    form.render(null, 'choose_stock');
+
+    // 获取传值参数---得到id
+    var router = layui.router();
+    // console.log(router.search);
+    var id = router.search.receipt_id;
+    $('#receipt_id').val(id);
+    
+    get_data();
+    function get_data(){
+        // console.log(json_data)
+        for(var i in json_data){
+            json_data[i].goods_sku=json_data[i].goods_sn;
+        }        
+        table.render({
+            elem: '#test-table-apply'
+            ,data: json_data
+            ,title: "调货申请"
+            ,cellMinWidth: 80 
+            ,toolbar: '#test-table-toolbar'
+            ,cols: [[
+            {type:'checkbox'}
+            ,{field:'spec_id', width:80, title: 'ID',align:"center", sort: true,}
+            ,{field:'spec_sku', title: '商品SKU',align:"center"}
+            ,{field:'goods_name', title: '商品名称',align:"center"}
+            ,{field:'spec_name', title: '规格',align:"center"}
+            ,{field:'price', title: '价格',width: 90,align:"center"}
+            ,{field:'num', title: '数量',width: 90,align:"center"}
+            ,{field:'all_price', title: '金额',width: 100,align:"center",
+            templet: function (d) {                         
+                return (d.price*d.num).toFixed(2)
+            }}
+            ,{field: 'remarks', title:'备注',width:160,align:"center"}   
+            ]]
+            ,limit: 10000
+            ,where: { supplier_id:id }
+        });
+
+    }   
+
+    var myobj=[];//打印头部    
+    var json_data;
+    // 获取信息 “form” ---请求登入接口
+    admin.req({
+        url: layui.setter.baseUrl+'merchant/StockReceipt/lists'
+        ,data: { receipt_id:id }
+        ,type:'get'
+        ,success: function(res){
+            if(res.code==1){
+                // console.log(res.data);
+                // 赋值
+                form.val("choose_stock",{
+                    "to_shop_name_s" : res.data.info.to_shop_name,
+                    "id_s" : res.data.info.id,
+                    "from_shop_name_s" : res.data.info.from_shop_name,
+                    "status_s" : res.data.info.status,
+                    "order_money_s" : res.data.info.order_money,
+                    "create_time_s" : res.data.info.create_time,
+                    "update_time_s" : res.data.info.update_time,
+                    "remarks" : res.data.info.remarks,
+                });         
+                myobj['调出店铺']=res.data.info.from_shop_name;   
+                myobj['单号']=res.data.info.id; 
+                myobj['调入店铺']=res.data.info.to_shop_name;            
+                myobj['单据状态']=res.data.info.status;          
+                myobj['单据金额']=res.data.info.order_money;            
+                myobj['单据日期']=res.data.info.create_time;         
+                myobj['修改日期']=res.data.info.update_time;         
+                myobj['备注']=res.data.info.remarks;         
+                
+                 // 自定义json
+                json_data = res.data.lists;
+                for( var i in res.data.lists){
+                    res.data.lists[i].all_price=(res.data.lists[i].price*res.data.lists[i].num).toFixed(2);
+                }              
+                
+                // console.log(JSON.stringify(json_data));   
+                get_data();
+                form.render();
+            }else{
+                layer.msg(res.msg);
+            }
+        }
+    });    
+
+
+    // 检查是否已经添加  未重复则进行添加  重复则不进行添加
+    function check_data(data){
+        if(json_data==''){
+            json_data.push(data);
+            get_data();
+            layer.msg('添加成功' , {icon: 1,time: 1500});
+        }else{
+            for(var i in json_data){
+                if(json_data[i].spec_id==data.spec_id){
+                    layer.msg('不能重复添加', {icon: 5,anim: 6,shade:0.5,time: 1500});
+                    return ;
+                }else{
+                    layer.msg('添加成功' , {icon: 1,time: 1500});
+                }
+            }
+            json_data.push(data);
+            get_data();    
+        }
+        jisuan();
+    }
+    
+    // 日志
+    form.on('submit(log_submit)',function(e){
+        admin.popup({
+            title: "日志",
+            area: admin.screen() < 2 ? ['95%', '90%'] : ["600px", "600px"],
+            id: "LAY-popup-log_return",
+            success: function(e, i) {
+                view(this.id).render('/transout/delivery_log',id).done(function() {
+             
+                });
+            }
+        });
+
+    });
+
+    //打印带头部 
+    window.my_print=function(){
+        myprint.myprint(myobj,'test-table-apply');
+    };
+
+});
+</script>

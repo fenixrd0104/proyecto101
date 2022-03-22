@@ -1,0 +1,270 @@
+
+<title>配置列表</title>
+
+<div class="layui-card layadmin-header">
+  <div class="layui-breadcrumb" lay-filter="breadcrumb">
+    <a>www.d ke wl.co m   刀客源码网系统管理</a>
+    <a><cite>配置列表</cite></a>
+  </div>
+</div>
+
+<div class="layui-fluid">
+<div class="layui-row layui-col-space15">
+<div class="layui-col-md12">
+    <div class="layui-card">
+    <div class="layui-card-header">配置列表</div>
+    <div class="layui-card-body"> 
+        <div class="test-table-reload-btn" style="margin-bottom: 10px;">
+            <button type="button" class="layui-btn layuiadmin-btn-admin" style="margin-right: 30px;" data-type="add"><i class="layui-icon layui-icon-add-1 layuiadmin-button-btn"></i>添加配置</button> 
+            <div class="layui-inline">
+                <input class="layui-input" name="keywords" placeholder="输入需查询的标题" style="width: 220px" id="test-config_search" autocomplete="off">
+            </div>
+            <button type="button" class="layui-btn" data-type="reload"><i class="layui-icon">&#xe615;</i>搜索</button>
+        </div>  
+
+        <table class="layui-hide" id="config_list" lay-filter="config_list"></table>    
+        <script type="text/html" id="tool_config_list">
+            <a class="layui-btn layui-btn-normal layui-btn-xs" lay-event="edit"><i class="layui-icon layui-icon-edit"></i>编辑</a>
+            <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del"><i class="layui-icon layui-icon-delete"></i>删除</a>
+        </script>           
+        <script type="text/html" id="test-table-status">
+            <input type="checkbox" name="status" value="{{d.id}}" lay-skin="switch" lay-text="开启|禁止" class="layui-input" {{ d.status === 1 ? 'checked' : '' }} lay-filter="checkbox_status">
+        </script>              
+    </div>
+    </div>
+</div>
+</div>
+</div>
+
+<script>
+layui.use(['admin','table', 'view', 'form','setter','layer','ourJs'], function(){
+    var $ = layui.$
+    ,admin = layui.admin
+    ,setter = layui.setter
+    ,element = layui.element
+    ,form = layui.form
+    ,view = layui.view
+    ,layer = layui.layer
+    ,table = layui.table
+    ,ourJs = layui.ourJs
+    ,router = layui.router();
+    
+    var title_list="";
+    var type_list="";
+    var list="";
+    var listurl="";
+    // 请求登入接口
+    admin.req({
+        url: layui.setter.baseUrl+'admin/config/add_config' //实际使用请改成服务端真实接口
+        ,data: {}
+        ,type:'get'
+        ,success: function(res){
+            if(res.code==1){
+                // console.log(res.data.title)
+                title_list = res.data.group_lists; // 表格列表--group
+                type_list = res.data.type_lists; // 表格列表--type                
+
+                // 给  添加配置&&编辑配置  加select的值
+                list="<option value=''>==请选择==</option>";
+                for( var i in res.data.group_lists){
+                    list += "<option value='"+i+"'>"+res.data.group_lists[i]+"</option> ";
+                }  
+                listurl="<option value=''>==请选择==</option>";
+                for( var i in res.data.type_lists){
+                    listurl += "<option value='"+i+"'>"+res.data.type_lists[i]+"</option> ";
+                }  
+                form.render('select');  
+
+            }else{
+                layer.msg(res.msg);
+            }            
+        } 
+    });    
+
+    table.render({
+        elem: '#config_list'
+        ,url: layui.setter.baseUrl+'admin/config/index'
+        ,parseData: function(res){ //res 即为原始返回的数据
+            return {
+            "code": res.code, //解析接口状态
+            "msg": res.msg, //解析提示文本
+            "count": res.data.count, //解析数据长度
+            "data": res.data.lists //解析数据列表
+            };
+        }
+        ,cols: [[
+         {field:'id', width:80, title: 'ID', sort: true, align:'center'}
+        ,{field:'name', title: '名称', align:'center'}
+        ,{field:'title', title: '标题', align:'center'}
+        ,{field:'type', width:120, title: '类型',  align:'center'
+        ,templet:function(d){
+            for(var i in  type_list){
+                if(i==d.type){
+                    var this_type=type_list[i];
+                }
+            }
+            return this_type;           
+        }}
+        ,{field:'group', width:120, title: '分组', align:'center'
+        ,templet:function(d){
+            for(var i in  title_list){
+                if(i==d.group){
+                    var this_cate=title_list[i];
+                }
+            }
+            return this_cate;
+        }}
+        ,{field:'create_time', title: '创建时间', align:'center'}
+        ,{field:'update_time', title: '更新时间', align:'center'}
+        ,{field:'status', width:100, title: '状态', templet: '#test-table-status', align:'center'}
+        ,{fixed: 'right', title: '操作', align:'center',width:160,  toolbar: '#tool_config_list'}
+        ]]
+        ,page:true
+    });
+        
+    var $ = layui.$, active = {
+    // 添加会员组
+    add:function(){
+    admin.popup({
+        title: "添加配置",
+        area: admin.screen() < 2 ? ['95%', '90%'] :["800px", "700px"],
+        id: "LAY-popup-add_menu",
+        success: function(layero, index){
+        view(this.id).render('/config/add_config').done(function() {
+            form.render(null, 'add_config'); // 弹窗的lay-filter值
+            // 添加--- 给 select  加值  
+            $("#lay_group").html(list); 
+            $("#lay_type").html(listurl); 
+            form.render('select');  // 重载            
+            //监听提交
+            form.on('submit(component-form-element)', function(data){ 
+            // console.log(data.field);  
+            admin.req({
+                url: layui.setter.baseUrl+'admin/config/add_config' 
+                ,data: data.field
+                ,type:'post'
+                ,success: function(res){
+                    if(res.code==1){
+                        layer.msg(res.msg , {icon: 1} , function(){
+                            setTimeout(function(){
+                            layer.close(index); //执行关闭 
+                            layui.table.reload('config_list'); //重载表格
+                            },500);
+                            
+                        });
+                    }else{
+                        layer.msg(res.msg, {icon: 5,anim: 6,shade:0.5,time: 1000});
+                    }
+                }
+            }); 
+            });                
+            
+        });
+        }
+    });
+    }
+        // 搜索
+        ,reload: function(){
+            var demoReload = $('#test-config_search');        
+            //执行重载
+            table.reload('config_list', {
+                page: {
+                curr: 1 //重新从第 1 页开始
+                }
+                ,where: {
+                 keywords:  demoReload.val()
+                }
+            });
+        }
+    };    
+    $('.test-table-reload-btn .layui-btn').on('click', function(){
+        var type = $(this).data('type');
+        active[type] ? active[type].call(this) : '';
+    });
+    
+    //监听工具条
+    table.on('tool(config_list)', function(obj){
+        var data = obj.data;        
+        var id = obj.data.id;  
+
+        if(obj.event === 'del'){
+            layer.confirm('确认删除此配置?', {icon: 3, title:'提示'}, function(index){
+                admin.req({
+                  url: layui.setter.baseUrl+'admin/config/del_config' 
+                  ,data: {id:id}
+                  ,type:'get'
+                  ,success: function(res){
+                    if(res.code==1){                      
+                        obj.del();
+                        layer.close(index);                
+                    }else{
+                      layer.msg(res.msg, {icon: 5,anim: 6,shade:0.5,time: 1000});
+                    }
+                  }
+                });  
+            });
+        } else if(obj.event === 'edit'){
+        // 编辑            
+        admin.popup({
+            title: "编辑配置",
+            area: admin.screen() < 2 ? ['95%', '90%'] :["800px", "700px"],
+            id: "LAY-popup-add_menu",
+            success: function(layero, index){
+                view(this.id).render('/config/add_config',data).done(function() {
+                form.render(null, 'add_config'); // 弹窗的lay-filter值                
+                // 编辑的的select
+                $("#lay_group").html(list);
+                $('#lay_group').val(data.group);
+                $("#lay_type").html(listurl);
+                $('#lay_type').val(data.type);
+                form.render('select');   // 重载
+                
+                //监听提交
+                form.on('submit(component-form-element)', function(data){  
+                // console.log(data.field);                
+                data.field.id=id
+                admin.req({
+                    url: layui.setter.baseUrl+'admin/config/edit_config' 
+                    ,data: data.field
+                    ,type:'post'
+                    ,success: function(res){
+                        if(res.code==1){
+                            layer.msg(res.msg , {icon: 1,time: 1000} , function(){
+                                setTimeout(function(){
+                                layer.close(index); //执行关闭 
+                                layui.table.reload('config_list'); //重载表格
+                                },500);                                
+                            });
+                        }else{
+                            layer.msg(res.msg, {icon: 5,anim: 6,shade:0.5,time: 1000});
+                        }
+                    }
+                }); 
+                });                
+                });
+            }
+        });
+        } 
+    });
+    // 监听状态修改
+    form.on('switch(checkbox_status)',function(e){
+        var _this=this,status=e.elem.checked;   
+        admin.req({
+            url: layui.setter.baseUrl+'admin/config/status_config' 
+            ,data: { id:e.value }
+            ,type:'post'
+            ,success: function(res){
+                if(res.code==1){
+                    ourJs.status_tong(table,_this,status);
+                }else{
+                    layer.msg(res.msg, {icon: 5,anim: 6,shade:0.5,time: 1000});
+                }
+            }
+        }); 
+
+    });
+
+    
+    
+});
+</script>

@@ -1,0 +1,73 @@
+<title>供应商列表</title>
+
+<div class="layui-row">
+    <div class="layui-form" lay-filter="app-content-list" style="padding: 20px 30px 0 0;"> 
+        <div class="layui-inline"  style="width:300px;">
+            <input type="text" name="keywords" placeholder="单号/供应商/收货人/收货电话" class="layui-input" >
+        </div>
+        <div class="layui-inline">
+            <button class="layui-btn layuiadmin-btn-list" type="button" lay-submit lay-filter="p_search"><i class="layui-icon layui-icon-search layuiadmin-button-btn"></i></button>
+        </div>
+    </div>
+    <div class="layui-row">
+    <div class="layui-col-md12">          
+        <table class="layui-hide" id="test-table-new_shop" lay-filter="test-table-new_shop"></table>
+        <script type="text/html" id="test-table-toolbar-purchase-list">
+        <button type="button" class="layui-btn layui-btn-xs layui-btn-normal" lay-event="choose">选择</button>
+        </script>
+    </div>
+    </div>    
+</div>
+
+<script>
+layui.use(['admin','table','form','laydate','layer'], function(){
+    var $ = layui.$
+    ,admin = layui.admin
+    ,setter = layui.setter
+    ,view = layui.view
+    ,layer = layui.layer
+    ,table = layui.table
+    ,laydate = layui.laydate
+    ,form = layui.form;
+    
+    form.render(null, 'app-content-list');
+    
+    var keywords='';
+    get_data(keywords);
+    function get_data(keywords){
+        table.render({
+        elem: '#test-table-new_shop'
+        ,url: layui.setter.baseUrl+'admin/supplier/index'
+        ,parseData: function(res){ //res 即为原始返回的数据
+            return {
+            "code": res.code, //解析接口状态
+            "msg": res.msg, //解析提示文本
+            "count": res.data.count, //解析数据长度
+            "data": res.data.lists //解析数据列表
+            };
+        }
+        ,cols: [[
+            {field:'supplier_id', width:70, title: 'ID', sort: true,align:"center"}
+            ,{field:'supplier_name', title: '供应商',align:"center"}
+            ,{field:'supplier_status', width:100, align:"center", title: '供应商状态',
+            templet:function(d){
+                return '<span style="color:green;">正常</span>';                
+            }}
+            ,{field:'supplier_contacts', title: '联系人',align:"center"}
+            ,{field:'supplier_phone', title: '电话',align:"center"}
+            ,{fixed: 'right', title:'操作',  toolbar: '#test-table-toolbar-purchase-list', width:80,align:"center"}
+        ]]
+        ,page:true
+        ,where:{keywords:keywords}
+    });
+    }
+    // 搜索
+    form.on('submit(p_search)',function(e){
+        // console.log(e.field.keywords);
+        get_data(e.field.keywords);
+    });
+  
+
+
+});
+</script>

@@ -1,0 +1,80 @@
+<style>
+    .layui-form-label{
+        width: 102px;
+        padding-right: 0;
+        padding-left: 0;
+    }
+    .layui-form-item{
+        margin-bottom: 0;
+    }
+</style>
+
+<form class="layui-form" lay-filter="sf_login_form" style="padding: 20px 30px 0 0;">
+    <div class="layui-form-item">
+        <label class="layui-form-label">app_key</label>
+        <div class="layui-input-block">
+            <input type="text" name="app_key" lay-verify="required" autocomplete="off" class="layui-input">
+        </div>
+        <div class="layui-form-mid layui-input-block layui-word-aux">申请应用时分配的app_key</div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">app_secret</label>
+        <div class="layui-input-block">                   
+            <input type="text" name="app_secret" lay-verify="required" autocomplete="off" class="layui-input" value="" >
+        </div>
+        <div class="layui-form-mid layui-input-block layui-word-aux">申请应用时分配的 app_secret</div>
+    </div>
+    <div class="layui-form-item">
+        <div class="layui-input-block">
+        <button type="button" class="layui-btn" lay-submit lay-filter="sf_login_submit"><i class="layui-icon">&#xe654;</i>保存</button>
+        <button type="button" class="layui-btn layui-btn-danger" data-type="close"><i class="layui-icon">&#x1006;</i>返回</button>
+        </div>
+    </div>
+</form>
+<script type="text/html" template lay-done="layui.data.sendParams(d.params)"></script>         
+<script>
+    layui.data.sendParams = function(params){
+    console.log(params);
+    var id=params.id;
+    layui.use(['admin','form','setter','layer'], function(){
+        var $ = layui.$
+        ,admin = layui.admin
+        ,setter = layui.setter
+        ,element = layui.element
+        ,layer = layui.layer
+        ,form = layui.form
+        ,router = layui.router();
+
+        element.render();
+        form.render(null, 'sf_login_form');
+        
+        var $ = layui.$, active = {
+            // 返回
+            close:function(index){ 
+                layer.closeAll('page');
+            }
+        };
+        
+        $('.layui-input-block .layui-btn').on('click', function(){
+            var type = $(this).data('type');
+            active[type] ? active[type].call(this) : '';
+        });
+        admin.req({
+            url: layui.setter.baseUrl+'merchant/authorise/config' //实际使用请改成服务端真实接口
+            ,data: {id:id},
+            type:'get',
+            success: function(res){
+                if(res.code===1){
+                    console.log(res);
+                    form.val('sf_login_form',{
+                        'app_secret':res.data.config.app_secret,
+                        'app_key':res.data.config.app_key,
+                    });
+                    form.render();
+                }     
+            } 
+        }); 
+
+    });
+ }
+</script>

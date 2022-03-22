@@ -1,0 +1,94 @@
+<style>
+.layui-form-label{
+    width: 102px;
+    padding-right: 0;
+    padding-left: 0;
+}
+.layui-form-item{
+    margin-bottom: 0;
+}
+</style>
+
+<form class="layui-form" action="" lay-filter="pay_zfb"  style="padding: 20px 30px 0 0;">
+
+    <div id="my_form"></div>
+    <script  id="layui_script" type="text/html">
+        {{#  layui.each(d, function(index, item){ }}
+        <div class="layui-form-item">
+            <label class="layui-form-label">{{index}}</label>
+            <div class="layui-input-block">
+                <input type="text" name="{{index}}" lay-verify="required" autocomplete="off" class="layui-input" value="">
+            </div>
+            <div class="layui-form-mid layui-input-block layui-word-aux">{{item}}</div>
+        </div>
+        {{#  }); }} 
+    </script>
+    <script type="text/html" template>
+        <input type="hidden" name="id" value="{{d.params.id}}">
+    </script>
+    
+
+<div class="layui-form-item">
+    <div class="layui-input-block">
+    <button type="button" class="layui-btn" lay-submit="" lay-filter="pay_type_submit"><i class="layui-icon">&#xe654;</i>保存信息</button>
+    <button type="button" class="layui-btn layui-btn-danger" data-type="close"><i class="layui-icon">&#x1006;</i>返回</button>
+    </div>
+</div>
+</form>
+        
+<script type="text/html" template lay-done="layui.data.sendParams(d.params)"></script>    
+<script>
+layui.data.sendParams = function(params){
+    console.log(params);
+    var id=params.id;
+    layui.use(['admin','form','layer','element','setter'], function(){
+        var $ = layui.$
+        ,setter = layui.setter
+        ,admin = layui.admin
+        ,layer = layui.layer
+        ,element = layui.element
+        ,laytpl = layui.laytpl
+        ,form = layui.form
+        ,router = layui.router();
+
+        element.render();
+        form.render(null, 'pay_zfb');
+        
+        var $ = layui.$, active = {
+            // 返回
+            close:function(index){ 
+                layer.closeAll('page');
+            }
+        };
+        
+        $('.layui-input-block .layui-btn').on('click', function(){
+            var type = $(this).data('type');
+            active[type] ? active[type].call(this) : '';
+        });
+
+        admin.req({
+            url: layui.setter.baseUrl+'admin/payment/config' //实际使用请改成服务端真实接口
+            ,data:{id:id},
+            type:'get',
+            success: function(res){
+            if(res.code==1){
+                var data_item=res.data.param;
+                var getTpl_item = layui_script.innerHTML
+                    ,view_item = document.getElementById('my_form');
+                laytpl(getTpl_item).render(data_item, function(html){
+                    view_item.innerHTML = html;
+                });
+             
+                form.val("pay_zfb",res.data.config);
+
+                form.render();
+                }else{
+                    layer.msg(res.msg, {icon: 5,anim: 6,shade:0.5,time: 1500});
+                }
+            }
+        });
+
+
+    });
+}
+</script>

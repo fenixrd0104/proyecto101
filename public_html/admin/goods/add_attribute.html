@@ -1,0 +1,166 @@
+<form class="layui-form" action="" lay-filter="add_attribute" style="padding: 20px 30px 0 0;">
+    <div class="layui-form-item">
+        <label class="layui-form-label">属性名称</label>
+        <div class="layui-input-block">
+        <script type="text/html" template>                        
+            <input type="text" name="name" lay-verify="required" autocomplete="off" class="layui-input" value="{{ d.params.name || '' }}" >
+        </script>
+        </div>
+    </div>                
+    <div class="layui-form-item">
+        <label class="layui-form-label">所属商品类型</label>
+        <div class="layui-input-block" id="sel_type">
+            <div class="layui-input-inline">
+                <select name="" id="top_cates" lay-filter="choose_top_cate" lay-verify="required">
+                    <option value="" >选择模块</option>
+                    <option value="1">VIP商品</option>
+                    <option value="2">优享商品</option>
+                    <option value="3">特惠商品</option>
+                    <option value="4">直购</option>
+                    <option value="5">高端</option>
+                </select>
+            </div>
+            <div class="layui-input-inline">
+                <select name="select_id" id="type_caidan" lay-verify="required" lay-filter="type_caidan"> </select>
+            </div>
+            <div class="layui-input-inline">
+                <select name="type_id" id="type_spec" lay-verify="required"> </select>
+            </div>
+        </div>
+    </div>                
+    <div class="layui-form-item">
+        <label class="layui-form-label">该属性值的录入方式</label>
+        <div class="layui-input-block">
+            <script template type="text/html">
+                <input type="radio" name="input_type" value="0" title="手工录入" {{ d.params.input_type=== 0 ? 'checked': 'checked' }}>
+                <input type="radio" name="input_type" value="1" title="从下面的列表中选择（一行代表一个可选值）" {{ d.params.input_type=== 1 ? 'checked': '' }}>
+                <input type="radio" name="input_type" value="2" title="多行文本框" {{ d.params.input_type=== 2 ? 'checked': '' }}>
+            </script>        
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">可选值列表</label>
+        <div class="layui-input-block"> 
+            <textarea name="values" placeholder="录入方式为手工或者多行文本时，此输入框不需填写。" class="layui-textarea" value="" lay-filter="values" id="attr_textarea"></textarea>
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <div class="layui-input-block">
+        <button type="button" class="layui-btn" lay-submit="" lay-filter="attr_submit"><i class="layui-icon">&#xe654;</i>保存</button>
+        <button type="button" class="layui-btn layui-btn-danger" data-type="close"><i class="layui-icon">&#x1006;</i>返回</button>
+        </div>
+    </div>
+</form>
+
+<script type="text/html" template lay-done="layui.data.sendParams(d.params)"></script>       
+<script>
+layui.data.sendParams = function(params){
+// console.log(params);
+layui.use(['admin','form','setter','layer'], function(){
+    var $ = layui.$
+    ,admin = layui.admin
+    ,setter = layui.setter
+    ,layer = layui.layer
+    ,element = layui.element
+    ,layer = layui.layer
+    ,form = layui.form
+    ,router = layui.router();
+
+    element.render();
+    form.render(null, 'add_attribute');
+    
+    var $ = layui.$, active = {
+        // 返回
+        close:function(index){ 
+            layer.closeAll('page');
+        }
+    };
+    
+    $('.layui-input-block .layui-btn').on('click', function(){
+        var type = $(this).data('type');
+        active[type] ? active[type].call(this) : '';
+    });
+
+    // 获取传值参数---得到type
+    var router = layui.router();
+    // console.log(router.search);
+    if( router.search.type ){
+        var chec_id = router.search.type;
+    } else{
+        var chec_id=params.type_id;
+    }
+
+    if(params.values){
+        $('#attr_textarea').val(params.values);
+    }
+    if(params.id){
+        $('#top_cates').val(params.top_cate);
+        get_caidan(params.top_cate);
+        get_sptype(params.caidan_id);
+    }
+
+    form.on('select(choose_top_cate)',function(e){
+        get_caidan(e.value);
+        $('#type_caidan').val('');
+        $('#type_spec').html('');
+        $('#type_spec').val('');   
+
+    })
+
+    function get_caidan(id){
+        admin.req({
+            url: layui.setter.baseUrl+'admin/goods/catetype' 
+            ,data: {id:id},
+            type:'get',
+            success: function(res){
+                if(res.code==1){
+                    var list="<option value=''>--全部菜单类型--</option>";
+                    for( var i in res.data){
+                        list += "<option value='"+res.data[i].id+"' >"+res.data[i].name+"</option> ";
+                    }                  
+                    $('#type_caidan').html(list);
+                    if(params.id){
+                        $('#type_caidan').val(params.caidan_id);
+                    }
+                    form.render();
+                }else{
+                    layer.msg(res.msg);
+                }       
+            } 
+        });
+    }
+
+    // 编辑
+    form.on('select(type_caidan)',function(e){
+        get_sptype(e.value);
+    });
+    function get_sptype(par) {
+    // 商品类型
+    admin.req({
+        url: layui.setter.baseUrl+'admin/goods/getTypeList' 
+        ,data: {select_id:par},
+        type:'get',
+        success: function(res){
+            if(res.code==1){
+                var list="<option value=''>--全部商品类型--</option>";
+                for( var i in res.data){
+                    list += "<option value='"+res.data[i].id+"' >"+res.data[i].name+"</option> ";
+                }     
+                $('#type_spec').html(list);   
+                if(params.id){
+                    $('#type_spec').val(params.type_id);   
+                }                 
+                form.render();
+            }else{
+                layer.msg(res.msg);
+            }       
+        } 
+    }); 
+    } 
+
+
+form.render();
+
+}); 
+}
+</script>

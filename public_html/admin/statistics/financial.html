@@ -1,0 +1,356 @@
+
+<title>财务数据</title>
+
+<div class="layui-card layadmin-header">
+    <div class="layui-breadcrumb" lay-filter="breadcrumb">
+        <a>数据统计</a>
+        <a><cite>财务数据</cite></a>
+    </div>
+</div>
+<script type="text/html" template>
+    <link rel="stylesheet" href="{{ layui.setter.base }}style/statistics.css?v={{ layui.admin.v }}-1" media="all">
+</script>
+
+<div class="layui-fluid" id="component-tabs">
+<div class="layui-row">      
+<div class="layui-card">
+<div class="layui-card-header">财务数据</div>
+<div class="layui-card-body">
+<div class="layui-tab layui-tab-brief" lay-filter="component-tabs-brief">
+    <ul class="layui-tab-title">
+        <li class="layui-this">提现统计</li>
+        <li class="layui-hide">充值统计</li>
+    </ul>
+    <div class="layui-tab-content">
+        <div class="layui-tab-item layui-show"> 
+            <blockquote class="layui-elem-quote">实时统计</blockquote>
+            <div class="layui-row" id="real_time"> 
+                <div class="layui-col-md2">
+                <div class="layui-card data_text">
+                    <p>总提现人数（人）</p>
+                    <h3 id="ztx_rs">0</h3>
+                </div>                
+                </div>
+                <div class="layui-col-md2">
+                <div class="layui-card data_text">
+                    <p>总提现笔数（笔）</p>
+                    <h3 id="ztx_bs">0</h3>
+                </div>                
+                </div>
+                <div class="layui-col-md2">
+                <div class="layui-card data_text">
+                    <p>总提现金额（元）</p>
+                    <h3 id="ztx_je">0.00</h3>
+                </div>                
+                </div>
+                <div class="layui-col-md2">
+                <div class="layui-card data_text">
+                    <p>本月提现人数（人）</p>
+                    <h3 id="bytx_rs">0</h3>
+                </div>                
+                </div>
+                <div class="layui-col-md2">
+                <div class="layui-card data_text">
+                    <p>本月提现笔数（笔）</p>
+                    <h3 id="bytx_bs">0</h3>
+                </div>                
+                </div>
+                <div class="layui-col-md2">
+                <div class="layui-card data_text">
+                    <p>本月提现金额（元）</p>
+                    <h3 id="bytx_je">0.00</h3>
+                </div>                
+                </div>
+            </div>  
+            <blockquote class="layui-elem-quote">往期统计</blockquote>
+            <div class="layui-row" id="real_time">
+                <div class="layui-col-md4">
+                <div class="layui-card data_text">
+                    <p>上月提现人数（人）</p>
+                    <h3 id="sytx_rs">0</h3>
+                    <p class="p_hui"><span>环比增幅</span>
+                    <span class="p_red">0% <i class="iconfont icon-up"></i></span></p>
+                </div>                
+                </div>
+                <div class="layui-col-md4">
+                <div class="layui-card data_text">
+                    <p>上月提现笔数（笔）</p>
+                    <h3 id="sytx_bs">0</h3>
+                    <p class="p_hui"><span>环比增幅</span>
+                    <span class="p_red">0% <i class="iconfont icon-up"></i></span></p>
+                </div>                
+                </div>
+                <div class="layui-col-md4">
+                <div class="layui-card data_text">
+                    <p>上月提现金额（元）</p>
+                    <h3 id="sytx_je">0.00</h3>
+                    <p class="p_hui"><span>环比增幅</span>
+                    <span class="p_red">0% <i class="iconfont icon-up"></i></span></p>
+                </div>                
+                </div>
+            </div>      
+            <blockquote class="layui-elem-quote">提现人数统计</blockquote>
+            <div class="layui-form layui-row layui-col-space10 laydata_div" style="margin: 10px 0 20px;">
+                <div class="layui-col-md6">
+                    <label class="layui-form-label">筛选日期：</label>
+                    <div class="layui-inline">
+                        <input type="text" name="start" class="layui-input" id="test-laydate-type-datetime-month-start-withd_people" placeholder="">
+                    </div>
+                    <label>至</label>
+                    <div class="layui-inline">
+                        <input type="text" name="end" class="layui-input" id="test-laydate-type-datetime-month-end-withd_people" placeholder="">
+                    </div>
+                    <div class="layui-inline">
+                        <button class="layui-btn layuiadmin-btn-list" lay-submit lay-filter="txrs_search">查询</button>
+                    </div>  
+                </div>               
+                <div class="layui-col-md6 order_num" id="txrs_data">
+                    <button class="layui-btn layui-btn-primary order_active" lay-type="d">日</button>
+                    <button class="layui-btn layui-btn-primary" lay-type="w">周</button>
+                    <button class="layui-btn layui-btn-primary" lay-type="m">月</button>
+                </div>
+            </div> 
+            <div class="new_payment">
+                <div class="payment_data">
+                    <span>近30天提现人数: </span><strong class="live_pink" id="txrs_strong">0</strong>
+                </div>
+                <div class="layui-carousel layadmin-carousel layadmin-dataview" data-anim="fade" lay-filter="LAY-index-heapline">
+                <div carousel-item id="LAY-index-withd_people">
+                    <div><i class="layui-icon layui-icon-loading1 layadmin-loading"></i></div>
+                </div>
+                </div>
+            </div>
+            <blockquote class="layui-elem-quote">提现笔数统计</blockquote>
+            <div class="layui-form layui-row layui-col-space10 laydata_div" style="margin: 10px 0 20px;">
+                <div class="layui-col-md6">
+                    <label class="layui-form-label">筛选日期：</label>
+                    <div class="layui-inline">
+                        <input type="text" name="start" class="layui-input" id="test-laydate-type-datetime-month-start-withd_number" placeholder="">
+                    </div>
+                    <label>至</label>
+                    <div class="layui-inline">
+                        <input type="text" name="end" class="layui-input" id="test-laydate-type-datetime-month-end-withd_number" placeholder="">
+                    </div>
+                    <div class="layui-inline">
+                        <button class="layui-btn layuiadmin-btn-list" lay-submit lay-filter="txbs_search">查询</button>
+                    </div>  
+                </div>               
+                <div class="layui-col-md6 order_num" id="txbs_data">
+                    <button class="layui-btn layui-btn-primary order_active" lay-type="d">日</button>
+                    <button class="layui-btn layui-btn-primary" lay-type="w">周</button>
+                    <button class="layui-btn layui-btn-primary" lay-type="m">月</button>
+                </div>
+            </div> 
+            <div class="new_payment">
+                <div class="payment_data">
+                    <span>近30天提现笔数: </span><strong class="live_blue" id="txbs_strong">0</strong>
+                </div>
+                <div class="layui-carousel layadmin-carousel layadmin-dataview" data-anim="fade" lay-filter="LAY-index-heapline">
+                <div carousel-item id="LAY-index-withd_number">
+                    <div><i class="layui-icon layui-icon-loading1 layadmin-loading"></i></div>
+                </div>
+                </div>
+            </div>
+            <blockquote class="layui-elem-quote">提现金额统计</blockquote>
+            <div class="layui-form layui-row layui-col-space10 laydata_div" style="margin: 10px 0 20px;">
+                <div class="layui-col-md6">
+                    <label class="layui-form-label">筛选日期：</label>
+                    <div class="layui-inline">
+                        <input type="text" name="start" class="layui-input" id="test-laydate-type-datetime-month-start-withd_money" placeholder="">
+                    </div>
+                    <label>至</label>
+                    <div class="layui-inline">
+                        <input type="text" name="end" class="layui-input" id="test-laydate-type-datetime-month-end-withd_money" placeholder="">
+                    </div>
+                    <div class="layui-inline">
+                        <button class="layui-btn layuiadmin-btn-list" lay-submit lay-filter="txje_search">查询</button>
+                    </div>  
+                </div>               
+                <div class="layui-col-md6 order_num" id="txje_data">
+                    <button class="layui-btn layui-btn-primary order_active" lay-type="d">日</button>
+                    <button class="layui-btn layui-btn-primary" lay-type="w">周</button>
+                    <button class="layui-btn layui-btn-primary" lay-type="m">月</button>
+                </div>
+            </div> 
+            <div class="new_payment">
+                <!-- <div class="payment_data">
+                    <span>近30天提现金额: </span><strong class="live_yellow" id="txje_strong">0.00</strong>
+                </div> -->
+                <div class="layui-carousel layadmin-carousel layadmin-dataview" data-anim="fade" lay-filter="LAY-index-heapline">
+                <div carousel-item id="LAY-index-withd_money">
+                    <div><i class="layui-icon layui-icon-loading1 layadmin-loading"></i></div>
+                </div>
+                </div>
+            </div>
+            <blockquote class="layui-elem-quote">提现人均金额统计</blockquote>
+            <div class="layui-form layui-row layui-col-space10 laydata_div" style="margin: 10px 0 20px;">
+                <div class="layui-col-md6">
+                    <label class="layui-form-label">筛选日期：</label>
+                    <div class="layui-inline">
+                        <input type="text" name="start" class="layui-input" id="test-laydate-type-datetime-month-start-withd_capita" placeholder="">
+                    </div>
+                    <label>至</label>
+                    <div class="layui-inline">
+                        <input type="text" name="end" class="layui-input" id="test-laydate-type-datetime-month-end-withd_capita" placeholder="">
+                    </div>
+                    <div class="layui-inline">
+                        <button class="layui-btn layuiadmin-btn-list" lay-submit lay-filter="txrj_search">查询</button>
+                    </div>  
+                </div>               
+                <div class="layui-col-md6 order_num" id="txrj_data">
+                    <button class="layui-btn layui-btn-primary order_active" lay-type="d">日</button>
+                    <button class="layui-btn layui-btn-primary" lay-type="w">周</button>
+                    <button class="layui-btn layui-btn-primary" lay-type="m">月</button>
+                </div>
+            </div> 
+            <div class="new_payment">
+                <!-- <div class="payment_data">
+                    <span>近30天提现人均金额: </span><strong class="live_purple" id="txrj_strong">0</strong>
+                </div> -->
+                <div class="layui-carousel layadmin-carousel layadmin-dataview" data-anim="fade" lay-filter="LAY-index-heapline">
+                <div carousel-item id="LAY-index-withd_capita">
+                    <div><i class="layui-icon layui-icon-loading1 layadmin-loading"></i></div>
+                </div>
+                </div>
+            </div>
+            <blockquote class="layui-elem-quote">提现方式饼状图</blockquote>
+            <div class="layui-carousel layadmin-carousel layadmin-dataview" data-anim="fade" lay-filter="LAY-index-heapline">
+            <div carousel-item id="LAY-index-withd_type">
+                <div><i class="layui-icon layui-icon-loading1 layadmin-loading"></i></div>
+            </div>
+            </div>
+            
+            
+        </div>
+        <div class="layui-tab-item layui-hide">
+            <blockquote class="layui-elem-quote">实时统计</blockquote>
+            <div class="layui-row" id="real_time">
+                <div class="layui-col-md6">
+                <div class="layui-card data_text">
+                    <p>总充值笔数（笔）</p>
+                    <h3>5</h3>
+                </div>                
+                </div>
+                <div class="layui-col-md6">
+                <div class="layui-card data_text">
+                    <p>总充值金额（元）</p>
+                    <h3>1122.5</h3>
+                </div>                
+                </div>
+            </div>  
+            <blockquote class="layui-elem-quote">充值笔数统计</blockquote>
+            <div class="layui-row layui-col-space10" style="margin: 10px 0 20px;">
+                <div class="layui-col-md6">
+                    <label class="layui-form-label">筛选日期：</label>
+                    <div class="layui-inline">
+                        <input type="text" name="startTime" class="layui-input" id="test-laydate-type-datetime-month-start-topup_number" placeholder="">
+                    </div>
+                    <label>至</label>
+                    <div class="layui-inline">
+                        <input type="text" name="endTime" class="layui-input" id="test-laydate-type-datetime-month-end-topup_number" placeholder="">
+                    </div>
+                    <div class="layui-inline">
+                        <button class="layui-btn layuiadmin-btn-list" lay-submit lay-filter="LAY-user-back-search">查询</button>
+                    </div>  
+                </div>               
+                <div class="layui-col-md6 order_num" id="refund_num">
+                    <button class="layui-btn layui-btn-primary order_active" lay-submit lay-filter="layui_day">日</button>
+                    <button class="layui-btn layui-btn-primary" lay-submit lay-filter="layui_weeks">周</button>
+                    <button class="layui-btn layui-btn-primary" lay-submit lay-filter="layui_month">月</button>
+                </div>
+            </div> 
+            <div class="new_payment">
+                <div class="payment_data">
+                    <span>近30天充值笔数: </span><strong class="live_blue">0</strong>
+                </div>
+                <div class="layui-carousel layadmin-carousel layadmin-dataview" data-anim="fade" lay-filter="LAY-index-heapline">
+                <div carousel-item id="LAY-index-topup_number">
+                    <div><i class="layui-icon layui-icon-loading1 layadmin-loading"></i></div>
+                </div>
+                </div>
+            </div>
+            <blockquote class="layui-elem-quote">充值金额统计</blockquote>
+            <div class="layui-row layui-col-space10" style="margin: 10px 0 20px;">
+                <div class="layui-col-md6">
+                    <label class="layui-form-label">筛选日期：</label>
+                    <div class="layui-inline">
+                        <input type="text" name="startTime" class="layui-input" id="test-laydate-type-datetime-month-start-topup_money" placeholder="">
+                    </div>
+                    <label>至</label>
+                    <div class="layui-inline">
+                        <input type="text" name="endTime" class="layui-input" id="test-laydate-type-datetime-month-end-topup_money" placeholder="">
+                    </div>
+                    <div class="layui-inline">
+                        <button class="layui-btn layuiadmin-btn-list" lay-submit lay-filter="LAY-user-back-search">查询</button>
+                    </div>  
+                </div>               
+                <div class="layui-col-md6 order_num" id="refund_num">
+                    <button class="layui-btn layui-btn-primary order_active" lay-submit lay-filter="layui_day">日</button>
+                    <button class="layui-btn layui-btn-primary" lay-submit lay-filter="layui_weeks">周</button>
+                    <button class="layui-btn layui-btn-primary" lay-submit lay-filter="layui_month">月</button>
+                </div>
+            </div> 
+            <div class="new_payment">
+                <div class="payment_data">
+                    <span>近30天充值金额: </span><strong class="live_yellow">0</strong>
+                </div>
+                <div class="layui-carousel layadmin-carousel layadmin-dataview" data-anim="fade" lay-filter="LAY-index-heapline">
+                <div carousel-item id="LAY-index-topup_money">
+                    <div><i class="layui-icon layui-icon-loading1 layadmin-loading"></i></div>
+                </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</div>
+</div>  
+</div>
+</div>
+
+<script>
+layui.use('financial_echarts', layui.factory('financial_echarts')).
+     use('statistics_laydate', layui.factory('statistics_laydate')).
+     use(['admin','laydate','table','form','element','laytpl'], function(){
+
+    var $ = layui.$
+    ,admin = layui.admin
+    ,laydate = layui.laydate
+    ,table = layui.table
+    ,form = layui.form
+    ,laytpl = layui.laytpl
+    ,element = layui.element
+    ,router = layui.router();  
+  
+
+    // 日-周-月
+    $('.order_num').find('.layui-btn').click(function(){
+        $(this).addClass("order_active").siblings().removeClass("order_active");
+    })
+   
+    // 统计
+    admin.req({
+        url: layui.setter.baseUrl + 'admin/StatisticsFinancial/tixian' 
+        ,data: { }
+        ,type: 'get'
+        ,success: function (res) {
+            if (res.code == 1) {
+                $('#ztx_rs').html( res.data.zong_tixian_renshu );
+                $('#ztx_bs').html( res.data.zong_bishu );
+                $('#ztx_je').html( res.data.zong_jine.toFixed(2) );
+                $('#bytx_rs').html( res.data.benyue_tixianrenshu );
+                $('#bytx_bs').html( res.data.benyue_tixianbishu );
+                $('#bytx_je').html( res.data.benyue_tixianjine.toFixed(2) );
+
+                $('#sytx_rs').html( res.data.shangyue_tixianrenshu );
+                $('#sytx_bs').html( res.data.shangyue_tixianbishu );
+                $('#sytx_je').html( res.data.shangyue_tixianjine.toFixed(2) );
+               
+            } else {
+                layer.msg(res.msg);
+            }
+        }
+    });
+
+});
+</script>

@@ -1,0 +1,39 @@
+<title>供应商对账</title>
+
+<div class="layui-card layadmin-header">
+    <div class="layui-breadcrumb" lay-filter="breadcrumb">
+        <a>采购管理</a>
+        <a><cite>供应商对账</cite></a>
+    </div>
+</div>
+
+<div class="layui-row">
+<div class="layui-form layui-fluid" style="padding: 0;" lay-filter="reconcil_detail">
+    <div class="layui-form-item">
+        <label class="layui-form-label">备注</label>
+        <div class="layui-input-block">
+            <input type="text" name="remark" placeholder="请输入备注" id="LAY-name" class="layui-input" >
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <div class="layui-input-block">
+        <button type="button" class="layui-btn" lay-submit lay-filter="component-form-element"><i class="layui-icon">&#xe654;</i>提交</button>
+    </div>
+</div>
+</div>
+<script>
+layui.use(['admin','table','form','view','layer'], function(){
+    var $ = layui.$
+    ,admin = layui.admin
+    ,view = layui.view
+    ,setter = layui.setter
+    ,table = layui.table
+    ,layer = layui.layer
+    ,myprint = layui.myprint
+    ,form = layui.form;
+
+    form.render(null, 'reconcil_detail');
+
+    
+});
+</script>

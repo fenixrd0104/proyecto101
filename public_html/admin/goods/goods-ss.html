@@ -1,0 +1,487 @@
+<title>商品列表</title>
+<div class="layui-card layadmin-header">
+    <div class="layui-breadcrumb" lay-filter="breadcrumb">
+        <a>商品管理</a>
+        <a><cite>商品列表</cite></a>
+    </div>
+</div>
+
+<script type="text/html" template>
+    <link rel="stylesheet" href="{{ layui.setter.base }}style/goods.css?v={{ layui.admin.v }}-1" media="all">
+</script>
+<style>
+  .layui-form .layui-inline{
+    width:120px;
+    margin-right: 10px!important;
+  }
+  .layui-form .layui-input-inline{
+    width:120px;
+  }
+  .layui-form-checkbox[lay-skin=primary] span{
+    padding-right: 0;
+    border-radius:100%;
+  }
+  .layui-form-checkbox[lay-skin=primary] i{
+    border-radius:100%;
+  }
+</style>
+
+<div class="layui-fluid">
+<div class="layui-row">
+<div class="layui-col-md12">
+<div class="layui-card">
+    <div class="layui-card-header">商品列表</div>
+    <div class="layui-card-body">
+        <form class="layui-form  layuiadmin-card-header-auto goods_list_search" lay-filter="goods_list_search">
+        <div class="layui-form-item" style="margin-bottom: 20px;">
+            <div class="layui-inline">
+                <div class="layui-input-inline">
+                <select name="cat_id" id="cat_id"> </select>
+                </div>
+            </div>
+            <div class="layui-inline">
+                <div class="layui-input-inline">
+                <select name="brand_id" id="brand_id"> </select>
+                </div>
+            </div>
+            <div class="layui-inline">
+                <div class="layui-input-inline">
+                <select name="is_on_sale" id="is_on_sales">
+                    <option value="">全部</option>
+                    <option value="1">上架</option>
+                    <option value="0">下架</option>
+                </select>
+                </div>
+            </div>
+            <div class="layui-inline">
+                <div class="layui-input-inline">
+                <select name="recom_type" id="recom_type">
+                    <option value="">全部</option>
+                    <option value="is_new">新品</option>
+                    <option value="is_hot">热卖</option>
+                    <option value="is_recommend">推荐</option>
+                </select>
+                </div>
+            </div>
+            <div class="layui-inline">
+                <div class="layui-input-inline">
+                <input type="text" name="keywords" placeholder="请输入" autocomplete="off" class="layui-input">
+                </div>
+            </div>
+            <div class="layui-inline">
+                <button class="layui-btn layuiadmin-btn-list" lay-submit lay-filter="goods_search" type="button">
+                <i class="layui-icon layui-icon-search layuiadmin-button-btn"></i>
+                </button>
+            </div>
+        </div>
+        </form>
+
+        <table class="layui-hide" id="goods_list" lay-filter="goods_list"></table>
+        <script type="text/html" id="test-table-goods_list_add">
+        <div class="layui-btn-container">
+            <a onclick="add_goods_info();" class="layui-btn"><i class="layui-icon layui-icon-add-1"></i>添加商品</a>
+            <!-- <a lay-href="/goods/add_goods" class="layui-btn"><i class="layui-icon layui-icon-add-1"></i>添加商品</a> -->
+        </div>
+        </script>
+        <script type="text/html" id="goods_add_toolbar">
+        <!-- <a class="layui-btn layui-btn-xs layui-btn-normal" lay-event="look">预览</a> -->
+        <a class="layui-btn layui-btn-xs layui-btn-normal" lay-event="code">条码</a>
+        <button type="button" class="layui-btn layui-btn-xs" lay-event="detail">库存详情</button>
+        <a class="layui-btn layui-btn-xs" lay-event="edit">编辑</a>
+        <!-- <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del">删除</a> -->
+        </script>
+        <!-- 推荐 -->
+        <script type="text/html" id="is_recommend">
+        <input type="checkbox" name="" lay-skin="primary" value="{{d.id}}" title="是" class="layui-input" {{d.is_recommend===1?'checked':''}} lay-filter="is_recommend">
+        </script>
+        <!-- 新品 -->
+        <script type="text/html" id="is_new">
+        <input type="checkbox" name="" lay-skin="primary" value="{{d.id}}" title="是" class="layui-input" {{d.is_new===1?'checked':''}} lay-filter="is_new">
+        </script>
+        <!-- 热卖 -->
+        <script type="text/html" id="is_hot">
+        <input type="checkbox" name="" lay-skin="primary" value="{{d.id}}" title="是" class="layui-input" {{d.is_hot===1?'checked':''}} lay-filter="is_hot">
+        </script>
+        <!-- 上/下架 -->
+        <script type="text/html" id="is_on_sale">
+        <input type="checkbox" name="" value="{{d.id}}" title="上架" class="layui-input" {{d.is_on_sale===1?'checked':''}} lay-filter="is_on_sale">
+        </script>
+        <!--  状态 -->
+        <script type="text/html" id="status">
+        <input type="checkbox" name="" value="{{d.id}}" title="开启" class="layui-input" {{d.status===1?'checked':''}} lay-filter="status">
+        </script>
+    </div>
+</div>
+</div>
+</div>
+</div>
+
+
+<script>
+layui.use('JsBarcode.all.min', layui.factory('JsBarcode.all.min'))
+    .use('JsBarcode.code128.min', layui.factory('JsBarcode.code128.min'))
+    .use(['admin','table','setter','layer','ourJs','laytpl'], function(){
+    var $ = layui.$
+    ,admin = layui.admin
+    ,setter = layui.setter
+    ,view = layui.view
+    ,layer = layui.layer
+    ,table = layui.table
+    ,ourJs = layui.ourJs
+    ,laytpl = layui.laytpl
+    ,form = layui.form;
+      
+
+    // 添加商品
+    window.add_goods_info=function(){
+        admin.popup({
+        title: "添加商品",
+        area: admin.screen() < 2 ? ['95%', '90%'] :["800px", "650px"],
+        id: "LAY-popup-add_goods_list",
+        success: function(layero, index){
+            view(this.id).render('/goods/add_goods-ss').done(function() {
+                form.render(null, 'add_goods_1'); // 弹窗的lay-filter值
+            //监听提交
+            form.on('submit(submit_add_goods_1)', function(datas){
+                console.log(datas);
+                return
+                admin.req({
+                    url: layui.setter.baseUrl+'admin/goods/addGoods' //实际使用请改成服务端真实接口
+                    ,data: datas.field,
+                    type:'post',
+                    success: function(res){
+                    if(res.code==1){
+                        layer.msg(res.msg , {icon: 1,time: 1500} , function(){
+                            setTimeout(function(){
+                            layer.close(index); //执行关闭 
+                            layui.table.reload('goods_list'); //重载表格
+                            },1500);
+                            
+                        });
+                    }else{
+                        layer.msg(res.msg, {icon: 5,anim: 6,shade:0.5,time: 1500});
+                    }
+                    }
+                }); 
+
+            });
+            
+            });
+        }
+        });
+    }
+
+
+    // 监听工具条 
+    table.on('tool(goods_list)',function(e){
+      var id=e.data.id;
+      var data=e.data;      
+      if(e.event==='edit'){
+        admin.popup({
+          title: "编辑商品",
+          area: admin.screen() < 2 ? ['95%', '90%'] :["800px", "650px"],
+          id: "LAY-popup-edit_goods_list",
+          success: function(layero, index){
+            view(this.id).render('/goods/edit_goods-ss',data).done(function() {
+                form.render(null, 'edit_goods_1'); // 弹窗的lay-filter值
+               //监听提交
+               form.on('submit(submit_edit_goods_1)', function(datas){
+                datas.field.id=id
+                admin.req({
+                    url: layui.setter.baseUrl+'admin/goods/editGoods' //实际使用请改成服务端真实接口
+                    ,data: datas.field,
+                    type:'post',
+                    success: function(res){
+                      if(res.code==1){
+                          layer.msg(res.msg , {icon: 1,time: 1500} , function(){
+                            setTimeout(function(){
+                              layer.close(index); //执行关闭 
+                              layui.table.reload('goods_list'); //重载表格
+                            },1500);
+                            
+                          });
+                      }else{
+                        layer.msg(res.msg, {icon: 5,anim: 6,shade:0.5,time: 1500});
+                      }
+                    }
+                }); 
+
+              });
+              
+            });
+          }
+        });
+      } else if(e.event==='code'){
+        admin.popup({
+            title: "查看条码",
+            area: admin.screen() < 2 ? ['95%', '90%'] :["800px", "700px"],
+            id: "LAY-popup-edit_goods_list",
+            success: function(layero, index){
+                view(this.id).render('/goods/goods_barcode',id).done(function() {
+                    form.render(null, 'goods_barcode'); // 弹窗的lay-filter值
+                
+                });
+            }
+        });
+      } else if(e.event==='detail'){
+        admin.popup({
+            title: "库存详情",
+            area: admin.screen() < 2 ? ['95%', '90%'] :["700px", "600px"],
+            id: "LAY-popup-edit_goods_list",
+            success: function(layero, index){
+                view(this.id).render('/goods/inventory',id).done(function() {
+                
+                });
+            }
+        });
+      } else{
+        layer.confirm('确认删该商品吗?', {icon: 3, title:'提示'}, function(index){
+          admin.req({
+            url: layui.setter.baseUrl+'admin/goods/delGoods' //实际使用请改成服务端真实接口
+            ,data: {id:id},
+            type:'get',
+            success: function(res){
+              if(res.code==1){ 
+                  e.del();
+                  layer.close(index);                                 
+              }else{
+                layer.msg(res.msg, {icon: 5,anim: 6,shade:0.5,time: 1500});
+              }
+            }
+          });  
+        });
+      }
+
+    });
+
+
+    // 监听排序
+    table.on('edit(goods_list)',function(e){
+      admin.req({
+          url: layui.setter.baseUrl+'admin/goods/changeInfo' //实际使用请改成服务端真实接口
+          ,data:{
+            id:e.data.id,
+            attr:'order',
+            val:e.value
+          },
+          type:'post',
+          success: function(res){
+            if(res.code==1){
+                // layer.msg(res.msg , {icon: 1,shade:0.3,time: 1500});
+            }else{
+              layer.msg(res.msg, {icon: 5,anim: 6,shade:0.5,time: 1500});
+            }
+          }
+      }); 
+    });
+
+    // 监听推荐修改
+    form.on('checkbox(is_recommend)',function(e){
+      var id=e.value;
+      if(e.elem.checked==true){
+        var is_recommend=1;
+      }else{
+        var is_recommend=0;
+      }
+      admin.req({
+          url: layui.setter.baseUrl+'admin/goods/changeInfo' //实际使用请改成服务端真实接口
+          ,data: {
+            id:id,
+            attr:'is_recommend',
+            val:is_recommend
+          },
+          type:'post',
+          success: function(res){
+            if(res.code==1){
+                // layer.msg(res.msg , {icon: 1,shade:0.3,time: 1500});
+            }else{
+              layer.msg(res.msg, {icon: 5,anim: 6,shade:0.5,time: 1500});
+            }
+          }
+      }); 
+
+    });
+
+    // 监听新品修改
+    form.on('checkbox(is_new)',function(e){
+      var id=e.value;
+      if(e.elem.checked==true){
+        var is_new=1;
+      }else{
+        var is_new=0;
+      }
+      admin.req({
+          url: layui.setter.baseUrl+'admin/goods/changeInfo' //实际使用请改成服务端真实接口
+          ,data: {
+            id:id,
+            attr:'is_new',
+            val:is_new
+          },
+          type:'post',
+          success: function(res){
+            if(res.code==1){
+                // layer.msg(res.msg , {icon: 1,shade:0.3,time: 1500});
+            }else{
+              layer.msg(res.msg, {icon: 5,anim: 6,shade:0.5,time: 1500});
+            }
+          }
+      }); 
+
+    });
+
+    // 监听热卖修改
+    form.on('checkbox(is_hot)',function(e){
+      var id=e.value;
+      if(e.elem.checked==true){
+        var is_hot=1;
+      }else{
+        var is_hot=0;
+      }
+      admin.req({
+          url: layui.setter.baseUrl+'admin/goods/changeInfo' //实际使用请改成服务端真实接口
+          ,data: {
+            id:id,
+            attr:'is_hot',
+            val:is_hot
+          },
+          type:'post',
+          success: function(res){
+            if(res.code==1){
+                // layer.msg(res.msg , {icon: 1,shade:0.3,time: 1500});
+            }else{
+              layer.msg(res.msg, {icon: 5,anim: 6,shade:0.5,time: 1500});
+            }
+          }
+      }); 
+
+    });
+    // 监听上下架修改
+    form.on('checkbox(is_on_sale)',function(e){
+      var id=e.value;
+      if(e.elem.checked==true){
+        var is_on_sale=1;
+      }else{
+        var is_on_sale=0;
+      }
+      admin.req({
+          url: layui.setter.baseUrl+'admin/goods/changeInfo' //实际使用请改成服务端真实接口
+          ,data: {
+            id:id,
+            attr:'is_on_sale',
+            val:is_on_sale
+          },
+          type:'post',
+          success: function(res){
+            if(res.code==1){
+                // layer.msg(res.msg , {icon: 1,shade:0.3,time: 1500});
+            }else{
+              layer.msg(res.msg, {icon: 5,anim: 6,shade:0.5,time: 1500});
+            }
+          }
+      }); 
+
+    });
+    // 监听状态修改
+    form.on('checkbox(status)',function(e){
+      var id=e.value;
+      if(e.elem.checked==true){
+        var status=1;
+      }else{
+        var status=0;
+      }
+      admin.req({
+          url: layui.setter.baseUrl+'admin/goods/changeInfo' //实际使用请改成服务端真实接口
+          ,data: {
+            id:id,
+            attr:'status',
+            val:status
+          },
+          type:'post',
+          success: function(res){
+            if(res.code==1){
+                // layer.msg(res.msg , {icon: 1,shade:0.3,time: 1500});
+            }else{
+              layer.msg(res.msg, {icon: 5,anim: 6,shade:0.5,time: 1500});
+            }
+          }
+      }); 
+
+    });
+
+    var cate_list=''
+
+    // 搜索
+
+
+  // 搜索按钮
+    form.on('submit(goods_search)',function(e){
+      console.log(e.field);
+      get_data(e.field);
+    });
+
+    get_data(0);
+    function get_data(d){
+      if(d!=0){
+        var type='cat_id='+d.cat_id+"&brand_id="+d.brand_id+"&is_on_sale="+d.is_on_sale+"&recom_type="+d.recom_type+'&keywords='+d.keywords;
+      }else{
+        var type='';
+      }
+      table.render({
+        elem: '#goods_list'
+        ,url: layui.setter.baseUrl+'admin/goods/index?'+type
+        ,toolbar: '#test-table-goods_list_add'
+        ,cellMinWidth: 80 //全局定义常规单元格的最小宽度，layui 2.2.1 新增
+        ,parseData: function(res){ //res 即为原始返回的数据
+            if(d==0){
+                var list1="<option value=''>所有分类</option>";
+                var list2="<option value=''>所有品牌</option>";
+
+                for(var i in res.data.categoryList){
+                  list1+="<option value='"+res.data.categoryList[i].id+"' >"+res.data.categoryList[i].name+"</option>";
+                }
+                for(var i in res.data.brandList){
+                  list2+="<option value='"+res.data.brandList[i].id+"' >"+res.data.brandList[i].name+"</option>";
+                }
+
+                $('#cat_id').html(list1);
+                $('#brand_id').html(list2);
+                cate_list=res.data.categoryList;
+                form.render();
+            }
+           
+            return {
+            "code": res.code, //解析接口状态
+            "msg": res.msg, //解析提示文本
+            "count": res.data.count, //解析数据长度
+            "data": res.data.lists //解析数据列表
+            };
+        }
+        ,cols: [[
+        {field:'id', width:80, title: 'ID', sort: true,align:'center'}
+          ,{field:'goods_name', title: '商品名称',align:'center'}
+          ,{field:'goods_sn', width:150, title: '货号', sort: true,align:'center'}
+          ,{field:'cat_id', width:200, title: '分类',align:'center',templet:function(d){
+            for(var i in  cate_list){
+              if(cate_list[i].id==d.cat_id){
+                var this_cate=cate_list[i].name;
+              }
+            }
+            return this_cate;
+          }}
+          ,{field:'shop_price', title: '价格', width: 80,align:'center'} //minWidth：局部定义当前单元格的最小宽度，layui 2.2.1 新增
+          ,{field:'is_recommend', title: '推荐', width: 60,align:'center',templet:'#is_recommend'}
+          ,{field:'is_new', title: '新品', width: 60,align:'center',templet:'#is_new'}
+          ,{field:'is_hot', title: '热卖', width: 60,align:'center',templet:'#is_hot'}
+          ,{field:'is_on_sale', width:137, title: '上/下架',align:'center',templet:'#is_on_sale'}
+          ,{field:'status', width:137, title: '状态',align:'center',templet:'#status'}
+          ,{field:'store_count', width:80, title: '库存',align:'center'}
+          ,{field:'sort', width:80, title: '排序',edit: 'text',align:'center'}
+          ,{fixed: 'right', title:'操作', toolbar: '#goods_add_toolbar', width:200,align:'center'}
+        ]],
+        page:true
+    });
+    }
+
+
+});
+</script>

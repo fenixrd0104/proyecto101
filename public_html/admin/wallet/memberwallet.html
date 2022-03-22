@@ -1,0 +1,116 @@
+<title>资产信息</title>
+
+<div class="layui-card layadmin-header">
+    <div class="layui-breadcrumb" lay-filter="breadcrumb">
+        <a>财务管理</a>
+        <a><cite>资产信息</cite></a>
+    </div>
+</div>
+
+<div class="layui-fluid">
+<div class="layui-row layui-col-space15">
+<div class="layui-col-md12">
+<div class="layui-card">
+    <div class="layui-card-header">资产信息</div>
+    <div class="layui-card-body">
+        <form class="layui-form" style="margin-bottom: 20px;">
+
+            <div class="layui-inline">
+                <input class="layui-input" name="min_money" placeholder="区间内最小余额" id="test-table-demoReload" autocomplete="off">
+            </div>
+            <div class="layui-inline">
+                <input class="layui-input" name="max_money" placeholder="区间内最大余额" id="test-table-demoReload" autocomplete="off">
+            </div>
+            <div class="layui-inline" style="width: 200px;">
+                <input class="layui-input" name="keywords" placeholder="搜索会员账号/姓名/手机号" id="test-table-demoReload" autocomplete="off">
+            </div>
+            <div class="layui-inline" >
+                <input type="text" class="layui-input" id="test-laydate-type-datetime-start" name="starttime" placeholder="开始时间">
+            </div>
+            <div class="layui-inline" >
+                <input type="text" class="layui-input" name="endtime" id="test-laydate-type-datetime-end" placeholder="结束时间">
+            </div>
+            <div class="layui-inline">
+                <button class="layui-btn" type="button" lay-submit lay-filter="usdt_log_search"><i class="layui-icon">&#xe615;</i>搜索</button>
+            </div>
+        </form>
+
+        <table class="layui-hide" id="usdt_log" lay-filter="usdt_log"></table>
+        <script id="tool_usdt_log" type='text/html' templet>
+            <!-- 余额总增加数量：<span id="z_usdt" style="font-weight:800;color:orangered;"></span>
+            余额总扣除数量：<span id="z_usdts" style="font-weight:800;color:orangered;"></span> -->
+        </script>
+
+    </div>
+</div>
+</div>
+</div>
+</div>
+
+<script>
+    layui.use(['admin', 'table', 'view', 'form', 'layer', 'laydate'], function () {
+        var $ = layui.$
+            , admin = layui.admin
+            , element = layui.element
+            , form = layui.form
+            , view = layui.view
+            , laydate = layui.laydate
+            , layer = layui.layer
+            , table = layui.table;
+        //日期时间选择器
+        laydate.render({
+            elem: '#test-laydate-type-datetime-start'
+            , type: 'datetime'
+        });
+        laydate.render({
+            elem: '#test-laydate-type-datetime-end'
+            , type: 'datetime'
+        });
+        form.render();
+
+
+        form.on('submit(usdt_log_search)', function (datas) {
+            get_data(datas.field);
+        });
+
+
+        var keywords = "";
+        var act = "";
+        var n = 1;
+        var cid_list = "<option value=''>--选择币种--</option>";
+        get_data({ keywords: '' });
+        function get_data(param) {
+            table.render({
+                elem: '#usdt_log'
+                , url: layui.setter.baseUrl + 'admin/Member_Wallet/index'
+                , toolbar: '#tool_usdt_log'
+                , parseData: function (res) { //res 即为原始返回的数据
+                    return {
+                        "code": res.code, //解析接口状态
+                        "msg": res.msg, //解析提示文本
+                        "count": res.data.count, //解析数据长度
+                        "data": res.data.list //解析数据列表
+                    };
+                }
+                , cols: [[
+                    { field: 'id', width: 85, title: '序号', sort: true, align: 'center' }
+                    , { field: 'name', title: '币种', align: 'center' }
+
+                    , { field: 'account', title: '会员账号', align: 'center' }
+                    , { field: 'mobile', title: '手机号码', align: 'center' }
+                    // , { field: 'name', title: '真实姓名', align: 'center' }
+                    , { field: 'balance', title: '余额', align: 'center' }
+                    , { field: 'lock_balance', title: '冻结余额', align: 'center' }
+                    , { field: 'cz_address', title: '钱包地址', align: 'center',templet:'<div>{{d.cz_address?d.cz_address:"无"}}</div>' }
+                    , { field: 'create_time', title: '注册时间', align: 'center' }
+                    , { field: 'update_time', title: '创建时间', align: 'center' }
+                ]],
+                page: true,
+                where: param
+            });
+        }
+
+
+
+    });
+</script>
